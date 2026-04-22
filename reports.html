@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Reports · nexus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="top-strip"></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand-tile">N</div>
+      <nav class="nav">
+        <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+        <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="reports.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
+        <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
+        <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
+      </nav>
+      <div class="avatar">K</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1>Reports</h1>
+        <div class="page-header__right">
+          <select class="select"><option>Last 7 days</option><option>Last 30 days</option><option>Custom…</option></select>
+          <select class="select"><option>All domains</option><option>offers.acme.com</option><option>refer.acme.com</option></select>
+          <select class="select" id="lander-filter">
+            <option value="">All landers</option>
+            <option>Summer Sale</option>
+            <option>Referral Q2</option>
+            <option>Founder Letter</option>
+            <option>Partner Announce</option>
+            <option>Black Friday</option>
+          </select>
+          <button class="btn">↓ Export CSV</button>
+        </div>
+      </div>
+
+      <!-- Filter banner — shown when Analyse navigated here with ?lander=... -->
+      <div class="filter-note" id="filter-note">
+        <span><strong id="filter-note-name"></strong> is filtered in — other landers are hidden.</span>
+        <button type="button" id="filter-note-clear">Clear filter</button>
+      </div>
+
+      <div class="reports-layout">
+        <div class="card">
+          <div class="table-scroll" role="region" aria-label="Reports data">
+          <table class="table reports-table">
+            <thead>
+              <tr>
+                <th style="width:28px"></th>
+                <th>Variant / Lander</th>
+                <th class="right">Impressions ↓</th>
+                <th class="right">Clicks</th>
+                <th class="right">CTR</th>
+                <th class="right">Conversions</th>
+                <th class="right">CVR</th>
+                <th class="right">Score</th>
+                <th class="right reports-col-view" aria-label="View variant"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Partner Announce — expanded; drawer opens only via eye icon -->
+              <tr class="reports-data-row" data-report-row data-lander="Partner Announce" data-variant="V1 — Press" data-domain="try.acme.com">
+                <td><button type="button" class="lander-toggle" aria-expanded="true" aria-controls="pa-days"><span class="chev">▸</span></button></td>
+                <td>
+                  <div class="lander-cell"><div class="lander-name"><strong>Press</strong><small>Partner Announce · try.acme.com</small></div></div>
+                </td>
+                <td class="right num">2,285</td>
+                <td class="right num">868</td>
+                <td class="right num">38.0%</td>
+                <td class="right num">329</td>
+                <td class="right num">37.9%</td>
+                <td class="right num"><strong>0.144</strong></td>
+                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
+              </tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 21, 2026</td><td class="right num">482</td><td class="right num">183</td><td class="right num">38.0%</td><td class="right num">70</td><td class="right num">38.3%</td><td class="right num">0.145</td><td></td></tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 20, 2026</td><td class="right num">424</td><td class="right num">161</td><td class="right num">38.0%</td><td class="right num">61</td><td class="right num">37.9%</td><td class="right num">0.144</td><td></td></tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 19, 2026</td><td class="right num">381</td><td class="right num">145</td><td class="right num">38.1%</td><td class="right num">55</td><td class="right num">37.9%</td><td class="right num">0.144</td><td></td></tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 18, 2026</td><td class="right num">328</td><td class="right num">124</td><td class="right num">37.8%</td><td class="right num">47</td><td class="right num">37.9%</td><td class="right num">0.143</td><td></td></tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 17, 2026</td><td class="right num">265</td><td class="right num">101</td><td class="right num">38.1%</td><td class="right num">38</td><td class="right num">37.6%</td><td class="right num">0.143</td><td></td></tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 16, 2026</td><td class="right num">222</td><td class="right num">84</td><td class="right num">37.8%</td><td class="right num">32</td><td class="right num">38.1%</td><td class="right num">0.144</td><td></td></tr>
+              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 15, 2026</td><td class="right num">183</td><td class="right num">70</td><td class="right num">38.3%</td><td class="right num">26</td><td class="right num">37.1%</td><td class="right num">0.142</td><td></td></tr>
+
+              <tr class="reports-data-row" data-report-row data-lander="Black Friday" data-variant="V1 — Orange bold" data-domain="offers.acme.com">
+                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="bf-days"><span class="chev">▸</span></button></td>
+                <td><div class="lander-cell"><div class="lander-name"><strong>Orange bold</strong><small>Black Friday · offers.acme.com</small></div></div></td>
+                <td class="right num">5,786</td><td class="right num">1,042</td><td class="right num">18.0%</td><td class="right num">185</td><td class="right num">17.8%</td><td class="right num"><strong>0.032</strong></td>
+                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
+              </tr>
+              <tr class="day-row" data-parent="bf-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="day-row" data-parent="bf-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">1,240</td><td class="right num">223</td><td class="right num">18.0%</td><td class="right num">40</td><td class="right num">17.9%</td><td class="right num">0.032</td><td></td></tr>
+              <tr class="day-row" data-parent="bf-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">1,102</td><td class="right num">198</td><td class="right num">18.0%</td><td class="right num">35</td><td class="right num">17.7%</td><td class="right num">0.032</td><td></td></tr>
+
+              <tr class="reports-data-row" data-report-row data-lander="Founder Letter" data-variant="V1 — Long form" data-domain="offers.acme.com">
+                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="fl-days"><span class="chev">▸</span></button></td>
+                <td><div class="lander-cell"><div class="lander-name"><strong>Long form</strong><small>Founder Letter · offers.acme.com</small></div></div></td>
+                <td class="right num">14,668</td><td class="right num">6,601</td><td class="right num">45.0%</td><td class="right num">2,376</td><td class="right num">36.0%</td><td class="right num"><strong>0.162</strong></td>
+                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
+              </tr>
+              <tr class="day-row" data-parent="fl-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="day-row" data-parent="fl-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">3,120</td><td class="right num">1,404</td><td class="right num">45.0%</td><td class="right num">505</td><td class="right num">36.0%</td><td class="right num">0.162</td><td></td></tr>
+              <tr class="day-row" data-parent="fl-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">2,890</td><td class="right num">1,300</td><td class="right num">45.0%</td><td class="right num">468</td><td class="right num">36.0%</td><td class="right num">0.162</td><td></td></tr>
+
+              <tr class="reports-data-row" data-report-row data-lander="Referral Q2" data-variant="V1 — Single-field" data-domain="refer.acme.com">
+                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="rq-days"><span class="chev">▸</span></button></td>
+                <td><div class="lander-cell"><div class="lander-name"><strong>Single-field</strong><small>Referral Q2 · refer.acme.com</small></div></div></td>
+                <td class="right num">16,951</td><td class="right num">8,608</td><td class="right num">50.8%</td><td class="right num">4,657</td><td class="right num">54.1%</td><td class="right num"><strong>0.275</strong></td>
+                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
+              </tr>
+              <tr class="day-row" data-parent="rq-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="day-row" data-parent="rq-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">3,610</td><td class="right num">1,834</td><td class="right num">50.8%</td><td class="right num">992</td><td class="right num">54.1%</td><td class="right num">0.275</td><td></td></tr>
+              <tr class="day-row" data-parent="rq-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">3,401</td><td class="right num">1,728</td><td class="right num">50.8%</td><td class="right num">935</td><td class="right num">54.1%</td><td class="right num">0.275</td><td></td></tr>
+
+              <tr class="reports-data-row" data-report-row data-lander="Summer Sale" data-variant="V1 — Main hero" data-domain="offers.acme.com">
+                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="ss-days"><span class="chev">▸</span></button></td>
+                <td><div class="lander-cell"><div class="lander-name"><strong>Main hero</strong><small>Summer Sale · offers.acme.com</small></div></div></td>
+                <td class="right num">112,613</td><td class="right num">75,899</td><td class="right num">67.4%</td><td class="right num">52,164</td><td class="right num">68.7%</td><td class="right num"><strong>0.463</strong></td>
+                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
+              </tr>
+              <tr class="day-row" data-parent="ss-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr class="day-row" data-parent="ss-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">24,100</td><td class="right num">16,243</td><td class="right num">67.4%</td><td class="right num">11,170</td><td class="right num">68.7%</td><td class="right num">0.463</td><td></td></tr>
+              <tr class="day-row" data-parent="ss-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">22,800</td><td class="right num">15,360</td><td class="right num">67.4%</td><td class="right num">10,552</td><td class="right num">68.7%</td><td class="right num">0.463</td><td></td></tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td></td>
+                <td>Grand total</td>
+                <td class="right num">152,303</td>
+                <td class="right num">93,018</td>
+                <td class="right num">61.1%</td>
+                <td class="right num">59,711</td>
+                <td class="right num">64.2%</td>
+                <td class="right num">0.392</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+          </div>
+        </div>
+
+        <aside class="reports-side">
+          <div>
+            <h4>Breakdown</h4>
+            <div class="breakdown-list">
+              <button type="button" class="is-active">Lander → Day</button>
+              <button type="button">Day</button>
+              <button type="button">Country</button>
+              <button type="button">Device</button>
+            </div>
+          </div>
+          <div>
+            <h4>Columns</h4>
+            <div class="column-list">
+              <label><input type="checkbox" checked /> Impressions</label>
+              <label><input type="checkbox" checked /> Clicks</label>
+              <label><input type="checkbox" checked /> CTR</label>
+              <label><input type="checkbox" checked /> Conversions</label>
+              <label><input type="checkbox" checked /> CVR</label>
+              <label><input type="checkbox" checked /> Score</label>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <!-- 5: Side drawer for viewing a variant -->
+  <div class="drawer-scrim" id="drawer-scrim"></div>
+  <aside class="drawer" id="variant-drawer" aria-hidden="true" aria-labelledby="drawer-variant-title">
+    <div class="drawer__head">
+      <div>
+        <div class="drawer__title">
+          <span class="badge badge--variant" id="drawer-variant-badge">V1</span>
+          <span id="drawer-variant-title">Summer Sale</span>
+        </div>
+        <div class="drawer__sub" id="drawer-variant-sub">offers.acme.com</div>
+      </div>
+      <button class="btn btn--ghost" id="drawer-close" aria-label="Close drawer">✕ Close</button>
+    </div>
+    <div class="drawer__body">
+      <div class="drawer__preview"></div>
+      <div class="drawer__stats" id="drawer-stats"></div>
+      <div class="opus-note">Preview &amp; stats are mock. In production this would render the live variant and real Reports data.</div>
+      <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+        <a class="btn btn--black" id="drawer-editor-link" href="editor.html" style="flex:1; justify-content:center;">Open in editor →</a>
+        <button class="btn" id="drawer-duplicate">Duplicate</button>
+      </div>
+    </div>
+  </aside>
+
+  <script src="app.js"></script>
+  <script>
+    var scrim = document.getElementById("drawer-scrim");
+    var drawer = document.getElementById("variant-drawer");
+    var statsEl = document.getElementById("drawer-stats");
+    var titleEl = document.getElementById("drawer-variant-title");
+    var subEl = document.getElementById("drawer-variant-sub");
+    var badgeEl = document.getElementById("drawer-variant-badge");
+
+    function closeDrawer() {
+      drawer.classList.remove("is-open");
+      scrim.classList.remove("is-open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    function openDrawer(row) {
+      var lander = row.getAttribute("data-lander") || "";
+      var variant = row.getAttribute("data-variant") || "";
+      var domain = row.getAttribute("data-domain") || "";
+      var parts = variant.split(" — ");
+      badgeEl.textContent = (parts[0] || "—").trim();
+      titleEl.textContent = (parts[1] || variant).trim();
+      subEl.textContent = lander + " · " + domain;
+
+      var cells = row.querySelectorAll("td");
+      // (toggle) | variant/lander | Impressions … Score | view
+      var labels = ["Impressions", "Clicks", "CTR", "Conversions", "CVR", "Score"];
+      statsEl.innerHTML = "";
+      for (var i = 0; i < labels.length; i++) {
+        var cell = cells[2 + i];
+        if (!cell) continue;
+        var value = cell.innerText.replace(/\s+/g, " ").trim();
+        var wrap = document.createElement("div");
+        wrap.className = "drawer__stat";
+        wrap.innerHTML = '<div class="drawer__stat-label">' + labels[i] + '</div><div class="drawer__stat-value">' + value + "</div>";
+        statsEl.appendChild(wrap);
+      }
+
+      var vLabel = (parts[1] || variant).trim();
+      var elink = document.getElementById("drawer-editor-link");
+      if (elink && lander) {
+        elink.href = "editor.html?name=" + encodeURIComponent(lander) + "&variant=" + encodeURIComponent(vLabel);
+      }
+
+      drawer.classList.add("is-open");
+      scrim.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+    }
+
+    document.querySelectorAll(".js-drawer-view").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var row = btn.closest("tr[data-report-row]");
+        if (row) openDrawer(row);
+      });
+    });
+
+    scrim.addEventListener("click", closeDrawer);
+    document.getElementById("drawer-close").addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+
+    // Honor ?lander=<name> — pre-select filter and hide other lander rows.
+    (function applyLanderFilter() {
+      var params = new URLSearchParams(window.location.search);
+      var name   = params.get("lander");
+      var sel    = document.getElementById("lander-filter");
+      var note   = document.getElementById("filter-note");
+      var noteN  = document.getElementById("filter-note-name");
+      var clearBtn = document.getElementById("filter-note-clear");
+
+      function applyFilter(value) {
+        var rows = document.querySelectorAll(".reports-table tbody tr[data-report-row]");
+        rows.forEach(function (r) {
+          var keep = !value || r.getAttribute("data-lander") === value;
+          r.classList.toggle("row-hidden", !keep);
+          // also hide attached day-rows when parent is hidden
+          var toggleBtn = r.querySelector(".lander-toggle");
+          var parentId  = toggleBtn && toggleBtn.getAttribute("aria-controls");
+          if (parentId) {
+            document.querySelectorAll('[data-parent="'+parentId+'"]').forEach(function (d) {
+              d.classList.toggle("row-hidden", !keep);
+            });
+          }
+        });
+        if (value) { noteN.textContent = value; note.classList.add("is-active"); }
+        else       { note.classList.remove("is-active"); }
+      }
+
+      if (name) { sel.value = name; applyFilter(name); }
+      sel.addEventListener("change", function () { applyFilter(sel.value); });
+      clearBtn.addEventListener("click", function () {
+        sel.value = "";
+        applyFilter("");
+        // also strip ?lander= from URL without reloading
+        var url = new URL(window.location.href);
+        url.searchParams.delete("lander");
+        window.history.replaceState({}, "", url.toString());
+      });
+    })();
+  </script>
+</body>
+</html>

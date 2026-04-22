@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Home · nexus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="top-strip"></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand-tile" title="nexus">N</div>
+      <nav class="nav">
+        <a href="index.html" class="is-active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+          Home
+        </a>
+        <a href="landers.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Landers
+        </a>
+        <a href="reports.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+          Reports
+        </a>
+        <a href="domains.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+          Domains
+        </a>
+        <a href="logs.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Logs
+        </a>
+      </nav>
+      <div class="avatar" title="Kyle">K</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-body">
+        <div class="content-rail">
+        <h2 class="home-hero">What are you <em>building today?</em></h2>
+
+        <div class="builder-card">
+          <div class="builder-card__left">
+            <textarea id="home-build-prompt" placeholder="Describe the lander you want — audience, offer, tone, reference URL, anything else. I'll ask for what's missing."></textarea>
+            <div class="build-row">
+              <button type="button" class="btn btn--black" id="home-build-btn">Build</button>
+            </div>
+          </div>
+          <div class="builder-card__right">
+            <h4>Suggestions</h4>
+            <a class="suggest">Create a SERP lander for walk-in tubs comparing brands, safety &amp; financing</a>
+            <a class="suggest">Lead gen lander for home insurance with trust signals and urgency hook</a>
+            <a class="suggest">2-click lander for opening a brokerage account — mobile-first</a>
+          </div>
+        </div>
+
+        <div class="recent-head">
+          <h2>Recent Landers</h2>
+          <div><span class="meta">Last 7 days</span> &nbsp; <a href="landers.html">View all →</a></div>
+        </div>
+
+        <div class="card">
+          <div class="table-scroll" role="region" aria-label="Recent landers">
+          <table class="table table--home">
+            <colgroup>
+              <col class="col-name" />
+              <col class="col-updated" />
+              <col class="col-status" />
+              <col class="col-impressions" />
+              <col class="col-score" />
+              <col class="col-actions" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Updated</th>
+                <th>Status</th>
+                <th class="right">Impressions</th>
+                <th class="right">Score</th>
+                <th class="right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="lander-cell">
+                    <span class="lander-thumb" aria-hidden="true"></span>
+                    <div class="lander-name"><strong>Summer Sale</strong><small>offers.acme.com/summer-sale-hero</small></div>
+                  </div>
+                </td>
+                <td class="muted">2h ago</td>
+                <td><span class="badge badge--published">Published</span></td>
+                <td class="right num">169,700</td>
+                <td class="right num"><strong>0.46</strong></td>
+                <td class="right"><div class="actions">
+                  <details class="pop" id="pop-add-summer-sale">
+                    <summary class="icon-btn" title="Add variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></summary>
+                    <div class="pop-panel js-add-variant" data-lander="Summer Sale" data-lander-id="summer-sale">
+                      <button type="button" class="pop-option js-open-builder" data-mode="new" data-lander-id="summer-sale">New variant <small>start from prompt</small></button>
+                      <button type="button" class="pop-option js-open-builder" data-mode="existing" data-lander-id="summer-sale">Existing variant <small>clone from another lander</small></button>
+                    </div>
+                  </details>
+                  <button type="button" class="icon-btn js-lander-settings" data-lander="Summer Sale" data-lander-id="summer-sale" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+                  <button type="button" class="icon-btn js-clone-lander" data-lander="Summer Sale" data-lander-id="summer-sale" title="Clone lander (duplicate with 0 metrics)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                  <a class="icon-btn" href="reports.html?lander=Summer%20Sale" title="Analyse in Reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></a>
+                </div></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="lander-cell">
+                    <span class="lander-thumb" aria-hidden="true"></span>
+                    <div class="lander-name"><strong>Referral Q2</strong><small>refer.acme.com/referral-q2</small></div>
+                  </div>
+                </td>
+                <td class="muted">5h ago</td>
+                <td><span class="badge badge--published">Published</span></td>
+                <td class="right num">25,545</td>
+                <td class="right num"><strong>0.27</strong></td>
+                <td class="right"><div class="actions">
+                  <details class="pop" id="pop-add-referral-q2">
+                    <summary class="icon-btn" title="Add variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></summary>
+                    <div class="pop-panel js-add-variant" data-lander="Referral Q2" data-lander-id="referral-q2">
+                      <button type="button" class="pop-option js-open-builder" data-mode="new" data-lander-id="referral-q2">New variant <small>start from prompt</small></button>
+                      <button type="button" class="pop-option js-open-builder" data-mode="existing" data-lander-id="referral-q2">Existing variant <small>clone from another lander</small></button>
+                    </div>
+                  </details>
+                  <button type="button" class="icon-btn js-lander-settings" data-lander="Referral Q2" data-lander-id="referral-q2" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+                  <button type="button" class="icon-btn js-clone-lander" data-lander="Referral Q2" data-lander-id="referral-q2" title="Clone lander (duplicate with 0 metrics)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                  <a class="icon-btn" href="reports.html?lander=Referral%20Q2" title="Analyse in Reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></a>
+                </div></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="lander-cell">
+                    <span class="lander-thumb" aria-hidden="true"></span>
+                    <div class="lander-name"><strong>Founder Letter</strong><small>offers.acme.com/founder-letter</small></div>
+                  </div>
+                </td>
+                <td class="muted">6h ago</td>
+                <td><span class="badge badge--published">Published</span></td>
+                <td class="right num">22,104</td>
+                <td class="right num"><strong>0.16</strong></td>
+                <td class="right"><div class="actions">
+                  <details class="pop" id="pop-add-founder-letter">
+                    <summary class="icon-btn" title="Add variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></summary>
+                    <div class="pop-panel js-add-variant" data-lander="Founder Letter" data-lander-id="founder-letter">
+                      <button type="button" class="pop-option js-open-builder" data-mode="new" data-lander-id="founder-letter">New variant <small>start from prompt</small></button>
+                      <button type="button" class="pop-option js-open-builder" data-mode="existing" data-lander-id="founder-letter">Existing variant <small>clone from another lander</small></button>
+                    </div>
+                  </details>
+                  <button type="button" class="icon-btn js-lander-settings" data-lander="Founder Letter" data-lander-id="founder-letter" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+                  <button type="button" class="icon-btn js-clone-lander" data-lander="Founder Letter" data-lander-id="founder-letter" title="Clone lander (duplicate with 0 metrics)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                  <a class="icon-btn" href="reports.html?lander=Founder%20Letter" title="Analyse in Reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></a>
+                </div></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="lander-cell">
+                    <span class="lander-thumb" aria-hidden="true"></span>
+                    <div class="lander-name"><strong>Partner Pulse</strong><small>try.acme.com/partner-pulse</small></div>
+                  </div>
+                </td>
+                <td class="muted">—</td>
+                <td><span class="badge badge--draft">Draft</span></td>
+                <td class="right muted">-</td>
+                <td class="right muted">-</td>
+                <td class="right"><div class="actions">
+                  <details class="pop" id="pop-add-partner-pulse-draft">
+                    <summary class="icon-btn" title="Add variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></summary>
+                    <div class="pop-panel js-add-variant" data-lander="Partner Pulse" data-lander-id="partner-pulse-draft">
+                      <button type="button" class="pop-option js-open-builder" data-mode="new" data-lander-id="partner-pulse-draft">New variant <small>start from prompt</small></button>
+                      <button type="button" class="pop-option js-open-builder" data-mode="existing" data-lander-id="partner-pulse-draft">Existing variant <small>clone from another lander</small></button>
+                    </div>
+                  </details>
+                  <button type="button" class="icon-btn js-lander-settings" data-lander="Partner Pulse" data-lander-id="partner-pulse-draft" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+                  <button type="button" class="icon-btn js-clone-lander" data-lander="Partner Pulse" data-lander-id="partner-pulse-draft" title="Clone lander (duplicate with 0 metrics)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                  <a class="icon-btn" href="reports.html?lander=Partner%20Pulse" title="Analyse in Reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></a>
+                </div></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Plan-Mode dialog: ask any missing required dimensions before the editor -->
+  <dialog class="modal modal--plan" id="dialog-plan">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title">
+            <span class="plan-pill">Plan mode</span>
+            Before I generate…
+          </h2>
+          <p class="modal__hint">A couple of quick questions help <strong>Opus 4.7</strong> land V1 closer to what you want. Skip any time.</p>
+        </div>
+        <div class="plan-header-actions">
+          <button type="button" class="btn btn--ghost" id="plan-skip">Skip → Editor</button>
+          <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+        </div>
+      </div>
+
+      <div class="plan-chat" id="plan-chat"></div>
+
+      <div class="plan-compose" id="plan-compose">
+        <div class="plan-chips" id="plan-chips"></div>
+        <div class="plan-input-row">
+          <input type="text" id="plan-input" placeholder="Type your answer…" autocomplete="off" />
+          <button type="button" class="plan-send" id="plan-send" aria-label="Send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <div class="plan-progress" id="plan-progress">
+          <span id="plan-progress-label">Getting started</span>
+          <span class="plan-progress__bar"><span id="plan-progress-fill"></span></span>
+        </div>
+      </div>
+
+      <div class="plan-done" id="plan-done" hidden>
+        <div class="plan-done__summary" id="plan-done-summary"></div>
+        <button type="button" class="btn btn--black" id="plan-generate">Build</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Home Recent Landers: same settings + clone loader as Landers tab -->
+  <dialog class="modal modal--settings" id="dialog-lander-settings">
+    <form method="dialog" class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title" id="lander-settings-title">Lander settings</h2>
+          <p class="modal__hint">Lander-level record — overridable per variant.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__title">Identity</p>
+        <div class="field"><label>Lander name</label><input type="text" data-settings="name" value="" /></div>
+        <div class="field-row">
+          <div class="field">
+            <label>Domain</label>
+            <select data-settings="domain">
+              <option>offers.acme.com</option>
+              <option>refer.acme.com</option>
+              <option>try.acme.com</option>
+              <option>hub.acme.com</option>
+            </select>
+          </div>
+          <div class="field"><label>Path</label><input type="text" data-settings="path" value="" placeholder="/your-path" /></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__title">Pixels</p>
+        <div class="field-row">
+          <div class="field"><label>GTM container ID</label><input type="text" value="GTM-ACME42" placeholder="GTM-XXXXXXX" /></div>
+          <div class="field"><label>Meta pixel ID</label><input type="text" value="398201746" placeholder="e.g. 398201746" /></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__title">
+          Custom variables
+          <span class="info-tip" tabindex="0" aria-label="What are custom variables?">
+            <span class="info-tip__icon">i</span>
+            <span class="info-tip__body">
+              Custom variables are reusable components shared across variants of this lander. Reference one anywhere with <code>{{Publisher}}</code>, <code>{{CTA}}</code>, etc. — edit it once here and every variant updates.
+            </span>
+          </span>
+        </p>
+        <div class="kv-editor" id="kv-editor-home">
+          <div class="kv-row"><input data-kv="key" value="Publisher" /><input data-kv="value" value="BestLivingIdeas" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button></div>
+          <div class="kv-row"><input data-kv="key" value="CTA" /><input data-kv="value" value="Shop Now →" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button></div>
+        </div>
+        <button type="button" class="kv-add" id="kv-add-home">+ Add variable</button>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="submit" class="btn btn--black">Save settings</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal loader-dlg" id="dialog-clone-loader-home">
+    <div class="modal__inner">
+      <div class="spinner" aria-hidden="true"></div>
+      <p><strong id="clone-loader-title-home">Cloning lander…</strong></p>
+      <p class="muted" id="clone-loader-sub-home">Duplicating all variants · metrics reset to 0</p>
+    </div>
+  </dialog>
+
+  <!-- Add-variant builder — same as Landers tab (+ popover) -->
+  <dialog class="modal modal--builder" id="dialog-variant-builder">
+    <form method="dialog" class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title" id="builder-title">New variant</h2>
+          <p class="modal__hint" id="builder-sub">Describe the angle. Opus 4.7 will draft V2 in the editor.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+
+      <div class="builder-pre" id="builder-pre" hidden>
+        <label for="builder-existing-select">Pick an existing variant to clone</label>
+        <select id="builder-existing-select"></select>
+      </div>
+
+      <div class="builder-dialog">
+        <div class="builder-dialog__left">
+          <textarea id="builder-prompt" placeholder="Describe the variant you want — audience, angle, CTA, offer, tone…"></textarea>
+          <div class="build-row">
+            <button type="button" class="btn btn--black" id="builder-submit">Build →</button>
+          </div>
+        </div>
+        <div class="builder-dialog__right">
+          <h4>Suggestions</h4>
+          <a class="suggest js-builder-suggest">Stronger hero headline with urgency + limited-time framing</a>
+          <a class="suggest js-builder-suggest">Lead with a testimonial strip, soften the CTA color</a>
+          <a class="suggest js-builder-suggest">Mobile-first single-field entry, progressive disclosure for FAQ</a>
+          <a class="suggest js-builder-suggest">Advertorial tone, longer copy, before/after photo pair</a>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    // ---------------------------------------------------------------
+    // Home build flow — enrich prompt, then run Plan Mode, then editor
+    // ---------------------------------------------------------------
+    (function () {
+      var btn = document.getElementById("home-build-btn");
+      var ta  = document.getElementById("home-build-prompt");
+
+      // Suggestion cards fill the textarea
+      document.querySelectorAll(".builder-card__right .suggest").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (ta) { ta.value = a.textContent.trim(); ta.focus(); }
+        });
+      });
+
+      function startBuild() {
+        var prompt = (ta && ta.value.trim()) || "";
+        if (!prompt) { ta && ta.focus(); return; }
+        openPlan({ prompt: prompt });
+      }
+
+      btn.addEventListener("click", startBuild);
+      ta.addEventListener("keydown", function (e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); startBuild(); }
+      });
+
+      // ---------- Plan Mode ----------
+      var dlg       = document.getElementById("dialog-plan");
+      var chatEl    = document.getElementById("plan-chat");
+      var chipsEl   = document.getElementById("plan-chips");
+      var inputEl   = document.getElementById("plan-input");
+      var sendBtn   = document.getElementById("plan-send");
+      var skipBtn   = document.getElementById("plan-skip");
+      var progLabel = document.getElementById("plan-progress-label");
+      var progFill  = document.getElementById("plan-progress-fill");
+      var composeEl = document.getElementById("plan-compose");
+      var doneEl    = document.getElementById("plan-done");
+      var doneSum   = document.getElementById("plan-done-summary");
+      var genBtn    = document.getElementById("plan-generate");
+
+      var plan = null;     // current plan state
+      var seq  = [];       // dialogue sequence
+      var step = 0;        // index into seq
+
+      function openPlan(seed) {
+        plan = {
+          prompt: seed.prompt,
+          autofilled: deriveAutofilled(seed.prompt),
+          answers: {}
+        };
+        seq  = buildSequence(plan);
+        step = 0;
+        chatEl.innerHTML = "";
+        doneEl.hidden = true;
+        composeEl.hidden = false;
+        dlg.showModal();
+        addBubble(plan.prompt, "user");
+        setTimeout(nextStep, 300);
+      }
+
+      skipBtn.addEventListener("click", function () { dlg.close(); gotoEditor(true); });
+      document.querySelector("#dialog-plan .modal__close").addEventListener("click", function () { dlg.close(); });
+      sendBtn.addEventListener("click", function () { submitFreeText(inputEl.value); });
+      inputEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); submitFreeText(inputEl.value); }
+      });
+      genBtn.addEventListener("click", function () { dlg.close(); gotoEditor(false); });
+
+      function addBubble(text, who, extraHTML) {
+        var b = document.createElement("div");
+        b.className = "plan-bubble" + (who === "user" ? " user" : "");
+        b.innerHTML = text + (extraHTML || "");
+        chatEl.appendChild(b);
+        chatEl.scrollTop = chatEl.scrollHeight;
+        return b;
+      }
+
+      function renderChips(q) {
+        chipsEl.innerHTML = "";
+        (q.chips || []).forEach(function (c) {
+          var bb = document.createElement("button");
+          bb.type = "button";
+          bb.textContent = c;
+          bb.addEventListener("click", function () { answer(c); });
+          chipsEl.appendChild(bb);
+        });
+        var skip = document.createElement("button");
+        skip.type = "button";
+        skip.className = "chip--skip";
+        skip.textContent = q.type === "optional" ? "Skip" : "Skip this question";
+        skip.addEventListener("click", function () { answer(q.default || "skipped", true); });
+        chipsEl.appendChild(skip);
+        inputEl.placeholder = q.placeholder || "Type your answer…";
+        inputEl.disabled = !q.allowInput;
+        inputEl.style.opacity = q.allowInput ? 1 : 0.4;
+      }
+
+      function submitFreeText(val) {
+        var q = seq[step];
+        if (!q || !q.key) return;
+        var text = (val || "").trim();
+        if (!text) return;
+        answer(text);
+      }
+
+      function answer(val, skipped) {
+        var q = seq[step];
+        if (q.key) plan.answers[q.key] = skipped ? null : val;
+        if (!skipped || val) addBubble(val || "Skipped", "user");
+        inputEl.value = "";
+        step++;
+        setTimeout(nextStep, 220);
+      }
+
+      function nextStep() {
+        if (step >= seq.length) return finish();
+        var q = seq[step];
+        var totalQ = seq.filter(function (x) { return x.key; }).length;
+        var ansQ   = Object.keys(plan.answers).length;
+        progLabel.textContent = q.type === "recap"
+          ? "Reviewing auto-filled signals"
+          : "Question " + Math.min(ansQ + 1, totalQ) + " of " + totalQ + (q.type === "optional" ? " · optional" : "");
+        progFill.style.width = Math.min(100, Math.round((ansQ / Math.max(totalQ, 1)) * 100)) + "%";
+
+        if (q.type === "recap") {
+          var rows = plan.autofilled.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("");
+          var html = "<div class=\"plan-recap-card\"><dl>" + rows + "</dl></div>";
+          addBubble(q.ai, "ai", html);
+          renderChips({ chips: ["Looks good →"], allowInput: false, type: "recap" });
+          chipsEl.querySelector("button").addEventListener("click", function () { step++; nextStep(); }, { once: true });
+          chipsEl.removeChild(chipsEl.lastChild); // drop the Skip chip for recap
+        } else {
+          addBubble(q.ai, "ai");
+          renderChips(q);
+        }
+      }
+
+      function finish() {
+        composeEl.hidden = true;
+        doneEl.hidden = false;
+        progLabel.textContent = "Ready to generate";
+        progFill.style.width = "100%";
+        var ans = plan.answers;
+        var filled = Object.keys(ans).filter(function (k) { return ans[k]; }).length;
+        doneSum.innerHTML = "Plan locked — <strong>" + filled + "</strong> dimensions captured + " +
+                            plan.autofilled.length + " auto-filled. You can still refine everything in the editor.";
+        addBubble("All set! I'll draft <strong>V1</strong> now. You can refine copy, layout, and CTA in the editor.", "ai");
+      }
+
+      function gotoEditor(skipped) {
+        var q = new URLSearchParams({ "new": "1" });
+        if (plan && plan.prompt) q.set("prompt", plan.prompt);
+        if (plan) {
+          var a = plan.answers || {};
+          Object.keys(a).forEach(function (k) { if (a[k]) q.set(k, a[k]); });
+        }
+        if (skipped) q.set("planSkipped", "1");
+        window.location.href = "editor.html?" + q.toString();
+      }
+
+      // ---- naive auto-fill from the prompt (mocks what crawl + LLM mapping would do)
+      function deriveAutofilled(prompt) {
+        var p = (prompt || "").toLowerCase();
+        var category = "—";
+        if (/insurance/.test(p))                category = "Insurance";
+        else if (/finance|loan|credit|broker|invest|trading/.test(p)) category = "Finance";
+        else if (/health|medicare|senior/.test(p)) category = "Health";
+        else if (/home|tub|roof|solar|hvac/.test(p)) category = "Home services";
+        else if (/legal|attorney|lawyer/.test(p)) category = "Legal";
+
+        var fmt = /serp|search/.test(p) ? "SERP"
+                : /listicle|top \d+/.test(p) ? "Listicle"
+                : /compar/.test(p) ? "Comparison"
+                : /quiz/.test(p) ? "Quiz"
+                : "Advertorial";
+
+        var urgency = /urgent|limited|now|hurry|today|deadline/.test(p) ? "Yes" : "No";
+        var price   = /free|save|discount|deal|cheap|offer|\d+\s*%\s*off/.test(p) ? "Yes" : "No";
+
+        // Pluck a URL from the prompt if the user dropped one in free text
+        var urlMatch = (prompt || "").match(/https?:\/\/\S+/i);
+        var refUrl   = urlMatch ? urlMatch[0] : "—";
+
+        return [
+          ["Advertiser category", category],
+          ["Page format",          fmt],
+          ["Urgency angle",        urgency],
+          ["Price angle",          price],
+          ["Language",             "English"],
+          ["Target device",        "Desktop, Mobile"],
+          ["Reference URL",        refUrl]
+        ];
+      }
+
+      // ---- Question sequence (4 required + 1 optional probe per doc policy)
+      function buildSequence(plan) {
+        var category = (plan.autofilled.find(function (r) { return r[0] === "Advertiser category"; }) || [])[1] || "";
+        var isInsurance = /insurance/i.test(category);
+        var isFinance   = /finance/i.test(category);
+
+        return [
+          {
+            type: "recap",
+            ai:   "Got it — here's what I picked up from your prompt" + (plan.refUrl ? " and the reference URL" : "") +
+                  ". Confirm or adjust anything before we continue."
+          },
+          {
+            type: "required", key: "adv_headline",
+            ai:   "What's the <strong>main headline</strong> you want on the lander?",
+            placeholder: "e.g. Save up to 40% on home insurance this week",
+            chips: ["Use an AI-generated headline"],
+            allowInput: true
+          },
+          {
+            type: "required", key: "adv_page_cta_text",
+            ai:   "What should the <strong>CTA button</strong> say?",
+            placeholder: "e.g. Get my free quote",
+            chips: isInsurance ? ["Get a free quote", "Compare plans", "Check my rate"]
+                 : isFinance   ? ["Open account", "Start free", "Get matched"]
+                               : ["Shop now", "Learn more", "Start →", "Save now"],
+            allowInput: true
+          },
+          {
+            type: "required", key: "buy_angle",
+            ai:   "What's the <strong>buy angle</strong> — the hook from your ad creative?",
+            placeholder: "e.g. Switch & save, lowest rate guaranteed",
+            chips: ["Switch & save", "Limited-time offer", "Lowest rate guaranteed", "As seen on TV"],
+            allowInput: true
+          },
+          {
+            type: "required", key: "publication_name",
+            ai:   "What <strong>publication name</strong> should appear on the lander?",
+            placeholder: "e.g. BestLivingIdeas",
+            chips: ["BestLivingIdeas", "ACME Insights", "SavingsWire"],
+            allowInput: true,
+            default: "ACME Insights"
+          },
+          {
+            type: "optional", key: "emotional_direction",
+            ai:   "One quick optional — what's the emotional direction?",
+            chips: ["Savings", "Urgency", "Aspiration", "Curiosity", "Fear"],
+            allowInput: true,
+            placeholder: "Or describe it in your own words…"
+          }
+        ];
+      }
+    })();
+  </script>
+  <script>
+    (function () {
+      if (!window.NEXUS_DATA) return;
+
+      function allLanders() {
+        return window.NEXUS_DATA.landers || [];
+      }
+
+      function findLander(id) {
+        return allLanders().find(function (x) { return x.id === id; });
+      }
+
+      var settingsDlg   = document.getElementById("dialog-lander-settings");
+      var settingsTitle = document.getElementById("lander-settings-title");
+      var loaderDlg     = document.getElementById("dialog-clone-loader-home");
+      var loaderTitle   = document.getElementById("clone-loader-title-home");
+      var loaderSub     = document.getElementById("clone-loader-sub-home");
+      var kvAdd         = document.getElementById("kv-add-home");
+      var kvEditor      = document.getElementById("kv-editor-home");
+
+      var builderDlg     = document.getElementById("dialog-variant-builder");
+      var builderTitle   = document.getElementById("builder-title");
+      var builderSub     = document.getElementById("builder-sub");
+      var builderPre     = document.getElementById("builder-pre");
+      var builderSelect  = document.getElementById("builder-existing-select");
+      var builderPrompt  = document.getElementById("builder-prompt");
+      var builderSubmit  = document.getElementById("builder-submit");
+      var builderState   = { mode: "new", landerId: null };
+
+      function openSettings(lname, lid) {
+        if (!settingsDlg) return;
+        var l = findLander(lid);
+        if (settingsTitle) settingsTitle.textContent = "Lander settings — " + lname;
+        var nameInput  = settingsDlg.querySelector('[data-settings="name"]');
+        var domainSel  = settingsDlg.querySelector('[data-settings="domain"]');
+        var pathInput  = settingsDlg.querySelector('[data-settings="path"]');
+        if (nameInput) nameInput.value = l ? l.name : lname;
+        if (l && domainSel && pathInput) {
+          var clean = l.url.replace(/^https?:\/\//, "");
+          var slash = clean.indexOf("/");
+          var domain = slash === -1 ? clean : clean.slice(0, slash);
+          var path   = slash === -1 ? "/"   : clean.slice(slash);
+          var matched = false;
+          Array.prototype.forEach.call(domainSel.options, function (opt) {
+            if (opt.value === domain || opt.textContent === domain) {
+              domainSel.value = opt.value || opt.textContent;
+              matched = true;
+            }
+          });
+          if (!matched && domain) {
+            var opt = document.createElement("option");
+            opt.textContent = domain;
+            domainSel.appendChild(opt);
+            domainSel.value = domain;
+          }
+          pathInput.value = path;
+        }
+        settingsDlg.showModal();
+      }
+
+      function openBuilder(mode, landerId) {
+        if (!builderDlg || !builderTitle || !builderSub || !builderPre || !builderSelect || !builderPrompt || !builderSubmit) return;
+        var landers = allLanders();
+        var l = landers.find(function (x) { return x.id === landerId; });
+        if (!l) return;
+        builderState.mode = mode;
+        builderState.landerId = landerId;
+
+        if (mode === "new") {
+          builderTitle.textContent = "New variant — " + l.name;
+          builderSub.textContent   = "Describe the angle. Opus 4.7 will draft it in the editor.";
+          builderPre.hidden        = true;
+          builderPrompt.placeholder = l.name + " — new angle, keep palette and CTA…";
+          builderPrompt.value      = "";
+          builderSubmit.textContent = "Build →";
+        } else {
+          builderTitle.textContent = "Clone existing variant → " + l.name;
+          builderSub.textContent   = "Pick a variant from another lander, then describe any tweaks.";
+          builderPre.hidden        = false;
+          builderSelect.innerHTML = "";
+          landers.forEach(function (o) {
+            if (o.id === l.id) return;
+            var grp = document.createElement("optgroup");
+            grp.label = o.name;
+            (o.variants || []).forEach(function (v) {
+              var opt = document.createElement("option");
+              opt.textContent = o.name + " — " + v.name;
+              grp.appendChild(opt);
+            });
+            if (grp.children.length) builderSelect.appendChild(grp);
+          });
+          builderPrompt.placeholder = "Optional — anything you'd like to tweak on top of the clone? (tone, CTA, layout…)";
+          builderPrompt.value      = "";
+          builderSubmit.textContent = "Clone in this lander";
+        }
+        builderDlg.showModal();
+        setTimeout(function () { builderPrompt.focus(); }, 40);
+      }
+
+      function submitBuilder() {
+        if (!builderDlg || !builderPrompt || !builderSelect) return;
+        var l = findLander(builderState.landerId);
+        if (!l) return;
+        var text = (builderPrompt.value || "").trim();
+        if (builderState.mode === "new") {
+          var q = new URLSearchParams({ name: l.name, "new": "1" });
+          if (text) q.set("prompt", text);
+          builderDlg.close();
+          window.location.href = "editor.html?" + q.toString();
+        } else {
+          var picked = builderSelect.value || "";
+          var parts = picked.split(" — ");
+          var cleanName = (parts[1] || parts[0] || "Variant").trim();
+          var fromLander = (parts[0] || "").trim();
+          builderDlg.close();
+          var q2 = new URLSearchParams({
+            name: l.name,
+            variant: cleanName + " (cloned)",
+            cloned: "1",
+            source: cleanName,
+            from: fromLander || l.name
+          });
+          if (text) q2.set("prompt", text);
+          window.location.href = "editor.html?" + q2.toString();
+        }
+      }
+
+      document.addEventListener("click", function (e) {
+        var sBtn = e.target.closest(".js-lander-settings");
+        if (sBtn) {
+          openSettings(sBtn.getAttribute("data-lander") || "Lander", sBtn.getAttribute("data-lander-id") || "");
+          return;
+        }
+        var lBtn = e.target.closest(".js-clone-lander");
+        if (lBtn && loaderDlg) {
+          var name = lBtn.getAttribute("data-lander") || "Lander";
+          var id   = lBtn.getAttribute("data-lander-id");
+          var l    = findLander(id);
+          var nVar = l && l.variants ? l.variants.length : 0;
+          if (loaderTitle) loaderTitle.textContent = 'Cloning "' + name + '"…';
+          if (loaderSub) loaderSub.textContent = "Duplicating " + nVar + " variant" + (nVar === 1 ? "" : "s") + " · metrics reset to 0";
+          loaderDlg.showModal();
+          setTimeout(function () {
+            loaderDlg.close();
+            window.location.href = "landers.html";
+          }, 1500);
+          return;
+        }
+        var openB = e.target.closest(".js-open-builder");
+        if (openB) {
+          var mode = openB.getAttribute("data-mode") || "new";
+          var lid2 = openB.getAttribute("data-lander-id");
+          var pop = openB.closest("details.pop");
+          if (pop) pop.open = false;
+          openBuilder(mode, lid2);
+          return;
+        }
+      });
+
+      if (builderSubmit && builderPrompt) {
+        builderSubmit.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          submitBuilder();
+        });
+        builderPrompt.addEventListener("keydown", function (e) {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+            e.preventDefault();
+            submitBuilder();
+          }
+        });
+      }
+      document.querySelectorAll(".js-builder-suggest").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (!builderPrompt) return;
+          var existing = builderPrompt.value.trim();
+          builderPrompt.value = existing ? existing + " " + a.textContent.trim() : a.textContent.trim();
+          builderPrompt.focus();
+        });
+      });
+
+      if (kvAdd && kvEditor) {
+        kvAdd.addEventListener("click", function () {
+          var row = document.createElement("div");
+          row.className = "kv-row";
+          row.innerHTML = '<input data-kv="key" placeholder="Key" /><input data-kv="value" placeholder="Value" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button>';
+          kvEditor.appendChild(row);
+          var k = row.querySelector('[data-kv="key"]');
+          if (k) k.focus();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Editor · nexus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="editor-open">
+  <div class="editor-shell">
+    <!-- Editor top bar — replaces the global top-strip when the editor is open -->
+    <header class="editor-top">
+      <div class="editor-top__left">
+        <button class="editor-back" type="button" onclick="window.location.href='landers.html'">← Back</button>
+        <div class="editor-title" id="editor-lander-title">Summer Sale</div>
+        <select id="editor-variant-select" class="editor-variant-select" aria-label="Active variant">
+          <option value="main-hero" selected>Main hero</option>
+          <option value="urgency">Urgency countdown</option>
+        </select>
+      </div>
+
+      <div class="editor-top__center">
+        <div class="device-toggle" role="tablist" aria-label="Preview size">
+          <button type="button" data-device="desktop" title="Desktop" aria-label="Desktop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </button>
+          <button type="button" data-device="tablet" title="Tablet" aria-label="Tablet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M11 18h2"/></svg>
+          </button>
+          <button type="button" data-device="mobile" class="is-active" title="Mobile" aria-label="Mobile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="editor-top__right">
+        <details class="pop editor-settings-pop">
+          <summary class="btn btn--ghost">Settings</summary>
+          <div class="editor-settings-panel">
+            <p class="editor-settings-panel__title">Page &amp; SEO</p>
+            <div class="field">
+              <label for="settings-page-title">Page title</label>
+              <input type="text" id="settings-page-title" value="Summer Sale — Up to 60% Off" />
+            </div>
+            <div class="field">
+              <label for="settings-favicon">Favicon</label>
+              <input type="url" id="settings-favicon" placeholder="https://…/favicon.ico" />
+            </div>
+            <div class="field">
+              <label for="settings-description">Description</label>
+              <textarea id="settings-description" rows="2" placeholder="Meta description for search &amp; social…">Limited time. Shop the biggest deals of the season before they're gone.</textarea>
+            </div>
+            <div class="field">
+              <label for="settings-keywords">Keywords</label>
+              <input type="text" id="settings-keywords" placeholder="comma, separated, keywords" value="summer sale, deals, shop" />
+            </div>
+            <p class="editor-settings-panel__foot">Saved on the <strong>variant</strong> in Base · pixels stay on the lander.</p>
+          </div>
+        </details>
+        <button class="btn" type="button">Save</button>
+        <button class="btn btn--publish" type="button" id="editor-publish-btn">Publish <span class="chev">▾</span></button>
+      </div>
+    </header>
+
+    <div class="editor-body">
+      <!-- Left: nexus AI chat -->
+      <aside class="editor-panel">
+        <div class="editor-panel__head">Nexus AI</div>
+        <div class="editor-chat" id="editor-chat">
+          <div class="chat-note">
+            ⚠ Header / Footer are managed at domain level.
+            <br />
+            Go to <a href="domains.html">Domains</a> to edit.
+          </div>
+          <div class="chat-bubble" id="welcome-bubble">
+            Hi! I've drafted <strong>V1</strong> of your <strong id="welcome-name">Summer Sale</strong> lander. What would you like to change — copy, layout, design, or CTA?
+          </div>
+        </div>
+        <div class="editor-compose">
+          <div class="suggestion-chips">
+            <button type="button" data-prompt="Give me a stronger, punchier headline">Stronger headline</button>
+            <button type="button" data-prompt="Change the CTA copy to something more action-oriented">Change CTA</button>
+            <button type="button" data-prompt="Add a sense of urgency — countdown, limited stock, deadline">Add urgency</button>
+            <button type="button" data-prompt="Simplify the body copy, keep it under 40 words per section">Simplify copy</button>
+          </div>
+          <div class="compose-row">
+            <input type="text" id="editor-input" placeholder="Tell nexus what to change…" />
+            <button class="compose-send" id="editor-send" aria-label="Send">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right: preview canvas -->
+      <main class="editor-canvas">
+        <div class="preview-label" id="preview-label">Mobile preview · <span id="preview-title">Summer Sale — Up to 60% Off…</span></div>
+        <div class="mobile-frame" id="mobile-frame">
+          <div class="managed-band">managed by domain · header</div>
+          <section class="preview-hero">
+            <div class="preview-eyebrow">Limited time offer</div>
+            <h1 class="preview-h1" id="preview-h1">Summer Sale — Up to 60% Off</h1>
+            <p class="preview-sub" id="preview-sub">
+              Limited time. Shop the biggest deals of the season before they're gone.
+            </p>
+            <button class="preview-cta" id="preview-cta">Shop Now →</button>
+          </section>
+
+          <div class="preview-trust">
+            <div class="preview-trust__row"><span>✓ 50k+ happy customers</span></div>
+            <div class="preview-trust__row">
+              <span>✓ ★★★★★ rated</span>
+              <span>✓ Free shipping</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-card__thumb"></div>
+            <div>
+              <div class="feature-card__title">Quality guaranteed</div>
+              <div class="feature-card__body">We stand behind every order with our promise to you.</div>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card__thumb"></div>
+            <div>
+              <div class="feature-card__title">Fast delivery</div>
+              <div class="feature-card__body">Ships in 1–2 business days from our US warehouses.</div>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card__thumb"></div>
+            <div>
+              <div class="feature-card__title">30-day returns</div>
+              <div class="feature-card__body">Changed your mind? Send it back, no questions asked.</div>
+            </div>
+          </div>
+
+          <div class="managed-band managed-band--foot">managed by domain · footer</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="modal modal--publish" id="dialog-publish-lander">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title">Publish Lander</h2>
+          <p class="modal__hint">Choose where this variant goes live.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+
+      <div class="field">
+        <label for="publish-domain">Domain <span class="req">*</span></label>
+        <select id="publish-domain">
+          <option value="">Select a domain…</option>
+          <option value="offers.acme.com">offers.acme.com</option>
+          <option value="refer.acme.com">refer.acme.com</option>
+          <option value="try.acme.com">try.acme.com</option>
+        </select>
+        <p class="field-error" id="publish-domain-error" hidden>Domain is required to publish</p>
+      </div>
+
+      <div class="field">
+        <label for="publish-path">Path (slug)</label>
+        <div class="path-input-row">
+          <span class="path-input-row__prefix" id="publish-path-prefix">domain.com/</span>
+          <input type="text" id="publish-path" value="summer-sale-v1" placeholder="your-path" />
+        </div>
+      </div>
+
+      <div class="publish-info-box">
+        Traffic split: this variant will receive <strong>100%</strong> of traffic on this path. Configure splits in All Landers.
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="publish-live-btn" disabled>Publish Live →</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // ---- Read ?name=... to rename the title (e.g. when opened from "+ New Lander")
+    var params = new URLSearchParams(window.location.search);
+    var name   = params.get("name");
+    var isNew  = params.get("new") === "1";
+
+    if (name) {
+      document.getElementById("editor-lander-title").textContent = name;
+      document.getElementById("welcome-name").textContent = name;
+      document.getElementById("preview-h1").textContent = name;
+      document.getElementById("preview-title").textContent = name;
+      var st = document.getElementById("settings-page-title");
+      if (st) st.value = name + " — Up to 60% Off";
+    }
+    if (isNew) {
+      document.getElementById("welcome-bubble").innerHTML =
+        "Let's build a new lander. Describe who it's for, the offer, and the tone you want — I'll draft V1 with <strong>Opus 4.7</strong>.";
+    }
+
+    // ---- If the home Plan-Mode dialog passed context, recap it as an AI bubble
+    (function () {
+      var chatEl   = document.getElementById("editor-chat");
+      if (!chatEl) return;
+      var prompt   = params.get("prompt");
+      var skipped  = params.get("planSkipped") === "1";
+      var keys = [
+        ["adv_headline",         "Headline"],
+        ["adv_page_cta_text",    "CTA"],
+        ["buy_angle",            "Buy angle"],
+        ["publication_name",     "Publication"],
+        ["emotional_direction",  "Emotion"],
+        ["ref",                  "Reference URL"]
+      ];
+      var rows = keys
+        .map(function (k) { var v = params.get(k[0]); return v ? "<li><strong>" + k[1] + ":</strong> " + v + "</li>" : null; })
+        .filter(Boolean).join("");
+
+      if (prompt || rows) {
+        var hero = document.createElement("div");
+        hero.className = "chat-bubble";
+        var heading = skipped
+          ? "<strong>Plan skipped</strong> — starting from your prompt alone. Ask me anything and I'll refine V1."
+          : "<strong>Plan locked ✓</strong> — here's what I'll use for V1. Ask me to tweak any of it below.";
+        hero.innerHTML =
+          heading +
+          (prompt ? "<div style=\"margin-top:.45rem;font-size:12px;color:#6b6052;\"><em>&ldquo;" + prompt + "&rdquo;</em></div>" : "") +
+          (rows ? "<ul style=\"margin:.5rem 0 0;padding-left:1rem;font-size:12.5px;line-height:1.55;\">" + rows + "</ul>" : "");
+        chatEl.appendChild(hero);
+      }
+    })();
+
+    // ---- Device toggle
+    var frame = document.getElementById("mobile-frame");
+    var label = document.getElementById("preview-label");
+    document.querySelectorAll(".device-toggle button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.querySelectorAll(".device-toggle button").forEach(function (x) { x.classList.remove("is-active"); });
+        b.classList.add("is-active");
+        var d = b.getAttribute("data-device");
+        frame.className = "mobile-frame" + (d !== "mobile" ? " mobile-frame--" + d : "");
+        label.firstChild.textContent = (d.charAt(0).toUpperCase() + d.slice(1)) + " preview · ";
+      });
+    });
+
+    // ---- Chat (mocked by Opus 4.7)
+    var chat  = document.getElementById("editor-chat");
+    var input = document.getElementById("editor-input");
+    var send  = document.getElementById("editor-send");
+
+    function addBubble(text, who) {
+      var b = document.createElement("div");
+      b.className = "chat-bubble" + (who === "user" ? " user" : "");
+      b.textContent = text;
+      chat.appendChild(b);
+      chat.scrollTop = chat.scrollHeight;
+      return b;
+    }
+
+    function submitPrompt(text) {
+      if (!text || !text.trim()) return;
+      addBubble(text.trim(), "user");
+      input.value = "";
+      setTimeout(function () {
+        addBubble("Applied by Opus 4.7 — preview updated. Want another pass?", "ai");
+      }, 450);
+    }
+
+    send.addEventListener("click", function () { submitPrompt(input.value); });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); submitPrompt(input.value); }
+    });
+    document.querySelectorAll(".suggestion-chips button").forEach(function (c) {
+      c.addEventListener("click", function () { submitPrompt(c.getAttribute("data-prompt")); });
+    });
+
+    // ---- Variant dropdown → sync preview label (prototype)
+    var variantSel = document.getElementById("editor-variant-select");
+    var previewTitleEl = document.getElementById("preview-title");
+    variantSel.addEventListener("change", function () {
+      var t = variantSel.options[variantSel.selectedIndex].text;
+      var landerName = document.getElementById("editor-lander-title").textContent || "Summer Sale";
+      if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + t;
+    });
+
+    // ---- Publish Lander dialog
+    var publishDlg   = document.getElementById("dialog-publish-lander");
+    var publishBtn   = document.getElementById("editor-publish-btn");
+    var publishDomain = document.getElementById("publish-domain");
+    var publishPath   = document.getElementById("publish-path");
+    var publishPrefix = document.getElementById("publish-path-prefix");
+    var publishErr    = document.getElementById("publish-domain-error");
+    var publishLive   = document.getElementById("publish-live-btn");
+
+    function syncPublishPrefix() {
+      var d = publishDomain.value;
+      publishPrefix.textContent = (d || "domain.com") + "/";
+    }
+    function validatePublishForm() {
+      var ok = !!publishDomain.value;
+      publishErr.hidden = ok;
+      publishLive.disabled = !ok;
+      return ok;
+    }
+    publishBtn.addEventListener("click", function () {
+      publishDlg.showModal();
+      validatePublishForm();
+      syncPublishPrefix();
+    });
+    publishDomain.addEventListener("change", function () {
+      syncPublishPrefix();
+      validatePublishForm();
+    });
+    publishLive.addEventListener("click", function () {
+      if (!validatePublishForm()) return;
+      publishDlg.close();
+      alert("Published (prototype): " + publishDomain.value + "/" + publishPath.value.replace(/^\/+/, ""));
+    });
+
+    // URL ?variant=... pre-selects matching option or adds one
+    var vParam = params.get("variant");
+    if (vParam && variantSel) {
+      var found = false;
+      Array.prototype.forEach.call(variantSel.options, function (opt) {
+        if (opt.text === vParam || opt.value === vParam) { variantSel.value = opt.value; found = true; }
+      });
+      if (!found) {
+        var o = document.createElement("option");
+        o.value = "custom";
+        o.textContent = vParam;
+        variantSel.appendChild(o);
+        variantSel.value = "custom";
+      }
+    }
+    if (variantSel) variantSel.dispatchEvent(new Event("change"));
+  </script>
+</body>
+</html>

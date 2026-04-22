@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Domains · nexus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="top-strip"></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand-tile">N</div>
+      <nav class="nav">
+        <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+        <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
+        <a href="domains.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
+        <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
+      </nav>
+      <div class="avatar">K</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1>Domains</h1>
+        <div class="page-header__right">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input class="input" type="search" placeholder="Search domains..." />
+          </div>
+          <button class="btn btn--black">+ Add Domain</button>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <div class="card">
+          <div class="table-scroll" role="region" aria-label="Domains">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Domain</th>
+                <th>Status</th>
+                <th>Workspace</th>
+                <th>Added</th>
+                <!-- 6: H/F renamed to "Site shell" (Header / Footer / CMP). Tooltip clarifies. -->
+                <th class="right" title="Shared header, footer, and consent (CMP) markup">Site shell</th>
+                <th class="right"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="domain-row">
+                <td>
+                  <strong class="mono">offers.acme.com</strong>
+                  <div class="domain-row__meta">4 landers · <button class="js-domain-toggle" data-target="nested-offers" aria-expanded="true" aria-controls="nested-offers"><span class="js-collapse-label">collapse ▴</span></button></div>
+                </td>
+                <td><span class="badge badge--active">Active</span></td>
+                <td>ACME Growth</td>
+                <td class="muted">7 days ago</td>
+                <td class="right"><button class="shell-btn js-edit-shell" data-domain="offers.acme.com">Site shell</button></td>
+                <td class="right"><button class="icon-btn" aria-label="More">⋯</button></td>
+              </tr>
+              <tr><td colspan="6" style="padding:0; border:none;">
+                <div class="nested-landers" id="nested-offers">
+                  <div class="nested-landers__head"><div>Lander</div><div>Status</div><div class="right">Variants</div><div></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Summer Sale</strong><small>offers.acme.com/summer-sale-hero</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">2</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Founder Letter</strong><small>offers.acme.com/founder-letter</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">1</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Black Friday</strong><small>offers.acme.com/black-friday-2026</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">1</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Spring Promo</strong><small>offers.acme.com/spring-promo</small></div></div><div><span class="badge badge--draft">Draft</span></div><div class="right">1</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
+                </div>
+              </td></tr>
+
+              <tr class="domain-row">
+                <td><strong class="mono">refer.acme.com</strong>
+                  <div class="domain-row__meta">1 lander · <button class="js-domain-toggle" data-target="nested-refer" aria-expanded="false" aria-controls="nested-refer"><span class="js-collapse-label">expand ▾</span></button></div>
+                </td>
+                <td><span class="badge badge--active">Active</span></td>
+                <td>ACME Growth</td>
+                <td class="muted">10 days ago</td>
+                <td class="right"><button class="shell-btn js-edit-shell" data-domain="refer.acme.com">Site shell</button></td>
+                <td class="right"><button class="icon-btn">⋯</button></td>
+              </tr>
+              <tr><td colspan="6" style="padding:0; border:none;"><div class="nested-landers" id="nested-refer" hidden></div></td></tr>
+
+              <tr class="domain-row">
+                <td><strong class="mono">try.acme.com</strong>
+                  <div class="domain-row__meta">2 landers · <button class="js-domain-toggle" data-target="nested-try" aria-expanded="false" aria-controls="nested-try"><span class="js-collapse-label">expand ▾</span></button></div>
+                </td>
+                <td><span class="badge badge--active">Active</span></td>
+                <td>ACME Growth</td>
+                <td class="muted">12 days ago</td>
+                <td class="right"><button class="shell-btn js-edit-shell" data-domain="try.acme.com">Site shell</button></td>
+                <td class="right"><button class="icon-btn">⋯</button></td>
+              </tr>
+              <tr><td colspan="6" style="padding:0; border:none;"><div class="nested-landers" id="nested-try" hidden></div></td></tr>
+
+              <tr class="domain-row">
+                <td><strong class="mono">edge.financeapp.com</strong>
+                  <div class="domain-row__meta">0 landers</div>
+                </td>
+                <td><span class="badge badge--pending">Pending</span></td>
+                <td>FinanceEdge</td>
+                <td class="muted">2 days ago</td>
+                <td class="right"><button class="shell-btn js-edit-shell" data-domain="edge.financeapp.com">Site shell</button></td>
+                <td class="right"><button class="icon-btn">⋯</button></td>
+              </tr>
+              <tr class="domain-row">
+                <td><strong class="mono">insights.financeapp.com</strong>
+                  <div class="domain-row__meta">0 landers</div>
+                </td>
+                <td><span class="badge badge--active">Active</span></td>
+                <td>FinanceEdge</td>
+                <td class="muted">20 days ago</td>
+                <td class="right"><button class="shell-btn js-edit-shell" data-domain="insights.financeapp.com">Site shell</button></td>
+                <td class="right"><button class="icon-btn">⋯</button></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 6: Site shell dialog (was H/F). Edit Header / Footer / CMP with AI. -->
+  <dialog class="modal modal--wide" id="dialog-shell">
+    <form method="dialog" class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title">Site shell — <span id="shell-domain" class="mono"></span></h2>
+          <p class="modal__hint">Shared across every lander on this domain. Edit the HTML directly, or ask <strong>Opus 4.7</strong> to change it below.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+
+      <div class="chrome-tabs" role="tablist">
+        <button type="button" class="chrome-tab is-active" data-chrome-tab="header" role="tab">Header</button>
+        <button type="button" class="chrome-tab" data-chrome-tab="footer" role="tab">Footer</button>
+        <button type="button" class="chrome-tab" data-chrome-tab="cmp" role="tab">CMP (consent)</button>
+      </div>
+
+      <div class="chrome-panel is-active" data-chrome-panel="header">
+        <textarea id="shell-header" class="code-editor" spellcheck="false">&lt;header class="site-header"&gt;
+  &lt;a class="logo" href="/"&gt;
+    &lt;img src="/assets/logo.svg" alt="ACME" width="96" height="24" /&gt;
+  &lt;/a&gt;
+  &lt;nav aria-label="Primary"&gt;
+    &lt;a href="/offers"&gt;Offers&lt;/a&gt;
+    &lt;a href="/help"&gt;Help&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;</textarea>
+        <div class="ai-row">
+          <input type="text" id="shell-ai-header" placeholder="e.g. make the header sticky on mobile and shrink logo to 80px" />
+          <button type="button" class="btn btn--cta js-chrome-ai" data-target="shell-header" data-input="shell-ai-header">Edit with AI</button>
+        </div>
+      </div>
+
+      <div class="chrome-panel" data-chrome-panel="footer">
+        <textarea id="shell-footer" class="code-editor" spellcheck="false">&lt;footer class="site-footer"&gt;
+  &lt;p&gt;© 2026 ACME Inc. · &lt;a href="/privacy"&gt;Privacy&lt;/a&gt; · &lt;a href="/terms"&gt;Terms&lt;/a&gt;&lt;/p&gt;
+&lt;/footer&gt;</textarea>
+        <div class="ai-row">
+          <input type="text" id="shell-ai-footer" placeholder="e.g. add a trust strip with 3 logos above the copyright" />
+          <button type="button" class="btn btn--cta js-chrome-ai" data-target="shell-footer" data-input="shell-ai-footer">Edit with AI</button>
+        </div>
+      </div>
+
+      <div class="chrome-panel" data-chrome-panel="cmp">
+        <textarea id="shell-cmp" class="code-editor" spellcheck="false">&lt;div id="cmp-banner" role="region" aria-label="Cookie consent"&gt;
+  &lt;p&gt;We use cookies to improve your experience. &lt;a href="/cookies"&gt;Learn more&lt;/a&gt;.&lt;/p&gt;
+  &lt;div class="cmp-actions"&gt;
+    &lt;button data-cmp="reject"&gt;Reject all&lt;/button&gt;
+    &lt;button data-cmp="accept"&gt;Accept all&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        <div class="ai-row">
+          <input type="text" id="shell-ai-cmp" placeholder="e.g. add a Manage preferences button and make Reject equally weighted (GDPR)" />
+          <button type="button" class="btn btn--cta js-chrome-ai" data-target="shell-cmp" data-input="shell-ai-cmp">Edit with AI</button>
+        </div>
+      </div>
+
+      <div class="opus-note">Prototype only. Real "Edit with AI" would send the selected block + your instruction to Claude Opus 4.7 and return a patched snippet.</div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="submit" class="btn btn--black">Save site shell</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    var dlg = document.getElementById("dialog-shell");
+    var domainLabel = document.getElementById("shell-domain");
+    document.querySelectorAll(".js-edit-shell").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        domainLabel.textContent = btn.getAttribute("data-domain") || "";
+        dlg.showModal();
+      });
+    });
+  </script>
+</body>
+</html>
