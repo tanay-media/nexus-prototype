@@ -73,10 +73,10 @@
 
     var useNexusWordmark = pathFile === "domains.html";
     var brandAnchor =
-      '<a href="index.html" class="top-brand' + (useNexusWordmark ? " top-brand--nexus" : "") + '" title="Home" aria-label="' + (useNexusWordmark ? "nexus" : "Forbes") + '">' +
+      '<a href="index.html" class="top-brand' + (useNexusWordmark ? " top-brand--nexus" : "") + '" title="Home" aria-label="nexus">' +
         (useNexusWordmark
           ? '<img src="img/nexus-wordmark.png" alt="nexus" class="top-brand__img top-brand__img--nexus" width="120" height="32" decoding="async" />'
-          : '<img src="img/forbes-logo.svg" alt="Forbes" class="top-brand__img" width="72" height="18" decoding="async" />') +
+          : '<img src="img/nexus-logo.svg" alt="nexus" class="top-brand__img top-brand__img--mark" width="24" height="24" decoding="async" />') +
       "</a>";
 
     strip.innerHTML =
