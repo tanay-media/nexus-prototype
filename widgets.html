@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Widgets · nexus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="top-strip"></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <a href="index.html" class="brand-tile" title="Home" aria-label="Forbes"><img src="img/forbes-logo.svg" alt="Forbes" class="brand-tile__img" width="72" height="18" decoding="async" /></a>
+      <nav class="nav">
+        <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+        <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="widgets.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
+        <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
+        <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
+        <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
+      </nav>
+      <div class="avatar">K</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1>Widgets</h1>
+        <div class="page-header__right">
+          <button type="button" class="btn btn--black">+ New widget</button>
+        </div>
+      </div>
+
+      <div class="page-body" data-tabs="widgets-page">
+        <div class="tabs">
+          <button type="button" class="tab is-active" data-tab="widgets-form">All widgets</button>
+          <button type="button" class="tab" data-tab="widgets-responses">Form Responses</button>
+        </div>
+
+        <section data-tab-panel="widgets-form">
+          <div class="card">
+            <div class="table-scroll" role="region" aria-label="Form widgets">
+              <table class="table table--widgets">
+                <thead>
+                  <tr>
+                    <th>Widget</th>
+                    <th>Type</th>
+                    <th>Lander</th>
+                    <th>Variants</th>
+                    <th>Updated</th>
+                    <th>By</th>
+                    <th class="right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Lead — short qualify</strong><div class="muted" style="font-size:11px;">3 steps · ZIP last</div></td>
+                    <td><span class="badge badge--type">Form</span></td>
+                    <td><a href="landers.html">Summer Sale</a></td>
+                    <td class="muted">Main hero, Urgency countdown</td>
+                    <td class="muted">2h ago</td>
+                    <td class="muted">Kyle</td>
+                    <td class="right"><div class="actions"><button type="button" class="icon-btn js-widget-edit" data-widget="Lead — short qualify" title="Edit widget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></div></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Quote request</strong><div class="muted" style="font-size:11px;">5 steps · consent mid</div></td>
+                    <td><span class="badge badge--type">Form</span></td>
+                    <td><a href="landers.html">Referral Q2</a></td>
+                    <td class="muted">Single-field entry</td>
+                    <td class="muted">1d ago</td>
+                    <td class="muted">Maya</td>
+                    <td class="right"><div class="actions"><button type="button" class="icon-btn js-widget-edit" data-widget="Quote request" title="Edit widget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></div></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Newsletter + SMS opt-in</strong><div class="muted" style="font-size:11px;">2 steps</div></td>
+                    <td><span class="badge badge--type">Form</span></td>
+                    <td><a href="landers.html">Founder Letter</a></td>
+                    <td class="muted">All variants</td>
+                    <td class="muted">3d ago</td>
+                    <td class="muted">Sam</td>
+                    <td class="right"><div class="actions"><button type="button" class="icon-btn js-widget-edit" data-widget="Newsletter + SMS opt-in" title="Edit widget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section data-tab-panel="widgets-responses" hidden>
+          <div class="card">
+            <div class="form-responses-toolbar">
+              <label class="form-responses-toolbar__label" for="widget-response-form">Form</label>
+              <select class="select form-responses-toolbar__select" id="widget-response-form" aria-label="Select form to view responses">
+                <option value="lead-qualify">Lead — short qualify</option>
+                <option value="quote-request">Quote request</option>
+                <option value="newsletter-sms">Newsletter + SMS opt-in</option>
+                <option value="home-service">Home service quote</option>
+              </select>
+              <span class="muted form-responses-toolbar__hint">Playground: mock rows per form schema.</span>
+            </div>
+            <div class="table-scroll" role="region" aria-label="Form responses">
+              <table class="table table--form-responses" id="widget-responses-table">
+                <thead id="widget-responses-thead"></thead>
+                <tbody id="widget-responses-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog class="modal modal--widget-editor" id="dialog-widget-form">
+    <div class="modal__inner modal__inner--widget-editor">
+      <div class="modal__header widget-editor__modal-head">
+        <h2 class="modal__title" id="widget-editor-title">Edit Form</h2>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <div class="widget-editor__body">
+        <aside class="widget-editor__sidebar">
+          <p class="widget-editor__section-title">Fields <span class="widget-editor__count" id="widget-field-count">(2)</span></p>
+          <div class="widget-editor__field-list" id="widget-field-list">
+            <button type="button" class="widget-editor-field is-selected" data-label="Full Name" data-placeholder="John Doe" data-type="Text" data-required="1">
+              <span class="widget-editor-field__drag" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h11M4 6h1M9 12h11M4 12h1M9 18h11M4 18h1"/></svg></span>
+              <span class="widget-editor-field__name">Full Name</span>
+              <span class="widget-editor-field__del" title="Remove" role="presentation"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></span>
+            </button>
+            <button type="button" class="widget-editor-field" data-label="Email" data-placeholder="you@company.com" data-type="Email" data-required="1">
+              <span class="widget-editor-field__lead" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M22 7l-10 7L2 7"/></svg></span>
+              <span class="widget-editor-field__name">Email</span>
+              <span class="widget-editor-field__del" title="Remove" role="presentation"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></span>
+            </button>
+          </div>
+          <button type="button" class="widget-editor__add-field">+ Add Field</button>
+          <div class="widget-editor__submit-block">
+            <span class="widget-editor__submit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 8l5-5 5 5M5 21h14"/></svg></span>
+            <span>Submit</span>
+          </div>
+        </aside>
+        <div class="widget-editor__props">
+          <div class="field">
+            <label for="widget-prop-type">Field type</label>
+            <select id="widget-prop-type">
+              <option value="Text">Text</option>
+              <option value="Email">Email</option>
+              <option value="Phone">Phone</option>
+              <option value="Select">Select</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="widget-prop-label">Label</label>
+            <input type="text" id="widget-prop-label" value="Full Name" />
+          </div>
+          <div class="field">
+            <label for="widget-prop-placeholder">Placeholder</label>
+            <input type="text" id="widget-prop-placeholder" value="John Doe" />
+          </div>
+          <div class="field field--checkbox">
+            <label><input type="checkbox" id="widget-prop-required" checked /> Field is required</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal__actions widget-editor__footer">
+        <button type="button" class="btn btn--black" id="widget-editor-save">Update Form</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      var dlg = document.getElementById("dialog-widget-form");
+      var title = document.getElementById("widget-editor-title");
+      var list = document.getElementById("widget-field-list");
+      var countEl = document.getElementById("widget-field-count");
+      var typeSel = document.getElementById("widget-prop-type");
+      var labelIn = document.getElementById("widget-prop-label");
+      var placeIn = document.getElementById("widget-prop-placeholder");
+      var reqIn = document.getElementById("widget-prop-required");
+      var addBtn = document.querySelector(".widget-editor__add-field");
+
+      function fieldCount() {
+        return list.querySelectorAll(".widget-editor-field").length;
+      }
+
+      function refreshCount() {
+        if (countEl) countEl.textContent = "(" + fieldCount() + ")";
+      }
+
+      function syncPropsFromField(btn) {
+        if (!btn) return;
+        typeSel.value = btn.getAttribute("data-type") || "Text";
+        labelIn.value = btn.getAttribute("data-label") || "";
+        placeIn.value = btn.getAttribute("data-placeholder") || "";
+        reqIn.checked = btn.getAttribute("data-required") === "1";
+      }
+
+      function syncFieldFromProps(btn) {
+        if (!btn) return;
+        btn.setAttribute("data-type", typeSel.value);
+        btn.setAttribute("data-label", labelIn.value.trim());
+        btn.setAttribute("data-placeholder", placeIn.value.trim());
+        btn.setAttribute("data-required", reqIn.checked ? "1" : "0");
+        var nm = btn.querySelector(".widget-editor-field__name");
+        if (nm) nm.textContent = labelIn.value.trim() || "Untitled";
+      }
+
+      function selectField(row) {
+        list.querySelectorAll(".widget-editor-field").forEach(function (f) {
+          f.classList.remove("is-selected");
+        });
+        row.classList.add("is-selected");
+        syncPropsFromField(row);
+      }
+
+      document.querySelectorAll(".js-widget-edit").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var name = btn.getAttribute("data-widget") || "Form";
+          title.textContent = "Edit Form — " + name;
+          var first = list.querySelector(".widget-editor-field");
+          list.querySelectorAll(".widget-editor-field").forEach(function (f) {
+            f.classList.remove("is-selected");
+          });
+          if (first) {
+            first.classList.add("is-selected");
+            syncPropsFromField(first);
+          }
+          refreshCount();
+          dlg.showModal();
+        });
+      });
+
+      list.addEventListener("click", function (e) {
+        if (e.target.closest(".widget-editor-field__del")) {
+          e.preventDefault();
+          e.stopPropagation();
+          var row = e.target.closest(".widget-editor-field");
+          if (!row || fieldCount() <= 1) return;
+          var wasSel = row.classList.contains("is-selected");
+          row.remove();
+          refreshCount();
+          if (wasSel) {
+            var next = list.querySelector(".widget-editor-field");
+            if (next) selectField(next);
+          }
+          return;
+        }
+        var row = e.target.closest(".widget-editor-field");
+        if (!row) return;
+        selectField(row);
+      });
+
+      if (addBtn) {
+        addBtn.addEventListener("click", function () {
+          var n = fieldCount() + 1;
+          var row = document.createElement("button");
+          row.type = "button";
+          row.className = "widget-editor-field";
+          row.setAttribute("data-label", "New field " + n);
+          row.setAttribute("data-placeholder", "");
+          row.setAttribute("data-type", "Text");
+          row.setAttribute("data-required", "0");
+          row.innerHTML =
+            '<span class="widget-editor-field__drag" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h11M4 6h1M9 12h11M4 12h1M9 18h11M4 18h1"/></svg></span>' +
+            '<span class="widget-editor-field__name">New field ' + n + "</span>" +
+            '<span class="widget-editor-field__del" title="Remove" role="presentation"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></span>';
+          list.appendChild(row);
+          refreshCount();
+          selectField(row);
+        });
+      }
+
+      [typeSel, labelIn, placeIn, reqIn].forEach(function (el) {
+        el.addEventListener("change", function () {
+          var sel = list.querySelector(".widget-editor-field.is-selected");
+          syncFieldFromProps(sel);
+        });
+        el.addEventListener("input", function () {
+          var sel = list.querySelector(".widget-editor-field.is-selected");
+          syncFieldFromProps(sel);
+        });
+      });
+
+      document.getElementById("widget-editor-save").addEventListener("click", function () {
+        var sel = list.querySelector(".widget-editor-field.is-selected");
+        syncFieldFromProps(sel);
+        dlg.close();
+      });
+    })();
+
+    (function () {
+      var FORM_RESPONSES = {
+        "lead-qualify": {
+          columns: ["Submitted at", "Visit ID", "Email", "ZIP code", "Phone"],
+          rows: [
+            ["2026-04-22 10:12", "vis_a7f2…p2q5", "jane.d@gmail.com", "44102", "(opt out)"],
+            ["2026-04-22 09:58", "vis_m3k9…n8r1", "m.rodriguez@yahoo.com", "90210", "+1 216-555-0142"],
+            ["2026-04-22 09:41", "vis_p2n8…k4j7", "alex@company.com", "10012", ""],
+            ["2026-04-21 16:22", "vis_q8w1…t9x3", "sam@outlook.com", "30301", "(opt out)"]
+          ]
+        },
+        "quote-request": {
+          columns: ["Submitted at", "Visit ID", "Coverage", "Deductible", "Consent"],
+          rows: [
+            ["2026-04-22 10:08", "vis_b4h2…m9s6", "Home", "$1,000", "yes"],
+            ["2026-04-22 08:15", "vis_c9j1…l2v8", "Home", "$2,500", "yes"],
+            ["2026-04-21 14:03", "vis_d1k7…n5w4", "Renters", "$500", "no"]
+          ]
+        },
+        "newsletter-sms": {
+          columns: ["Submitted at", "Visit ID", "Email", "SMS opt-in"],
+          rows: [
+            ["2026-04-22 09:51", "vis_e5l3…o7y2", "news@yahoo.com", "no"],
+            ["2026-04-21 11:30", "vis_f8m4…p1z9", "digest@gmail.com", "yes"]
+          ]
+        },
+        "home-service": {
+          columns: ["Submitted at", "Visit ID", "Carpet area (sq ft)", "No. of stories", "Zipcode"],
+          rows: [
+            ["2026-04-22 11:05", "vis_g2n5…q4a1", "1,850", "2", "44102"],
+            ["2026-04-22 07:40", "vis_h6o8…r3b7", "2,400", "1", "90210"],
+            ["2026-04-21 19:12", "vis_j9p1…s8c5", "920", "3", "30301"]
+          ]
+        }
+      };
+
+      var sel = document.getElementById("widget-response-form");
+      var thead = document.getElementById("widget-responses-thead");
+      var tbody = document.getElementById("widget-responses-tbody");
+
+      function renderResponses(formKey) {
+        var spec = FORM_RESPONSES[formKey] || FORM_RESPONSES["lead-qualify"];
+        var trh = document.createElement("tr");
+        spec.columns.forEach(function (col) {
+          var th = document.createElement("th");
+          th.textContent = col;
+          trh.appendChild(th);
+        });
+        thead.innerHTML = "";
+        thead.appendChild(trh);
+        tbody.innerHTML = "";
+        spec.rows.forEach(function (cells) {
+          var tr = document.createElement("tr");
+          cells.forEach(function (text) {
+            var td = document.createElement("td");
+            td.textContent = text;
+            if (String(text).indexOf("vis_") === 0) td.className = "mono muted";
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      }
+
+      if (sel && thead && tbody) {
+        renderResponses(sel.value);
+        sel.addEventListener("change", function () {
+          renderResponses(sel.value);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

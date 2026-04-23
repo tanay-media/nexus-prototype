@@ -10,10 +10,11 @@
   <div class="top-strip"></div>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand-tile">N</div>
+      <a href="index.html" class="brand-tile" title="Home" aria-label="Forbes"><img src="img/forbes-logo.svg" alt="Forbes" class="brand-tile__img" width="72" height="18" decoding="async" /></a>
       <nav class="nav">
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
         <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="widgets.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
         <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
         <a href="domains.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
         <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
@@ -25,15 +26,33 @@
       <div class="page-header">
         <h1>Domains</h1>
         <div class="page-header__right">
-          <div class="search-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-            <input class="input" type="search" placeholder="Search domains..." />
-          </div>
           <button class="btn btn--black">+ Add Domain</button>
         </div>
       </div>
 
-      <div class="page-body">
+      <div class="page-body" data-tabs="domains-page">
+        <div class="tabs">
+          <button type="button" class="tab is-active" data-tab="domains">Domains</button>
+          <button type="button" class="tab" data-tab="dsk">Domain service keys</button>
+        </div>
+
+        <section data-tab-panel="domains">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input class="input" type="search" id="domains-search" placeholder="Search by domain, workspace" />
+          </div>
+          <select class="select" id="domains-status-filter" aria-label="Status filter">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+          </select>
+          <div class="date-range" role="group" aria-label="Date added range">
+            <input type="date" class="date-range__input" id="domains-date-from" aria-label="From date" />
+            <span class="date-range__sep" aria-hidden="true">→</span>
+            <input type="date" class="date-range__input" id="domains-date-to" aria-label="To date" />
+          </div>
+        </div>
         <div class="card">
           <div class="table-scroll" role="region" aria-label="Domains">
           <table class="table">
@@ -49,7 +68,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="domain-row">
+              <tr class="domain-row" data-domain-row data-domain="offers.acme.com" data-workspace="ACME Growth" data-status="active" data-added="2026-04-16">
                 <td>
                   <strong class="mono">offers.acme.com</strong>
                   <div class="domain-row__meta">4 landers · <button class="js-domain-toggle" data-target="nested-offers" aria-expanded="true" aria-controls="nested-offers"><span class="js-collapse-label">collapse ▴</span></button></div>
@@ -63,14 +82,14 @@
               <tr><td colspan="6" style="padding:0; border:none;">
                 <div class="nested-landers" id="nested-offers">
                   <div class="nested-landers__head"><div>Lander</div><div>Status</div><div class="right">Variants</div><div></div></div>
-                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Summer Sale</strong><small>offers.acme.com/summer-sale-hero</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">2</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
-                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Founder Letter</strong><small>offers.acme.com/founder-letter</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">1</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
-                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Black Friday</strong><small>offers.acme.com/black-friday-2026</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">1</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
-                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Spring Promo</strong><small>offers.acme.com/spring-promo</small></div></div><div><span class="badge badge--draft">Draft</span></div><div class="right">1</div><div><button class="icon-btn" title="Open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></button></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Summer Sale</strong><small>offers.acme.com/summer-sale-hero</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">2</div><div><a class="icon-btn" href="landers.html?lander=summer-sale" title="Open in Landers" aria-label="Open Summer Sale in Landers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Founder Letter</strong><small>offers.acme.com/founder-letter</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">1</div><div><a class="icon-btn" href="landers.html?lander=founder-letter" title="Open in Landers" aria-label="Open Founder Letter in Landers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Black Friday</strong><small>offers.acme.com/black-friday-2026</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">1</div><div><a class="icon-btn" href="landers.html?lander=black-friday" title="Open in Landers" aria-label="Open Black Friday in Landers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a></div></div>
+                  <div class="nested-lander"><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Spring Promo</strong><small>offers.acme.com/spring-promo</small></div></div><div><span class="badge badge--published">Published</span></div><div class="right">1</div><div><a class="icon-btn" href="landers.html?lander=spring-promo" title="Open in Landers" aria-label="Open Spring Promo in Landers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a></div></div>
                 </div>
               </td></tr>
 
-              <tr class="domain-row">
+              <tr class="domain-row" data-domain-row data-domain="refer.acme.com" data-workspace="ACME Growth" data-status="active" data-added="2026-04-13">
                 <td><strong class="mono">refer.acme.com</strong>
                   <div class="domain-row__meta">1 lander · <button class="js-domain-toggle" data-target="nested-refer" aria-expanded="false" aria-controls="nested-refer"><span class="js-collapse-label">expand ▾</span></button></div>
                 </td>
@@ -82,7 +101,7 @@
               </tr>
               <tr><td colspan="6" style="padding:0; border:none;"><div class="nested-landers" id="nested-refer" hidden></div></td></tr>
 
-              <tr class="domain-row">
+              <tr class="domain-row" data-domain-row data-domain="try.acme.com" data-workspace="ACME Growth" data-status="active" data-added="2026-04-11">
                 <td><strong class="mono">try.acme.com</strong>
                   <div class="domain-row__meta">2 landers · <button class="js-domain-toggle" data-target="nested-try" aria-expanded="false" aria-controls="nested-try"><span class="js-collapse-label">expand ▾</span></button></div>
                 </td>
@@ -94,7 +113,7 @@
               </tr>
               <tr><td colspan="6" style="padding:0; border:none;"><div class="nested-landers" id="nested-try" hidden></div></td></tr>
 
-              <tr class="domain-row">
+              <tr class="domain-row" data-domain-row data-domain="edge.financeapp.com" data-workspace="FinanceEdge" data-status="pending" data-added="2026-04-21">
                 <td><strong class="mono">edge.financeapp.com</strong>
                   <div class="domain-row__meta">0 landers</div>
                 </td>
@@ -104,7 +123,7 @@
                 <td class="right"><button class="shell-btn js-edit-shell" data-domain="edge.financeapp.com">Site shell</button></td>
                 <td class="right"><button class="icon-btn">⋯</button></td>
               </tr>
-              <tr class="domain-row">
+              <tr class="domain-row" data-domain-row data-domain="insights.financeapp.com" data-workspace="FinanceEdge" data-status="active" data-added="2026-04-03">
                 <td><strong class="mono">insights.financeapp.com</strong>
                   <div class="domain-row__meta">0 landers</div>
                 </td>
@@ -118,86 +137,277 @@
           </table>
           </div>
         </div>
+        </section>
+
+        <section data-tab-panel="dsk" hidden>
+          <div class="card">
+            <div class="toolbar" style="padding-top:0.5rem;">
+              <p class="muted" style="margin:0; flex:1; font-size:12px;">Keys used for server-side calls (webhooks, APIs). Prototype — nothing is persisted.</p>
+              <button type="button" class="btn btn--black" id="dsk-add-btn">+ Add key</button>
+            </div>
+            <div class="table-scroll" role="region" aria-label="Domain service keys">
+              <table class="table table--dsk" id="dsk-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Key ID</th>
+                    <th>Domains</th>
+                    <th>Created</th>
+                    <th>Last used</th>
+                    <th class="right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="dsk-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   </div>
 
-  <!-- 6: Site shell dialog (was H/F). Edit Header / Footer / CMP with AI. -->
-  <dialog class="modal modal--wide" id="dialog-shell">
-    <form method="dialog" class="modal__inner">
+  <!-- Site shell: right drawer + preview (see site-shell.js) -->
+
+  <!-- DSK: add / edit (same dialog, mode) -->
+  <dialog class="modal" id="dialog-dsk-form">
+    <form method="dialog" class="modal__inner" id="form-dsk">
       <div class="modal__header">
         <div>
-          <h2 class="modal__title">Site shell — <span id="shell-domain" class="mono"></span></h2>
-          <p class="modal__hint">Shared across every lander on this domain. Edit the HTML directly, or ask <strong>Opus 4.7</strong> to change it below.</p>
+          <h2 class="modal__title" id="dsk-form-title">Add service key</h2>
+          <p class="modal__hint" id="dsk-form-hint">Display name and which domains may use this key.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
-
-      <div class="chrome-tabs" role="tablist">
-        <button type="button" class="chrome-tab is-active" data-chrome-tab="header" role="tab">Header</button>
-        <button type="button" class="chrome-tab" data-chrome-tab="footer" role="tab">Footer</button>
-        <button type="button" class="chrome-tab" data-chrome-tab="cmp" role="tab">CMP (consent)</button>
+      <input type="hidden" id="dsk-edit-id" value="" />
+      <div class="field"><label for="dsk-name">Name</label><input type="text" id="dsk-name" required placeholder="e.g. Stripe payouts" /></div>
+      <div class="field"><label for="dsk-domains">Domains (comma-separated)</label><input type="text" id="dsk-domains" placeholder="offers.acme.com, try.acme.com" /></div>
+      <div class="field" id="dsk-secret-wrap">
+        <label for="dsk-secret">Secret (shown once)</label>
+        <input type="text" id="dsk-secret" placeholder="sk_live_…" autocomplete="off" />
+        <div class="field__hint">Prototype only — not stored securely.</div>
       </div>
-
-      <div class="chrome-panel is-active" data-chrome-panel="header">
-        <textarea id="shell-header" class="code-editor" spellcheck="false">&lt;header class="site-header"&gt;
-  &lt;a class="logo" href="/"&gt;
-    &lt;img src="/assets/logo.svg" alt="ACME" width="96" height="24" /&gt;
-  &lt;/a&gt;
-  &lt;nav aria-label="Primary"&gt;
-    &lt;a href="/offers"&gt;Offers&lt;/a&gt;
-    &lt;a href="/help"&gt;Help&lt;/a&gt;
-  &lt;/nav&gt;
-&lt;/header&gt;</textarea>
-        <div class="ai-row">
-          <input type="text" id="shell-ai-header" placeholder="e.g. make the header sticky on mobile and shrink logo to 80px" />
-          <button type="button" class="btn btn--cta js-chrome-ai" data-target="shell-header" data-input="shell-ai-header">Edit with AI</button>
-        </div>
-      </div>
-
-      <div class="chrome-panel" data-chrome-panel="footer">
-        <textarea id="shell-footer" class="code-editor" spellcheck="false">&lt;footer class="site-footer"&gt;
-  &lt;p&gt;© 2026 ACME Inc. · &lt;a href="/privacy"&gt;Privacy&lt;/a&gt; · &lt;a href="/terms"&gt;Terms&lt;/a&gt;&lt;/p&gt;
-&lt;/footer&gt;</textarea>
-        <div class="ai-row">
-          <input type="text" id="shell-ai-footer" placeholder="e.g. add a trust strip with 3 logos above the copyright" />
-          <button type="button" class="btn btn--cta js-chrome-ai" data-target="shell-footer" data-input="shell-ai-footer">Edit with AI</button>
-        </div>
-      </div>
-
-      <div class="chrome-panel" data-chrome-panel="cmp">
-        <textarea id="shell-cmp" class="code-editor" spellcheck="false">&lt;div id="cmp-banner" role="region" aria-label="Cookie consent"&gt;
-  &lt;p&gt;We use cookies to improve your experience. &lt;a href="/cookies"&gt;Learn more&lt;/a&gt;.&lt;/p&gt;
-  &lt;div class="cmp-actions"&gt;
-    &lt;button data-cmp="reject"&gt;Reject all&lt;/button&gt;
-    &lt;button data-cmp="accept"&gt;Accept all&lt;/button&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</textarea>
-        <div class="ai-row">
-          <input type="text" id="shell-ai-cmp" placeholder="e.g. add a Manage preferences button and make Reject equally weighted (GDPR)" />
-          <button type="button" class="btn btn--cta js-chrome-ai" data-target="shell-cmp" data-input="shell-ai-cmp">Edit with AI</button>
-        </div>
-      </div>
-
-      <div class="opus-note">Prototype only. Real "Edit with AI" would send the selected block + your instruction to Claude Opus 4.7 and return a patched snippet.</div>
-
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="submit" class="btn btn--black">Save site shell</button>
+        <button type="submit" class="btn btn--black" id="dsk-form-save">Save</button>
       </div>
     </form>
   </dialog>
 
+  <dialog class="modal" id="dialog-dsk-rename">
+    <form method="dialog" class="modal__inner">
+      <div class="modal__header">
+        <div><h2 class="modal__title">Rename key</h2></div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <input type="hidden" id="dsk-rename-id" />
+      <div class="field"><label for="dsk-rename-input">New name</label><input type="text" id="dsk-rename-input" required /></div>
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="dsk-rename-save">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="dialog-dsk-delete">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <div><h2 class="modal__title">Delete key</h2><p class="modal__hint" id="dsk-delete-msg"></p></div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="dsk-delete-confirm">Delete</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="app.js"></script>
+  <script src="site-shell.js"></script>
   <script>
-    var dlg = document.getElementById("dialog-shell");
-    var domainLabel = document.getElementById("shell-domain");
-    document.querySelectorAll(".js-edit-shell").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        domainLabel.textContent = btn.getAttribute("data-domain") || "";
-        dlg.showModal();
+    // --- Domains tab: search + status + date-added filters ---
+    (function () {
+      var rows = document.querySelectorAll("tr[data-domain-row]");
+      if (!rows.length) return;
+      var search = document.getElementById("domains-search");
+      var stat   = document.getElementById("domains-status-filter");
+      var fromEl = document.getElementById("domains-date-from");
+      var toEl   = document.getElementById("domains-date-to");
+
+      function apply() {
+        var q  = (search && search.value || "").trim().toLowerCase();
+        var sv = stat && stat.value || "";
+        var fromD = fromEl && fromEl.value ? new Date(fromEl.value) : null;
+        var toD   = toEl   && toEl.value   ? new Date(toEl.value)   : null;
+
+        rows.forEach(function (r) {
+          var dom  = (r.getAttribute("data-domain") || "").toLowerCase();
+          var ws   = (r.getAttribute("data-workspace") || "").toLowerCase();
+          var st   = r.getAttribute("data-status") || "";
+          var addS = r.getAttribute("data-added") || "";
+          var addD = addS ? new Date(addS) : null;
+          var keep = true;
+          if (q && dom.indexOf(q) === -1 && ws.indexOf(q) === -1) keep = false;
+          if (sv && st !== sv) keep = false;
+          if (fromD && addD && addD < fromD) keep = false;
+          if (toD && addD && addD.getTime() > toD.getTime() + 86399999) keep = false;
+          r.hidden = !keep;
+          // Hide the sibling nested-landers row (if any) alongside the domain row.
+          var next = r.nextElementSibling;
+          if (next && next.querySelector(".nested-landers")) next.hidden = !keep;
+        });
+      }
+
+      if (search) search.addEventListener("input", apply);
+      if (stat)   stat.addEventListener("change", apply);
+      if (fromEl) fromEl.addEventListener("change", apply);
+      if (toEl)   toEl.addEventListener("change", apply);
+    })();
+
+    // --- Domain service keys (prototype CRUD) ---
+    (function () {
+      var body = document.getElementById("dsk-body");
+      var formDlg = document.getElementById("dialog-dsk-form");
+      var formTitle = document.getElementById("dsk-form-title");
+      var formHint = document.getElementById("dsk-form-hint");
+      var editId = document.getElementById("dsk-edit-id");
+      var nameIn = document.getElementById("dsk-name");
+      var domIn = document.getElementById("dsk-domains");
+      var secIn = document.getElementById("dsk-secret");
+      var secWrap = document.getElementById("dsk-secret-wrap");
+      var renameDlg = document.getElementById("dialog-dsk-rename");
+      var renameId = document.getElementById("dsk-rename-id");
+      var renameIn = document.getElementById("dsk-rename-input");
+      var delDlg = document.getElementById("dialog-dsk-delete");
+      var delMsg = document.getElementById("dsk-delete-msg");
+      var delPending = null;
+
+      var keys = [
+        { id: "k1", name: "Meta CAPI", prefix: "nxd_sk_a3f9", domains: "offers.acme.com, refer.acme.com", created: "Mar 2, 2026", lastUsed: "2h ago" },
+        { id: "k2", name: "Lead webhook HMAC", prefix: "nxd_sk_8b21", domains: "offers.acme.com", created: "Jan 18, 2026", lastUsed: "1d ago" },
+        { id: "k3", name: "Partner API", prefix: "nxd_sk_ee02", domains: "try.acme.com", created: "Apr 1, 2026", lastUsed: "—" }
+      ];
+
+      function render() {
+        if (!body) return;
+        body.innerHTML = "";
+        keys.forEach(function (k) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td><strong>" + escapeHtml(k.name) + "</strong></td>" +
+            "<td><code class=\"mono\">" + escapeHtml(k.prefix) + "••••••••</code></td>" +
+            "<td class=\"muted\">" + escapeHtml(k.domains) + "</td>" +
+            "<td class=\"muted\">" + escapeHtml(k.created) + "</td>" +
+            "<td class=\"muted\">" + escapeHtml(k.lastUsed) + "</td>" +
+            "<td class=\"right\"><div class=\"actions\">" +
+            "<button type=\"button\" class=\"icon-btn js-dsk-copy\" data-id=\"" + k.id + "\" title=\"Copy key id\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg></button>" +
+            "<button type=\"button\" class=\"icon-btn js-dsk-edit\" data-id=\"" + k.id + "\" title=\"Edit\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z\"/></svg></button>" +
+            "<button type=\"button\" class=\"icon-btn js-dsk-rename\" data-id=\"" + k.id + "\" title=\"Rename\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 7V4h16v3\"/><path d=\"M9 20h6\"/><path d=\"M12 4v16\"/></svg></button>" +
+            "<button type=\"button\" class=\"icon-btn js-dsk-del\" data-id=\"" + k.id + "\" title=\"Delete\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/></svg></button>" +
+            "</div></td>";
+          body.appendChild(tr);
+        });
+      }
+
+      function escapeHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\"/g, "&quot;");
+      }
+
+      function openAdd() {
+        editId.value = "";
+        formTitle.textContent = "Add service key";
+        formHint.textContent = "Display name and which domains may use this key.";
+        nameIn.value = "";
+        domIn.value = "";
+        secIn.value = "";
+        secWrap.hidden = false;
+        formDlg.showModal();
+      }
+
+      function openEdit(id) {
+        var k = keys.find(function (x) { return x.id === id; });
+        if (!k) return;
+        editId.value = id;
+        formTitle.textContent = "Edit service key";
+        formHint.textContent = "Update domains allowed for this key.";
+        nameIn.value = k.name;
+        domIn.value = k.domains;
+        secWrap.hidden = true;
+        formDlg.showModal();
+      }
+
+      document.getElementById("dsk-add-btn").addEventListener("click", openAdd);
+
+      document.getElementById("form-dsk").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var id = editId.value;
+        var nm = nameIn.value.trim();
+        var dm = domIn.value.trim();
+        if (!nm) return;
+        if (id) {
+          var kk = keys.find(function (x) { return x.id === id; });
+          if (kk) { kk.name = nm; kk.domains = dm || kk.domains; }
+        } else {
+          var prefix = "nxd_sk_" + Math.random().toString(36).slice(2, 6);
+          keys.push({
+            id: "k" + Date.now(),
+            name: nm,
+            prefix: prefix,
+            domains: dm || "—",
+            created: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
+            lastUsed: "—"
+          });
+        }
+        formDlg.close();
+        render();
       });
-    });
+
+      document.getElementById("dsk-body").addEventListener("click", function (e) {
+        var t = e.target.closest(".js-dsk-copy");
+        if (t) {
+          var k = keys.find(function (x) { return x.id === t.getAttribute("data-id"); });
+          if (k && navigator.clipboard) navigator.clipboard.writeText(k.prefix + "•••••••• (mock)");
+          return;
+        }
+        t = e.target.closest(".js-dsk-edit");
+        if (t) { openEdit(t.getAttribute("data-id")); return; }
+        t = e.target.closest(".js-dsk-rename");
+        if (t) {
+          var kk = keys.find(function (x) { return x.id === t.getAttribute("data-id"); });
+          if (kk) {
+            renameId.value = kk.id;
+            renameIn.value = kk.name;
+            renameDlg.showModal();
+          }
+          return;
+        }
+        t = e.target.closest(".js-dsk-del");
+        if (t) {
+          delPending = t.getAttribute("data-id");
+          var kk = keys.find(function (x) { return x.id === delPending; });
+          delMsg.textContent = kk ? "Remove \"" + kk.name + "\"? Integrations using it will break." : "";
+          delDlg.showModal();
+        }
+      });
+
+      document.getElementById("dsk-rename-save").addEventListener("click", function () {
+        var id = renameId.value;
+        var nm = renameIn.value.trim();
+        if (!nm) return;
+        var kk = keys.find(function (x) { return x.id === id; });
+        if (kk) kk.name = nm;
+        renameDlg.close();
+        render();
+      });
+
+      document.getElementById("dsk-delete-confirm").addEventListener("click", function () {
+        keys = keys.filter(function (x) { return x.id !== delPending; });
+        delDlg.close();
+        delPending = null;
+        render();
+      });
+
+      render();
+    })();
   </script>
 </body>
 </html>

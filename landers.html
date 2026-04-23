@@ -10,10 +10,11 @@
   <div class="top-strip"></div>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand-tile" title="nexus">N</div>
+      <a href="index.html" class="brand-tile" title="Home" aria-label="Forbes"><img src="img/forbes-logo.svg" alt="Forbes" class="brand-tile__img" width="72" height="18" decoding="async" /></a>
       <nav class="nav">
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
         <a href="landers.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="widgets.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
         <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
         <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
         <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
@@ -34,19 +35,22 @@
           Published <span class="tab-count" id="published-count">0</span>
         </button>
         <button type="button" class="tab" data-tab="drafts" role="tab" aria-selected="false">
-          Drafts &amp; Archived <span class="tab-count">3</span>
+          Drafts &amp; Archived <span class="tab-count" id="drafts-count">3</span>
         </button>
       </div>
 
-      <div class="toolbar">
+      <div class="toolbar" data-toolbar="published-only">
         <div class="search-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input class="input" type="search" placeholder="Search landers..." />
+          <input class="input" type="search" id="landers-search" placeholder="Search by name, url, variant" />
         </div>
-        <select class="select"><option>All domains</option><option>offers.acme.com</option><option>refer.acme.com</option></select>
-        <select class="select"><option>All editors</option><option>Kyle</option><option>Maya</option><option>Sam</option></select>
-        <select class="select"><option>Any date</option><option>Last 7 days</option><option>Last 30 days</option></select>
-        <!-- 5: Status filter replaces the unpublished toggle -->
+        <select class="select" id="landers-domain-filter" aria-label="Domain filter"><option value="">All domains</option><option>offers.acme.com</option><option>refer.acme.com</option><option>try.acme.com</option></select>
+        <select class="select" id="landers-editor-filter" aria-label="Editor filter"><option value="">All editors</option><option>Kyle</option><option>Maya</option><option>Sam</option><option>Dana</option></select>
+        <div class="date-range" role="group" aria-label="Updated date range">
+          <input type="date" class="date-range__input" id="landers-date-from" aria-label="From date" />
+          <span class="date-range__sep" aria-hidden="true">→</span>
+          <input type="date" class="date-range__input" id="landers-date-to" aria-label="To date" />
+        </div>
         <select class="select" id="status-filter" aria-label="Status filter">
           <option value="published" selected>Published</option>
           <option value="all">All</option>
@@ -59,18 +63,18 @@
         <div class="card">
           <div class="table-scroll" role="region" aria-label="Published landers">
           <table class="table" id="landers-table">
-            <thead>
+            <thead id="landers-thead">
               <tr>
-                <th style="width: 34px;"></th>
-                <th>Name</th>
-                <th>Split</th>
-                <th>Last updated</th>
-                <th>By</th>
-                <th class="right">Visits</th>
-                <th class="right">Impressions</th>
-                <th class="right">Clicks</th>
-                <th class="right">Conversions</th>
-                <th class="right">Score</th>
+                <th class="lander-row__toggle" style="width: 44px;"></th>
+                <th class="is-sortable" data-sort="name">Name<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th>Traffic</th>
+                <th class="is-sortable" data-sort="updated">Last updated<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="is-sortable" data-sort="by">By<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="right is-sortable" data-sort="visits">Visits<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="right is-sortable" data-sort="impressions">Impressions<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="right is-sortable" data-sort="clicks">Clicks<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="right is-sortable" data-sort="conversions">Conversions<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="right is-sortable" data-sort="score">Score<span class="th-sort" aria-hidden="true">↕</span></th>
                 <th class="right" style="min-width: 150px;">Actions</th>
               </tr>
             </thead>
@@ -81,35 +85,35 @@
       </section>
 
       <section class="page-body" data-tab-panel="drafts" hidden>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input class="input" type="search" id="drafts-search" placeholder="Search by name, url, variant" />
+          </div>
+          <select class="select" id="drafts-status-filter" aria-label="Status filter">
+            <option value="all">All</option>
+            <option value="draft">Draft</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
         <div class="card">
           <div class="table-scroll" role="region" aria-label="Draft landers">
-          <table class="table">
+          <table class="table" id="drafts-table">
             <thead>
               <tr>
                 <th style="width:34px"></th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Last updated</th>
-                <th>By</th>
+                <th class="is-sortable" data-sort="name">Name<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="is-sortable" data-sort="status">Status<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="is-sortable" data-sort="updated">Last updated<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th class="is-sortable" data-sort="by">By<span class="th-sort" aria-hidden="true">↕</span></th>
                 <th class="right" style="min-width: 150px;">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td></td>
-                <td><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Spring Promo</strong><small>offers.acme.com/spring-promo</small></div></div></td>
-                <td><span class="badge badge--draft">Draft</span></td>
-                <td class="muted">1h ago</td>
-                <td class="muted">Kyle</td>
-                <td class="right"><div class="actions">
-                  <button class="icon-btn js-lander-settings" data-lander="Spring Promo" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
-                  <a class="icon-btn" href="editor.html?name=Spring%20Promo" title="Open editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
-                </div></td>
-              </tr>
-              <tr>
+            <tbody id="drafts-body">
+              <tr data-drafts-row data-status="draft" data-name="Webinar Signup" data-url="offers.acme.com/webinar-q1" data-by="Maya" data-updated="2026-02-18">
                 <td></td>
                 <td><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Webinar Signup</strong><small>offers.acme.com/webinar-q1</small></div></div></td>
-                <td><span class="badge badge--archived">Archived</span></td>
+                <td><span class="badge badge--draft">Draft</span></td>
                 <td class="muted">2mo ago</td>
                 <td class="muted">Maya</td>
                 <td class="right"><div class="actions">
@@ -117,7 +121,18 @@
                   <a class="icon-btn" href="editor.html?name=Webinar%20Signup" title="Open editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
                 </div></td>
               </tr>
-              <tr>
+              <tr data-drafts-row data-status="draft" data-name="Partner Pulse" data-url="try.acme.com/partner-pulse" data-by="Kyle" data-updated="2026-04-23">
+                <td></td>
+                <td><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Partner Pulse</strong><small>try.acme.com/partner-pulse</small></div></div></td>
+                <td><span class="badge badge--draft">Draft</span></td>
+                <td class="muted">just now</td>
+                <td class="muted">Kyle</td>
+                <td class="right"><div class="actions">
+                  <button class="icon-btn js-lander-settings" data-lander="Partner Pulse" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+                  <a class="icon-btn" href="editor.html?name=Partner%20Pulse" title="Open editor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+                </div></td>
+              </tr>
+              <tr data-drafts-row data-status="archived" data-name="Q3 '25 Launch (legacy)" data-url="offers.acme.com/q3-launch" data-by="Dana" data-updated="2025-10-23">
                 <td></td>
                 <td><div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>Q3 '25 Launch (legacy)</strong><small>offers.acme.com/q3-launch</small></div></div></td>
                 <td><span class="badge badge--archived">Archived</span></td>
@@ -279,6 +294,25 @@
     </div>
   </dialog>
 
+  <!-- Traffic split / variant weights (playground) -->
+  <dialog class="modal modal--weights" id="dialog-manage-weights">
+    <div class="modal__inner modal__inner--weights">
+      <div class="modal__header">
+        <div class="modal__header-text">
+          <h2 class="modal__title">Manage weights</h2>
+          <p class="modal__hint" id="weights-dialog-sub">Adjust how traffic splits across variants.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <div id="weights-dialog-body" class="weights-dialog-body"></div>
+      <p class="muted weights-dialog-footnote">Percentages are illustrative in this playground; wire your API to persist.</p>
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="weights-save-btn">Save weights</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="app.js"></script>
   <script>
     // --------------------------------------------------------------------
@@ -324,6 +358,15 @@
         ]
       },
       {
+        id: "spring-promo", name: "Spring Promo", url: "https://offers.acme.com/spring-promo",
+        split: "100%", updated: "1d ago", updatedDate: "Apr 19, 2026", by: "Kyle",
+        status: "published",
+        visits: 8200, impressions: 6100, clicks: 2100, conversions: 380, score: 0.12,
+        variants: [
+          { name: "Main promo", split: "100%", updated: "1d ago", by: "Kyle", visits: 8200, impressions: 6100, clicks: 2100, conversions: 380, score: 0.12 }
+        ]
+      },
+      {
         id: "partner-announce", name: "Partner Announce", url: "https://try.acme.com/partner-announce",
         split: "100%", updated: "1d ago", updatedDate: "Apr 19, 2026", by: "Kyle",
         status: "published",
@@ -350,6 +393,15 @@
         variants: [
           { name: "Gift-led hero", split: "100%", updated: "2mo ago", by: "Sam", visits: 180, impressions: 96, clicks: 22, conversions: 3, score: 0.03 }
         ]
+      },
+      {
+        id: "partner-pulse-draft", name: "Partner Pulse", url: "https://try.acme.com/partner-pulse",
+        split: "100%", updated: "just now", updatedDate: "Apr 23, 2026", by: "Kyle",
+        status: "unpublished",
+        visits: 0, impressions: 0, clicks: 0, conversions: 0, score: 0,
+        variants: [
+          { name: "V1 — Draft hero", split: "100%", updated: "just now", by: "Kyle", visits: 0, impressions: 0, clicks: 0, conversions: 0, score: 0 }
+        ]
       }
     ];
 
@@ -367,6 +419,25 @@
 
     function fmt(n)  { return n.toLocaleString(); }
     function pct(n,d){ if (!d) return "—"; return ((n/d)*100).toFixed(1) + "%"; }
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    }
+    function parseSplitPercent(s) {
+      var m = String(s).match(/(\d+(?:\.\d+)?)/);
+      return m ? parseFloat(m[1]) : 0;
+    }
+    function syncLanderSplitFromVariants(l) {
+      if (!l || !l.variants.length) return;
+      if (l.variants.length === 1) {
+        l.split = String(l.variants[0].split || "100%").replace(/\s/g, "") || "100%";
+        return;
+      }
+      var nums = l.variants.map(function (v) {
+        var m = String(v.split).match(/(\d+(?:\.\d+)?)/);
+        return m ? m[1] : "0";
+      });
+      l.split = nums.join("/") + "%";
+    }
 
     // Variant preview URLs — stable 7-digit IDs on first render
     function variantPreviewUrl(v) {
@@ -380,21 +451,118 @@
     var tbody  = document.getElementById("landers-body");
     var countT = document.getElementById("published-count");
 
+    var urlParams = new URLSearchParams(window.location.search);
+    var landerUrlFilter = (urlParams.get("lander") || "").trim();
+    if (landerUrlFilter) {
+      var foundForUrl = landers.find(function (l) { return l.id === landerUrlFilter; });
+      if (!foundForUrl) {
+        landerUrlFilter = null;
+      } else {
+        var pubTabBtn = document.querySelector(".tabs[data-tabs] .tab[data-tab=\"published\"]");
+        if (pubTabBtn) pubTabBtn.click();
+        if (foundForUrl.status !== "published") {
+          document.getElementById("status-filter").value = "all";
+        }
+      }
+    }
+
+    function expandLanderRowFromUrl(landerId) {
+      var row = document.querySelector('tr[data-lander-row="' + landerId + '"]');
+      if (!row) return;
+      var toggle = row.querySelector(".lander-toggle");
+      if (!toggle || toggle.getAttribute("aria-expanded") === "true") return;
+      var variantsId = toggle.getAttribute("aria-controls");
+      if (!variantsId) return;
+      toggle.setAttribute("aria-expanded", "true");
+      document.querySelectorAll('[data-parent="' + variantsId + '"]').forEach(function (r) {
+        r.hidden = false;
+      });
+      row.classList.add("is-expanded");
+    }
+
+    // Sort state for the Published table — clicking a sortable header cycles it.
+    var sortState = { key: "impressions", dir: "desc" };
+
+    function parseUpdatedDate(l) {
+      var d = l.updatedDate ? new Date(l.updatedDate) : null;
+      return d && !isNaN(d) ? d : new Date(0);
+    }
+
+    function matchesSearch(l, q) {
+      if (!q) return true;
+      q = q.toLowerCase();
+      if (l.name.toLowerCase().indexOf(q) !== -1) return true;
+      if (l.url.toLowerCase().indexOf(q) !== -1) return true;
+      return (l.variants || []).some(function (v) {
+        return v.name && v.name.toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    function inDateRange(l, from, to) {
+      if (!from && !to) return true;
+      var t = parseUpdatedDate(l).getTime();
+      if (from && t < from.getTime()) return false;
+      if (to && t > to.getTime() + 86399999) return false;
+      return true;
+    }
+
+    function applySortIndicators() {
+      var thead = document.getElementById("landers-thead");
+      if (!thead) return;
+      thead.querySelectorAll("th.is-sortable").forEach(function (th) {
+        var key = th.getAttribute("data-sort");
+        th.classList.remove("is-sorted", "is-sorted-asc", "is-sorted-desc");
+        var arrow = th.querySelector(".th-sort");
+        if (key === sortState.key) {
+          th.classList.add("is-sorted");
+          th.classList.add(sortState.dir === "asc" ? "is-sorted-asc" : "is-sorted-desc");
+          if (arrow) arrow.textContent = sortState.dir === "asc" ? "↑" : "↓";
+        } else if (arrow) {
+          arrow.textContent = "↕";
+        }
+      });
+    }
+
     function render() {
       var statusFilter = document.getElementById("status-filter").value;
+      var q        = (document.getElementById("landers-search").value || "").trim();
+      var dom      = document.getElementById("landers-domain-filter").value;
+      var editor   = document.getElementById("landers-editor-filter").value;
+      var fromRaw  = document.getElementById("landers-date-from").value;
+      var toRaw    = document.getElementById("landers-date-to").value;
+      var fromD    = fromRaw ? new Date(fromRaw) : null;
+      var toD      = toRaw   ? new Date(toRaw)   : null;
 
       var rows = landers.slice().filter(function (l) {
-        if (statusFilter === "published")   return l.status === "published";
-        if (statusFilter === "unpublished") return l.status === "unpublished";
-        return true; // all
+        if (statusFilter === "published"   && l.status !== "published")   return false;
+        if (statusFilter === "unpublished" && l.status !== "unpublished") return false;
+        if (dom && l.url.indexOf(dom) === -1) return false;
+        if (editor && l.by !== editor) return false;
+        if (!matchesSearch(l, q)) return false;
+        if (!inDateRange(l, fromD, toD)) return false;
+        return true;
       });
 
-      // 6: Auto sort by impressions (desc)
-      rows.sort(function (a, b) { return b.impressions - a.impressions; });
+      if (landerUrlFilter) {
+        rows = rows.filter(function (l) { return l.id === landerUrlFilter; });
+      }
+
+      var dir = sortState.dir === "asc" ? 1 : -1;
+      rows.sort(function (a, b) {
+        var k = sortState.key;
+        if (k === "updated") {
+          return (parseUpdatedDate(a) - parseUpdatedDate(b)) * dir;
+        }
+        if (k === "name" || k === "by") {
+          return String(a[k] || "").localeCompare(String(b[k] || "")) * dir;
+        }
+        return ((a[k] || 0) - (b[k] || 0)) * dir;
+      });
 
       tbody.innerHTML = "";
       rows.forEach(function (l) { tbody.appendChild(renderLanderRow(l)); });
       countT.textContent = landers.filter(function (x) { return x.status === "published"; }).length;
+      applySortIndicators();
     }
 
     function renderLanderRow(l) {
@@ -407,8 +575,8 @@
       var tr = document.createElement("tr");
       tr.setAttribute("data-lander-row", l.id);
       tr.innerHTML =
-        '<td>' + (l.variants.length
-          ? '<button class="lander-toggle" aria-expanded="false" aria-controls="'+variantsId+'">'+ICON.chev+'</button>'
+        '<td class="lander-row__toggle">' + (l.variants.length
+          ? '<button type="button" class="lander-toggle" aria-expanded="false" aria-controls="'+variantsId+'" aria-label="Show or hide variants for this lander">'+ICON.chev+'</button>'
           : '') + '</td>' +
         '<td>' +
           '<div class="lander-cell">' +
@@ -424,7 +592,8 @@
             '</div>' +
           '</div>' +
         '</td>' +
-        '<td class="muted">' + l.split + '</td>' +
+        '<td class="muted"><span class="traffic-cell">' + escapeHtml(l.split) +
+          '<button type="button" class="icon-btn traffic-weight-btn js-manage-weights" data-lander-id="' + l.id + '" title="Manage weights" aria-label="Manage weights">' + ICON.edit + '</button></span></td>' +
         '<td class="muted" title="' + l.updatedDate + '">' + l.updated + '</td>' +
         '<td class="muted">' + l.by + '</td>' +
         '<td class="right num">' + fmt(l.visits) + '</td>' +
@@ -479,7 +648,8 @@
             '</div>' +
           '</div>' +
         '</td>' +
-        '<td class="muted">'+v.split+'</td>' +
+        '<td class="muted"><span class="traffic-cell">' + escapeHtml(v.split) +
+          '<button type="button" class="icon-btn traffic-weight-btn js-manage-weights" data-lander-id="' + l.id + '" data-variant="' + encodeURIComponent(v.name) + '" title="Manage weights" aria-label="Manage weights">' + ICON.edit + '</button></span></td>' +
         '<td class="muted">'+v.updated+'</td>' +
         '<td class="muted">'+(v.by || l.by)+'</td>' +
         '<td class="right num">'+fmt(v.visits)+'</td>' +
@@ -489,6 +659,7 @@
         '<td class="right num">'+v.score.toFixed(2)+'</td>' +
         '<td class="right"><div class="actions">' +
           '<a class="icon-btn" href="editor.html?name='+encodeURIComponent(l.name)+'&variant='+encodeURIComponent(v.name)+'" title="Edit in editor">'+ICON.edit+'</a>' +
+          '<button type="button" class="icon-btn js-manage-weights" data-lander-id="' + l.id + '" data-variant="' + encodeURIComponent(v.name) + '" title="Manage traffic weights">'+ICON.settings+'</button>' +
           '<button class="icon-btn js-clone-variant" data-lander="'+l.name+'" data-lander-id="'+l.id+'" data-variant="'+v.name+'" title="Clone variant">'+ICON.clone+'</button>' +
           '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'" title="Analyse in Reports">'+ICON.analyse+'</a>' +
         '</div></td>';
@@ -497,16 +668,212 @@
 
     render();
 
+    if (landerUrlFilter) {
+      requestAnimationFrame(function () {
+        expandLanderRowFromUrl(landerUrlFilter);
+        var r = document.querySelector('tr[data-lander-row="' + landerUrlFilter + '"]');
+        if (r) r.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+    }
+
     // --------------------------------------------------------------------
-    // Status filter
+    // Toolbar filters + sort (Published table)
     // --------------------------------------------------------------------
-    document.getElementById("status-filter").addEventListener("change", render);
+    document.getElementById("status-filter").addEventListener("change", function () {
+      landerUrlFilter = null;
+      render();
+    });
+
+    ["landers-search", "landers-domain-filter", "landers-editor-filter",
+     "landers-date-from", "landers-date-to"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var evt = el.tagName === "SELECT" || el.type === "date" ? "change" : "input";
+      el.addEventListener(evt, function () {
+        landerUrlFilter = null;
+        render();
+      });
+    });
+
+    // Sortable headers — click to toggle asc/desc
+    (function () {
+      var thead = document.getElementById("landers-thead");
+      if (!thead) return;
+      thead.addEventListener("click", function (e) {
+        var th = e.target.closest("th.is-sortable");
+        if (!th) return;
+        var key = th.getAttribute("data-sort");
+        if (!key) return;
+        if (sortState.key === key) {
+          sortState.dir = sortState.dir === "asc" ? "desc" : "asc";
+        } else {
+          sortState.key = key;
+          sortState.dir = key === "name" || key === "by" ? "asc" : "desc";
+        }
+        render();
+      });
+    })();
+
+    // --------------------------------------------------------------------
+    // Drafts tab — search + status + sortable headers (static rows)
+    // --------------------------------------------------------------------
+    (function () {
+      var body   = document.getElementById("drafts-body");
+      var search = document.getElementById("drafts-search");
+      var stat   = document.getElementById("drafts-status-filter");
+      var countEl= document.getElementById("drafts-count");
+      var table  = document.getElementById("drafts-table");
+      if (!body || !table) return;
+
+      var draftSort = { key: "updated", dir: "desc" };
+
+      function applyDraftsFilters() {
+        var q  = (search && search.value || "").trim().toLowerCase();
+        var sv = stat && stat.value || "all";
+        var visible = 0;
+        body.querySelectorAll("tr[data-drafts-row]").forEach(function (r) {
+          var name = (r.getAttribute("data-name") || "").toLowerCase();
+          var url  = (r.getAttribute("data-url") || "").toLowerCase();
+          var st   = r.getAttribute("data-status") || "";
+          var keep = true;
+          if (sv !== "all" && st !== sv) keep = false;
+          if (q && name.indexOf(q) === -1 && url.indexOf(q) === -1) keep = false;
+          r.hidden = !keep;
+          if (keep) visible++;
+        });
+        if (countEl) countEl.textContent = String(visible);
+      }
+
+      function applyDraftsSort() {
+        var k = draftSort.key, dir = draftSort.dir === "asc" ? 1 : -1;
+        var rows = Array.prototype.slice.call(body.querySelectorAll("tr[data-drafts-row]"));
+        rows.sort(function (a, b) {
+          var av = a.getAttribute("data-" + (k === "updated" ? "updated" : k)) || "";
+          var bv = b.getAttribute("data-" + (k === "updated" ? "updated" : k)) || "";
+          if (k === "updated") {
+            return (new Date(av) - new Date(bv)) * dir;
+          }
+          return String(av).localeCompare(String(bv)) * dir;
+        });
+        rows.forEach(function (r) { body.appendChild(r); });
+        applyDraftsSortIndicators();
+      }
+
+      function applyDraftsSortIndicators() {
+        table.querySelectorAll("thead th.is-sortable").forEach(function (th) {
+          var key = th.getAttribute("data-sort");
+          th.classList.remove("is-sorted", "is-sorted-asc", "is-sorted-desc");
+          var arrow = th.querySelector(".th-sort");
+          if (key === draftSort.key) {
+            th.classList.add("is-sorted");
+            th.classList.add(draftSort.dir === "asc" ? "is-sorted-asc" : "is-sorted-desc");
+            if (arrow) arrow.textContent = draftSort.dir === "asc" ? "↑" : "↓";
+          } else if (arrow) {
+            arrow.textContent = "↕";
+          }
+        });
+      }
+
+      if (search) search.addEventListener("input", applyDraftsFilters);
+      if (stat)   stat.addEventListener("change", applyDraftsFilters);
+
+      table.querySelector("thead").addEventListener("click", function (e) {
+        var th = e.target.closest("th.is-sortable");
+        if (!th) return;
+        var key = th.getAttribute("data-sort");
+        if (!key) return;
+        if (draftSort.key === key) {
+          draftSort.dir = draftSort.dir === "asc" ? "desc" : "asc";
+        } else {
+          draftSort.key = key;
+          draftSort.dir = key === "updated" ? "desc" : "asc";
+        }
+        applyDraftsSort();
+      });
+
+      applyDraftsFilters();
+      applyDraftsSort();
+    })();
 
     // --------------------------------------------------------------------
     // Delegated interactions (dialogs, add-variant popover, lander clone)
     // --------------------------------------------------------------------
     var settingsDlg   = document.getElementById("dialog-lander-settings");
     var settingsTitle = document.getElementById("lander-settings-title");
+    var weightsDlg    = document.getElementById("dialog-manage-weights");
+    var weightsSub    = document.getElementById("weights-dialog-sub");
+    var weightsBody   = document.getElementById("weights-dialog-body");
+    var weightsSaveBtn = document.getElementById("weights-save-btn");
+
+    function openManageWeights(landerId, focusVariantName) {
+      if (!weightsDlg || !weightsBody || !weightsSub) return;
+      var l = landers.find(function (x) { return x.id === landerId; });
+      if (!l) return;
+      weightsDlg.dataset.activeLanderId = landerId;
+      weightsSub.textContent = l.name + " — set each variant’s share of traffic.";
+      weightsBody.innerHTML = "";
+      l.variants.forEach(function (v, i) {
+        var row = document.createElement("div");
+        row.className = "weights-row";
+        var pctVal = parseSplitPercent(v.split);
+        var lab = document.createElement("label");
+        lab.htmlFor = "w-inp-" + landerId + "-" + i;
+        lab.innerHTML =
+          '<span class="weights-variant-name">' + escapeHtml(v.name) + "</span>" +
+          '<span class="weights-field-label">Share of traffic (%)</span>';
+        var inp = document.createElement("input");
+        inp.type = "number";
+        inp.min = "0";
+        inp.max = "100";
+        inp.step = "0.1";
+        inp.className = "input weights-input js-weight-input";
+        inp.id = "w-inp-" + landerId + "-" + i;
+        inp.value = String(pctVal || 0);
+        inp.setAttribute("data-variant-idx", String(i));
+        row.appendChild(lab);
+        row.appendChild(inp);
+        weightsBody.appendChild(row);
+      });
+      weightsDlg.showModal();
+      if (focusVariantName) {
+        var idx = l.variants.findIndex(function (v) { return v.name === focusVariantName; });
+        if (idx >= 0) {
+          var focusInp = weightsBody.querySelector('[data-variant-idx="' + idx + '"]');
+          if (focusInp) setTimeout(function () { focusInp.focus(); focusInp.select(); }, 30);
+        }
+      }
+    }
+
+    document.addEventListener("click", function (e) {
+      var wbtn = e.target.closest(".js-manage-weights");
+      if (!wbtn || !weightsDlg) return;
+      var lid = wbtn.getAttribute("data-lander-id");
+      if (!lid) return;
+      e.preventDefault();
+      var vEnc = wbtn.getAttribute("data-variant");
+      var vname = vEnc ? decodeURIComponent(vEnc) : "";
+      openManageWeights(lid, vname);
+    });
+
+    if (weightsSaveBtn && weightsDlg) {
+      weightsSaveBtn.addEventListener("click", function () {
+        var lid = weightsDlg.dataset.activeLanderId;
+        var l = landers.find(function (x) { return x.id === lid; });
+        if (!l) { weightsDlg.close(); return; }
+        weightsDlg.querySelectorAll(".js-weight-input").forEach(function (inp, i) {
+          var v = l.variants[i];
+          if (!v) return;
+          var raw = parseFloat(inp.value);
+          if (isNaN(raw) || raw < 0) raw = 0;
+          if (raw > 100) raw = 100;
+          var rounded = Math.round(raw * 10) / 10;
+          v.split = (rounded % 1 === 0 ? String(Math.round(rounded)) : rounded.toFixed(1)) + "%";
+        });
+        syncLanderSplitFromVariants(l);
+        weightsDlg.close();
+        render();
+      });
+    }
     var cloneDlg      = document.getElementById("dialog-clone");
     var cloneTitle    = document.getElementById("clone-title");
     var cloneSub      = document.getElementById("clone-subtitle");
@@ -602,12 +969,13 @@
     // except the 4 action icons, popovers, links, and the preview ↗
     document.addEventListener("click", function (e) {
       var row = e.target.closest("tr[data-lander-row]");
-      if (row) {
-        var inActions = e.target.closest(".actions, details.pop, a, button:not(.lander-toggle)");
-        if (!inActions) {
-          var t = row.querySelector(".lander-toggle");
-          if (t) t.click();
-        }
+      if (!row) return;
+      /* Clicks on the chevron are handled by app.js; do not synthesize a second click or expand/collapse cancels out. */
+      if (e.target.closest(".lander-toggle")) return;
+      var inActions = e.target.closest(".actions, details.pop, a, button:not(.lander-toggle)");
+      if (!inActions) {
+        var t = row.querySelector(".lander-toggle");
+        if (t) t.click();
       }
     });
 

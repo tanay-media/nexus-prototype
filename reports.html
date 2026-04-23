@@ -10,10 +10,11 @@
   <div class="top-strip"></div>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand-tile">N</div>
+      <a href="index.html" class="brand-tile" title="Home" aria-label="Forbes"><img src="img/forbes-logo.svg" alt="Forbes" class="brand-tile__img" width="72" height="18" decoding="async" /></a>
       <nav class="nav">
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
         <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="widgets.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
         <a href="reports.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
         <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
         <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
@@ -46,122 +47,72 @@
       </div>
 
       <div class="reports-layout">
+        <div class="reports-main-stack">
         <div class="card">
+          <p class="muted reports-table-hint" style="font-size:12px; margin:0 0 0.65rem; padding: 0.85rem 1rem 0;">Use <strong>Measures</strong> and <strong>Dimensions</strong> on the right to add or remove columns.</p>
           <div class="table-scroll" role="region" aria-label="Reports data">
-          <table class="table reports-table">
-            <thead>
-              <tr>
-                <th style="width:28px"></th>
-                <th>Variant / Lander</th>
-                <th class="right">Impressions ↓</th>
-                <th class="right">Clicks</th>
-                <th class="right">CTR</th>
-                <th class="right">Conversions</th>
-                <th class="right">CVR</th>
-                <th class="right">Score</th>
-                <th class="right reports-col-view" aria-label="View variant"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Partner Announce — expanded; drawer opens only via eye icon -->
-              <tr class="reports-data-row" data-report-row data-lander="Partner Announce" data-variant="V1 — Press" data-domain="try.acme.com">
-                <td><button type="button" class="lander-toggle" aria-expanded="true" aria-controls="pa-days"><span class="chev">▸</span></button></td>
-                <td>
-                  <div class="lander-cell"><div class="lander-name"><strong>Press</strong><small>Partner Announce · try.acme.com</small></div></div>
-                </td>
-                <td class="right num">2,285</td>
-                <td class="right num">868</td>
-                <td class="right num">38.0%</td>
-                <td class="right num">329</td>
-                <td class="right num">37.9%</td>
-                <td class="right num"><strong>0.144</strong></td>
-                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
-              </tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 21, 2026</td><td class="right num">482</td><td class="right num">183</td><td class="right num">38.0%</td><td class="right num">70</td><td class="right num">38.3%</td><td class="right num">0.145</td><td></td></tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 20, 2026</td><td class="right num">424</td><td class="right num">161</td><td class="right num">38.0%</td><td class="right num">61</td><td class="right num">37.9%</td><td class="right num">0.144</td><td></td></tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 19, 2026</td><td class="right num">381</td><td class="right num">145</td><td class="right num">38.1%</td><td class="right num">55</td><td class="right num">37.9%</td><td class="right num">0.144</td><td></td></tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 18, 2026</td><td class="right num">328</td><td class="right num">124</td><td class="right num">37.8%</td><td class="right num">47</td><td class="right num">37.9%</td><td class="right num">0.143</td><td></td></tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 17, 2026</td><td class="right num">265</td><td class="right num">101</td><td class="right num">38.1%</td><td class="right num">38</td><td class="right num">37.6%</td><td class="right num">0.143</td><td></td></tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 16, 2026</td><td class="right num">222</td><td class="right num">84</td><td class="right num">37.8%</td><td class="right num">32</td><td class="right num">38.1%</td><td class="right num">0.144</td><td></td></tr>
-              <tr class="day-row" data-parent="pa-days"><td></td><td>Apr 15, 2026</td><td class="right num">183</td><td class="right num">70</td><td class="right num">38.3%</td><td class="right num">26</td><td class="right num">37.1%</td><td class="right num">0.142</td><td></td></tr>
-
-              <tr class="reports-data-row" data-report-row data-lander="Black Friday" data-variant="V1 — Orange bold" data-domain="offers.acme.com">
-                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="bf-days"><span class="chev">▸</span></button></td>
-                <td><div class="lander-cell"><div class="lander-name"><strong>Orange bold</strong><small>Black Friday · offers.acme.com</small></div></div></td>
-                <td class="right num">5,786</td><td class="right num">1,042</td><td class="right num">18.0%</td><td class="right num">185</td><td class="right num">17.8%</td><td class="right num"><strong>0.032</strong></td>
-                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
-              </tr>
-              <tr class="day-row" data-parent="bf-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="day-row" data-parent="bf-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">1,240</td><td class="right num">223</td><td class="right num">18.0%</td><td class="right num">40</td><td class="right num">17.9%</td><td class="right num">0.032</td><td></td></tr>
-              <tr class="day-row" data-parent="bf-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">1,102</td><td class="right num">198</td><td class="right num">18.0%</td><td class="right num">35</td><td class="right num">17.7%</td><td class="right num">0.032</td><td></td></tr>
-
-              <tr class="reports-data-row" data-report-row data-lander="Founder Letter" data-variant="V1 — Long form" data-domain="offers.acme.com">
-                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="fl-days"><span class="chev">▸</span></button></td>
-                <td><div class="lander-cell"><div class="lander-name"><strong>Long form</strong><small>Founder Letter · offers.acme.com</small></div></div></td>
-                <td class="right num">14,668</td><td class="right num">6,601</td><td class="right num">45.0%</td><td class="right num">2,376</td><td class="right num">36.0%</td><td class="right num"><strong>0.162</strong></td>
-                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
-              </tr>
-              <tr class="day-row" data-parent="fl-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="day-row" data-parent="fl-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">3,120</td><td class="right num">1,404</td><td class="right num">45.0%</td><td class="right num">505</td><td class="right num">36.0%</td><td class="right num">0.162</td><td></td></tr>
-              <tr class="day-row" data-parent="fl-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">2,890</td><td class="right num">1,300</td><td class="right num">45.0%</td><td class="right num">468</td><td class="right num">36.0%</td><td class="right num">0.162</td><td></td></tr>
-
-              <tr class="reports-data-row" data-report-row data-lander="Referral Q2" data-variant="V1 — Single-field" data-domain="refer.acme.com">
-                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="rq-days"><span class="chev">▸</span></button></td>
-                <td><div class="lander-cell"><div class="lander-name"><strong>Single-field</strong><small>Referral Q2 · refer.acme.com</small></div></div></td>
-                <td class="right num">16,951</td><td class="right num">8,608</td><td class="right num">50.8%</td><td class="right num">4,657</td><td class="right num">54.1%</td><td class="right num"><strong>0.275</strong></td>
-                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
-              </tr>
-              <tr class="day-row" data-parent="rq-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="day-row" data-parent="rq-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">3,610</td><td class="right num">1,834</td><td class="right num">50.8%</td><td class="right num">992</td><td class="right num">54.1%</td><td class="right num">0.275</td><td></td></tr>
-              <tr class="day-row" data-parent="rq-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">3,401</td><td class="right num">1,728</td><td class="right num">50.8%</td><td class="right num">935</td><td class="right num">54.1%</td><td class="right num">0.275</td><td></td></tr>
-
-              <tr class="reports-data-row" data-report-row data-lander="Summer Sale" data-variant="V1 — Main hero" data-domain="offers.acme.com">
-                <td><button type="button" class="lander-toggle" aria-expanded="false" aria-controls="ss-days"><span class="chev">▸</span></button></td>
-                <td><div class="lander-cell"><div class="lander-name"><strong>Main hero</strong><small>Summer Sale · offers.acme.com</small></div></div></td>
-                <td class="right num">112,613</td><td class="right num">75,899</td><td class="right num">67.4%</td><td class="right num">52,164</td><td class="right num">68.7%</td><td class="right num"><strong>0.463</strong></td>
-                <td class="right reports-col-view"><button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
-              </tr>
-              <tr class="day-row" data-parent="ss-days" hidden><td></td><td>DAY</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr class="day-row" data-parent="ss-days" hidden><td></td><td>Apr 21, 2026</td><td class="right num">24,100</td><td class="right num">16,243</td><td class="right num">67.4%</td><td class="right num">11,170</td><td class="right num">68.7%</td><td class="right num">0.463</td><td></td></tr>
-              <tr class="day-row" data-parent="ss-days" hidden><td></td><td>Apr 20, 2026</td><td class="right num">22,800</td><td class="right num">15,360</td><td class="right num">67.4%</td><td class="right num">10,552</td><td class="right num">68.7%</td><td class="right num">0.463</td><td></td></tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td></td>
-                <td>Grand total</td>
-                <td class="right num">152,303</td>
-                <td class="right num">93,018</td>
-                <td class="right num">61.1%</td>
-                <td class="right num">59,711</td>
-                <td class="right num">64.2%</td>
-                <td class="right num">0.392</td>
-                <td></td>
-              </tr>
-            </tfoot>
+          <table class="table reports-table" id="reports-data-table">
+            <thead id="reports-thead"></thead>
+            <tbody id="reports-tbody"></tbody>
+            <tfoot id="reports-tfoot"></tfoot>
           </table>
           </div>
         </div>
+        </div>
 
         <aside class="reports-side">
-          <div>
-            <h4>Breakdown</h4>
-            <div class="breakdown-list">
-              <button type="button" class="is-active">Lander → Day</button>
-              <button type="button">Day</button>
-              <button type="button">Country</button>
-              <button type="button">Device</button>
+          <div class="reports-side__block reports-side__block--measures">
+            <h4>Measures</h4>
+            <div class="reports-check-list" id="reports-measure-list">
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="lander_thumb" /><span>Lander thumbnail</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="variant_thumb" /><span>Variant thumbnail</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="visits" /><span>Visits</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="impressions" checked /><span>Impressions</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="impression_rate" /><span>Impression rate</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="clicks" checked /><span>Clicks</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="ctr" checked /><span>CTR</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="conversions" checked /><span>Conversions</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="cvr" checked /><span>CVR</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="score" checked /><span>Score</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_start" /><span>Form start</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_step_complete" /><span>Form step complete</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_submit" /><span>Form submit</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_step_abandon" /><span>Form step abandon</span></label>
             </div>
           </div>
-          <div>
-            <h4>Columns</h4>
-            <div class="column-list">
-              <label><input type="checkbox" checked /> Impressions</label>
-              <label><input type="checkbox" checked /> Clicks</label>
-              <label><input type="checkbox" checked /> CTR</label>
-              <label><input type="checkbox" checked /> Conversions</label>
-              <label><input type="checkbox" checked /> CVR</label>
-              <label><input type="checkbox" checked /> Score</label>
+          <div class="reports-side__block reports-side__block--dimensions">
+            <h4>Dimensions</h4>
+            <div class="reports-check-list" id="reports-dimension-list">
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_created" /><span>Time — created date</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_updated" /><span>Time — updated date</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_hour" /><span>Time — hour of day</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_dow" /><span>Time — day of week</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_week" /><span>Time — week</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_month" /><span>Time — month</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_year" /><span>Time — year</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="workspace" /><span>Workspace name</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="lander_id" /><span>Lander id</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="lander_name" /><span>Lander name</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="variant_id" /><span>Variant id</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="variant_name" /><span>Variant name</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="version_id" /><span>version_id</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="domain" /><span>Domain</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="route" /><span>Route</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="device" /><span>Device type</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="os" /><span>OS</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="browser" /><span>Browser name</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="webview" /><span>Webview flag</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="country" /><span>Country</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="county" /><span>County</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="city" /><span>City</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="zip" /><span>ZIP code</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="channel" /><span>Channel name</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="utm_source" /><span>UTM source</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="utm_medium" /><span>UTM medium</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="utm_campaign" /><span>UTM campaign</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="referer" /><span>Referer</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="cta_id" /><span>CTA_id</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="linkout" /><span>Linkout</span></label>
             </div>
           </div>
         </aside>
@@ -173,34 +124,506 @@
   <div class="drawer-scrim" id="drawer-scrim"></div>
   <aside class="drawer" id="variant-drawer" aria-hidden="true" aria-labelledby="drawer-variant-title">
     <div class="drawer__head">
-      <div>
+      <div class="drawer__head-text">
         <div class="drawer__title">
           <span class="badge badge--variant" id="drawer-variant-badge">V1</span>
           <span id="drawer-variant-title">Summer Sale</span>
         </div>
         <div class="drawer__sub" id="drawer-variant-sub">offers.acme.com</div>
       </div>
-      <button class="btn btn--ghost" id="drawer-close" aria-label="Close drawer">✕ Close</button>
+      <div class="drawer__head-actions">
+        <a class="icon-btn" id="drawer-edit-btn" href="editor.html" title="Edit in editor" aria-label="Edit in editor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        </a>
+        <a class="icon-btn" id="drawer-settings-btn" href="editor.html" title="Lander settings" aria-label="Lander settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </a>
+      </div>
     </div>
-    <div class="drawer__body">
-      <div class="drawer__preview"></div>
-      <div class="drawer__stats" id="drawer-stats"></div>
-      <div class="opus-note">Preview &amp; stats are mock. In production this would render the live variant and real Reports data.</div>
-      <div style="display:flex; gap:0.5rem; margin-top:1rem;">
-        <a class="btn btn--black" id="drawer-editor-link" href="editor.html" style="flex:1; justify-content:center;">Open in editor →</a>
-        <button class="btn" id="drawer-duplicate">Duplicate</button>
+    <div class="drawer__body drawer__body--preview">
+      <div class="drawer-mobile-chrome" aria-hidden="true">
+        <div class="drawer-mobile-bar"></div>
+        <div class="drawer-mobile-scroll">
+          <div class="drawer-dummy-lander">
+            <div class="drawer-dummy-lander__hero">
+              <p class="drawer-dummy-lander__eyebrow">Limited time</p>
+              <h1 class="drawer-dummy-lander__h1">Refresh your space for spring</h1>
+              <p class="drawer-dummy-lander__lead">See pricing for your zip in under a minute — no obligation.</p>
+              <button type="button" class="drawer-dummy-lander__cta">Get my quote →</button>
+            </div>
+            <ul class="drawer-dummy-lander__bullets">
+              <li>Licensed &amp; insured pros in your area</li>
+              <li>Financing options available</li>
+              <li>Thousands of five-star reviews</li>
+            </ul>
+            <div class="drawer-dummy-lander__card">
+              <strong>Why homeowners choose us</strong>
+              <p>Transparent quotes, clear timelines, and a dedicated coordinator from measure to install.</p>
+            </div>
+            <div class="drawer-dummy-lander__card">
+              <strong>How it works</strong>
+              <ol>
+                <li>Tell us about your project</li>
+                <li>Compare options matched to your home</li>
+                <li>Book when you’re ready</li>
+              </ol>
+            </div>
+            <p class="drawer-dummy-lander__fine">Mock mobile preview · not live HTML</p>
+          </div>
+        </div>
       </div>
     </div>
   </aside>
 
   <script src="app.js"></script>
   <script>
+    (function () {
+      var MEASURE_ORDER = ["lander_thumb", "variant_thumb", "visits", "impressions", "impression_rate", "clicks", "ctr", "conversions", "cvr", "score", "form_start", "form_step_complete", "form_submit", "form_step_abandon"];
+      var DIMENSION_ORDER = ["t_created", "t_updated", "t_hour", "t_dow", "t_week", "t_month", "t_year", "workspace", "lander_id", "lander_name", "variant_id", "variant_name", "version_id", "domain", "route", "device", "os", "browser", "webview", "country", "county", "city", "zip", "channel", "utm_source", "utm_medium", "utm_campaign", "referer", "cta_id", "linkout"];
+      var MEASURE_LABEL = {
+        lander_thumb: "Lander",
+        variant_thumb: "Variant",
+        visits: "Visits",
+        impressions: "Impressions",
+        impression_rate: "Impr. rate",
+        clicks: "Clicks",
+        ctr: "CTR",
+        conversions: "Conversions",
+        cvr: "CVR",
+        score: "Score",
+        form_start: "Form start",
+        form_step_complete: "Form step complete",
+        form_submit: "Form submit",
+        form_step_abandon: "Form step abandon"
+      };
+      var DIMENSION_LABEL = {
+        t_created: "Created date",
+        t_updated: "Updated date",
+        t_hour: "Hour",
+        t_dow: "Day of week",
+        t_week: "Week",
+        t_month: "Month",
+        t_year: "Year",
+        workspace: "Workspace",
+        lander_id: "Lander id",
+        lander_name: "Lander name",
+        variant_id: "Variant id",
+        variant_name: "Variant name",
+        version_id: "version_id",
+        domain: "Domain",
+        route: "Route",
+        device: "Device",
+        os: "OS",
+        browser: "Browser",
+        webview: "Webview",
+        country: "Country",
+        county: "County",
+        city: "City",
+        zip: "ZIP",
+        channel: "Channel",
+        utm_source: "UTM source",
+        utm_medium: "UTM medium",
+        utm_campaign: "UTM campaign",
+        referer: "Referer",
+        cta_id: "CTA_id",
+        linkout: "Linkout"
+      };
+
+      function nf(n) {
+        return Math.round(n).toLocaleString();
+      }
+      function pct(a, b) {
+        if (!b) return "—";
+        return (100 * a / b).toFixed(1) + "%";
+      }
+
+      var ROWS = [
+        { key: "pa", lander: "Partner Announce", variant: "V1 — Press", domain: "try.acme.com", expandId: "pa-days", startOpen: true, vstrong: "Press", hue: 32,
+          m: { visits: 2410, impressions: 2285, clicks: 868, conversions: 329, score: 0.144, form_start: 1960, form_step_complete: 1420, form_submit: 329, form_abandon: 1631 },
+          days: [
+            { header: true },
+            { impressions: 482, clicks: 183, conversions: 70, score: 0.145, date: "Apr 21, 2026" },
+            { impressions: 424, clicks: 161, conversions: 61, score: 0.144, date: "Apr 20, 2026" },
+            { impressions: 381, clicks: 145, conversions: 55, score: 0.144, date: "Apr 19, 2026" },
+            { impressions: 328, clicks: 124, conversions: 47, score: 0.143, date: "Apr 18, 2026" },
+            { impressions: 265, clicks: 101, conversions: 38, score: 0.143, date: "Apr 17, 2026" },
+            { impressions: 222, clicks: 84, conversions: 32, score: 0.144, date: "Apr 16, 2026" },
+            { impressions: 183, clicks: 70, conversions: 26, score: 0.142, date: "Apr 15, 2026" }
+          ]
+        },
+        { key: "bf", lander: "Black Friday", variant: "V1 — Orange bold", domain: "offers.acme.com", expandId: "bf-days", startOpen: false, vstrong: "Orange bold", hue: 210,
+          m: { visits: 6050, impressions: 5786, clicks: 1042, conversions: 185, score: 0.032, form_start: 4200, form_step_complete: 2880, form_submit: 185, form_abandon: 4015 },
+          days: [{ header: true }, { impressions: 1240, clicks: 223, conversions: 40, score: 0.032, date: "Apr 21, 2026" }, { impressions: 1102, clicks: 198, conversions: 35, score: 0.032, date: "Apr 20, 2026" }]
+        },
+        { key: "fl", lander: "Founder Letter", variant: "V1 — Long form", domain: "offers.acme.com", expandId: "fl-days", startOpen: false, vstrong: "Long form", hue: 118,
+          m: { visits: 15420, impressions: 14668, clicks: 6601, conversions: 2376, score: 0.162, form_start: 12900, form_step_complete: 9100, form_submit: 2376, form_abandon: 10524 },
+          days: [{ header: true }, { impressions: 3120, clicks: 1404, conversions: 505, score: 0.162, date: "Apr 21, 2026" }, { impressions: 2890, clicks: 1300, conversions: 468, score: 0.162, date: "Apr 20, 2026" }]
+        },
+        { key: "rq", lander: "Referral Q2", variant: "V1 — Single-field", domain: "refer.acme.com", expandId: "rq-days", startOpen: false, vstrong: "Single-field", hue: 265,
+          m: { visits: 17800, impressions: 16951, clicks: 8608, conversions: 4657, score: 0.275, form_start: 15100, form_step_complete: 11200, form_submit: 4657, form_abandon: 13143 },
+          days: [{ header: true }, { impressions: 3610, clicks: 1834, conversions: 992, score: 0.275, date: "Apr 21, 2026" }, { impressions: 3401, clicks: 1728, conversions: 935, score: 0.275, date: "Apr 20, 2026" }]
+        },
+        { key: "ss", lander: "Summer Sale", variant: "V1 — Main hero", domain: "offers.acme.com", expandId: "ss-days", startOpen: false, vstrong: "Main hero", hue: 18,
+          m: { visits: 118420, impressions: 112613, clicks: 75899, conversions: 52164, score: 0.463, form_start: 98200, form_step_complete: 72450, form_submit: 52164, form_abandon: 46036 },
+          days: [{ header: true }, { impressions: 24100, clicks: 16243, conversions: 11170, score: 0.463, date: "Apr 21, 2026" }, { impressions: 22800, clicks: 15360, conversions: 10552, score: 0.463, date: "Apr 20, 2026" }]
+        }
+      ];
+
+      var MOCK_DIM = { t_created: "Apr 1, 2026", t_updated: "Apr 21, 2026", t_hour: "14", t_dow: "Tue", t_week: "W16", t_month: "Apr", t_year: "2026", workspace: "ACME Growth", lander_id: "ldr_mock", variant_id: "var_mock", version_id: "vv_m5n8k3p", route: "/", device: "mobile", os: "iOS 18", browser: "Safari", webview: "no", country: "US", county: "Cuyahoga", city: "Cleveland", zip: "44102", channel: "Paid search", utm_source: "google", utm_medium: "cpc", utm_campaign: "brand_q2", referer: "google.com", cta_id: "cta_primary", linkout: "adv_default" };
+
+      // Mock split values for each dimension. When a dimension is selected, each parent row
+      // expands into one child row per value — i.e. "group by" that dimension.
+      var DIM_VALUES = {
+        t_created: ["Apr 21, 2026", "Apr 20, 2026", "Apr 19, 2026"],
+        t_updated: ["Apr 21, 2026", "Apr 20, 2026"],
+        t_hour: ["09:00", "13:00", "20:00"],
+        t_dow: ["Mon", "Wed", "Fri", "Sun"],
+        t_week: ["W16", "W15", "W14"],
+        t_month: ["Apr", "Mar"],
+        t_year: ["2026"],
+        workspace: ["ACME Growth"],
+        domain: ["offers.acme.com", "refer.acme.com", "try.acme.com"],
+        route: ["/", "/hero", "/promo"],
+        device: ["mobile", "desktop", "tablet"],
+        os: ["iOS 18", "Android 14", "Windows 11", "macOS"],
+        browser: ["Safari", "Chrome", "Edge", "Firefox"],
+        webview: ["no", "yes"],
+        country: ["United States", "United Kingdom", "Canada", "Australia"],
+        county: ["Cuyahoga", "Los Angeles", "King", "Harris"],
+        city: ["Cleveland", "Austin", "New York", "Seattle"],
+        zip: ["44102", "73301", "10001", "98101"],
+        channel: ["Paid search", "Organic", "Email", "Social"],
+        utm_source: ["google", "meta", "reddit", "direct"],
+        utm_medium: ["cpc", "organic", "email", "social"],
+        utm_campaign: ["brand_q2", "spring_promo", "referral_push"],
+        referer: ["google.com", "facebook.com", "(direct)"],
+        cta_id: ["cta_primary", "cta_secondary", "cta_footer"],
+        linkout: ["adv_default", "adv_partner"]
+      };
+
+      function weightsForN(n) {
+        if (n <= 0) return [];
+        if (n === 1) return [1];
+        var raw = [], total = 0;
+        for (var i = 0; i < n; i++) { var v = 1 / Math.pow(1.45, i); raw.push(v); total += v; }
+        return raw.map(function (x) { return x / total; });
+      }
+
+      function pickGroupByDim(dimensions) {
+        for (var i = 0; i < dimensions.length; i++) {
+          var d = dimensions[i];
+          if (DIM_VALUES[d] && DIM_VALUES[d].length) return d;
+        }
+        return null;
+      }
+
+      function splitMeasureCell(mid, row, weight, dimLabel) {
+        var m = row.m;
+        if (mid === "lander_thumb") return '<span class="reports-thumb reports-thumb--lander" style="--th:' + row.hue + '"></span>';
+        if (mid === "variant_thumb") return '<span class="reports-thumb reports-thumb--variant" style="--th:' + ((row.hue + 140) % 360) + '"></span>';
+        if (mid === "visits") return nf(m.visits * weight);
+        if (mid === "impressions") return nf(m.impressions * weight);
+        if (mid === "clicks") return nf(m.clicks * weight);
+        if (mid === "conversions") return nf(m.conversions * weight);
+        if (mid === "ctr") return pct(m.clicks * weight, m.impressions * weight);
+        if (mid === "cvr") return pct(m.conversions * weight, m.clicks * weight);
+        if (mid === "score") return (m.score * (0.9 + 0.2 * weight)).toFixed(3);
+        if (mid === "impression_rate") return pct(m.impressions * weight, m.visits * weight);
+        if (mid === "form_start") return nf(m.form_start * weight);
+        if (mid === "form_step_complete") return nf(m.form_step_complete * weight);
+        if (mid === "form_submit") return nf(m.form_submit * weight);
+        if (mid === "form_step_abandon") return nf(m.form_abandon * weight);
+        return "—";
+      }
+
+      function rowCtr(m) { return pct(m.clicks, m.impressions); }
+      function rowCvr(m) { return pct(m.conversions, m.clicks); }
+      function rowImprRate(m) { return pct(m.impressions, m.visits); }
+
+      function measureCell(row, mid, isDay, day) {
+        if (isDay && day.header) return "—";
+        var m = row.m;
+        if (mid === "lander_thumb") return isDay ? "—" : '<span class="reports-thumb reports-thumb--lander" style="--th:' + row.hue + '"></span>';
+        if (mid === "variant_thumb") return isDay ? "—" : '<span class="reports-thumb reports-thumb--variant" style="--th:' + ((row.hue + 140) % 360) + '"></span>';
+        if (isDay) {
+          if (mid === "impressions") return nf(day.impressions);
+          if (mid === "clicks") return nf(day.clicks);
+          if (mid === "conversions") return nf(day.conversions);
+          if (mid === "ctr") return pct(day.clicks, day.impressions);
+          if (mid === "cvr") return pct(day.conversions, day.clicks);
+          if (mid === "score") return day.score.toFixed(3);
+          if (mid === "impression_rate") return "—";
+          return "—";
+        }
+        if (mid === "visits") return nf(m.visits);
+        if (mid === "impressions") return nf(m.impressions);
+        if (mid === "clicks") return nf(m.clicks);
+        if (mid === "conversions") return nf(m.conversions);
+        if (mid === "ctr") return rowCtr(m);
+        if (mid === "cvr") return rowCvr(m);
+        if (mid === "score") return "<strong>" + m.score.toFixed(3) + "</strong>";
+        if (mid === "impression_rate") return rowImprRate(m);
+        if (mid === "form_start") return nf(m.form_start);
+        if (mid === "form_step_complete") return nf(m.form_step_complete);
+        if (mid === "form_submit") return nf(m.form_submit);
+        if (mid === "form_step_abandon") return nf(m.form_abandon);
+        return "—";
+      }
+
+      function dimensionCell(row, did, isDay, day) {
+        if (isDay && day.header) return "—";
+        if (isDay && !day.header && (did === "lander_name" || did === "variant_name" || did === "domain")) {
+          if (did === "lander_name") return row.lander;
+          if (did === "variant_name") return row.vstrong;
+          return row.domain;
+        }
+        if (did === "lander_name") return row.lander;
+        if (did === "variant_name") return row.vstrong;
+        if (did === "domain") return row.domain;
+        if (did === "lander_id") return "ldr_" + row.key;
+        if (did === "variant_id") return "var_" + row.key;
+        if (isDay) return "—";
+        return MOCK_DIM[did] != null ? MOCK_DIM[did] : "—";
+      }
+
+      function collectActive(kind) {
+        var out = [];
+        document.querySelectorAll('.js-report-col-toggle[data-kind="' + kind + '"]:checked').forEach(function (inp) {
+          out.push(inp.getAttribute("data-col"));
+        });
+        var order = kind === "measure" ? MEASURE_ORDER : DIMENSION_ORDER;
+        return order.filter(function (id) { return out.indexOf(id) !== -1; });
+      }
+
+      function renderReportsTable() {
+        var measures = collectActive("measure");
+        var dimensions = collectActive("dimension");
+        var thead = document.getElementById("reports-thead");
+        var tbody = document.getElementById("reports-tbody");
+        var tfoot = document.getElementById("reports-tfoot");
+        if (!thead || !tbody || !tfoot) return;
+
+        var trh = document.createElement("tr");
+        trh.appendChild(document.createElement("th")).style.width = "28px";
+        var thName = document.createElement("th");
+        thName.textContent = "Variant / Lander";
+        trh.appendChild(thName);
+        measures.forEach(function (id) {
+          var th = document.createElement("th");
+          th.className = id.indexOf("thumb") !== -1 ? "" : "right";
+          th.textContent = MEASURE_LABEL[id] || id;
+          trh.appendChild(th);
+        });
+        dimensions.forEach(function (id) {
+          var th = document.createElement("th");
+          th.textContent = DIMENSION_LABEL[id] || id;
+          trh.appendChild(th);
+        });
+        var thView = document.createElement("th");
+        thView.className = "right reports-col-view";
+        thView.setAttribute("aria-label", "View variant");
+        trh.appendChild(thView);
+        thead.innerHTML = "";
+        thead.appendChild(trh);
+
+        var groupDim = pickGroupByDim(dimensions);
+        tbody.innerHTML = "";
+        ROWS.forEach(function (row) {
+          var tr = document.createElement("tr");
+          tr.className = "reports-data-row" + (row.startOpen ? " is-expanded" : "");
+          tr.setAttribute("data-report-row", "");
+          tr.setAttribute("data-lander", row.lander);
+          tr.setAttribute("data-variant", row.variant);
+          tr.setAttribute("data-domain", row.domain);
+          tr.setAttribute("data-row-key", row.key);
+
+          var td0 = document.createElement("td");
+          var tb = document.createElement("button");
+          tb.type = "button";
+          tb.className = "lander-toggle";
+          tb.setAttribute("aria-expanded", row.startOpen ? "true" : "false");
+          tb.setAttribute("aria-controls", row.expandId);
+          tb.innerHTML = '<span class="chev">▸</span>';
+          td0.appendChild(tb);
+          tr.appendChild(td0);
+
+          var td1 = document.createElement("td");
+          td1.innerHTML = '<div class="lander-cell"><div class="lander-name"><strong>' + row.vstrong + "</strong><small>" + row.lander + " · " + row.domain + "</small></div></div>";
+          tr.appendChild(td1);
+
+          measures.forEach(function (mid) {
+            var td = document.createElement("td");
+            if (mid.indexOf("thumb") === -1) td.className = "right num";
+            td.innerHTML = measureCell(row, mid, false, null);
+            tr.appendChild(td);
+          });
+          dimensions.forEach(function (did) {
+            var td = document.createElement("td");
+            if (did === groupDim) { td.textContent = "All"; td.className = "muted reports-dim-all"; }
+            else {
+              td.textContent = dimensionCell(row, did, false, null);
+              if (did !== "lander_name" && did !== "variant_name" && did !== "domain") td.className = "muted";
+            }
+            tr.appendChild(td);
+          });
+
+          var tdV = document.createElement("td");
+          tdV.className = "right reports-col-view";
+          tdV.innerHTML = '<button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>';
+          tr.appendChild(tdV);
+          tbody.appendChild(tr);
+
+          if (groupDim) {
+            var values = DIM_VALUES[groupDim];
+            var weights = weightsForN(values.length);
+            values.forEach(function (val, idx) {
+              var dr = document.createElement("tr");
+              dr.className = "day-row dim-row";
+              dr.setAttribute("data-parent", row.expandId);
+              dr.hidden = !row.startOpen;
+              dr.appendChild(document.createElement("td"));
+              var c1 = document.createElement("td");
+              c1.innerHTML = '<span class="dim-row-label">↳ ' + (DIMENSION_LABEL[groupDim] || groupDim) + '</span>';
+              dr.appendChild(c1);
+              var w = weights[idx];
+              measures.forEach(function (mid) {
+                var td = document.createElement("td");
+                if (mid.indexOf("thumb") === -1) td.className = "right num";
+                td.innerHTML = splitMeasureCell(mid, row, w, val);
+                dr.appendChild(td);
+              });
+              dimensions.forEach(function (did) {
+                var td = document.createElement("td");
+                if (did === groupDim) { td.textContent = val; td.className = "reports-dim-value"; }
+                else { td.textContent = dimensionCell(row, did, false, null); if (did !== "lander_name" && did !== "variant_name" && did !== "domain") td.className = "muted"; }
+                dr.appendChild(td);
+              });
+              dr.appendChild(document.createElement("td"));
+              tbody.appendChild(dr);
+            });
+          } else {
+            row.days.forEach(function (day, idx) {
+              var dr = document.createElement("tr");
+              dr.className = "day-row";
+              dr.setAttribute("data-parent", row.expandId);
+              dr.hidden = !row.startOpen;
+              var c0 = document.createElement("td");
+              dr.appendChild(c0);
+              var c1 = document.createElement("td");
+              c1.textContent = day.header ? "DAY" : day.date;
+              dr.appendChild(c1);
+              measures.forEach(function (mid) {
+                var td = document.createElement("td");
+                if (!day.header && mid.indexOf("thumb") === -1) td.className = "right num";
+                td.innerHTML = measureCell(row, mid, true, day);
+                dr.appendChild(td);
+              });
+              dimensions.forEach(function (did) {
+                var td = document.createElement("td");
+                td.textContent = dimensionCell(row, did, true, day);
+                if (!day.header && did !== "lander_name" && did !== "variant_name" && did !== "domain") td.className = "muted";
+                dr.appendChild(td);
+              });
+              dr.appendChild(document.createElement("td"));
+              tbody.appendChild(dr);
+            });
+          }
+        });
+
+        var sumImp = 0, sumClk = 0, sumConv = 0, sumVisit = 0, sumFs = 0, sumFsc = 0, sumFsub = 0, sumFab = 0;
+        ROWS.forEach(function (row) {
+          sumImp += row.m.impressions; sumClk += row.m.clicks; sumConv += row.m.conversions;
+          sumVisit += row.m.visits; sumFs += row.m.form_start; sumFsc += row.m.form_step_complete; sumFsub += row.m.form_submit; sumFab += row.m.form_abandon;
+        });
+        var trf = document.createElement("tr");
+        trf.className = "reports-grand-total";
+        trf.appendChild(document.createElement("td"));
+        var tdf = document.createElement("td");
+        tdf.textContent = "Grand total";
+        trf.appendChild(tdf);
+        measures.forEach(function (mid) {
+          var td = document.createElement("td");
+          td.className = "right num";
+          if (mid === "lander_thumb" || mid === "variant_thumb") td.textContent = "";
+          else if (mid === "impressions") td.textContent = nf(sumImp);
+          else if (mid === "clicks") td.textContent = nf(sumClk);
+          else if (mid === "conversions") td.textContent = nf(sumConv);
+          else if (mid === "ctr") td.textContent = pct(sumClk, sumImp);
+          else if (mid === "cvr") td.textContent = pct(sumConv, sumClk);
+          else if (mid === "visits") td.textContent = nf(sumVisit);
+          else if (mid === "impression_rate") td.textContent = pct(sumImp, sumVisit);
+          else if (mid === "score") td.textContent = "0.392";
+          else if (mid === "form_start") td.textContent = nf(sumFs);
+          else if (mid === "form_step_complete") td.textContent = nf(sumFsc);
+          else if (mid === "form_submit") td.textContent = nf(sumFsub);
+          else if (mid === "form_step_abandon") td.textContent = nf(sumFab);
+          else td.textContent = "—";
+          trf.appendChild(td);
+        });
+        dimensions.forEach(function () {
+          var td = document.createElement("td");
+          td.textContent = "—";
+          td.className = "muted";
+          trf.appendChild(td);
+        });
+        trf.appendChild(document.createElement("td"));
+        tfoot.innerHTML = "";
+        tfoot.appendChild(trf);
+      }
+
+      document.querySelectorAll(".js-report-col-toggle").forEach(function (inp) {
+        inp.addEventListener("change", function () {
+          renderReportsTable();
+          var sel = document.getElementById("lander-filter");
+          if (sel && sel.value) applyReportsLanderFilter(sel.value);
+        });
+      });
+
+      function applyReportsLanderFilter(value) {
+        document.querySelectorAll("#reports-tbody tr[data-report-row]").forEach(function (r) {
+          var keep = !value || r.getAttribute("data-lander") === value;
+          r.classList.toggle("row-hidden", !keep);
+          var toggleBtn = r.querySelector(".lander-toggle");
+          var parentId = toggleBtn && toggleBtn.getAttribute("aria-controls");
+          if (parentId) {
+            document.querySelectorAll('#reports-tbody tr[data-parent="' + parentId + '"]').forEach(function (d) {
+              d.classList.toggle("row-hidden", !keep);
+            });
+          }
+        });
+      }
+      window.applyReportsLanderFilter = applyReportsLanderFilter;
+
+      var reportsTable = document.getElementById("reports-data-table");
+      if (reportsTable) {
+        reportsTable.addEventListener("click", function (e) {
+          var t = e.target.closest(".lander-toggle");
+          if (!t) return;
+          // Stop the global app.js .lander-toggle handler from also firing and undoing us.
+          e.preventDefault();
+          e.stopPropagation();
+          var id = t.getAttribute("aria-controls");
+          var wasOpen = t.getAttribute("aria-expanded") === "true";
+          var nowOpen = !wasOpen;
+          t.setAttribute("aria-expanded", nowOpen ? "true" : "false");
+          var parentRow = t.closest("tr.reports-data-row");
+          if (parentRow) parentRow.classList.toggle("is-expanded", nowOpen);
+          document.querySelectorAll('#reports-tbody tr[data-parent="' + id + '"]').forEach(function (dr) {
+            dr.hidden = !nowOpen;
+          });
+        });
+      }
+
+      renderReportsTable();
+    })();
+
     var scrim = document.getElementById("drawer-scrim");
     var drawer = document.getElementById("variant-drawer");
-    var statsEl = document.getElementById("drawer-stats");
     var titleEl = document.getElementById("drawer-variant-title");
     var subEl = document.getElementById("drawer-variant-sub");
     var badgeEl = document.getElementById("drawer-variant-badge");
+    var editBtn = document.getElementById("drawer-edit-btn");
+    var settingsBtn = document.getElementById("drawer-settings-btn");
 
     function closeDrawer() {
       drawer.classList.remove("is-open");
@@ -217,41 +640,29 @@
       titleEl.textContent = (parts[1] || variant).trim();
       subEl.textContent = lander + " · " + domain;
 
-      var cells = row.querySelectorAll("td");
-      // (toggle) | variant/lander | Impressions … Score | view
-      var labels = ["Impressions", "Clicks", "CTR", "Conversions", "CVR", "Score"];
-      statsEl.innerHTML = "";
-      for (var i = 0; i < labels.length; i++) {
-        var cell = cells[2 + i];
-        if (!cell) continue;
-        var value = cell.innerText.replace(/\s+/g, " ").trim();
-        var wrap = document.createElement("div");
-        wrap.className = "drawer__stat";
-        wrap.innerHTML = '<div class="drawer__stat-label">' + labels[i] + '</div><div class="drawer__stat-value">' + value + "</div>";
-        statsEl.appendChild(wrap);
-      }
-
       var vLabel = (parts[1] || variant).trim();
-      var elink = document.getElementById("drawer-editor-link");
-      if (elink && lander) {
-        elink.href = "editor.html?name=" + encodeURIComponent(lander) + "&variant=" + encodeURIComponent(vLabel);
-      }
+      var q = "name=" + encodeURIComponent(lander) + "&variant=" + encodeURIComponent(vLabel);
+      if (editBtn && lander) editBtn.href = "editor.html?" + q;
+      if (settingsBtn && lander) settingsBtn.href = "editor.html?" + q + "&panel=settings";
 
       drawer.classList.add("is-open");
       scrim.classList.add("is-open");
       drawer.setAttribute("aria-hidden", "false");
     }
 
-    document.querySelectorAll(".js-drawer-view").forEach(function (btn) {
-      btn.addEventListener("click", function (e) {
+    var reportsDataTable = document.getElementById("reports-data-table");
+    if (reportsDataTable) {
+      reportsDataTable.addEventListener("click", function (e) {
+        var viewBtn = e.target.closest(".js-drawer-view");
+        if (!viewBtn) return;
+        e.preventDefault();
         e.stopPropagation();
-        var row = btn.closest("tr[data-report-row]");
+        var row = viewBtn.closest("tr[data-report-row]");
         if (row) openDrawer(row);
       });
-    });
+    }
 
     scrim.addEventListener("click", closeDrawer);
-    document.getElementById("drawer-close").addEventListener("click", closeDrawer);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
 
     // Honor ?lander=<name> — pre-select filter and hide other lander rows.
@@ -264,21 +675,9 @@
       var clearBtn = document.getElementById("filter-note-clear");
 
       function applyFilter(value) {
-        var rows = document.querySelectorAll(".reports-table tbody tr[data-report-row]");
-        rows.forEach(function (r) {
-          var keep = !value || r.getAttribute("data-lander") === value;
-          r.classList.toggle("row-hidden", !keep);
-          // also hide attached day-rows when parent is hidden
-          var toggleBtn = r.querySelector(".lander-toggle");
-          var parentId  = toggleBtn && toggleBtn.getAttribute("aria-controls");
-          if (parentId) {
-            document.querySelectorAll('[data-parent="'+parentId+'"]').forEach(function (d) {
-              d.classList.toggle("row-hidden", !keep);
-            });
-          }
-        });
+        if (typeof applyReportsLanderFilter === "function") applyReportsLanderFilter(value);
         if (value) { noteN.textContent = value; note.classList.add("is-active"); }
-        else       { note.classList.remove("is-active"); }
+        else { note.classList.remove("is-active"); }
       }
 
       if (name) { sel.value = name; applyFilter(name); }

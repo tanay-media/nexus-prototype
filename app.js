@@ -13,6 +13,7 @@
       { id: "referral-q2",      name: "Referral Q2",      url: "https://refer.acme.com/referral-q2",        variants: [{ name: "Single-field entry" }, { name: "Testimonial strip" }] },
       { id: "founder-letter",   name: "Founder Letter",   url: "https://offers.acme.com/founder-letter",    variants: [{ name: "Long form" }] },
       { id: "black-friday",     name: "Black Friday",     url: "https://offers.acme.com/black-friday-2026", variants: [{ name: "Orange bold" }] },
+      { id: "spring-promo",     name: "Spring Promo",     url: "https://offers.acme.com/spring-promo",      variants: [{ name: "Main promo" }] },
       { id: "partner-announce", name: "Partner Announce", url: "https://try.acme.com/partner-announce",     variants: [{ name: "Press style" }] },
       { id: "walk-in-tubs",     name: "Walk-in Tubs",     url: "https://try.acme.com/walk-in-tubs",         variants: [{ name: "Bathtub safety lede" }, { name: "Senior testimonial" }] },
       { id: "fall-preview",     name: "Fall Preview",     url: "https://offers.acme.com/fall-preview",      variants: [{ name: "Cozy warm palette" }] },
@@ -20,7 +21,7 @@
       { id: "partner-pulse-draft", name: "Partner Pulse", url: "https://try.acme.com/partner-pulse", variants: [{ name: "V1 — Draft hero" }] }
     ],
     domains: [
-      { name: "offers.acme.com", routes: ["/summer-sale-hero", "/founder-letter", "/black-friday-2026", "/fall-preview", "/holiday-teaser"] },
+      { name: "offers.acme.com", routes: ["/summer-sale-hero", "/founder-letter", "/black-friday-2026", "/spring-promo", "/fall-preview", "/holiday-teaser"] },
       { name: "refer.acme.com",  routes: ["/referral-q2"] },
       { name: "try.acme.com",    routes: ["/partner-announce", "/walk-in-tubs", "/partner-pulse"] },
       { name: "hub.acme.com",    routes: [] }
@@ -52,7 +53,7 @@
 
   // -------------------------------------------------------------------
   // Top strip (single source of truth for global chrome).
-  // Layout: [N logo] · [Workspace name ▾] · [Page name]      [search · bell · avatar]
+  // Layout: [Brand logo] · [Workspace name ▾] · [Page name]      [search · bell · avatar]
   // -------------------------------------------------------------------
   var strip = document.querySelector(".top-strip");
   if (strip && !strip.children.length) {
@@ -61,17 +62,26 @@
     var active = workspaces.find(function (w) { return stored && w.id === stored; }) || workspaces[0];
 
     // Detect the current page name from the sidebar's active link (fallback to filename).
+    var pathFile = (location.pathname.split("/").pop() || "index.html").toLowerCase();
     var pageName = (function () {
       var a = document.querySelector(".sidebar .nav a.is-active");
       if (a) return (a.textContent || "").replace(/\s+/g, " ").trim();
-      var file = (location.pathname.split("/").pop() || "index.html").replace(".html", "");
+      var file = pathFile.replace(".html", "");
       var map  = { "index": "Home", "landers": "Landers", "reports": "Reports", "domains": "Domains", "logs": "Logs", "editor": "Editor" };
       return map[file] || (file.charAt(0).toUpperCase() + file.slice(1));
     })();
 
+    var useNexusWordmark = pathFile === "domains.html";
+    var brandAnchor =
+      '<a href="index.html" class="top-brand' + (useNexusWordmark ? " top-brand--nexus" : "") + '" title="Home" aria-label="' + (useNexusWordmark ? "nexus" : "Forbes") + '">' +
+        (useNexusWordmark
+          ? '<img src="img/nexus-wordmark.png" alt="nexus" class="top-brand__img top-brand__img--nexus" width="120" height="32" decoding="async" />'
+          : '<img src="img/forbes-logo.svg" alt="Forbes" class="top-brand__img" width="72" height="18" decoding="async" />') +
+      "</a>";
+
     strip.innerHTML =
       '<div class="top-strip__left">' +
-        '<a href="index.html" class="top-brand" title="nexus — home" aria-label="nexus">N</a>' +
+        brandAnchor +
         '<details class="ws pop">' +
           '<summary class="ws-switch" title="Switch workspace">' +
             '<span class="ws-name" id="ws-active-name">' + active.name + '</span>' +

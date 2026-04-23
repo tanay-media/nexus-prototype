@@ -7,10 +7,11 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="editor-open">
-  <div class="editor-shell">
+  <div class="editor-shell" data-editor-domain="offers.acme.com">
     <!-- Editor top bar — replaces the global top-strip when the editor is open -->
     <header class="editor-top">
       <div class="editor-top__left">
+        <a href="index.html" class="editor-top__brand" title="Home" aria-label="Forbes"><img src="img/forbes-logo.svg" alt="Forbes" width="72" height="18" decoding="async" /></a>
         <button class="editor-back" type="button" onclick="window.location.href='landers.html'">← Back</button>
         <div class="editor-title" id="editor-lander-title">Summer Sale</div>
         <select id="editor-variant-select" class="editor-variant-select" aria-label="Active variant">
@@ -67,10 +68,9 @@
       <aside class="editor-panel">
         <div class="editor-panel__head">Nexus AI</div>
         <div class="editor-chat" id="editor-chat">
-          <div class="chat-note">
-            ⚠ Header / Footer are managed at domain level.
-            <br />
-            Go to <a href="domains.html">Domains</a> to edit.
+          <div class="chat-note chat-note--shell">
+            <span class="chat-note__text">Header, footer, and CMP are shared for this domain.</span>
+            <button type="button" class="btn btn--ghost btn--sm js-site-shell-open" data-shell-tab="header">Edit site shell</button>
           </div>
           <div class="chat-bubble" id="welcome-bubble">
             Hi! I've drafted <strong>V1</strong> of your <strong id="welcome-name">Summer Sale</strong> lander. What would you like to change — copy, layout, design, or CTA?
@@ -83,20 +83,56 @@
             <button type="button" data-prompt="Add a sense of urgency — countdown, limited stock, deadline">Add urgency</button>
             <button type="button" data-prompt="Simplify the body copy, keep it under 40 words per section">Simplify copy</button>
           </div>
-          <div class="compose-row">
-            <input type="text" id="editor-input" placeholder="Tell nexus what to change…" />
-            <button class="compose-send" id="editor-send" aria-label="Send">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </button>
+          <div class="compose-stack" id="editor-compose-stack">
+            <div id="editor-insert-panel" class="editor-insert-panel" hidden>
+              <div class="editor-insert-panel__head">
+                <span class="editor-insert-panel__title">Insert from library</span>
+                <button type="button" class="editor-insert-close" id="editor-insert-close" aria-label="Close">✕</button>
+              </div>
+              <div class="editor-insert-tabs" role="tablist">
+                <span class="editor-insert-tab is-active" role="tab" aria-selected="true">Forms</span>
+              </div>
+              <ul class="editor-form-list" id="editor-form-list" role="listbox" aria-label="Forms">
+                <li><button type="button" class="editor-form-pick" role="option" data-form-id="lead-short" data-form-name="Lead — short qualify"><strong>Lead — short qualify</strong><small>3 steps · ZIP last</small></button></li>
+                <li><button type="button" class="editor-form-pick" role="option" data-form-id="quote-request" data-form-name="Quote request"><strong>Quote request</strong><small>5 steps · consent mid</small></button></li>
+                <li><button type="button" class="editor-form-pick" role="option" data-form-id="newsletter-sms" data-form-name="Newsletter + SMS opt-in"><strong>Newsletter + SMS opt-in</strong><small>2 steps</small></button></li>
+              </ul>
+              <div id="editor-insert-step2" class="editor-insert-step2" hidden>
+                <p class="editor-insert-step2__picked muted" id="editor-insert-picked-label"></p>
+                <div class="field field--compact">
+                  <label for="editor-form-embed-label">CTA / button text</label>
+                  <input type="text" id="editor-form-embed-label" placeholder="e.g. Get your quote" autocomplete="off" />
+                </div>
+                <button type="button" class="btn btn--black editor-insert-submit" id="editor-form-embed-do">Add to HTML</button>
+              </div>
+              <p class="editor-insert-panel__foot"><a href="widgets.html" target="_blank" rel="noopener">Manage forms in Widgets →</a></p>
+            </div>
+            <div class="compose-row">
+              <button type="button" class="compose-add-btn" id="editor-insert-open" title="Insert from library (forms)" aria-label="Insert from library" aria-expanded="false" aria-controls="editor-insert-panel">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <input type="text" id="editor-input" placeholder="Tell nexus what to change…" />
+              <button class="compose-send" id="editor-send" aria-label="Send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
           </div>
+          <details class="editor-html-drawer">
+            <summary>Variant HTML <span class="muted">(playground)</span></summary>
+            <p class="editor-html-drawer__hint muted">Embeds from <strong>Forms</strong> append here. Production would sync to your page source.</p>
+            <textarea id="editor-variant-html" class="code-editor" rows="8" spellcheck="false" placeholder="&lt;!-- Your variant markup --&gt;"></textarea>
+          </details>
         </div>
       </aside>
 
       <!-- Right: preview canvas -->
       <main class="editor-canvas">
         <div class="preview-label" id="preview-label">Mobile preview · <span id="preview-title">Summer Sale — Up to 60% Off…</span></div>
+        <div class="editor-preview-stage">
         <div class="mobile-frame" id="mobile-frame">
-          <div class="managed-band">managed by domain · header</div>
+          <div class="editor-chrome-slot editor-chrome-slot--header">
+            <div id="editor-shell-header-view" class="editor-shell-view"></div>
+          </div>
           <section class="preview-hero">
             <div class="preview-eyebrow">Limited time offer</div>
             <h1 class="preview-h1" id="preview-h1">Summer Sale — Up to 60% Off</h1>
@@ -136,7 +172,18 @@
             </div>
           </div>
 
-          <div class="managed-band managed-band--foot">managed by domain · footer</div>
+          <div class="editor-chrome-slot editor-chrome-slot--cmp">
+            <div id="editor-shell-cmp-view" class="editor-shell-view editor-shell-view--cmp"></div>
+          </div>
+          <div class="editor-chrome-slot editor-chrome-slot--footer">
+            <div id="editor-shell-footer-view" class="editor-shell-view"></div>
+          </div>
+        </div>
+        <aside class="editor-chrome-rail" aria-label="Edit shared site shell (domain)">
+          <button type="button" class="chrome-info-btn js-site-shell-open" data-shell-tab="header" title="Edit domain header" aria-label="Edit domain header">i</button>
+          <button type="button" class="chrome-info-btn js-site-shell-open" data-shell-tab="cmp" title="Edit consent (CMP)" aria-label="Edit consent banner">i</button>
+          <button type="button" class="chrome-info-btn js-site-shell-open" data-shell-tab="footer" title="Edit domain footer" aria-label="Edit domain footer">i</button>
+        </aside>
         </div>
       </main>
     </div>
@@ -182,6 +229,7 @@
     </div>
   </dialog>
 
+  <script src="site-shell.js"></script>
   <script>
     // ---- Read ?name=... to rename the title (e.g. when opened from "+ New Lander")
     var params = new URLSearchParams(window.location.search);
@@ -198,7 +246,7 @@
     }
     if (isNew) {
       document.getElementById("welcome-bubble").innerHTML =
-        "Let's build a new lander. Describe who it's for, the offer, and the tone you want — I'll draft V1 with <strong>Opus 4.7</strong>.";
+        "Let's build a new lander. Describe who it's for, the offer, and the tone you want — I'll help you draft V1.";
     }
 
     // ---- If the home Plan-Mode dialog passed context, recap it as an AI bubble
@@ -243,6 +291,9 @@
         var d = b.getAttribute("data-device");
         frame.className = "mobile-frame" + (d !== "mobile" ? " mobile-frame--" + d : "");
         label.firstChild.textContent = (d.charAt(0).toUpperCase() + d.slice(1)) + " preview · ";
+        requestAnimationFrame(function () {
+          if (window.nexusAlignEditorChromeRail) window.nexusAlignEditorChromeRail();
+        });
       });
     });
 
@@ -276,6 +327,121 @@
     document.querySelectorAll(".suggestion-chips button").forEach(function (c) {
       c.addEventListener("click", function () { submitPrompt(c.getAttribute("data-prompt")); });
     });
+
+    // ---- Insert form embed (+ panel → append HTML to variant buffer)
+    (function () {
+      var stack = document.getElementById("editor-compose-stack");
+      var panel = document.getElementById("editor-insert-panel");
+      var openBtn = document.getElementById("editor-insert-open");
+      var closeBtn = document.getElementById("editor-insert-close");
+      var step2 = document.getElementById("editor-insert-step2");
+      var pickedLabel = document.getElementById("editor-insert-picked-label");
+      var labelInput = document.getElementById("editor-form-embed-label");
+      var embedDo = document.getElementById("editor-form-embed-do");
+      var variantHtml = document.getElementById("editor-variant-html");
+      var htmlDrawer = document.querySelector(".editor-html-drawer");
+      if (!stack || !panel || !openBtn) return;
+
+      var selectedFormId = "";
+      var selectedFormName = "";
+
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function resetStep2() {
+        selectedFormId = "";
+        selectedFormName = "";
+        if (step2) step2.hidden = true;
+        if (pickedLabel) pickedLabel.textContent = "";
+        if (labelInput) labelInput.value = "";
+      }
+
+      function setPanelOpen(open) {
+        panel.hidden = !open;
+        openBtn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (!open) resetStep2();
+      }
+
+      function togglePanel() {
+        setPanelOpen(panel.hidden);
+      }
+
+      openBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePanel();
+      });
+      if (closeBtn) {
+        closeBtn.addEventListener("mousedown", function (e) {
+          e.stopPropagation();
+        });
+        closeBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          setPanelOpen(false);
+        });
+      }
+
+      document.addEventListener("pointerdown", function (e) {
+        if (panel.hidden) return;
+        if (stack.contains(e.target)) return;
+        setPanelOpen(false);
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape" || panel.hidden) return;
+        setPanelOpen(false);
+      });
+
+      document.querySelectorAll(".editor-form-pick").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          selectedFormId = btn.getAttribute("data-form-id") || "";
+          selectedFormName = btn.getAttribute("data-form-name") || selectedFormId;
+          if (step2) step2.hidden = false;
+          if (pickedLabel) {
+            pickedLabel.textContent = "Form: " + selectedFormName;
+          }
+          var defaults = {
+            "lead-short": "Get qualified",
+            "quote-request": "Request a quote",
+            "newsletter-sms": "Subscribe"
+          };
+          if (labelInput) {
+            labelInput.value = defaults[selectedFormId] || "Continue";
+            labelInput.focus();
+            labelInput.select();
+          }
+        });
+      });
+
+      if (embedDo && variantHtml) {
+        embedDo.addEventListener("click", function () {
+          if (!selectedFormId) return;
+          var raw = labelInput ? labelInput.value.trim() : "";
+          var cta = raw || "Continue";
+          var idEsc = escapeHtml(selectedFormId);
+          var nameEsc = escapeHtml(selectedFormName);
+          var ctaEsc = escapeHtml(cta);
+          var block =
+            "\n<!-- nexus: form embed (" + nameEsc + ") -->\n" +
+            '<section class="lander-form-embed" data-form-id="' + idEsc + '" data-form-name="' + nameEsc + '" data-lander-embed="form">\n' +
+            '  <button type="button" class="lander-form-embed__cta">' + ctaEsc + "</button>\n" +
+            "</section>\n";
+          variantHtml.value = (variantHtml.value || "") + block;
+          if (htmlDrawer) htmlDrawer.open = true;
+          variantHtml.focus();
+          setPanelOpen(false);
+          if (typeof addBubble === "function") {
+            addBubble("Added form embed (“" + cta + "”) to variant HTML.", "ai");
+          }
+        });
+      }
+    })();
 
     // ---- Variant dropdown → sync preview label (prototype)
     var variantSel = document.getElementById("editor-variant-select");
@@ -336,6 +502,54 @@
       }
     }
     if (variantSel) variantSel.dispatchEvent(new Event("change"));
+
+    // Align chrome "i" buttons with header / CMP / footer slots inside the preview
+    function alignEditorChromeRail() {
+      var frame = document.getElementById("mobile-frame");
+      var rail = document.querySelector(".editor-chrome-rail");
+      if (!frame || !rail) return;
+
+      if (window.matchMedia("(max-width: 480px)").matches) {
+        rail.querySelectorAll(".chrome-info-btn").forEach(function (btn) {
+          btn.style.position = "";
+          btn.style.top = "";
+          btn.style.left = "";
+        });
+        return;
+      }
+
+      var slots = [
+        frame.querySelector(".editor-chrome-slot--header"),
+        frame.querySelector(".editor-chrome-slot--cmp"),
+        frame.querySelector(".editor-chrome-slot--footer")
+      ];
+      var btns = rail.querySelectorAll(".chrome-info-btn");
+      if (btns.length !== 3 || slots.some(function (s) { return !s; })) return;
+
+      var railRect = rail.getBoundingClientRect();
+
+      btns.forEach(function (btn, i) {
+        var slot = slots[i];
+        var sr = slot.getBoundingClientRect();
+        var centerY = sr.top + sr.height / 2 - railRect.top;
+        var bh = btn.getBoundingClientRect().height || 26;
+        btn.style.position = "absolute";
+        btn.style.left = "0";
+        btn.style.top = Math.round(centerY - bh / 2) + "px";
+      });
+    }
+
+    window.nexusAlignEditorChromeRail = alignEditorChromeRail;
+
+    if (window.nexusShellApplyEditorInjections) window.nexusShellApplyEditorInjections();
+    else requestAnimationFrame(alignEditorChromeRail);
+
+    window.addEventListener("resize", alignEditorChromeRail);
+    if (typeof ResizeObserver !== "undefined") {
+      var mf = document.getElementById("mobile-frame");
+      if (mf) new ResizeObserver(function () { alignEditorChromeRail(); }).observe(mf);
+    }
+    document.fonts.ready.then(function () { alignEditorChromeRail(); }).catch(function () { alignEditorChromeRail(); });
   </script>
 </body>
 </html>

@@ -10,10 +10,11 @@
   <div class="top-strip"></div>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand-tile">N</div>
+      <a href="index.html" class="brand-tile" title="Home" aria-label="Forbes"><img src="img/forbes-logo.svg" alt="Forbes" class="brand-tile__img" width="72" height="18" decoding="async" /></a>
       <nav class="nav">
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
         <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="widgets.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
         <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
         <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
         <a href="logs.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
@@ -25,9 +26,6 @@
       <div class="page-header">
         <h1>Event logs</h1>
         <div class="page-header__right">
-          <select class="select" aria-label="Event type"><option>All events</option><option>Impression</option><option>Click</option><option>Conversion</option><option>Visit</option></select>
-          <select class="select" aria-label="Lander"><option>All landers</option><option>Summer Sale</option><option>Black Friday</option><option>Referral Q2</option><option>Founder Letter</option></select>
-          <select class="select" aria-label="Date range"><option>Today</option><option>Last 7 days</option><option>Last 30 days</option></select>
           <button type="button" class="btn">↓ CSV</button>
         </div>
       </div>
@@ -35,13 +33,46 @@
       <div class="page-body">
         <div class="logs-pills-bar">
           <div class="logs-pills" role="tablist" aria-label="Filter by event">
-            <button type="button" class="log-filter-pill is-active" data-filter="all">All <span class="log-filter-count">(12)</span></button>
-            <button type="button" class="log-filter-pill" data-filter="impression"><span class="dot" aria-hidden="true"></span>Impression <span class="log-filter-count">(3)</span></button>
-            <button type="button" class="log-filter-pill" data-filter="click"><span class="dot" aria-hidden="true"></span>Click <span class="log-filter-count">(4)</span></button>
-            <button type="button" class="log-filter-pill" data-filter="conversion"><span class="dot" aria-hidden="true"></span>Conversion <span class="log-filter-count">(3)</span></button>
-            <button type="button" class="log-filter-pill" data-filter="visit"><span class="dot" aria-hidden="true"></span>Visit <span class="log-filter-count">(2)</span></button>
+            <button type="button" class="log-filter-pill is-active" data-filter="all">All <span class="log-filter-count" id="log-count-all">(12)</span></button>
+            <button type="button" class="log-filter-pill" data-filter="impression"><span class="dot" aria-hidden="true"></span>Impression <span class="log-filter-count" id="log-count-impression">(3)</span></button>
+            <button type="button" class="log-filter-pill" data-filter="click"><span class="dot" aria-hidden="true"></span>Click <span class="log-filter-count" id="log-count-click">(4)</span></button>
+            <button type="button" class="log-filter-pill" data-filter="conversion"><span class="dot" aria-hidden="true"></span>Conversion <span class="log-filter-count" id="log-count-conversion">(3)</span></button>
+            <button type="button" class="log-filter-pill" data-filter="visit"><span class="dot" aria-hidden="true"></span>Visit <span class="log-filter-count" id="log-count-visit">(2)</span></button>
           </div>
-          <span class="logs-refresh-note muted">12 records · auto-refreshing</span>
+          <span class="logs-refresh-note muted" id="logs-refresh-note">12 records · auto-refreshing</span>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input class="input" type="search" id="logs-url-filter" placeholder="Filter by URL / path" />
+          </div>
+          <select class="select" id="logs-lander-filter" aria-label="Lander">
+            <option value="">All landers</option>
+            <option>Summer Sale</option>
+            <option>Black Friday</option>
+            <option>Referral Q2</option>
+            <option>Founder Letter</option>
+            <option>Partner Announce</option>
+            <option>Walk-in Tubs</option>
+            <option>Holiday Teaser</option>
+            <option>Fall Preview</option>
+          </select>
+          <select class="select" id="logs-variant-filter" aria-label="Variant">
+            <option value="">All variants</option>
+          </select>
+          <select class="select" id="logs-visits-having" aria-label="Visits having" disabled title="Select the Visit event pill to enable">
+            <option value="">Visits having…</option>
+            <option value="click">Clicks</option>
+            <option value="conversion">Conversions</option>
+            <option value="form_start">Form start</option>
+            <option value="form_complete">Form complete</option>
+          </select>
+          <div class="date-range" role="group" aria-label="Date range">
+            <input type="date" class="date-range__input" id="logs-date-from" aria-label="From date" />
+            <span class="date-range__sep" aria-hidden="true">→</span>
+            <input type="date" class="date-range__input" id="logs-date-to" aria-label="To date" />
+          </div>
         </div>
 
         <div class="card logs-card">
@@ -62,12 +93,12 @@
                 </tr>
               </thead>
               <tbody id="logs-tbody">
-                <tr class="log-data-row" data-log-row data-event="conversion" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="conversion" data-lander="Summer Sale" data-variant="var_ss_03" data-url="offers.acme.com/summer-sale-hero" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:42:11</td>
                   <td><span class="log-event log-event--conversion">Conversion</span></td>
                   <td><strong>Summer Sale</strong></td>
-                  <td><span class="log-variant-pill">V3</span></td>
+                  <td><span class="log-variant-pill mono">var_ss_03</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
@@ -88,12 +119,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="click" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="click" data-lander="Black Friday" data-variant="var_bf_02" data-url="offers.acme.com/black-friday-2026" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:38:02</td>
                   <td><span class="log-event log-event--click">Click</span></td>
                   <td><strong>Black Friday</strong></td>
-                  <td><span class="log-variant-pill">V2</span></td>
+                  <td><span class="log-variant-pill mono">var_bf_02</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Mobile</td>
                   <td class="muted">iOS</td>
@@ -114,12 +145,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="impression" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="impression" data-lander="Referral Q2" data-variant="var_rq_01" data-url="refer.acme.com/referral-q2" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:31:44</td>
                   <td><span class="log-event log-event--impression">Impression</span></td>
                   <td><strong>Referral Q2</strong></td>
-                  <td><span class="log-variant-pill">V1</span></td>
+                  <td><span class="log-variant-pill mono">var_rq_01</span></td>
                   <td class="muted">refer.acme.com</td>
                   <td class="muted">Tablet</td>
                   <td class="muted">iPadOS</td>
@@ -140,12 +171,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="visit" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="visit" data-lander="Founder Letter" data-variant="var_fl_01" data-url="offers.acme.com/founder-letter" data-ts="2026-04-21" data-has="click,conversion,form_start,form_complete" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:22:09</td>
                   <td><span class="log-event log-event--visit">Visit</span></td>
                   <td><strong>Founder Letter</strong></td>
-                  <td><span class="log-variant-pill">V1</span></td>
+                  <td><span class="log-variant-pill mono">var_fl_01</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Desktop</td>
                   <td class="muted">Windows</td>
@@ -166,12 +197,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="click" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="click" data-lander="Summer Sale" data-variant="var_ss_03" data-url="offers.acme.com/summer-sale-hero" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:15:33</td>
                   <td><span class="log-event log-event--click">Click</span></td>
                   <td><strong>Summer Sale</strong></td>
-                  <td><span class="log-variant-pill">V3</span></td>
+                  <td><span class="log-variant-pill mono">var_ss_03</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
@@ -192,12 +223,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="conversion" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="conversion" data-lander="Partner Announce" data-variant="var_pa_01" data-url="try.acme.com/partner-announce" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:02:18</td>
                   <td><span class="log-event log-event--conversion">Conversion</span></td>
                   <td><strong>Partner Announce</strong></td>
-                  <td><span class="log-variant-pill">V1</span></td>
+                  <td><span class="log-variant-pill mono">var_pa_01</span></td>
                   <td class="muted">try.acme.com</td>
                   <td class="muted">Mobile</td>
                   <td class="muted">Android</td>
@@ -218,12 +249,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="impression" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="impression" data-lander="Black Friday" data-variant="var_bf_02" data-url="offers.acme.com/black-friday-2026" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 08:55:01</td>
                   <td><span class="log-event log-event--impression">Impression</span></td>
                   <td><strong>Black Friday</strong></td>
-                  <td><span class="log-variant-pill">V2</span></td>
+                  <td><span class="log-variant-pill mono">var_bf_02</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Desktop</td>
                   <td class="muted">Linux</td>
@@ -244,12 +275,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="click" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="click" data-lander="Walk-in Tubs" data-variant="var_wt_02" data-url="try.acme.com/walk-in-tubs" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 08:48:27</td>
                   <td><span class="log-event log-event--click">Click</span></td>
                   <td><strong>Walk-in Tubs</strong></td>
-                  <td><span class="log-variant-pill">V2</span></td>
+                  <td><span class="log-variant-pill mono">var_wt_02</span></td>
                   <td class="muted">try.acme.com</td>
                   <td class="muted">Mobile</td>
                   <td class="muted">iOS</td>
@@ -270,12 +301,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="visit" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="visit" data-lander="Holiday Teaser" data-variant="var_ht_01" data-url="offers.acme.com/holiday-teaser" data-ts="2026-04-21" data-has="click,form_start" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 08:40:12</td>
                   <td><span class="log-event log-event--visit">Visit</span></td>
                   <td><strong>Holiday Teaser</strong></td>
-                  <td><span class="log-variant-pill">V1</span></td>
+                  <td><span class="log-variant-pill mono">var_ht_01</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
@@ -296,12 +327,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="click" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="click" data-lander="Referral Q2" data-variant="var_rq_01" data-url="refer.acme.com/referral-q2" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 08:33:56</td>
                   <td><span class="log-event log-event--click">Click</span></td>
                   <td><strong>Referral Q2</strong></td>
-                  <td><span class="log-variant-pill">V1</span></td>
+                  <td><span class="log-variant-pill mono">var_rq_01</span></td>
                   <td class="muted">refer.acme.com</td>
                   <td class="muted">Desktop</td>
                   <td class="muted">Windows</td>
@@ -322,12 +353,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="conversion" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="conversion" data-lander="Fall Preview" data-variant="var_fp_01" data-url="offers.acme.com/fall-preview" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 08:21:03</td>
                   <td><span class="log-event log-event--conversion">Conversion</span></td>
                   <td><strong>Fall Preview</strong></td>
-                  <td><span class="log-variant-pill">V1</span></td>
+                  <td><span class="log-variant-pill mono">var_fp_01</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Mobile</td>
                   <td class="muted">Android</td>
@@ -349,12 +380,12 @@
                   </td>
                 </tr>
 
-                <tr class="log-data-row" data-log-row data-event="impression" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
+                <tr class="log-data-row" data-log-row data-event="impression" data-lander="Summer Sale" data-variant="var_ss_03" data-url="offers.acme.com/summer-sale-hero" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 08:10:41</td>
                   <td><span class="log-event log-event--impression">Impression</span></td>
                   <td><strong>Summer Sale</strong></td>
-                  <td><span class="log-variant-pill">V3</span></td>
+                  <td><span class="log-variant-pill mono">var_ss_03</span></td>
                   <td class="muted">offers.acme.com</td>
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
@@ -396,5 +427,102 @@
   </div>
 
   <script src="app.js"></script>
+  <script>
+    // Combined filters for the logs table. app.js also toggles rows based on the
+    // event-type pill; this runs after it and intersects with the other filters.
+    (function () {
+      var urlEl    = document.getElementById("logs-url-filter");
+      var landerEl = document.getElementById("logs-lander-filter");
+      var varEl    = document.getElementById("logs-variant-filter");
+      var havEl    = document.getElementById("logs-visits-having");
+      var fromEl   = document.getElementById("logs-date-from");
+      var toEl     = document.getElementById("logs-date-to");
+      var rangeEl  = document.getElementById("logs-footer-range");
+      var noteEl   = document.getElementById("logs-refresh-note");
+      var rows     = Array.prototype.slice.call(document.querySelectorAll("tr[data-log-row]"));
+
+      (function populateVariants() {
+        if (!varEl) return;
+        var seen = {}, list = [];
+        rows.forEach(function (r) {
+          var v = r.getAttribute("data-variant");
+          if (v && !seen[v]) { seen[v] = 1; list.push(v); }
+        });
+        list.sort();
+        list.forEach(function (v) {
+          var opt = document.createElement("option");
+          opt.value = v; opt.textContent = v;
+          varEl.appendChild(opt);
+        });
+      })();
+
+      function activePillFilter() {
+        var p = document.querySelector(".log-filter-pill.is-active");
+        return p ? (p.getAttribute("data-filter") || "all") : "all";
+      }
+
+      function apply() {
+        var ev     = activePillFilter();
+        var urlQ   = (urlEl && urlEl.value || "").trim().toLowerCase();
+        var lnd    = landerEl && landerEl.value || "";
+        var varId  = varEl && varEl.value || "";
+        var hav    = havEl && havEl.value || "";
+        var fromD  = fromEl && fromEl.value ? new Date(fromEl.value) : null;
+        var toD    = toEl   && toEl.value   ? new Date(toEl.value)   : null;
+
+        // "Visits having" is only meaningful when the Visit pill is active.
+        if (havEl) {
+          var visitMode = ev === "visit";
+          havEl.disabled = !visitMode;
+          if (!visitMode) { havEl.value = ""; hav = ""; }
+        }
+
+        var vis = 0;
+        rows.forEach(function (r) {
+          var rEv   = r.getAttribute("data-event") || "";
+          var rLnd  = r.getAttribute("data-lander") || "";
+          var rVar  = r.getAttribute("data-variant") || "";
+          var rUrl  = (r.getAttribute("data-url") || "").toLowerCase();
+          var rTs   = r.getAttribute("data-ts") || "";
+          var rHas  = (r.getAttribute("data-has") || "").split(",");
+
+          var keep = true;
+          if (ev !== "all" && rEv !== ev) keep = false;
+          if (urlQ && rUrl.indexOf(urlQ) === -1) keep = false;
+          if (lnd && rLnd !== lnd) keep = false;
+          if (varId && rVar !== varId) keep = false;
+          if (hav && rHas.indexOf(hav) === -1) keep = false;
+          if (rTs) {
+            var d = new Date(rTs);
+            if (fromD && d < fromD) keep = false;
+            if (toD && d.getTime() > toD.getTime() + 86399999) keep = false;
+          }
+
+          r.hidden = !keep;
+          var exp = r.nextElementSibling;
+          if (exp && exp.classList.contains("log-expand-row")) {
+            exp.hidden = !keep || !r.classList.contains("is-expanded");
+          }
+          if (keep) vis++;
+        });
+
+        if (noteEl)  noteEl.textContent = vis + " records · auto-refreshing";
+        if (rangeEl) rangeEl.innerHTML = "<strong>Showing " + (vis ? "1" : "0") + "–" + vis + " of " + rows.length + "</strong>";
+      }
+
+      [urlEl, landerEl, varEl, havEl, fromEl, toEl].forEach(function (el) {
+        if (!el) return;
+        var evt = el.tagName === "SELECT" || el.type === "date" ? "change" : "input";
+        el.addEventListener(evt, apply);
+      });
+
+      // Re-apply combined filters after the pill click is handled by app.js.
+      document.addEventListener("click", function (e) {
+        if (e.target.closest(".log-filter-pill")) setTimeout(apply, 0);
+      });
+
+      apply();
+    })();
+  </script>
 </body>
 </html>
