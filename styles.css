@@ -1523,11 +1523,98 @@ tr[data-lander-row].is-expanded > td { background: #fbf1df; }
   min-width: 150px;
 }
 .plan-recap-card dl > *:nth-last-child(-n+2) { border-bottom: none; }
+.plan-recap-hint {
+  margin: 0;
+  padding: 0.5rem 0.7rem 0.35rem;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+.plan-recap-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  font: inherit;
+  font-size: 12px;
+  background: #fff;
+  color: var(--text);
+}
+.plan-recap-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+.plan-recap-card dd {
+  display: flex;
+  align-items: center;
+}
 
 .plan-compose {
   padding: 0.7rem 1.15rem 0.85rem;
   border-top: 1px solid var(--border);
   background: #fff;
+}
+
+/* Plan CTAs: tertiary (skip) < secondary (looks good) < primary (build) */
+.plan-compose-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.55rem;
+  flex-wrap: wrap;
+}
+.plan-compose-footer__right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.plan-cta-tertiary {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.plan-cta-tertiary:hover {
+  color: var(--text);
+}
+.plan-cta-secondary {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(70, 55, 30, 0.06);
+}
+.plan-cta-secondary:hover {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: #4a3010;
+}
+.plan-cta-primary {
+  flex-shrink: 0;
+  min-width: 7rem;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
 }
 .plan-chips {
   display: flex;
@@ -1584,14 +1671,18 @@ tr[data-lander-row].is-expanded > td { background: #fbf1df; }
 .plan-progress {
   font-size: 10.5px;
   color: var(--text-muted);
-  margin-top: 0.55rem;
+  margin-top: 0;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
   letter-spacing: 0.03em;
 }
 .plan-progress .plan-progress__bar {
   flex: 1; max-width: 180px;
-  margin-left: 0.7rem;
+  margin-left: 0;
   height: 3px; border-radius: 2px;
   background: var(--border); overflow: hidden;
 }
@@ -1605,10 +1696,19 @@ tr[data-lander-row].is-expanded > td { background: #fbf1df; }
   padding: 0.75rem 1.15rem 1rem;
   border-top: 1px solid var(--border);
   background: #fbf1df;
-  display: flex; gap: 0.6rem;
-  justify-content: space-between; align-items: center;
+  display: flex;
+  gap: 0.85rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
-.plan-done__summary { font-size: 12px; color: #6b3f16; line-height: 1.45; }
+.plan-done__summary {
+  font-size: 12px;
+  color: #6b3f16;
+  line-height: 1.45;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
 .plan-done__summary strong { color: #2a2a2a; font-weight: 600; }
 
 /* ---------- Variant builder dialog (big prompt, suggestions sidebar) ---------- */

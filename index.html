@@ -197,10 +197,9 @@
             <span class="plan-pill">Plan mode</span>
             Before I generate…
           </h2>
-          <p class="modal__hint">A couple of quick questions help <strong>Opus 4.7</strong> land V1 closer to what you want. Skip any time.</p>
+          <p class="modal__hint">A few quick questions lock the plan before the editor. You can skip anytime.</p>
         </div>
         <div class="plan-header-actions">
-          <button type="button" class="btn btn--ghost" id="plan-skip">Skip → Editor</button>
           <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
         </div>
       </div>
@@ -215,15 +214,21 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           </button>
         </div>
-        <div class="plan-progress" id="plan-progress">
-          <span id="plan-progress-label">Getting started</span>
-          <span class="plan-progress__bar"><span id="plan-progress-fill"></span></span>
+        <div class="plan-compose-footer">
+          <button type="button" class="plan-cta-tertiary" id="plan-skip">Skip to editor</button>
+          <div class="plan-compose-footer__right">
+            <button type="button" class="btn plan-cta-secondary" id="plan-recap-confirm" hidden>Looks good →</button>
+            <div class="plan-progress" id="plan-progress">
+              <span id="plan-progress-label">Getting started</span>
+              <span class="plan-progress__bar"><span id="plan-progress-fill"></span></span>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="plan-done" id="plan-done" hidden>
         <div class="plan-done__summary" id="plan-done-summary"></div>
-        <button type="button" class="btn btn--black" id="plan-generate">Build</button>
+        <button type="button" class="btn btn--black plan-cta-primary" id="plan-generate">Build</button>
       </div>
     </div>
   </dialog>
@@ -371,6 +376,8 @@
       var doneEl    = document.getElementById("plan-done");
       var doneSum   = document.getElementById("plan-done-summary");
       var genBtn    = document.getElementById("plan-generate");
+      var recapBtn  = document.getElementById("plan-recap-confirm");
+      var inputRow  = composeEl ? composeEl.querySelector(".plan-input-row") : null;
 
       var plan = null;     // current plan state
       var seq  = [];       // dialogue sequence
@@ -387,18 +394,30 @@
         chatEl.innerHTML = "";
         doneEl.hidden = true;
         composeEl.hidden = false;
+        if (recapBtn) recapBtn.hidden = true;
+        if (inputRow) inputRow.style.display = "";
         dlg.showModal();
         addBubble(plan.prompt, "user");
         setTimeout(nextStep, 300);
       }
 
-      skipBtn.addEventListener("click", function () { dlg.close(); gotoEditor(true); });
+      if (skipBtn) skipBtn.addEventListener("click", function () { dlg.close(); gotoEditor(true); });
       document.querySelector("#dialog-plan .modal__close").addEventListener("click", function () { dlg.close(); });
       sendBtn.addEventListener("click", function () { submitFreeText(inputEl.value); });
       inputEl.addEventListener("keydown", function (e) {
         if (e.key === "Enter") { e.preventDefault(); submitFreeText(inputEl.value); }
       });
       genBtn.addEventListener("click", function () { dlg.close(); gotoEditor(false); });
+      if (recapBtn) {
+        recapBtn.addEventListener("click", function () {
+          syncRecapFromDom();
+          seq = buildSequence(plan);
+          step++;
+          if (recapBtn) recapBtn.hidden = true;
+          if (inputRow) inputRow.style.display = "";
+          setTimeout(nextStep, 120);
+        });
+      }
 
       function addBubble(text, who, extraHTML) {
         var b = document.createElement("div");
@@ -439,11 +458,29 @@
 
       function answer(val, skipped) {
         var q = seq[step];
-        if (q.key) plan.answers[q.key] = skipped ? null : val;
-        if (!skipped || val) addBubble(val || "Skipped", "user");
+        if (q.key) {
+          if (skipped) {
+            plan.answers[q.key] = q.default != null && String(q.default).length ? q.default : null;
+          } else {
+            plan.answers[q.key] = val;
+          }
+        }
+        var bubble = skipped
+          ? (q.default != null && String(q.default).length ? "Using default: " + q.default : "Skipped")
+          : val;
+        if (bubble) addBubble(bubble, "user");
         inputEl.value = "";
         step++;
         setTimeout(nextStep, 220);
+      }
+
+      function syncRecapFromDom() {
+        if (!plan || !plan.autofilled) return;
+        var inputs = chatEl.querySelectorAll(".plan-recap-input");
+        inputs.forEach(function (inp) {
+          var i = parseInt(inp.getAttribute("data-recap-idx"), 10);
+          if (!isNaN(i) && plan.autofilled[i]) plan.autofilled[i][1] = inp.value.trim() || "—";
+        });
       }
 
       function nextStep() {
@@ -457,13 +494,35 @@
         progFill.style.width = Math.min(100, Math.round((ansQ / Math.max(totalQ, 1)) * 100)) + "%";
 
         if (q.type === "recap") {
-          var rows = plan.autofilled.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("");
-          var html = "<div class=\"plan-recap-card\"><dl>" + rows + "</dl></div>";
-          addBubble(q.ai, "ai", html);
-          renderChips({ chips: ["Looks good →"], allowInput: false, type: "recap" });
-          chipsEl.querySelector("button").addEventListener("click", function () { step++; nextStep(); }, { once: true });
-          chipsEl.removeChild(chipsEl.lastChild); // drop the Skip chip for recap
+          chipsEl.innerHTML = "";
+          if (inputRow) inputRow.style.display = "none";
+          if (recapBtn) recapBtn.hidden = false;
+          var card = document.createElement("div");
+          card.className = "plan-recap-card";
+          var hint = document.createElement("p");
+          hint.className = "plan-recap-hint";
+          hint.textContent = "Adjust any value below, then continue.";
+          card.appendChild(hint);
+          var dl = document.createElement("dl");
+          plan.autofilled.forEach(function (row, idx) {
+            var dt = document.createElement("dt");
+            dt.textContent = row[0];
+            var dd = document.createElement("dd");
+            var inp = document.createElement("input");
+            inp.type = "text";
+            inp.className = "plan-recap-input";
+            inp.setAttribute("data-recap-idx", String(idx));
+            inp.value = row[1] === "—" ? "" : row[1];
+            inp.placeholder = row[1] === "—" ? "—" : "";
+            dd.appendChild(inp);
+            dl.appendChild(dt);
+            dl.appendChild(dd);
+          });
+          card.appendChild(dl);
+          addBubble(q.ai, "ai", card.outerHTML);
         } else {
+          if (recapBtn) recapBtn.hidden = true;
+          if (inputRow) inputRow.style.display = "";
           addBubble(q.ai, "ai");
           renderChips(q);
         }
@@ -478,17 +537,20 @@
         var filled = Object.keys(ans).filter(function (k) { return ans[k]; }).length;
         doneSum.innerHTML = "Plan locked — <strong>" + filled + "</strong> dimensions captured + " +
                             plan.autofilled.length + " auto-filled. You can still refine everything in the editor.";
-        addBubble("All set! I'll draft <strong>V1</strong> now. You can refine copy, layout, and CTA in the editor.", "ai");
+        addBubble("All set! Opening the editor with your plan — you can still change anything there.", "ai");
       }
 
       function gotoEditor(skipped) {
         var q = new URLSearchParams({ "new": "1" });
         if (plan && plan.prompt) q.set("prompt", plan.prompt);
-        if (plan) {
+        if (skipped) {
+          q.set("planSkipped", "1");
+        } else if (plan) {
           var a = plan.answers || {};
-          Object.keys(a).forEach(function (k) { if (a[k]) q.set(k, a[k]); });
+          Object.keys(a).forEach(function (k) {
+            if (a[k] != null && String(a[k]).length) q.set(k, a[k]);
+          });
         }
-        if (skipped) q.set("planSkipped", "1");
         window.location.href = "editor.html?" + q.toString();
       }
 
