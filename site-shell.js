@@ -81,25 +81,51 @@
   var drawer;
   var currentDomain = "offers.acme.com";
   var activePart = "header";
+  var activeDevice = "desktop";
 
-  function previewDoc(fragment) {
+  var DEVICE_LABEL = { desktop: "Desktop", tablet: "Tablet", mobile: "Mobile" };
+
+  function previewDoc(fragment, part) {
     var css =
-      "body{margin:0;font-family:system-ui,-apple-system,sans-serif;font-size:14px;background:#faf8f4;color:#2a261f;}" +
-      ".site-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e4ddd0;background:#fff;}" +
+      "html,body{height:100%;}" +
+      "body{margin:0;font-family:system-ui,-apple-system,sans-serif;font-size:14px;background:#faf8f4;color:#2a261f;display:flex;flex-direction:column;min-height:100vh;}" +
+      ".site-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e4ddd0;background:#fff;flex-shrink:0;}" +
       ".site-header .logo img{display:block;height:22px;width:auto;}" +
       ".site-header nav{display:flex;gap:1rem;font-size:13px;}" +
       ".site-header a{color:#3d5a9a;text-decoration:none;font-weight:500;}" +
-      ".site-footer{padding:12px 14px;background:#f3efe6;border-top:1px solid #e4ddd0;font-size:12px;color:#5c4a2e;}" +
+      ".site-footer{padding:12px 14px;background:#f3efe6;border-top:1px solid #e4ddd0;font-size:12px;color:#5c4a2e;flex-shrink:0;}" +
       ".site-footer a{color:#3d5a9a;}" +
-      "#cmp-banner{padding:10px 12px;background:#2a261f;color:#f5f0e7;font-size:12px;}" +
+      "#cmp-banner{padding:10px 12px;background:#2a261f;color:#f5f0e7;font-size:12px;flex-shrink:0;}" +
       "#cmp-banner a{color:#c9d4ff;}" +
       ".cmp-actions{display:flex;gap:8px;margin-top:8px;}" +
-      ".cmp-actions button{padding:6px 10px;border-radius:6px;border:1px solid #666;background:#444;color:#fff;font-size:11px;cursor:default;}";
+      ".cmp-actions button{padding:6px 10px;border-radius:6px;border:1px solid #666;background:#444;color:#fff;font-size:11px;cursor:default;}" +
+      ".nss-variant-watermark{flex:1;min-height:160px;display:flex;align-items:center;justify-content:center;padding:1.5rem 1rem;background-color:#f7f2e8;background-image:repeating-linear-gradient(135deg,rgba(180,160,120,0.06) 0,rgba(180,160,120,0.06) 1px,transparent 1px,transparent 14px);}" +
+      ".nss-variant-watermark__chip{display:inline-flex;align-items:center;gap:0.45rem;padding:0.55rem 0.95rem;border:1.5px dashed #c8b894;background:rgba(255,255,255,0.78);color:#8a7a55;font-size:12.5px;font-weight:600;letter-spacing:0.02em;border-radius:99px;text-align:center;line-height:1.4;}" +
+      ".nss-variant-watermark__chip svg{width:14px;height:14px;flex-shrink:0;}" +
+      ".nss-variant-watermark__chip small{display:block;font-weight:500;color:#aa9a78;font-size:11px;letter-spacing:0;}";
+
+    var watermarkHtml =
+      '<div class="nss-variant-watermark" aria-hidden="true">' +
+      '  <span class="nss-variant-watermark__chip">' +
+      '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>' +
+      '    <span>Depends on the Variant HTML<small>This area renders whatever the variant outputs</small></span>' +
+      "  </span>" +
+      "</div>";
+
+    var content = stripScripts(fragment);
+    var bodyHtml;
+    if (part === "header") {
+      bodyHtml = content + watermarkHtml;
+    } else {
+      // footer / cmp sit at the bottom — watermark fills the area above
+      bodyHtml = watermarkHtml + content;
+    }
+
     return (
       "<!DOCTYPE html><html><head><meta charset='utf-8'><style>" +
       css +
       "</style></head><body>" +
-      stripScripts(fragment) +
+      bodyHtml +
       "</body></html>"
     );
   }
@@ -114,7 +140,14 @@
     if (activePart === "header" && taH) html = taH.value;
     else if (activePart === "footer" && taF) html = taF.value;
     else if (activePart === "cmp" && taC) html = taC.value;
-    iframe.srcdoc = previewDoc(html);
+    iframe.srcdoc = previewDoc(html, activePart);
+  }
+
+  function updatePreviewLabel() {
+    var lab = document.getElementById("nss-preview-label");
+    if (!lab) return;
+    var part = activePart === "header" ? "Header" : activePart === "footer" ? "Footer" : "CMP (consent)";
+    lab.textContent = (DEVICE_LABEL[activeDevice] || "Desktop") + " preview · " + part;
   }
 
   function setActiveTab(part) {
@@ -124,12 +157,20 @@
     root.querySelectorAll(".nss-chrome-tabs .chrome-tab").forEach(function (t) {
       t.classList.toggle("is-active", t.getAttribute("data-chrome-tab") === part);
     });
-    var lab = document.getElementById("nss-preview-label");
-    if (lab) {
-      var name = part === "header" ? "Header" : part === "footer" ? "Footer" : "CMP (consent)";
-      lab.textContent = "Live preview · " + name;
-    }
+    updatePreviewLabel();
     refreshPreview();
+  }
+
+  function setActiveDevice(device) {
+    activeDevice = device || "desktop";
+    var frame = document.getElementById("nss-preview-frame");
+    if (frame) {
+      frame.classList.remove("mobile-frame--mobile", "mobile-frame--tablet", "mobile-frame--desktop");
+      if (activeDevice === "tablet") frame.classList.add("mobile-frame--tablet");
+      else if (activeDevice === "desktop") frame.classList.add("mobile-frame--desktop");
+      else frame.classList.add("mobile-frame--mobile");
+    }
+    updatePreviewLabel();
   }
 
   function appendChat(text, who) {
@@ -226,10 +267,25 @@
       '          <button type="button" class="chrome-tab" data-chrome-tab="footer" role="tab">Footer</button>' +
       '          <button type="button" class="chrome-tab" data-chrome-tab="cmp" role="tab">CMP (consent)</button>' +
       "        </div>" +
-      '        <p class="preview-label site-shell-preview-label" id="nss-preview-label">Live preview · Header</p>' +
+      '        <div class="site-shell-preview-meta">' +
+      '          <p class="preview-label site-shell-preview-label" id="nss-preview-label">Desktop preview · Header</p>' +
+      '          <div class="device-toggle nss-device-toggle" role="tablist" aria-label="Preview size">' +
+      '            <button type="button" data-nss-device="desktop" class="is-active" title="Desktop" aria-label="Desktop">' +
+      '              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>' +
+      "            </button>" +
+      '            <button type="button" data-nss-device="tablet" title="Tablet" aria-label="Tablet">' +
+      '              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M11 18h2"/></svg>' +
+      "            </button>" +
+      '            <button type="button" data-nss-device="mobile" title="Mobile" aria-label="Mobile">' +
+      '              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>' +
+      "            </button>" +
+      "          </div>" +
+      "        </div>" +
       "      </div>" +
-      '      <div class="mobile-frame mobile-frame--desktop site-shell-preview-frame">' +
-      '        <iframe id="nss-preview" class="nss-preview-iframe" title="Shell preview" sandbox="allow-same-origin"></iframe>' +
+      '      <div class="site-shell-preview-stage">' +
+      '        <div class="mobile-frame mobile-frame--desktop site-shell-preview-frame" id="nss-preview-frame">' +
+      '          <iframe id="nss-preview" class="nss-preview-iframe" title="Shell preview" sandbox="allow-same-origin"></iframe>' +
+      "        </div>" +
       "      </div>" +
       "    </main>" +
       "  </div>" +
@@ -254,6 +310,16 @@
     dlg.querySelectorAll(".nss-chrome-tabs .chrome-tab").forEach(function (tab) {
       tab.addEventListener("click", function () {
         setActiveTab(tab.getAttribute("data-chrome-tab"));
+      });
+    });
+
+    dlg.querySelectorAll(".nss-device-toggle button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        dlg.querySelectorAll(".nss-device-toggle button").forEach(function (x) {
+          x.classList.remove("is-active");
+        });
+        b.classList.add("is-active");
+        setActiveDevice(b.getAttribute("data-nss-device") || "desktop");
       });
     });
 
@@ -311,6 +377,11 @@
       appendChat("Pick a tab, then describe what to change — or expand HTML source.", "ai");
     }
 
+    var deviceBtns = drawer.querySelectorAll(".nss-device-toggle button");
+    deviceBtns.forEach(function (b) {
+      b.classList.toggle("is-active", b.getAttribute("data-nss-device") === "desktop");
+    });
+    setActiveDevice("desktop");
     setActiveTab(part || "header");
     drawer.showModal();
   }

@@ -44,8 +44,21 @@
               <input type="text" id="settings-page-title" value="Summer Sale — Up to 60% Off" />
             </div>
             <div class="field">
-              <label for="settings-favicon">Favicon</label>
-              <input type="url" id="settings-favicon" placeholder="https://…/favicon.ico" />
+              <label>Favicon</label>
+              <div class="favicon-upload" data-favicon="settings">
+                <input type="file" id="settings-favicon-file" class="favicon-upload__file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,image/vnd.microsoft.icon" hidden />
+                <div class="favicon-upload__preview" data-favicon-preview aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+                </div>
+                <div class="favicon-upload__meta">
+                  <strong class="favicon-upload__name" data-favicon-name>No file selected</strong>
+                  <small class="favicon-upload__hint">PNG, JPG, WebP, SVG or ICO · up to 1MB</small>
+                </div>
+                <div class="favicon-upload__actions">
+                  <button type="button" class="btn btn--ghost btn--sm" data-favicon-pick>Choose file</button>
+                  <button type="button" class="btn btn--ghost btn--sm favicon-upload__remove" data-favicon-remove hidden>Remove</button>
+                </div>
+              </div>
             </div>
             <div class="field">
               <label for="settings-description">Description</label>
@@ -59,7 +72,23 @@
           </div>
         </details>
         <button class="btn" type="button">Save</button>
-        <button class="btn btn--publish" type="button" id="editor-publish-btn">Publish <span class="chev">▾</span></button>
+        <button class="btn btn--ghost editor-preview-btn" type="button" id="editor-preview-btn" title="Open a preview of this variant in a new tab">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Preview
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </button>
+        <div class="publish-split" id="editor-publish-split" data-state="">
+          <button class="btn btn--publish publish-split__main" type="button" id="editor-publish-btn">Publish</button>
+          <button class="btn btn--publish publish-split__caret" type="button" id="editor-publish-caret" aria-haspopup="menu" aria-expanded="false" aria-label="More publish actions" hidden>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="publish-menu" id="editor-publish-menu" role="menu" hidden>
+            <button type="button" class="publish-menu__item" role="menuitem" id="editor-deactivate-variant">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5 5l14 14"/></svg>
+              <span><strong>Deactivate this variant</strong><small>Stops serving traffic to this variant. Lander stays live.</small></span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -84,31 +113,58 @@
             <button type="button" data-prompt="Simplify the body copy, keep it under 40 words per section">Simplify copy</button>
           </div>
           <div class="compose-stack" id="editor-compose-stack">
-            <div id="editor-insert-panel" class="editor-insert-panel" hidden>
-              <div class="editor-insert-panel__head">
-                <span class="editor-insert-panel__title">Insert from library</span>
-                <button type="button" class="editor-insert-close" id="editor-insert-close" aria-label="Close">✕</button>
+            <div id="editor-insert-menu" class="editor-insert-menu" role="menu" aria-label="Insert into variant" hidden>
+              <div class="editor-insert-menu__head">
+                <p class="editor-insert-menu__title">Insert into variant</p>
+                <button type="button" class="editor-insert-menu__close" id="editor-insert-menu-close" aria-label="Close menu" title="Close">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
               </div>
-              <div class="editor-insert-tabs" role="tablist">
-                <span class="editor-insert-tab is-active" role="tab" aria-selected="true">Forms</span>
-              </div>
-              <ul class="editor-form-list" id="editor-form-list" role="listbox" aria-label="Forms">
-                <li><button type="button" class="editor-form-pick" role="option" data-form-id="lead-short" data-form-name="Lead — short qualify"><strong>Lead — short qualify</strong><small>3 steps · ZIP last</small></button></li>
-                <li><button type="button" class="editor-form-pick" role="option" data-form-id="quote-request" data-form-name="Quote request"><strong>Quote request</strong><small>5 steps · consent mid</small></button></li>
-                <li><button type="button" class="editor-form-pick" role="option" data-form-id="newsletter-sms" data-form-name="Newsletter + SMS opt-in"><strong>Newsletter + SMS opt-in</strong><small>2 steps</small></button></li>
-              </ul>
-              <div id="editor-insert-step2" class="editor-insert-step2" hidden>
-                <p class="editor-insert-step2__picked muted" id="editor-insert-picked-label"></p>
-                <div class="field field--compact">
-                  <label for="editor-form-embed-label">CTA / button text</label>
-                  <input type="text" id="editor-form-embed-label" placeholder="e.g. Get your quote" autocomplete="off" />
-                </div>
-                <button type="button" class="btn btn--black editor-insert-submit" id="editor-form-embed-do">Add to HTML</button>
-              </div>
-              <p class="editor-insert-panel__foot"><a href="widgets.html" target="_blank" rel="noopener">Manage forms in Widgets →</a></p>
+              <button type="button" class="editor-insert-menu__item" role="menuitem" data-insert-type="forms">
+                <span class="editor-insert-menu__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>
+                </span>
+                <span class="editor-insert-menu__text">
+                  <strong>Forms</strong>
+                  <small>Multi-step lead, quote, opt-in</small>
+                </span>
+                <svg class="editor-insert-menu__chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button type="button" class="editor-insert-menu__item is-disabled" role="menuitem" disabled>
+                <span class="editor-insert-menu__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="13" rx="2"/><path d="M9 11h6"/></svg>
+                </span>
+                <span class="editor-insert-menu__text">
+                  <strong>Popup</strong>
+                  <small>Exit-intent or timed</small>
+                </span>
+                <span class="editor-insert-menu__soon">Soon</span>
+              </button>
+              <button type="button" class="editor-insert-menu__item is-disabled" role="menuitem" disabled>
+                <span class="editor-insert-menu__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13"/></svg>
+                </span>
+                <span class="editor-insert-menu__text">
+                  <strong>Wagon wheel</strong>
+                  <small>Spin-to-win incentive</small>
+                </span>
+                <span class="editor-insert-menu__soon">Soon</span>
+              </button>
+              <button type="button" class="editor-insert-menu__item is-disabled" role="menuitem" disabled>
+                <span class="editor-insert-menu__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+                </span>
+                <span class="editor-insert-menu__text">
+                  <strong>Inline modal</strong>
+                  <small>Headless overlay block</small>
+                </span>
+                <span class="editor-insert-menu__soon">Soon</span>
+              </button>
+              <a class="editor-insert-menu__foot" href="widgets.html" target="_blank" rel="noopener">Manage library in Widgets →</a>
             </div>
+            <div class="editor-insert-toast" id="editor-insert-toast" role="status" aria-live="polite" hidden></div>
             <div class="compose-row">
-              <button type="button" class="compose-add-btn" id="editor-insert-open" title="Insert from library (forms)" aria-label="Insert from library" aria-expanded="false" aria-controls="editor-insert-panel">
+              <button type="button" class="compose-add-btn" id="editor-insert-open" title="Insert into variant" aria-label="Insert into variant" aria-expanded="false" aria-controls="editor-insert-menu" aria-haspopup="menu">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
               </button>
               <input type="text" id="editor-input" placeholder="Tell nexus what to change…" />
@@ -117,11 +173,6 @@
               </button>
             </div>
           </div>
-          <details class="editor-html-drawer">
-            <summary>Variant HTML <span class="muted">(playground)</span></summary>
-            <p class="editor-html-drawer__hint muted">Embeds from <strong>Forms</strong> append here. Production would sync to your page source.</p>
-            <textarea id="editor-variant-html" class="code-editor" rows="8" spellcheck="false" placeholder="&lt;!-- Your variant markup --&gt;"></textarea>
-          </details>
         </div>
       </aside>
 
@@ -189,43 +240,312 @@
     </div>
   </div>
 
-  <dialog class="modal modal--publish" id="dialog-publish-lander">
-    <div class="modal__inner">
+  <dialog class="modal modal--insert-form" id="dialog-insert-form" aria-labelledby="insert-form-title">
+    <div class="modal__inner insert-form">
+      <header class="modal__header">
+        <div>
+          <h2 class="modal__title" id="insert-form-title">Insert form</h2>
+          <p class="modal__hint">Pick a form, preview the fields, then drop it into this variant.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </header>
+
+      <div class="insert-form__body">
+        <aside class="insert-form__list" aria-label="Form library">
+          <div class="insert-form__list-head">
+            <p class="insert-form__list-title">Forms in library</p>
+            <a href="widgets.html" target="_blank" rel="noopener" class="insert-form__manage">Manage →</a>
+          </div>
+          <ul id="insert-form-list" role="listbox" aria-label="Forms"></ul>
+        </aside>
+
+        <section class="insert-form__preview" id="insert-form-preview" aria-live="polite">
+          <div class="insert-form__preview-empty" id="insert-form-preview-empty">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>
+            <p>Pick a form on the left to preview its fields here.</p>
+          </div>
+        </section>
+      </div>
+
+      <footer class="insert-form__foot">
+        <div class="insert-form__cta-field">
+          <label for="insert-form-cta">CTA / button text</label>
+          <input type="text" id="insert-form-cta" placeholder="e.g. Get your quote" autocomplete="off" disabled />
+        </div>
+        <div class="insert-form__actions">
+          <button type="button" class="btn" data-close-dialog>Cancel</button>
+          <button type="button" class="btn btn--black" id="insert-form-add" disabled>Add to this variant</button>
+        </div>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog class="modal modal--publish modal--publish-flow" id="dialog-publish-lander">
+    <div class="modal__inner publish-flow">
       <div class="modal__header">
         <div>
-          <h2 class="modal__title">Publish Lander</h2>
-          <p class="modal__hint">Choose where this variant goes live.</p>
+          <h2 class="modal__title" id="publish-flow-title">Publish lander</h2>
+          <p class="modal__hint" id="publish-flow-sub">Pick the route, confirm settings, then ship it.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
 
-      <div class="field">
-        <label for="publish-domain">Domain <span class="req">*</span></label>
-        <select id="publish-domain">
-          <option value="">Select a domain…</option>
-          <option value="offers.acme.com">offers.acme.com</option>
-          <option value="refer.acme.com">refer.acme.com</option>
-          <option value="try.acme.com">try.acme.com</option>
-        </select>
-        <p class="field-error" id="publish-domain-error" hidden>Domain is required to publish</p>
+      <ol class="publish-steps" role="tablist" aria-label="Publish steps">
+        <li class="publish-step is-active" data-step="1" role="tab" aria-selected="true">
+          <span class="publish-step__num">1</span>
+          <span class="publish-step__label">Route</span>
+        </li>
+        <li class="publish-step" data-step="2" role="tab" aria-selected="false">
+          <span class="publish-step__num">2</span>
+          <span class="publish-step__label">Settings</span>
+        </li>
+        <li class="publish-step" data-step="3" role="tab" aria-selected="false">
+          <span class="publish-step__num">3</span>
+          <span class="publish-step__label">Review</span>
+        </li>
+      </ol>
+
+      <!-- Step 1 — Route -->
+      <section class="publish-pane is-active" data-pane="1" role="tabpanel" aria-label="Route">
+        <div class="publish-route">
+          <div class="publish-route__row">
+            <div class="field">
+              <label for="publish-domain">Domain <span class="req">*</span></label>
+              <select id="publish-domain">
+                <option value="">Select a domain…</option>
+                <option value="offers.acme.com">offers.acme.com</option>
+                <option value="refer.acme.com">refer.acme.com</option>
+                <option value="try.acme.com">try.acme.com</option>
+              </select>
+              <p class="field-error" id="publish-domain-error" hidden>Domain is required to publish</p>
+            </div>
+            <div class="field">
+              <label for="publish-path">Path</label>
+              <div class="path-input-row">
+                <span class="path-input-row__prefix" id="publish-path-prefix">domain.com/</span>
+                <input type="text" id="publish-path" value="summer-sale-v1" placeholder="your-path" />
+              </div>
+            </div>
+          </div>
+
+          <div class="publish-section">
+            <div class="publish-section__head">
+              <h4>Site shell</h4>
+              <p class="muted">Auto-detected from this domain. Manage in <a href="#" id="publish-open-shell">Site Shell</a>.</p>
+            </div>
+            <ul class="publish-shell-list" id="publish-shell-list">
+              <li class="publish-shell-row" data-part="header">
+                <span class="publish-shell-row__check" aria-hidden="true"></span>
+                <span class="publish-shell-row__label">Header</span>
+                <span class="publish-shell-row__status">Checking…</span>
+              </li>
+              <li class="publish-shell-row" data-part="footer">
+                <span class="publish-shell-row__check" aria-hidden="true"></span>
+                <span class="publish-shell-row__label">Footer</span>
+                <span class="publish-shell-row__status">Checking…</span>
+              </li>
+              <li class="publish-shell-row" data-part="cmp">
+                <span class="publish-shell-row__check" aria-hidden="true"></span>
+                <span class="publish-shell-row__label">Consent (CMP)</span>
+                <span class="publish-shell-row__status">Checking…</span>
+              </li>
+            </ul>
+            <p class="publish-shell-warn" id="publish-shell-warn" hidden>One or more pieces are missing. Add them in Site Shell to publish.</p>
+          </div>
+
+          <div class="publish-section">
+            <div class="publish-section__head">
+              <div>
+                <h4>Variants in rotation</h4>
+                <p class="muted">Pick which variants serve traffic and how the split is allocated.</p>
+              </div>
+              <button type="button" class="btn btn--ghost btn--sm" id="publish-even-split">Even split</button>
+            </div>
+            <div class="publish-rotation" id="publish-rotation"></div>
+            <div class="publish-rotation-foot">
+              <span class="publish-rotation-total" id="publish-rotation-total">Total: <strong>0%</strong></span>
+              <span class="publish-rotation-warn" id="publish-rotation-warn" hidden>Weights must total 100% across included variants.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 2 — Settings (Page + Variables + Tracking) -->
+      <section class="publish-pane" data-pane="2" role="tabpanel" aria-label="Settings" hidden>
+        <div class="publish-settings">
+          <div class="publish-section">
+            <div class="publish-section__head">
+              <div>
+                <h4>Page</h4>
+                <p class="muted">SEO + browser metadata for <span id="publish-page-scope-name">this variant</span>.</p>
+              </div>
+            </div>
+            <div class="publish-page-grid">
+              <div class="field">
+                <label for="publish-page-title">Page title</label>
+                <input type="text" id="publish-page-title" class="input" placeholder="e.g. Summer Sale — Up to 60% Off" />
+              </div>
+              <div class="field">
+                <label>Favicon</label>
+                <div class="favicon-upload" data-favicon="publish">
+                  <input type="file" id="publish-page-favicon-file" class="favicon-upload__file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,image/vnd.microsoft.icon" hidden />
+                  <div class="favicon-upload__preview" data-favicon-preview aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+                  </div>
+                  <div class="favicon-upload__meta">
+                    <strong class="favicon-upload__name" data-favicon-name>No file selected</strong>
+                    <small class="favicon-upload__hint">PNG, JPG, WebP, SVG or ICO · up to 1MB</small>
+                  </div>
+                  <div class="favicon-upload__actions">
+                    <button type="button" class="btn btn--ghost btn--sm" data-favicon-pick>Choose file</button>
+                    <button type="button" class="btn btn--ghost btn--sm favicon-upload__remove" data-favicon-remove hidden>Remove</button>
+                  </div>
+                </div>
+              </div>
+              <div class="field publish-page-grid__full">
+                <label for="publish-page-desc">Meta description</label>
+                <textarea id="publish-page-desc" class="input" rows="2" placeholder="Search & social preview…"></textarea>
+              </div>
+              <div class="field publish-page-grid__full">
+                <label for="publish-page-keywords">Keywords</label>
+                <input type="text" id="publish-page-keywords" class="input" placeholder="comma, separated, keywords" />
+              </div>
+            </div>
+          </div>
+
+          <div class="publish-section" id="publish-vars-section">
+            <div class="publish-section__head">
+              <div>
+                <h4>Custom variables</h4>
+                <p class="muted">Update values for this lander.</p>
+              </div>
+            </div>
+            <ul class="publish-vars" id="publish-vars-list"></ul>
+          </div>
+
+          <div class="publish-section">
+            <div class="publish-section__head">
+              <div>
+                <h4>Tracking</h4>
+                <p class="muted">Inherited from the workspace. Override below if this lander needs different IDs.</p>
+              </div>
+            </div>
+
+          <ul class="publish-pixel-list">
+            <li class="publish-pixel-row">
+              <span class="publish-pixel-row__icon publish-pixel-row__icon--gtm" aria-hidden="true">GTM</span>
+              <div class="publish-pixel-row__text">
+                <strong>Tag Manager</strong>
+                <small>Container ID that wraps GA, Meta and other tags.</small>
+              </div>
+              <input type="text" class="input publish-pixel-row__input" id="publish-gtm" value="" placeholder="GTM-XXXXXXX" />
+            </li>
+          </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 3 — Review -->
+      <section class="publish-pane" data-pane="3" role="tabpanel" aria-label="Review and publish" hidden>
+        <div class="publish-review">
+          <div class="publish-review__card">
+            <div class="publish-review__row">
+              <span class="publish-review__k">Lander</span>
+              <span class="publish-review__v" id="review-lander">—</span>
+            </div>
+            <div class="publish-review__row">
+              <span class="publish-review__k">URL</span>
+              <span class="publish-review__v" id="review-url">—</span>
+            </div>
+            <div class="publish-review__row">
+              <span class="publish-review__k">Traffic Split</span>
+              <span class="publish-review__v" id="review-variants">—</span>
+            </div>
+            <div class="publish-review__row">
+              <span class="publish-review__k">Site shell</span>
+              <span class="publish-review__v" id="review-shell">—</span>
+            </div>
+            <div class="publish-review__row">
+              <span class="publish-review__k">Page</span>
+              <span class="publish-review__v" id="review-page">—</span>
+            </div>
+            <div class="publish-review__row">
+              <span class="publish-review__k">Variables</span>
+              <span class="publish-review__v" id="review-vars">—</span>
+            </div>
+            <div class="publish-review__row">
+              <span class="publish-review__k">Tracking</span>
+              <span class="publish-review__v" id="review-tracking">—</span>
+            </div>
+          </div>
+          <p class="publish-review__hint muted">Pressing <strong>Publish Live</strong> applies these settings immediately and routes real traffic.</p>
+        </div>
+      </section>
+
+      <div class="modal__actions publish-actions">
+        <div class="publish-actions__right">
+          <button type="button" class="btn btn--ghost" id="publish-back-btn" hidden>← Back</button>
+          <button type="button" class="btn btn--black" id="publish-next-btn" disabled>Continue →</button>
+          <button type="button" class="btn btn--black" id="publish-live-btn" hidden>Publish live →</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal modal--publish-success" id="dialog-publish-success" aria-labelledby="publish-success-title">
+    <div class="modal__inner publish-success">
+      <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+
+      <div class="publish-success__check" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="44" height="44">
+          <path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
 
-      <div class="field">
-        <label for="publish-path">Path (slug)</label>
-        <div class="path-input-row">
-          <span class="path-input-row__prefix" id="publish-path-prefix">domain.com/</span>
-          <input type="text" id="publish-path" value="summer-sale-v1" placeholder="your-path" />
+      <h2 class="publish-success__title" id="publish-success-title">Published</h2>
+      <p class="publish-success__time">Last published: <span id="publish-success-time">—</span></p>
+
+      <div class="publish-success__field">
+        <div class="publish-success__label">Live URL</div>
+        <div class="copy-row">
+          <input type="text" id="publish-success-url" readonly value="" />
+          <button type="button" class="copy-row__btn" id="publish-success-copy" title="Copy URL" aria-label="Copy URL">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="11" height="11" rx="2"/>
+              <path d="M5 15V6a2 2 0 0 1 2-2h9"/>
+            </svg>
+          </button>
         </div>
       </div>
 
-      <div class="publish-info-box">
-        Traffic split: this variant will receive <strong>100%</strong> of traffic on this path. Configure splits in All Landers.
-      </div>
+      <p class="publish-success__hint">Click the link above to preview your page. Your browser may display an older version for a short period after publishing.</p>
 
-      <div class="modal__actions">
-        <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="button" class="btn btn--black" id="publish-live-btn" disabled>Publish Live →</button>
+      <div class="publish-success__actions">
+        <a class="btn btn--black publish-success__cta" id="publish-success-reports" href="reports.html">View in Reports →</a>
       </div>
+    </div>
+  </dialog>
+
+  <!-- Lightweight confirm dialog used for one-click publish actions:
+       activate-variant (live + inactive variant), publish-changes (live active w/ newer draft),
+       deactivate-variant (live + active variant). -->
+  <dialog class="modal modal--confirm" id="dialog-confirm-publish" aria-labelledby="confirm-publish-title">
+    <div class="modal__inner confirm">
+      <header class="modal__header">
+        <div>
+          <h2 class="modal__title" id="confirm-publish-title">Confirm</h2>
+          <p class="modal__hint" id="confirm-publish-sub">—</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </header>
+      <div class="confirm__body">
+        <ul class="confirm__list" id="confirm-publish-list"></ul>
+        <p class="confirm__note muted" id="confirm-publish-note" hidden></p>
+      </div>
+      <footer class="modal__actions confirm__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="confirm-publish-go">Confirm</button>
+      </footer>
     </div>
   </dialog>
 
@@ -248,6 +568,16 @@
       document.getElementById("welcome-bubble").innerHTML =
         "Let's build a new lander. Describe who it's for, the offer, and the tone you want — I'll help you draft V1.";
     }
+
+    // ---- Editor state model (drives the state-aware Publish button)
+    // Override via URL: ?landerStatus=draft|published|unpublished&variantStatus=active|inactive&changes=N
+    // Default: live lander, active variant, 5 unpublished changes → "Publish latest"
+    var EDITOR_STATE = {
+      landerStatus:  (params.get("landerStatus")  || (isNew ? "draft" : "published")),
+      variantStatus: (params.get("variantStatus") || (isNew ? "inactive" : "active")),
+      changes:       Math.max(0, parseInt(params.get("changes") || (isNew ? "0" : "5"), 10) || 0)
+    };
+    var publishAutoOpen = params.get("publish") === "1";
 
     // ---- If the home Plan-Mode dialog passed context, recap it as an AI bubble
     (function () {
@@ -328,116 +658,282 @@
       c.addEventListener("click", function () { submitPrompt(c.getAttribute("data-prompt")); });
     });
 
-    // ---- Insert form embed (+ panel → append HTML to variant buffer)
+    // ---- Insert flow: + opens menu → "Forms" opens dialog with live preview → Add to this variant
     (function () {
       var stack = document.getElementById("editor-compose-stack");
-      var panel = document.getElementById("editor-insert-panel");
       var openBtn = document.getElementById("editor-insert-open");
-      var closeBtn = document.getElementById("editor-insert-close");
-      var step2 = document.getElementById("editor-insert-step2");
-      var pickedLabel = document.getElementById("editor-insert-picked-label");
-      var labelInput = document.getElementById("editor-form-embed-label");
-      var embedDo = document.getElementById("editor-form-embed-do");
+      var menu = document.getElementById("editor-insert-menu");
+      var dialog = document.getElementById("dialog-insert-form");
+      var listEl = document.getElementById("insert-form-list");
+      var previewEl = document.getElementById("insert-form-preview");
+      var previewEmpty = document.getElementById("insert-form-preview-empty");
+      var ctaInput = document.getElementById("insert-form-cta");
+      var addBtn = document.getElementById("insert-form-add");
       var variantHtml = document.getElementById("editor-variant-html");
       var htmlDrawer = document.querySelector(".editor-html-drawer");
-      if (!stack || !panel || !openBtn) return;
+      var toast = document.getElementById("editor-insert-toast");
+      if (!stack || !openBtn || !menu || !dialog) return;
+
+      var FORMS = {
+        "lead-short": {
+          id: "lead-short",
+          name: "Lead — short qualify",
+          sub: "3 steps · ZIP last",
+          cta: "Get qualified",
+          steps: [
+            { title: "Step 1 of 3 · Contact", fields: [
+              { label: "Full name", type: "text", placeholder: "Jane Doe", required: true },
+              { label: "Email", type: "email", placeholder: "jane@example.com", required: true }
+            ]},
+            { title: "Step 2 of 3 · Project", fields: [
+              { label: "What are you looking for?", type: "select", options: ["Roofing", "Windows", "Solar", "HVAC"], required: true }
+            ]},
+            { title: "Step 3 of 3 · ZIP", fields: [
+              { label: "ZIP code", type: "text", placeholder: "44102", required: true }
+            ]}
+          ]
+        },
+        "quote-request": {
+          id: "quote-request",
+          name: "Quote request",
+          sub: "5 steps · consent mid",
+          cta: "Request a quote",
+          steps: [
+            { title: "Step 1 of 5 · Project", fields: [
+              { label: "Project type", type: "select", options: ["Roofing", "Siding", "Windows", "Solar"], required: true }
+            ]},
+            { title: "Step 2 of 5 · Address", fields: [
+              { label: "Street address", type: "text", placeholder: "1 Main St", required: true },
+              { label: "ZIP code", type: "text", placeholder: "44102", required: true }
+            ]},
+            { title: "Step 3 of 5 · Consent", fields: [
+              { label: "I agree to be contacted by partners about this project.", type: "checkbox", required: true }
+            ], note: "Consent banner sits in the middle of the funnel." },
+            { title: "Step 4 of 5 · Phone", fields: [
+              { label: "Phone", type: "tel", placeholder: "(555) 123-4567", required: true }
+            ]},
+            { title: "Step 5 of 5 · Email", fields: [
+              { label: "Email", type: "email", placeholder: "you@example.com", required: true }
+            ]}
+          ]
+        },
+        "newsletter-sms": {
+          id: "newsletter-sms",
+          name: "Newsletter + SMS opt-in",
+          sub: "2 steps",
+          cta: "Subscribe",
+          steps: [
+            { title: "Step 1 of 2 · Email", fields: [
+              { label: "Email", type: "email", placeholder: "you@example.com", required: true }
+            ]},
+            { title: "Step 2 of 2 · SMS opt-in", fields: [
+              { label: "Mobile number", type: "tel", placeholder: "(555) 123-4567" },
+              { label: "I'd like SMS updates too", type: "checkbox" }
+            ]}
+          ]
+        }
+      };
+      var FORM_ORDER = ["lead-short", "quote-request", "newsletter-sms"];
 
       var selectedFormId = "";
-      var selectedFormName = "";
+      var toastTimer = null;
+      var menuOpen = false;
 
       function escapeHtml(str) {
         return String(str == null ? "" : str)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
       }
 
-      function resetStep2() {
-        selectedFormId = "";
-        selectedFormName = "";
-        if (step2) step2.hidden = true;
-        if (pickedLabel) pickedLabel.textContent = "";
-        if (labelInput) labelInput.value = "";
+      function showToast(text) {
+        if (!toast) return;
+        toast.textContent = text;
+        toast.hidden = false;
+        toast.classList.add("is-visible");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toast.classList.remove("is-visible");
+          toast.hidden = true;
+        }, 3200);
       }
 
-      function setPanelOpen(open) {
-        panel.hidden = !open;
-        openBtn.setAttribute("aria-expanded", open ? "true" : "false");
-        if (!open) resetStep2();
-      }
-
-      function togglePanel() {
-        setPanelOpen(panel.hidden);
+      function setMenuOpen(open) {
+        menuOpen = !!open;
+        menu.hidden = !menuOpen;
+        openBtn.setAttribute("aria-expanded", menuOpen ? "true" : "false");
       }
 
       openBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        togglePanel();
+        setMenuOpen(!menuOpen);
       });
-      if (closeBtn) {
-        closeBtn.addEventListener("mousedown", function (e) {
-          e.stopPropagation();
-        });
-        closeBtn.addEventListener("click", function (e) {
+
+      var menuClose = document.getElementById("editor-insert-menu-close");
+      if (menuClose) {
+        menuClose.addEventListener("click", function (e) {
           e.preventDefault();
           e.stopPropagation();
-          setPanelOpen(false);
+          setMenuOpen(false);
         });
       }
 
       document.addEventListener("pointerdown", function (e) {
-        if (panel.hidden) return;
-        if (stack.contains(e.target)) return;
-        setPanelOpen(false);
+        if (!menuOpen) return;
+        if (menu.contains(e.target) || openBtn.contains(e.target)) return;
+        setMenuOpen(false);
       });
 
       document.addEventListener("keydown", function (e) {
-        if (e.key !== "Escape" || panel.hidden) return;
-        setPanelOpen(false);
+        if (e.key === "Escape" && menuOpen) setMenuOpen(false);
       });
 
-      document.querySelectorAll(".editor-form-pick").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          selectedFormId = btn.getAttribute("data-form-id") || "";
-          selectedFormName = btn.getAttribute("data-form-name") || selectedFormId;
-          if (step2) step2.hidden = false;
-          if (pickedLabel) {
-            pickedLabel.textContent = "Form: " + selectedFormName;
+      menu.querySelectorAll(".editor-insert-menu__item").forEach(function (item) {
+        item.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (item.disabled || item.classList.contains("is-disabled")) {
+            showToast("Coming soon — let us know if you'd ship this first.");
+            return;
           }
-          var defaults = {
-            "lead-short": "Get qualified",
-            "quote-request": "Request a quote",
-            "newsletter-sms": "Subscribe"
-          };
-          if (labelInput) {
-            labelInput.value = defaults[selectedFormId] || "Continue";
-            labelInput.focus();
-            labelInput.select();
+          var t = item.getAttribute("data-insert-type");
+          if (t === "forms") {
+            setMenuOpen(false);
+            openInsertFormDialog();
           }
         });
       });
 
-      if (embedDo && variantHtml) {
-        embedDo.addEventListener("click", function () {
+      function renderFormList() {
+        if (!listEl) return;
+        listEl.innerHTML = "";
+        FORM_ORDER.forEach(function (id) {
+          var f = FORMS[id];
+          var li = document.createElement("li");
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "insert-form-pick";
+          btn.setAttribute("role", "option");
+          btn.setAttribute("data-form-id", id);
+          btn.innerHTML =
+            '<span class="insert-form-pick__head">' +
+              '<strong>' + escapeHtml(f.name) + '</strong>' +
+              '<span class="insert-form-pick__count">' + f.steps.length + ' step' + (f.steps.length === 1 ? '' : 's') + '</span>' +
+            '</span>' +
+            '<small>' + escapeHtml(f.sub) + '</small>';
+          btn.addEventListener("click", function () { selectForm(id); });
+          li.appendChild(btn);
+          listEl.appendChild(li);
+        });
+      }
+
+      function fieldHtml(f) {
+        var labelHtml = '<label class="ifp-field__label">' + escapeHtml(f.label) +
+          (f.required ? ' <span class="ifp-field__req">*</span>' : '') + '</label>';
+        if (f.type === "select") {
+          var opts = (f.options || []).map(function (o) {
+            return '<option>' + escapeHtml(o) + '</option>';
+          }).join('');
+          return '<div class="ifp-field">' + labelHtml + '<select class="ifp-input" disabled><option>Choose…</option>' + opts + '</select></div>';
+        }
+        if (f.type === "checkbox") {
+          return '<label class="ifp-field ifp-field--check"><input type="checkbox" disabled /><span>' +
+            escapeHtml(f.label) + (f.required ? ' <em class="ifp-field__req">*</em>' : '') + '</span></label>';
+        }
+        var tp = f.type === "email" || f.type === "tel" ? f.type : "text";
+        var ph = f.placeholder ? ' placeholder="' + escapeHtml(f.placeholder) + '"' : '';
+        return '<div class="ifp-field">' + labelHtml +
+          '<input class="ifp-input" type="' + tp + '"' + ph + ' disabled />' +
+        '</div>';
+      }
+
+      function renderPreview(form) {
+        if (!previewEl) return;
+        if (!form) {
+          previewEl.innerHTML = "";
+          if (previewEmpty) previewEl.appendChild(previewEmpty);
+          return;
+        }
+        var html =
+          '<header class="ifp-head">' +
+            '<div>' +
+              '<strong>' + escapeHtml(form.name) + '</strong>' +
+              '<small>' + escapeHtml(form.sub) + '</small>' +
+            '</div>' +
+            '<span class="ifp-head__count">' + form.steps.length + ' steps</span>' +
+          '</header>' +
+          '<div class="ifp-steps">';
+        form.steps.forEach(function (s, i) {
+          html += '<section class="ifp-step">';
+          html += '<div class="ifp-step__title">' + escapeHtml(s.title) + '</div>';
+          if (s.note) html += '<div class="ifp-step__note">' + escapeHtml(s.note) + '</div>';
+          html += '<div class="ifp-step__fields">';
+          s.fields.forEach(function (f) { html += fieldHtml(f); });
+          html += '</div>';
+          html += '<button type="button" class="ifp-step__cta" disabled>' +
+            (i === form.steps.length - 1 ? escapeHtml(form.cta) : 'Continue') + '</button>';
+          html += '</section>';
+        });
+        html += '</div>';
+        previewEl.innerHTML = html;
+      }
+
+      function selectForm(id) {
+        selectedFormId = id;
+        var f = FORMS[id];
+        renderPreview(f);
+        listEl.querySelectorAll(".insert-form-pick").forEach(function (btn) {
+          btn.classList.toggle("is-active", btn.getAttribute("data-form-id") === id);
+        });
+        if (ctaInput) {
+          ctaInput.disabled = false;
+          ctaInput.value = f.cta;
+          ctaInput.focus();
+          ctaInput.select();
+        }
+        if (addBtn) addBtn.disabled = false;
+      }
+
+      function openInsertFormDialog() {
+        renderFormList();
+        selectedFormId = "";
+        renderPreview(null);
+        if (ctaInput) { ctaInput.value = ""; ctaInput.disabled = true; }
+        if (addBtn) addBtn.disabled = true;
+        if (typeof dialog.showModal === "function") dialog.showModal();
+        else dialog.setAttribute("open", "");
+      }
+
+      dialog.querySelectorAll("[data-close-dialog]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          dialog.close();
+        });
+      });
+
+      if (addBtn) {
+        addBtn.addEventListener("click", function () {
           if (!selectedFormId) return;
-          var raw = labelInput ? labelInput.value.trim() : "";
-          var cta = raw || "Continue";
-          var idEsc = escapeHtml(selectedFormId);
-          var nameEsc = escapeHtml(selectedFormName);
+          var f = FORMS[selectedFormId];
+          var raw = ctaInput ? ctaInput.value.trim() : "";
+          var cta = raw || f.cta || "Continue";
+          var idEsc = escapeHtml(f.id);
+          var nameEsc = escapeHtml(f.name);
           var ctaEsc = escapeHtml(cta);
           var block =
-            "\n<!-- nexus: form embed (" + nameEsc + ") -->\n" +
-            '<section class="lander-form-embed" data-form-id="' + idEsc + '" data-form-name="' + nameEsc + '" data-lander-embed="form">\n' +
+            "\n<!-- nexus: form embed (" + nameEsc + ") · " + f.steps.length + " step" +
+              (f.steps.length === 1 ? "" : "s") + " -->\n" +
+            '<section class="lander-form-embed" data-form-id="' + idEsc + '" data-form-name="' + nameEsc + '" data-lander-embed="form" data-steps="' + f.steps.length + '">\n' +
             '  <button type="button" class="lander-form-embed__cta">' + ctaEsc + "</button>\n" +
             "</section>\n";
-          variantHtml.value = (variantHtml.value || "") + block;
-          if (htmlDrawer) htmlDrawer.open = true;
-          variantHtml.focus();
-          setPanelOpen(false);
+          if (variantHtml) {
+            variantHtml.value = (variantHtml.value || "") + block;
+            if (htmlDrawer) htmlDrawer.open = true;
+          }
+          var addedName = f.name;
+          dialog.close();
+          showToast("Added “" + addedName + "” with CTA “" + cta + "” to this variant.");
           if (typeof addBubble === "function") {
-            addBubble("Added form embed (“" + cta + "”) to variant HTML.", "ai");
+            addBubble("Added form embed (“" + cta + "”) — " + f.steps.length + "-step " + addedName + ".", "ai");
           }
         });
       }
@@ -452,39 +948,849 @@
       if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + t;
     });
 
-    // ---- Publish Lander dialog
-    var publishDlg   = document.getElementById("dialog-publish-lander");
-    var publishBtn   = document.getElementById("editor-publish-btn");
+    // ---- Preview button (opens a non-indexed preview URL in a new tab)
+    var previewBtn = document.getElementById("editor-preview-btn");
+    if (previewBtn) {
+      previewBtn.addEventListener("click", function () {
+        var landerName = (document.getElementById("editor-lander-title").textContent || "").trim();
+        var variantText = "";
+        if (variantSel && variantSel.options[variantSel.selectedIndex]) {
+          variantText = variantSel.options[variantSel.selectedIndex].text || "";
+        }
+        var token = "pv_" + Math.random().toString(36).slice(2, 10);
+        var domHost = document.querySelector("[data-editor-domain]");
+        var domain = (domHost && domHost.getAttribute("data-editor-domain")) || "offers.acme.com";
+        var qs = ["preview=" + encodeURIComponent(token)];
+        if (landerName) qs.push("name=" + encodeURIComponent(landerName));
+        if (variantText) qs.push("variant=" + encodeURIComponent(variantText));
+        if (domain) qs.push("domain=" + encodeURIComponent(domain));
+        var url = "preview.html?" + qs.join("&");
+        window.open(url, "_blank", "noopener");
+      });
+    }
+
+    // ---- Publish Lander dialog (3-step flow: Route → Tracking → Review)
+    var publishDlg    = document.getElementById("dialog-publish-lander");
+    var publishBtn    = document.getElementById("editor-publish-btn");
     var publishDomain = document.getElementById("publish-domain");
     var publishPath   = document.getElementById("publish-path");
     var publishPrefix = document.getElementById("publish-path-prefix");
     var publishErr    = document.getElementById("publish-domain-error");
     var publishLive   = document.getElementById("publish-live-btn");
+    var publishNext   = document.getElementById("publish-next-btn");
+    var publishBack   = document.getElementById("publish-back-btn");
+    var publishShellList = document.getElementById("publish-shell-list");
+    var publishShellWarn = document.getElementById("publish-shell-warn");
+    var publishRotationEl = document.getElementById("publish-rotation");
+    var publishRotationTotal = document.getElementById("publish-rotation-total");
+    var publishRotationWarn  = document.getElementById("publish-rotation-warn");
+    var publishEvenSplitBtn  = document.getElementById("publish-even-split");
+    var publishOpenShell = document.getElementById("publish-open-shell");
+    var publishVarsList  = document.getElementById("publish-vars-list");
+    var publishFlowTitle = document.getElementById("publish-flow-title");
+    var publishFlowSub   = document.getElementById("publish-flow-sub");
+    var publishPageScopeName = document.getElementById("publish-page-scope-name");
+    var publishCurrentStep = 1;
+    var shellReady = false;
+    var publishMode = "wizard"; // "wizard" | "republish"
+    var publishRotation = []; // [{ id, name, included, weight }]
+    var publishRotationOk = false;
+
+    // Mock lander-level variables (mirrors /landers settings dialog).
+    // We only allow editing existing values here per product spec.
+    var EDITOR_LANDER_VARS = [
+      { key: "Publisher",      value: "BestLivingIdeas" },
+      { key: "CTA",            value: "Shop Now \u2192" },
+      { key: "Hero headline",  value: "60% off everything, ends Sunday" },
+      { key: "Offer code",     value: "SUMMER60" }
+    ];
+
+    function publishGoToStep(n) {
+      publishCurrentStep = n;
+      document.querySelectorAll(".publish-step").forEach(function (s) {
+        var sn = Number(s.getAttribute("data-step"));
+        s.classList.toggle("is-active", sn === n);
+        s.classList.toggle("is-complete", sn < n);
+        s.setAttribute("aria-selected", sn === n ? "true" : "false");
+      });
+      document.querySelectorAll(".publish-pane").forEach(function (p) {
+        var pn = Number(p.getAttribute("data-pane"));
+        var match = pn === n;
+        p.classList.toggle("is-active", match);
+        p.hidden = !match;
+      });
+      publishBack.hidden = n === 1;
+      if (n === 3) {
+        publishNext.hidden = true;
+        publishLive.hidden = false;
+        publishLive.disabled = false;
+        publishUpdateReview();
+      } else {
+        publishNext.hidden = false;
+        publishLive.hidden = true;
+      }
+      publishUpdateNextEnabled();
+    }
+
+    function publishUpdateNextEnabled() {
+      if (publishCurrentStep === 1) {
+        var domainOk = !!publishDomain.value;
+        var ok = domainOk && shellReady && publishRotationOk;
+        publishNext.disabled = !ok;
+        publishNext.title = !domainOk
+          ? "Pick a domain to continue"
+          : (!shellReady ? "Add header, footer & CMP in Site Shell to continue"
+          : (!publishRotationOk ? "Include at least one variant and split totaling 100%" : ""));
+      } else if (publishCurrentStep === 2) {
+        publishNext.disabled = false;
+        publishNext.title = "";
+      }
+    }
+
+    function publishCheckShell() {
+      var domain = publishDomain.value;
+      var rows = publishShellList ? publishShellList.querySelectorAll(".publish-shell-row") : [];
+
+      // No domain selected yet — site shell is domain-level, so we don't
+      // assume any pieces are present. Show a neutral "Pick a domain" state.
+      if (!domain) {
+        rows.forEach(function (row) {
+          row.classList.remove("is-ready", "is-missing");
+          var status = row.querySelector(".publish-shell-row__status");
+          if (status) status.textContent = "Select a domain";
+        });
+        shellReady = false;
+        if (publishShellWarn) publishShellWarn.hidden = true;
+        publishUpdateNextEnabled();
+        return;
+      }
+
+      var data = (window.nexusShellMerge ? window.nexusShellMerge(domain) : null) || {};
+      var allReady = true;
+      rows.forEach(function (row) {
+        var part = row.getAttribute("data-part");
+        var html = (data[part] || "").toString().trim();
+        var ok = html.length > 0;
+        if (!ok) allReady = false;
+        row.classList.toggle("is-ready", ok);
+        row.classList.toggle("is-missing", !ok);
+        var status = row.querySelector(".publish-shell-row__status");
+        if (status) status.textContent = ok ? "Attached" : "Missing — add it";
+      });
+      shellReady = allReady;
+      if (publishShellWarn) publishShellWarn.hidden = allReady;
+      publishUpdateNextEnabled();
+    }
+
+    function publishGetVariants() {
+      var sel = document.getElementById("editor-variant-select");
+      var out = [];
+      if (sel) {
+        Array.prototype.forEach.call(sel.options, function (opt) {
+          if (opt.value === "custom") return;
+          out.push({ id: opt.value, name: opt.text });
+        });
+      }
+      if (!out.length) out.push({ id: "main", name: "Main hero" });
+      return out;
+    }
+
+    var THUMB_PALETTE = [
+      { bg: "#fff7ec", accent: "#e76d2f", soft: "#fde2cf" },
+      { bg: "#f4f0ff", accent: "#6f55c8", soft: "#e2d8ff" },
+      { bg: "#eef9f1", accent: "#3b9b62", soft: "#d3eedb" },
+      { bg: "#fff0f0", accent: "#c8484f", soft: "#f3d5d6" }
+    ];
+
+    function publishEscape(s) {
+      return String(s == null ? "" : s).replace(/[<>&"']/g, function (c) {
+        return { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function publishBuildRotation() {
+      var variants = publishGetVariants();
+      // Default split = even
+      var even = variants.length ? Math.floor(100 / variants.length) : 0;
+      var rem = 100 - even * variants.length;
+      publishRotation = variants.map(function (v, i) {
+        return {
+          id: v.id,
+          name: v.name,
+          included: true,
+          weight: even + (i === 0 ? rem : 0)
+        };
+      });
+    }
+
+    function publishRecomputeRotation() {
+      var includedTotal = publishRotation.reduce(function (acc, r) {
+        return acc + (r.included ? (parseInt(r.weight, 10) || 0) : 0);
+      }, 0);
+      var anyIncluded = publishRotation.some(function (r) { return r.included; });
+      publishRotationOk = anyIncluded && includedTotal === 100;
+      if (publishRotationTotal) {
+        var pct = includedTotal;
+        publishRotationTotal.innerHTML = "Total: <strong style=\"color:" + (publishRotationOk ? "#1f7c41" : "#a04545") + "\">" + pct + "%</strong>";
+      }
+      if (publishRotationWarn) {
+        publishRotationWarn.hidden = publishRotationOk || !anyIncluded;
+        if (!anyIncluded) publishRotationWarn.hidden = false;
+        publishRotationWarn.textContent = !anyIncluded
+          ? "Include at least one variant in the rotation."
+          : "Weights must total 100% across included variants (currently " + includedTotal + "%).";
+      }
+      publishUpdateNextEnabled();
+    }
+
+    function publishRenderRotation() {
+      if (!publishRotationEl) return;
+      if (!publishRotation.length) publishBuildRotation();
+      var html = publishRotation.map(function (r, i) {
+        var p = THUMB_PALETTE[i % THUMB_PALETTE.length];
+        var nameEsc = publishEscape(r.name);
+        var includedAttr = r.included ? "checked" : "";
+        var disabled = r.included ? "" : "disabled";
+        var rowCls = "publish-rot-row" + (r.included ? "" : " is-out");
+        return (
+          '<div class="' + rowCls + '" data-rot-idx="' + i + '">' +
+            '<label class="publish-rot-row__include">' +
+              '<input type="checkbox" data-rot-include ' + includedAttr + ' aria-label="Include ' + nameEsc + ' in rotation" />' +
+              '<span class="publish-rot-row__check" aria-hidden="true"></span>' +
+            '</label>' +
+            '<div class="publish-rot-row__thumb" style="background:' + p.bg + '">' +
+              '<div class="publish-variant__phone">' +
+                '<span class="publish-variant__bar" style="background:' + p.accent + '"></span>' +
+                '<span class="publish-variant__line publish-variant__line--head"></span>' +
+                '<span class="publish-variant__line"></span>' +
+                '<span class="publish-variant__line publish-variant__line--short"></span>' +
+                '<span class="publish-variant__cta" style="background:' + p.accent + '"></span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="publish-rot-row__meta">' +
+              '<strong>' + nameEsc + '</strong>' +
+              '<small>' + (r.included ? "In rotation" : "Excluded") + '</small>' +
+            '</div>' +
+            '<div class="publish-rot-row__weight">' +
+              '<input type="number" min="0" max="100" step="1" value="' + (r.weight || 0) + '" data-rot-weight ' + disabled + ' inputmode="numeric" />' +
+              '<span class="publish-rot-row__suffix">%</span>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+      publishRotationEl.innerHTML = html;
+      publishRecomputeRotation();
+    }
+
+    function publishApplyEvenSplit() {
+      var included = publishRotation.filter(function (r) { return r.included; });
+      var n = included.length;
+      if (!n) return;
+      var even = Math.floor(100 / n);
+      var rem = 100 - even * n;
+      var assigned = 0;
+      publishRotation.forEach(function (r) {
+        if (!r.included) { r.weight = 0; return; }
+        r.weight = even + (assigned === 0 ? rem : 0);
+        assigned++;
+      });
+      publishRenderRotation();
+    }
+
+    function publishRenderVariables() {
+      if (!publishVarsList) return;
+      var rows = EDITOR_LANDER_VARS.map(function (kv, i) {
+        return (
+          '<li class="publish-var" data-var-idx="' + i + '">' +
+            '<span class="publish-var__key" data-var-key>' + publishEscape(kv.key) + '</span>' +
+            '<input type="text" class="input publish-var__val" value="' + publishEscape(kv.value) + '" data-var-input aria-label="Value for ' + publishEscape(kv.key) + '" />' +
+            '<button type="button" class="publish-var__remove" data-var-remove aria-label="Remove ' + publishEscape(kv.key) + '">' +
+              '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+            '</button>' +
+          '</li>'
+        );
+      }).join("");
+      publishVarsList.innerHTML = rows +
+        '<li class="publish-var-add-row">' +
+          '<button type="button" class="publish-var-add" data-var-add>+ Add variable</button>' +
+        '</li>';
+    }
+
+    function publishSyncPageFromEditor() {
+      var src = {
+        title:    document.getElementById("settings-page-title"),
+        desc:     document.getElementById("settings-description"),
+        keywords: document.getElementById("settings-keywords")
+      };
+      var dst = {
+        title:    document.getElementById("publish-page-title"),
+        desc:     document.getElementById("publish-page-desc"),
+        keywords: document.getElementById("publish-page-keywords")
+      };
+      Object.keys(dst).forEach(function (k) {
+        if (dst[k] && src[k]) dst[k].value = src[k].value || "";
+      });
+      // Favicon syncs via shared state — repaint both uploaders from EDITOR_FAVICON
+      faviconRepaintAll();
+      // Update the variant scope label
+      if (publishPageScopeName) {
+        var sel = document.getElementById("editor-variant-select");
+        var label = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "this variant";
+        publishPageScopeName.textContent = label;
+      }
+    }
+
+    function publishSyncPageToEditor() {
+      var pairs = [
+        ["settings-page-title",   "publish-page-title"],
+        ["settings-description",  "publish-page-desc"],
+        ["settings-keywords",     "publish-page-keywords"]
+      ];
+      pairs.forEach(function (p) {
+        var src = document.getElementById(p[1]);
+        var dst = document.getElementById(p[0]);
+        if (src && dst) dst.value = src.value || "";
+      });
+      // Favicon already lives in the shared EDITOR_FAVICON state — nothing to do here.
+    }
+
+    // ---- Favicon uploader (shared state across the editor settings popover
+    // and the publish wizard's Page step). Uses a data URL so the preview
+    // survives page updates without external storage.
+    var EDITOR_FAVICON = { dataUrl: "", name: "" };
+
+    function faviconRepaint(root) {
+      if (!root) return;
+      var preview = root.querySelector("[data-favicon-preview]");
+      var name    = root.querySelector("[data-favicon-name]");
+      var remove  = root.querySelector("[data-favicon-remove]");
+      var pick    = root.querySelector("[data-favicon-pick]");
+      var has = !!EDITOR_FAVICON.dataUrl;
+      root.classList.toggle("has-image", has);
+      if (preview) {
+        if (has) {
+          preview.innerHTML = '<img src="' + EDITOR_FAVICON.dataUrl + '" alt="" />';
+        } else {
+          preview.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>';
+        }
+      }
+      if (name) name.textContent = has ? (EDITOR_FAVICON.name || "favicon") : "No file selected";
+      if (remove) remove.hidden = !has;
+      if (pick)   pick.textContent = has ? "Replace" : "Choose file";
+    }
+    function faviconRepaintAll() {
+      document.querySelectorAll(".favicon-upload").forEach(faviconRepaint);
+    }
+    document.addEventListener("click", function (e) {
+      var pick = e.target.closest("[data-favicon-pick]");
+      if (pick) {
+        var root = pick.closest(".favicon-upload");
+        var input = root.querySelector(".favicon-upload__file");
+        if (input) input.click();
+        return;
+      }
+      var rm = e.target.closest("[data-favicon-remove]");
+      if (rm) {
+        EDITOR_FAVICON = { dataUrl: "", name: "" };
+        // Reset both file inputs so the same file can be re-picked later
+        document.querySelectorAll(".favicon-upload__file").forEach(function (i) { i.value = ""; });
+        faviconRepaintAll();
+        return;
+      }
+    });
+    document.addEventListener("change", function (e) {
+      var inp = e.target.closest(".favicon-upload__file");
+      if (!inp) return;
+      var file = inp.files && inp.files[0];
+      if (!file) return;
+      if (file.size > 1024 * 1024) {
+        editorPublishToast("Favicon must be under 1MB");
+        inp.value = "";
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        EDITOR_FAVICON = { dataUrl: reader.result, name: file.name };
+        faviconRepaintAll();
+      };
+      reader.readAsDataURL(file);
+    });
+    faviconRepaintAll();
+
+    // Apply a state-aware label & wiring to the editor's split publish button
+    // Lightweight floating toast for publish confirm actions (the editor has
+    // an IIFE-scoped showToast we can't reach from here).
+    function editorPublishToast(msg) {
+      var existing = document.getElementById("editor-publish-toast");
+      if (existing) existing.remove();
+      var t = document.createElement("div");
+      t.id = "editor-publish-toast";
+      t.className = "lander-toast";
+      t.textContent = msg;
+      document.body.appendChild(t);
+      requestAnimationFrame(function () { t.classList.add("is-in"); });
+      setTimeout(function () {
+        t.classList.remove("is-in");
+        setTimeout(function () { if (t.parentNode) t.remove(); }, 250);
+      }, 2800);
+    }
+
+    function publishComputeButtonModel() {
+      var ls = EDITOR_STATE.landerStatus, vs = EDITOR_STATE.variantStatus, c = EDITOR_STATE.changes;
+      if (ls === "draft" && vs === "inactive") {
+        return { label: "Publish",        kind: "wizard",            tooltip: "First publish — sets up route, settings, and tracking", caret: false };
+      }
+      if (ls === "unpublished" && vs === "inactive") {
+        return { label: "Republish",      kind: "wizard-republish",  tooltip: "Bring this lander back live",                            caret: false };
+      }
+      if (ls === "published" && vs === "inactive") {
+        return { label: "Publish",        kind: "confirm-activate",  tooltip: "Activate this variant in the live rotation",             caret: false };
+      }
+      if (ls === "published" && vs === "active" && c > 0) {
+        return { label: "Publish latest", kind: "wizard",            tooltip: c + " change" + (c === 1 ? "" : "s") + " ready to ship", caret: false, badge: c };
+      }
+      if (ls === "published" && vs === "active" && c === 0) {
+        return { label: "Publish latest", kind: "noop",              tooltip: "No changes since last publish",                          caret: false, disabled: true };
+      }
+      return { label: "Publish",        kind: "wizard",            tooltip: "",                                                         caret: false };
+    }
+
+    function publishApplyButtonModel() {
+      var m = publishComputeButtonModel();
+      var split = document.getElementById("editor-publish-split");
+      var caret = document.getElementById("editor-publish-caret");
+      var menu  = document.getElementById("editor-publish-menu");
+      if (split) split.setAttribute("data-state", m.kind);
+      publishBtn.textContent = m.label;
+      publishBtn.disabled = !!m.disabled;
+      publishBtn.title = m.tooltip || "";
+      if (caret) {
+        caret.hidden = true;
+        caret.disabled = true;
+      }
+      if (menu) menu.hidden = true;
+    }
+
+    function publishUpdateReview() {
+      var landerName = (document.getElementById("editor-lander-title").textContent || "").trim();
+      var domain = publishDomain.value || "—";
+      var path = (publishPath.value || "").replace(/^\/+/, "");
+      var url = publishDomain.value ? domain + "/" + path : "—";
+
+      var rotationText = publishRotation
+        .filter(function (r) { return r.included; })
+        .map(function (r) { return r.name + " · " + (r.weight || 0) + "%"; })
+        .join("  +  ") || "—";
+
+      var shellParts = [];
+      if (publishShellList) {
+        publishShellList.querySelectorAll(".publish-shell-row").forEach(function (row) {
+          var label = (row.querySelector(".publish-shell-row__label") || {}).textContent || "";
+          var ok = row.classList.contains("is-ready");
+          shellParts.push(label + (ok ? " ✓" : " ✕"));
+        });
+      }
+
+      var pageTitle = (document.getElementById("publish-page-title") || {}).value || "";
+      var pageDesc  = (document.getElementById("publish-page-desc") || {}).value || "";
+      var pageBits = [];
+      if (pageTitle) pageBits.push("\u201C" + pageTitle + "\u201D");
+      if (pageDesc) pageBits.push(pageDesc.length > 60 ? pageDesc.slice(0, 60) + "…" : pageDesc);
+      var pageText = pageBits.length ? pageBits.join(" · ") : "Inherited from variant";
+
+      var varCount = EDITOR_LANDER_VARS.length;
+      var varsText = varCount + " variable" + (varCount === 1 ? "" : "s") + " · edited values applied to live rotation";
+
+      var gtm = (document.getElementById("publish-gtm") || {}).value || "";
+      var trackingText = gtm ? "GTM " + gtm : "Not configured";
+
+      var rL = document.getElementById("review-lander");
+      var rU = document.getElementById("review-url");
+      var rV = document.getElementById("review-variants");
+      var rS = document.getElementById("review-shell");
+      var rP = document.getElementById("review-page");
+      var rVa = document.getElementById("review-vars");
+      var rT = document.getElementById("review-tracking");
+      if (rL) rL.textContent = landerName || "—";
+      if (rU) rU.textContent = url;
+      if (rV) rV.textContent = rotationText;
+      if (rS) rS.textContent = shellParts.join(" · ") || "—";
+      if (rP) rP.textContent = pageText;
+      if (rVa) rVa.textContent = varsText;
+      if (rT) rT.textContent = trackingText;
+    }
 
     function syncPublishPrefix() {
       var d = publishDomain.value;
       publishPrefix.textContent = (d || "domain.com") + "/";
     }
-    function validatePublishForm() {
-      var ok = !!publishDomain.value;
-      publishErr.hidden = ok;
-      publishLive.disabled = !ok;
-      return ok;
-    }
-    publishBtn.addEventListener("click", function () {
+
+    function openPublishWizard(prefilled) {
+      // Title varies by mode
+      if (publishFlowTitle && publishFlowSub) {
+        if (publishMode === "republish") {
+          publishFlowTitle.textContent = "Republish lander";
+          publishFlowSub.textContent   = "Bring this lander back live. Confirm route, settings, and tracking.";
+        } else {
+          publishFlowTitle.textContent = "Publish lander";
+          publishFlowSub.textContent   = "Pick the route, confirm settings, then ship it.";
+        }
+      }
+      publishGoToStep(1);
       publishDlg.showModal();
-      validatePublishForm();
       syncPublishPrefix();
+      publishBuildRotation();
+      publishRenderRotation();
+      publishCheckShell();
+      publishSyncPageFromEditor();
+      publishRenderVariables();
+    }
+
+    publishBtn.addEventListener("click", function () {
+      var m = publishComputeButtonModel();
+      if (m.disabled) return;
+      if (m.kind === "wizard") { publishMode = "wizard";    openPublishWizard(); return; }
+      if (m.kind === "wizard-republish") { publishMode = "republish"; openPublishWizard(); return; }
+      if (m.kind === "confirm-activate") { openPublishConfirm("activate"); return; }
+      if (m.kind === "confirm-changes")  { openPublishConfirm("changes");  return; }
     });
+
+    // Publish split-button caret + dropdown menu
+    var publishCaret = document.getElementById("editor-publish-caret");
+    var publishMenu  = document.getElementById("editor-publish-menu");
+    if (publishCaret && publishMenu) {
+      publishCaret.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var open = !publishMenu.hidden;
+        publishMenu.hidden = open;
+        publishCaret.setAttribute("aria-expanded", open ? "false" : "true");
+      });
+      document.addEventListener("click", function (e) {
+        if (publishMenu.hidden) return;
+        if (e.target.closest("#editor-publish-menu") || e.target.closest("#editor-publish-caret")) return;
+        publishMenu.hidden = true;
+        publishCaret.setAttribute("aria-expanded", "false");
+      });
+      var deactivateBtn = document.getElementById("editor-deactivate-variant");
+      if (deactivateBtn) {
+        deactivateBtn.addEventListener("click", function () {
+          publishMenu.hidden = true;
+          publishCaret.setAttribute("aria-expanded", "false");
+          openPublishConfirm("deactivate");
+        });
+      }
+    }
+
+    // ---- Confirm dialog (one-click flows for activate/changes/deactivate)
+    var confirmDlg  = document.getElementById("dialog-confirm-publish");
+    var confirmTitle = document.getElementById("confirm-publish-title");
+    var confirmSub   = document.getElementById("confirm-publish-sub");
+    var confirmList  = document.getElementById("confirm-publish-list");
+    var confirmNote  = document.getElementById("confirm-publish-note");
+    var confirmGo    = document.getElementById("confirm-publish-go");
+    var confirmKind  = "";
+
+    function variantNameForState() {
+      var sel = document.getElementById("editor-variant-select");
+      if (sel && sel.options[sel.selectedIndex]) return sel.options[sel.selectedIndex].text;
+      return "this variant";
+    }
+    function landerNameForState() {
+      return (document.getElementById("editor-lander-title").textContent || "this lander").trim();
+    }
+
+    function openPublishConfirm(kind) {
+      confirmKind = kind;
+      var v = variantNameForState();
+      var l = landerNameForState();
+      var title = "", sub = "", items = [], note = "", btn = "Confirm", btnClass = "btn btn--black";
+      if (kind === "activate") {
+        title = "Publish " + v + "?";
+        sub   = l + " is already live. We'll add this variant to the rotation.";
+        items = [
+          "Adds <strong>" + publishEscape(v) + "</strong> to the live rotation",
+          "Existing route, tracking, and settings stay the same",
+          "Other variants keep their current weights"
+        ];
+        note  = "You can rebalance weights any time from this lander's row in /landers.";
+        btn   = "Publish variant";
+      } else if (kind === "changes") {
+        title = "Publish " + EDITOR_STATE.changes + " change" + (EDITOR_STATE.changes === 1 ? "" : "s") + "?";
+        sub   = "Push your latest edits live to " + v + ".";
+        items = [
+          "<strong>" + EDITOR_STATE.changes + "</strong> draft change" + (EDITOR_STATE.changes === 1 ? "" : "s") + " on this variant",
+          "Route, tracking, and settings remain unchanged",
+          "Live traffic switches to the new version on the next request"
+        ];
+        note  = "Visitors mid-session may briefly see the previous version.";
+        btn   = "Publish latest";
+      } else if (kind === "deactivate") {
+        title = "Deactivate " + v + "?";
+        sub   = "Stops sending traffic to this variant. " + l + " stays live.";
+        items = [
+          "<strong>" + publishEscape(v) + "</strong> is removed from the live rotation",
+          "Other variants will absorb its share of traffic",
+          "Variant draft stays editable — you can re-activate any time"
+        ];
+        note  = "If this is the last active variant, " + l + " will be unpublished instead.";
+        btn   = "Deactivate variant";
+        btnClass = "btn btn--danger";
+      }
+      confirmTitle.textContent = title;
+      confirmSub.textContent   = sub;
+      confirmList.innerHTML    = items.map(function (i) { return "<li>" + i + "</li>"; }).join("");
+      confirmNote.textContent  = note || "";
+      confirmNote.hidden       = !note;
+      confirmGo.textContent    = btn;
+      confirmGo.className      = btnClass;
+      confirmDlg.showModal();
+    }
+
+    if (confirmGo) {
+      confirmGo.addEventListener("click", function () {
+        var orig = confirmGo.textContent;
+        confirmGo.disabled = true;
+        confirmGo.textContent = (confirmKind === "deactivate" ? "Deactivating…" : "Publishing…");
+        setTimeout(function () {
+          confirmGo.disabled = false;
+          confirmGo.textContent = orig;
+          confirmDlg.close();
+          // Update local state to reflect the action (mock)
+          if (confirmKind === "activate") {
+            EDITOR_STATE.variantStatus = "active";
+            EDITOR_STATE.changes = 0;
+          } else if (confirmKind === "changes") {
+            EDITOR_STATE.changes = 0;
+          } else if (confirmKind === "deactivate") {
+            EDITOR_STATE.variantStatus = "inactive";
+          }
+          publishApplyButtonModel();
+          var msg = confirmKind === "deactivate" ? "Variant deactivated" :
+                    (confirmKind === "activate" ? "Variant is live" : "Latest changes are live");
+          editorPublishToast(msg);
+        }, 800);
+      });
+    }
+
     publishDomain.addEventListener("change", function () {
       syncPublishPrefix();
-      validatePublishForm();
+      publishErr.hidden = !!publishDomain.value;
+      publishCheckShell();
     });
+
+    if (publishPath) {
+      publishPath.addEventListener("input", function () {
+        if (publishCurrentStep === 3) publishUpdateReview();
+      });
+    }
+
+    if (publishOpenShell) {
+      publishOpenShell.addEventListener("click", function (e) {
+        e.preventDefault();
+        publishDlg.close();
+        var dom = publishDomain.value || "offers.acme.com";
+        if (typeof window.nexusOpenSiteShell === "function") {
+          window.nexusOpenSiteShell(dom, "header");
+        } else {
+          var btn = document.querySelector(".js-site-shell-open");
+          if (btn) btn.click();
+        }
+      });
+    }
+
+    window.addEventListener("nexus-shell-saved", function () {
+      if (!publishDlg.open) return;
+      publishCheckShell();
+    });
+
+    publishNext.addEventListener("click", function () {
+      if (publishCurrentStep === 1) {
+        if (!publishDomain.value) { publishErr.hidden = false; return; }
+        if (!shellReady) return;
+        publishGoToStep(2);
+      } else if (publishCurrentStep === 2) {
+        publishGoToStep(3);
+      }
+    });
+
+    publishBack.addEventListener("click", function () {
+      if (publishCurrentStep > 1) publishGoToStep(publishCurrentStep - 1);
+    });
+
+    // Rotation list events (delegated)
+    if (publishRotationEl) {
+      publishRotationEl.addEventListener("change", function (e) {
+        var inc = e.target.closest("[data-rot-include]");
+        if (inc) {
+          var row = inc.closest("[data-rot-idx]");
+          var idx = Number(row.getAttribute("data-rot-idx"));
+          publishRotation[idx].included = inc.checked;
+          if (!inc.checked) publishRotation[idx].weight = 0;
+          publishRenderRotation();
+          return;
+        }
+      });
+      publishRotationEl.addEventListener("input", function (e) {
+        var w = e.target.closest("[data-rot-weight]");
+        if (!w) return;
+        var row = w.closest("[data-rot-idx]");
+        var idx = Number(row.getAttribute("data-rot-idx"));
+        var v = Math.max(0, Math.min(100, parseInt(w.value, 10) || 0));
+        publishRotation[idx].weight = v;
+        publishRecomputeRotation();
+      });
+    }
+    if (publishEvenSplitBtn) {
+      publishEvenSplitBtn.addEventListener("click", publishApplyEvenSplit);
+    }
+
+    // Variables editing — track edits back into EDITOR_LANDER_VARS
+    if (publishVarsList) {
+      publishVarsList.addEventListener("input", function (e) {
+        var inp = e.target.closest("[data-var-input]");
+        if (!inp) return;
+        var row = inp.closest("[data-var-idx]");
+        var idx = Number(row.getAttribute("data-var-idx"));
+        if (EDITOR_LANDER_VARS[idx]) EDITOR_LANDER_VARS[idx].value = inp.value;
+      });
+      publishVarsList.addEventListener("click", function (e) {
+        var rm = e.target.closest("[data-var-remove]");
+        if (rm) {
+          var row = rm.closest("[data-var-idx]");
+          var idx = Number(row.getAttribute("data-var-idx"));
+          if (idx >= 0) EDITOR_LANDER_VARS.splice(idx, 1);
+          publishRenderVariables();
+          return;
+        }
+        var add = e.target.closest("[data-var-add]");
+        if (add) {
+          var name = (window.prompt("Variable name (e.g. discount_code)") || "").trim();
+          if (!name) return;
+          if (EDITOR_LANDER_VARS.some(function (v) { return v.key === name; })) {
+            editorPublishToast("Variable “" + name + "” already exists");
+            return;
+          }
+          EDITOR_LANDER_VARS.push({ key: name, value: "" });
+          publishRenderVariables();
+          // Focus the new value input
+          var last = publishVarsList.querySelector('[data-var-idx="' + (EDITOR_LANDER_VARS.length - 1) + '"] [data-var-input]');
+          if (last) last.focus();
+        }
+      });
+    }
+
+    // Apply state-aware button label on load + auto-open from /landers
+    publishApplyButtonModel();
+    if (publishAutoOpen) {
+      // Slight delay so the editor settles first
+      setTimeout(function () {
+        var m = publishComputeButtonModel();
+        if (m.kind === "wizard-republish") publishMode = "republish";
+        else publishMode = "wizard";
+        openPublishWizard();
+      }, 60);
+    }
+
+    var successDlg     = document.getElementById("dialog-publish-success");
+    var successUrlEl   = document.getElementById("publish-success-url");
+    var successTimeEl  = document.getElementById("publish-success-time");
+    var successCopyBtn = document.getElementById("publish-success-copy");
+    var successReports = document.getElementById("publish-success-reports");
+
+    if (successDlg) {
+      successDlg.querySelectorAll("[data-close-dialog]").forEach(function (b) {
+        b.addEventListener("click", function () { successDlg.close(); });
+      });
+    }
+
+    function formatPublishTime(d) {
+      try {
+        var date = d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+        var time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+        return date + " " + time;
+      } catch (e) {
+        return d.toString();
+      }
+    }
+
     publishLive.addEventListener("click", function () {
-      if (!validatePublishForm()) return;
-      publishDlg.close();
-      alert("Published (prototype): " + publishDomain.value + "/" + publishPath.value.replace(/^\/+/, ""));
+      if (!publishDomain.value) {
+        publishErr.hidden = false;
+        publishGoToStep(1);
+        return;
+      }
+      if (!shellReady) {
+        publishGoToStep(1);
+        return;
+      }
+      var originalLabel = publishLive.textContent;
+      publishLive.disabled = true;
+      publishLive.classList.add("is-loading");
+      publishLive.textContent = "Publishing…";
+
+      setTimeout(function () {
+        publishLive.disabled = false;
+        publishLive.classList.remove("is-loading");
+        publishLive.textContent = originalLabel;
+        publishDlg.close();
+
+        // Single source of truth: write Page settings back into the editor's settings popover
+        publishSyncPageToEditor();
+
+        // Update state — lander goes live, current variant becomes active
+        EDITOR_STATE.landerStatus  = "published";
+        EDITOR_STATE.variantStatus = "active";
+        EDITOR_STATE.changes = 0;
+        publishApplyButtonModel();
+
+        var liveUrl = publishDomain.value + "/" + publishPath.value.replace(/^\/+/, "");
+        successUrlEl.value = liveUrl;
+        successTimeEl.textContent = formatPublishTime(new Date());
+
+        var landerName = (document.getElementById("editor-lander-title").textContent || "").trim();
+        var variantText = "";
+        if (variantSel && variantSel.options[variantSel.selectedIndex]) {
+          variantText = variantSel.options[variantSel.selectedIndex].text || "";
+        }
+        var reportsUrl = "reports.html";
+        var qs = [];
+        if (landerName)  qs.push("lander="  + encodeURIComponent(landerName));
+        if (variantText) qs.push("variant=" + encodeURIComponent(variantText));
+        if (qs.length) reportsUrl += "?" + qs.join("&");
+        successReports.setAttribute("href", reportsUrl);
+
+        if (typeof successDlg.showModal === "function") {
+          successDlg.showModal();
+        } else {
+          successDlg.setAttribute("open", "");
+        }
+      }, 1100);
     });
+
+    if (successCopyBtn && successUrlEl) {
+      successCopyBtn.addEventListener("click", function () {
+        var v = successUrlEl.value || "";
+        var done = function () {
+          successCopyBtn.classList.add("is-copied");
+          successCopyBtn.setAttribute("title", "Copied!");
+          setTimeout(function () {
+            successCopyBtn.classList.remove("is-copied");
+            successCopyBtn.setAttribute("title", "Copy URL");
+          }, 1400);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(v).then(done, function () {
+            successUrlEl.select();
+            try { document.execCommand("copy"); } catch (e) {}
+            done();
+          });
+        } else {
+          successUrlEl.select();
+          try { document.execCommand("copy"); } catch (e) {}
+          done();
+        }
+      });
+    }
 
     // URL ?variant=... pre-selects matching option or adds one
     var vParam = params.get("variant");
