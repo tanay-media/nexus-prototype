@@ -509,6 +509,13 @@
         <div class="publish-success__label">Live URL</div>
         <div class="copy-row">
           <input type="text" id="publish-success-url" readonly value="" />
+          <a class="copy-row__btn" id="publish-success-open" href="#" target="_blank" rel="noopener noreferrer" title="Open in new tab" aria-label="Open in new tab">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 4h6v6"/>
+              <path d="M10 14L20 4"/>
+              <path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/>
+            </svg>
+          </a>
           <button type="button" class="copy-row__btn" id="publish-success-copy" title="Copy URL" aria-label="Copy URL">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="11" height="11" rx="2"/>
@@ -1745,6 +1752,8 @@
 
         var liveUrl = publishDomain.value + "/" + publishPath.value.replace(/^\/+/, "");
         successUrlEl.value = liveUrl;
+        var successOpenEl = document.getElementById("publish-success-open");
+        if (successOpenEl) successOpenEl.setAttribute("href", "https://" + liveUrl);
         successTimeEl.textContent = formatPublishTime(new Date());
 
         var landerName = (document.getElementById("editor-lander-title").textContent || "").trim();

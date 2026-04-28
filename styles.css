@@ -5337,6 +5337,7 @@ body.editor-open .editor-shell .editor-chat {
 .copy-row__btn {
   flex: 0 0 auto;
   width: 36px;
+  height: 36px;
   border: 1px solid var(--border);
   background: #fff;
   border-radius: 8px;
@@ -5344,8 +5345,10 @@ body.editor-open .editor-shell .editor-chat {
   place-items: center;
   color: var(--text-muted);
   cursor: pointer;
+  text-decoration: none;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
+a.copy-row__btn { color: var(--text-muted); }
 .copy-row__btn:hover { color: var(--text); border-color: var(--border-strong); }
 .copy-row__btn.is-copied { color: #1f7a39; border-color: #b9d8b3; background: #ebf6e7; }
 .publish-success__hint {
