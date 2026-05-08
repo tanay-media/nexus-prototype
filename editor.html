@@ -17,6 +17,7 @@
         <select id="editor-variant-select" class="editor-variant-select" aria-label="Active variant">
           <option value="main-hero" selected>Main hero</option>
           <option value="urgency">Urgency countdown</option>
+          <option value="__new__">+ New variant</option>
         </select>
       </div>
 
@@ -325,6 +326,7 @@
                 <span class="path-input-row__prefix" id="publish-path-prefix">domain.com/</span>
                 <input type="text" id="publish-path" value="summer-sale-v1" placeholder="your-path" />
               </div>
+              <div class="path-suggestions" id="publish-path-suggestions" aria-label="Suggested URL paths"></div>
             </div>
           </div>
 
@@ -359,12 +361,21 @@
                 <h4>Variants in rotation</h4>
                 <p class="muted">Pick which variants serve traffic and how the split is allocated.</p>
               </div>
-              <button type="button" class="btn btn--ghost btn--sm" id="publish-even-split">Even split</button>
+              <div class="publish-rotation-tools">
+                <div class="publish-window-toggle" id="publish-window-toggle" aria-label="Metrics window">
+                  <button type="button" data-window="3d">3D</button>
+                  <button type="button" class="is-active" data-window="14d">14D</button>
+                  <button type="button" data-window="lifetime">Lifetime</button>
+                </div>
+              </div>
             </div>
             <div class="publish-rotation" id="publish-rotation"></div>
             <div class="publish-rotation-foot">
-              <span class="publish-rotation-total" id="publish-rotation-total">Total: <strong>0%</strong></span>
               <span class="publish-rotation-warn" id="publish-rotation-warn" hidden>Weights must total 100% across included variants.</span>
+              <div class="publish-rotation-foot__actions">
+                <span class="publish-rotation-total" id="publish-rotation-total">Total: <strong>0%</strong></span>
+                <button type="button" class="btn btn--ghost btn--sm" id="publish-even-split">Even split</button>
+              </div>
             </div>
           </div>
         </div>
@@ -520,6 +531,32 @@
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="11" height="11" rx="2"/>
               <path d="M5 15V6a2 2 0 0 1 2-2h9"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="publish-success__field publish-success__field--params">
+        <div class="publish-success__label">Query params (pick & choose)</div>
+        <ul class="success-param-list" id="publish-success-param-list"></ul>
+        <div class="success-param-actions">
+          <button type="button" class="btn btn--ghost btn--sm" id="publish-success-param-add">+ Add param</button>
+          <button type="button" class="btn btn--black btn--sm" id="publish-success-generate">Generate URL</button>
+        </div>
+      </div>
+
+      <div class="publish-success__field publish-success__field--platforms">
+        <div class="publish-success__label">Generated URL</div>
+        <div class="publish-success__generated-row">
+          <input type="text" id="publish-success-url-generated" readonly value="" />
+          <a class="copy-row__btn" id="publish-success-open-generated" href="#" target="_blank" rel="noopener noreferrer" title="Open generated URL" aria-label="Open generated URL">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 4h6v6"/><path d="M10 14L20 4"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/>
+            </svg>
+          </a>
+          <button type="button" class="copy-row__btn" id="publish-success-copy-generated" title="Copy generated URL" aria-label="Copy generated URL">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>
             </svg>
           </button>
         </div>
@@ -949,7 +986,108 @@
     // ---- Variant dropdown → sync preview label (prototype)
     var variantSel = document.getElementById("editor-variant-select");
     var previewTitleEl = document.getElementById("preview-title");
+    var previewH1El = document.getElementById("preview-h1");
+    var previewSubEl = document.getElementById("preview-sub");
+    var previewCtaEl = document.getElementById("preview-cta");
+    var settingsTitleEl = document.getElementById("settings-page-title");
+    var settingsDescEl = document.getElementById("settings-description");
+    var settingsKeywordsEl = document.getElementById("settings-keywords");
+    var variantWorkspaceState = {};
+    var activeVariantKey = variantSel ? variantSel.value : "";
+
+    function variantEsc(s) {
+      return String(s == null ? "" : s).replace(/[<>&"']/g, function (c) {
+        return { "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;", "'":"&#39;" }[c];
+      });
+    }
+    function variantCaptureState(key) {
+      if (!key || !chat) return;
+      variantWorkspaceState[key] = {
+        chatHtml: chat.innerHTML,
+        inputText: input ? (input.value || "") : "",
+        previewH1: previewH1El ? previewH1El.textContent : "",
+        previewSub: previewSubEl ? previewSubEl.textContent : "",
+        previewCta: previewCtaEl ? previewCtaEl.textContent : "",
+        pageTitle: settingsTitleEl ? settingsTitleEl.value : "",
+        pageDesc: settingsDescEl ? settingsDescEl.value : "",
+        pageKeywords: settingsKeywordsEl ? settingsKeywordsEl.value : ""
+      };
+    }
+    function variantApplyState(st) {
+      if (!st) return;
+      if (chat && typeof st.chatHtml === "string") chat.innerHTML = st.chatHtml;
+      if (input) input.value = st.inputText || "";
+      if (previewH1El && typeof st.previewH1 === "string") previewH1El.textContent = st.previewH1;
+      if (previewSubEl && typeof st.previewSub === "string") previewSubEl.textContent = st.previewSub;
+      if (previewCtaEl && typeof st.previewCta === "string") previewCtaEl.textContent = st.previewCta;
+      if (settingsTitleEl && typeof st.pageTitle === "string") settingsTitleEl.value = st.pageTitle;
+      if (settingsDescEl && typeof st.pageDesc === "string") settingsDescEl.value = st.pageDesc;
+      if (settingsKeywordsEl && typeof st.pageKeywords === "string") settingsKeywordsEl.value = st.pageKeywords;
+    }
+    function variantFreshState(variantName) {
+      var landerName = (document.getElementById("editor-lander-title").textContent || "this lander").trim();
+      var baseTitle = landerName + " — Up to 60% Off";
+      var chatHtml =
+        '<div class="chat-note chat-note--shell">' +
+          '<span class="chat-note__text">Header, footer, and CMP are shared for this domain.</span>' +
+          '<button type="button" class="btn btn--ghost btn--sm js-site-shell-open" data-shell-tab="header">Edit site shell</button>' +
+        '</div>' +
+        '<div class="chat-bubble">Starting <strong>' + variantEsc(variantName) + '</strong> for <strong>' + variantEsc(landerName) + '</strong>. Tell me what to change — copy, layout, design, or CTA.</div>';
+      return {
+        chatHtml: chatHtml,
+        inputText: "",
+        previewH1: landerName,
+        previewSub: "Limited time. Shop the biggest deals of the season before they're gone.",
+        previewCta: "Shop Now →",
+        pageTitle: baseTitle,
+        pageDesc: "Limited time. Shop the biggest deals of the season before they're gone.",
+        pageKeywords: "summer sale, deals, shop"
+      };
+    }
+
+    if (variantSel) variantCaptureState(activeVariantKey);
     variantSel.addEventListener("change", function () {
+      var previousKey = activeVariantKey;
+      if (variantSel.value === "__new__") {
+        var newName = (window.prompt("Variant name") || "").trim();
+        if (!newName) {
+          // Revert to first non-new option
+          var first = Array.prototype.find.call(variantSel.options, function (opt) { return opt.value !== "__new__"; });
+          if (first) variantSel.value = first.value;
+        } else {
+          var existing = Array.prototype.find.call(variantSel.options, function (opt) {
+            return opt.text.toLowerCase() === newName.toLowerCase();
+          });
+          if (existing) {
+            variantSel.value = existing.value;
+          } else {
+            var slug = newName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || ("variant-" + Date.now());
+            var o = document.createElement("option");
+            o.value = slug;
+            o.textContent = newName;
+            variantSel.insertBefore(o, variantSel.querySelector('option[value="__new__"]'));
+            variantSel.value = slug;
+            variantWorkspaceState[slug] = variantFreshState(newName);
+          }
+        }
+      }
+      // Save whatever was being edited on the previous variant.
+      variantCaptureState(previousKey);
+      activeVariantKey = variantSel.value;
+      if (variantWorkspaceState[activeVariantKey]) {
+        variantApplyState(variantWorkspaceState[activeVariantKey]);
+      } else if (variantSel.value !== "__new__") {
+        // First time opening an existing variant: start with clean workspace.
+        variantWorkspaceState[activeVariantKey] = variantFreshState(variantSel.options[variantSel.selectedIndex].text);
+        variantApplyState(variantWorkspaceState[activeVariantKey]);
+      }
+
+      // If publish drawer is open, keep rotation list in sync with latest variants.
+      if (publishDlg && publishDlg.open) {
+        publishBuildRotation();
+        publishRenderRotation();
+      }
+
       var t = variantSel.options[variantSel.selectedIndex].text;
       var landerName = document.getElementById("editor-lander-title").textContent || "Summer Sale";
       if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + t;
@@ -981,6 +1119,7 @@
     var publishBtn    = document.getElementById("editor-publish-btn");
     var publishDomain = document.getElementById("publish-domain");
     var publishPath   = document.getElementById("publish-path");
+    var publishPathSuggestions = document.getElementById("publish-path-suggestions");
     var publishPrefix = document.getElementById("publish-path-prefix");
     var publishErr    = document.getElementById("publish-domain-error");
     var publishLive   = document.getElementById("publish-live-btn");
@@ -992,6 +1131,7 @@
     var publishRotationTotal = document.getElementById("publish-rotation-total");
     var publishRotationWarn  = document.getElementById("publish-rotation-warn");
     var publishEvenSplitBtn  = document.getElementById("publish-even-split");
+    var publishWindowToggle  = document.getElementById("publish-window-toggle");
     var publishOpenShell = document.getElementById("publish-open-shell");
     var publishVarsList  = document.getElementById("publish-vars-list");
     var publishFlowTitle = document.getElementById("publish-flow-title");
@@ -1002,6 +1142,17 @@
     var publishMode = "wizard"; // "wizard" | "republish"
     var publishRotation = []; // [{ id, name, included, weight }]
     var publishRotationOk = false;
+    var publishMetricsWindow = "14d"; // 3d | 14d | lifetime
+
+    if (publishDlg) {
+      publishDlg.querySelectorAll("[data-close-dialog]").forEach(function (btn) {
+        btn.addEventListener("click", function () { publishDlg.close(); });
+      });
+      // Clicking the dialog backdrop (outside drawer panel) closes the drawer.
+      publishDlg.addEventListener("click", function (e) {
+        if (e.target === publishDlg) publishDlg.close();
+      });
+    }
 
     // Mock lander-level variables (mirrors /landers settings dialog).
     // We only allow editing existing values here per product spec.
@@ -1063,8 +1214,6 @@
       if (!domain) {
         rows.forEach(function (row) {
           row.classList.remove("is-ready", "is-missing");
-          var status = row.querySelector(".publish-shell-row__status");
-          if (status) status.textContent = "Select a domain";
         });
         shellReady = false;
         if (publishShellWarn) publishShellWarn.hidden = true;
@@ -1081,8 +1230,6 @@
         if (!ok) allReady = false;
         row.classList.toggle("is-ready", ok);
         row.classList.toggle("is-missing", !ok);
-        var status = row.querySelector(".publish-shell-row__status");
-        if (status) status.textContent = ok ? "Attached" : "Missing — add it";
       });
       shellReady = allReady;
       if (publishShellWarn) publishShellWarn.hidden = allReady;
@@ -1094,7 +1241,7 @@
       var out = [];
       if (sel) {
         Array.prototype.forEach.call(sel.options, function (opt) {
-          if (opt.value === "custom") return;
+          if (opt.value === "custom" || opt.value === "__new__") return;
           out.push({ id: opt.value, name: opt.text });
         });
       }
@@ -1108,11 +1255,35 @@
       { bg: "#eef9f1", accent: "#3b9b62", soft: "#d3eedb" },
       { bg: "#fff0f0", accent: "#c8484f", soft: "#f3d5d6" }
     ];
+    var VARIANT_METRICS = {
+      "main-hero": {
+        "3d":      { impressions: 39100, score: 0.43 },
+        "14d":     { impressions: 103400, score: 0.45 },
+        "lifetime":{ impressions: 169700, score: 0.46 }
+      },
+      "urgency": {
+        "3d":      { impressions: 6300, score: 0.24 },
+        "14d":     { impressions: 16200, score: 0.26 },
+        "lifetime":{ impressions: 25545, score: 0.27 }
+      }
+    };
 
     function publishEscape(s) {
       return String(s == null ? "" : s).replace(/[<>&"']/g, function (c) {
         return { "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&#39;" }[c];
       });
+    }
+    function publishFormatNum(n) {
+      var v = Number(n || 0);
+      return v.toLocaleString();
+    }
+    function publishMetricFor(variantId, idx) {
+      var byWindow = VARIANT_METRICS[variantId] || null;
+      if (byWindow && byWindow[publishMetricsWindow]) return byWindow[publishMetricsWindow];
+      var base = { impressions: Math.max(1200, 22104 - (idx * 6400)), score: Math.max(0.08, 0.46 - (idx * 0.11)) };
+      if (publishMetricsWindow === "3d") return { impressions: Math.round(base.impressions * 0.28), score: Math.max(0.01, base.score - 0.03) };
+      if (publishMetricsWindow === "14d") return { impressions: Math.round(base.impressions * 0.62), score: Math.max(0.01, base.score - 0.01) };
+      return base;
     }
 
     function publishBuildRotation() {
@@ -1155,6 +1326,7 @@
       if (!publishRotation.length) publishBuildRotation();
       var html = publishRotation.map(function (r, i) {
         var p = THUMB_PALETTE[i % THUMB_PALETTE.length];
+        var metrics = publishMetricFor(r.id, i);
         var nameEsc = publishEscape(r.name);
         var includedAttr = r.included ? "checked" : "";
         var disabled = r.included ? "" : "disabled";
@@ -1176,7 +1348,16 @@
             '</div>' +
             '<div class="publish-rot-row__meta">' +
               '<strong>' + nameEsc + '</strong>' +
-              '<small>' + (r.included ? "In rotation" : "Excluded") + '</small>' +
+              '<div class="publish-rot-row__stats">' +
+                '<span class="publish-rot-row__metric">' +
+                  '<small>Impressions</small>' +
+                  '<strong>' + publishFormatNum(metrics.impressions) + '</strong>' +
+                '</span>' +
+                '<span class="publish-rot-row__metric publish-rot-row__metric--score">' +
+                  '<small>Score</small>' +
+                  '<strong>' + Number(metrics.score || 0).toFixed(2) + '</strong>' +
+                '</span>' +
+              '</div>' +
             '</div>' +
             '<div class="publish-rot-row__weight">' +
               '<input type="number" min="0" max="100" step="1" value="' + (r.weight || 0) + '" data-rot-weight ' + disabled + ' inputmode="numeric" />' +
@@ -1217,10 +1398,7 @@
           '</li>'
         );
       }).join("");
-      publishVarsList.innerHTML = rows +
-        '<li class="publish-var-add-row">' +
-          '<button type="button" class="publish-var-add" data-var-add>+ Add variable</button>' +
-        '</li>';
+      publishVarsList.innerHTML = rows;
     }
 
     function publishSyncPageFromEditor() {
@@ -1432,6 +1610,59 @@
       publishPrefix.textContent = (d || "domain.com") + "/";
     }
 
+    function publishSlugWords(text) {
+      return String(text || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+    }
+
+    function publishBuildPathSuggestions() {
+      var landerName = (document.getElementById("editor-lander-title").textContent || "").trim();
+      var words = publishSlugWords(landerName);
+      if (!words.length) return ["landing-page", "offer", "best-offer"];
+
+      var suggestions = [];
+      // 2-word suggestion (default preferred)
+      suggestions.push(words.slice(0, Math.min(2, words.length)).join("-"));
+      // 1-word suggestion
+      suggestions.push(words[Math.min(1, words.length - 1)]);
+      // 3-word suggestion
+      suggestions.push(words.slice(0, Math.min(3, words.length)).join("-"));
+
+      // Fallbacks for very short names
+      if (words.length === 1) {
+        suggestions = [words[0], words[0] + "-offer", "best-" + words[0]];
+      } else if (words.length === 2) {
+        suggestions[2] = words[0] + "-" + words[1] + "-offer";
+      }
+
+      // unique + non-empty
+      var seen = {};
+      return suggestions.filter(function (s) {
+        if (!s || seen[s]) return false;
+        seen[s] = true;
+        return true;
+      }).slice(0, 3);
+    }
+
+    function publishRenderPathSuggestions() {
+      if (!publishPathSuggestions) return;
+      var list = publishBuildPathSuggestions();
+      publishPathSuggestions.innerHTML = list.map(function (slug, idx) {
+        return '<button type="button" class="path-suggestion" data-path-suggestion="' + publishEscape(slug) + '">' +
+          '<span class="path-suggestion__slash">/</span>' + publishEscape(slug) +
+          (idx === 0 ? ' <small>Suggested</small>' : '') +
+        '</button>';
+      }).join("");
+      // Auto-fill first suggestion only when path is empty or still default seed.
+      if (publishPath && (!publishPath.value || publishPath.value === "summer-sale-v1")) {
+        publishPath.value = list[0] || publishPath.value;
+      }
+    }
+
     function openPublishWizard(prefilled) {
       // Title varies by mode
       if (publishFlowTitle && publishFlowSub) {
@@ -1445,12 +1676,22 @@
       }
       publishGoToStep(1);
       publishDlg.showModal();
+      publishRenderPathSuggestions();
       syncPublishPrefix();
       publishBuildRotation();
       publishRenderRotation();
       publishCheckShell();
       publishSyncPageFromEditor();
       publishRenderVariables();
+    }
+
+    if (publishPathSuggestions) {
+      publishPathSuggestions.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-path-suggestion]");
+        if (!btn || !publishPath) return;
+        publishPath.value = btn.getAttribute("data-path-suggestion") || "";
+        if (publishCurrentStep === 3) publishUpdateReview();
+      });
     }
 
     publishBtn.addEventListener("click", function () {
@@ -1644,11 +1885,42 @@
         var idx = Number(row.getAttribute("data-rot-idx"));
         var v = Math.max(0, Math.min(100, parseInt(w.value, 10) || 0));
         publishRotation[idx].weight = v;
+        // Auto-adjust one remaining included variant so users don't need to type all rows.
+        var includedIdxs = publishRotation
+          .map(function (r, i) { return r.included ? i : -1; })
+          .filter(function (i) { return i >= 0; });
+        if (includedIdxs.length >= 2) {
+          var autoIdx = -1;
+          for (var k = includedIdxs.length - 1; k >= 0; k--) {
+            if (includedIdxs[k] !== idx) { autoIdx = includedIdxs[k]; break; }
+          }
+          if (autoIdx >= 0) {
+            var sumOthers = includedIdxs.reduce(function (acc, j) {
+              if (j === autoIdx) return acc;
+              return acc + (parseInt(publishRotation[j].weight, 10) || 0);
+            }, 0);
+            var autoWeight = Math.max(0, Math.min(100, 100 - sumOthers));
+            publishRotation[autoIdx].weight = autoWeight;
+            var autoInput = publishRotationEl.querySelector('[data-rot-idx="' + autoIdx + '"] [data-rot-weight]');
+            if (autoInput && autoInput !== w) autoInput.value = autoWeight;
+          }
+        }
         publishRecomputeRotation();
       });
     }
     if (publishEvenSplitBtn) {
       publishEvenSplitBtn.addEventListener("click", publishApplyEvenSplit);
+    }
+    if (publishWindowToggle) {
+      publishWindowToggle.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-window]");
+        if (!btn) return;
+        publishMetricsWindow = btn.getAttribute("data-window") || "14d";
+        publishWindowToggle.querySelectorAll("[data-window]").forEach(function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        publishRenderRotation();
+      });
     }
 
     // Variables editing — track edits back into EDITOR_LANDER_VARS
@@ -1669,20 +1941,6 @@
           publishRenderVariables();
           return;
         }
-        var add = e.target.closest("[data-var-add]");
-        if (add) {
-          var name = (window.prompt("Variable name (e.g. discount_code)") || "").trim();
-          if (!name) return;
-          if (EDITOR_LANDER_VARS.some(function (v) { return v.key === name; })) {
-            editorPublishToast("Variable “" + name + "” already exists");
-            return;
-          }
-          EDITOR_LANDER_VARS.push({ key: name, value: "" });
-          publishRenderVariables();
-          // Focus the new value input
-          var last = publishVarsList.querySelector('[data-var-idx="' + (EDITOR_LANDER_VARS.length - 1) + '"] [data-var-input]');
-          if (last) last.focus();
-        }
       });
     }
 
@@ -1700,13 +1958,148 @@
 
     var successDlg     = document.getElementById("dialog-publish-success");
     var successUrlEl   = document.getElementById("publish-success-url");
+    var successGeneratedUrlEl = document.getElementById("publish-success-url-generated");
+    var successOpenGeneratedEl = document.getElementById("publish-success-open-generated");
+    var successCopyGeneratedBtn = document.getElementById("publish-success-copy-generated");
+    var successParamListEl = document.getElementById("publish-success-param-list");
+    var successParamAddBtn = document.getElementById("publish-success-param-add");
+    var successGenerateBtn = document.getElementById("publish-success-generate");
     var successTimeEl  = document.getElementById("publish-success-time");
     var successCopyBtn = document.getElementById("publish-success-copy");
     var successReports = document.getElementById("publish-success-reports");
+    var successParamRows = [
+      { enabled: true, key: "utm_source" },
+      { enabled: true, key: "utm_campaign" },
+      { enabled: true, key: "keyword" },
+      { enabled: true, key: "utm_placement" }
+    ];
 
     if (successDlg) {
       successDlg.querySelectorAll("[data-close-dialog]").forEach(function (b) {
         b.addEventListener("click", function () { successDlg.close(); });
+      });
+      successDlg.addEventListener("click", function (e) {
+        if (e.target === successDlg) successDlg.close();
+      });
+    }
+
+    function successNormalizeBaseUrl() {
+      var base = ((successUrlEl && successUrlEl.value) || "").trim();
+      if (!base) return "";
+      if (/^https?:\/\//i.test(base)) return base;
+      return "https://" + base.replace(/^\/+/, "");
+    }
+
+    function successRenderParamRows() {
+      if (!successParamListEl) return;
+      successParamListEl.innerHTML = successParamRows.map(function (r, idx) {
+        return (
+          '<li class="success-param-row" data-param-idx="' + idx + '">' +
+            '<label class="success-param-row__pick" title="Include in URL">' +
+              '<input type="checkbox" data-param-enabled ' + (r.enabled ? "checked" : "") + ' />' +
+              '<span></span>' +
+            '</label>' +
+            '<input type="text" class="input success-param-row__key" data-param-key value="' + publishEscape(r.key || "") + '" placeholder="param key" />' +
+            '<button type="button" class="success-param-row__remove" data-param-remove aria-label="Remove param">✕</button>' +
+          '</li>'
+        );
+      }).join("");
+    }
+
+    function successBuildEnrichedUrl() {
+      var base = successNormalizeBaseUrl();
+      if (!base) return "";
+      var parts = [];
+      successParamRows.forEach(function (r) {
+        if (!r.enabled) return;
+        var k = String(r.key || "").trim();
+        if (!k) return;
+        if (k.toLowerCase() === "channel") return; // keep URL clean: use utm_source instead
+        var v = "{{" + k + "}}";
+        parts.push([k, v]);
+      });
+      var qs = parts.map(function (p) {
+        var key = encodeURIComponent(p[0]);
+        var val = encodeURIComponent(p[1])
+          .replace(/%7B%7B/g, "{{")
+          .replace(/%7D%7D/g, "}}");
+        return key + "=" + val;
+      }).join("&");
+      return base + (qs ? ("?" + qs) : "");
+    }
+
+    function successGenerateUrl() {
+      var url = successBuildEnrichedUrl();
+      if (successGeneratedUrlEl) successGeneratedUrlEl.value = url;
+      if (successOpenGeneratedEl) successOpenGeneratedEl.setAttribute("href", url || "#");
+    }
+
+    function successCopyUrl(inputEl, btnEl) {
+      if (!inputEl || !btnEl) return;
+      var v = (inputEl.value || "").trim();
+      if (!v) return;
+      var done = function () {
+        btnEl.classList.add("is-copied");
+        setTimeout(function () { btnEl.classList.remove("is-copied"); }, 1100);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(v).then(done, function () {
+          inputEl.select();
+          try { document.execCommand("copy"); } catch (e) {}
+          done();
+        });
+      } else {
+        inputEl.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        done();
+      }
+    }
+
+    if (successParamListEl) {
+      successParamListEl.addEventListener("input", function (e) {
+        var row = e.target.closest("[data-param-idx]");
+        if (!row) return;
+        var idx = Number(row.getAttribute("data-param-idx"));
+        if (!successParamRows[idx]) return;
+        var keyInput = e.target.closest("[data-param-key]");
+        if (keyInput) successParamRows[idx].key = keyInput.value;
+      });
+      successParamListEl.addEventListener("change", function (e) {
+        var row = e.target.closest("[data-param-idx]");
+        if (!row) return;
+        var idx = Number(row.getAttribute("data-param-idx"));
+        if (!successParamRows[idx]) return;
+        var enabled = e.target.closest("[data-param-enabled]");
+        if (enabled) successParamRows[idx].enabled = enabled.checked;
+      });
+      successParamListEl.addEventListener("click", function (e) {
+        var rm = e.target.closest("[data-param-remove]");
+        if (!rm) return;
+        var row = rm.closest("[data-param-idx]");
+        if (!row) return;
+        var idx = Number(row.getAttribute("data-param-idx"));
+        if (idx < 0) return;
+        successParamRows.splice(idx, 1);
+        successRenderParamRows();
+      });
+    }
+    if (successParamAddBtn) {
+      successParamAddBtn.addEventListener("click", function () {
+        successParamRows.push({ enabled: true, key: "" });
+        successRenderParamRows();
+      });
+    }
+    if (successGenerateBtn) {
+      successGenerateBtn.addEventListener("click", successGenerateUrl);
+    }
+    if (successCopyGeneratedBtn && successGeneratedUrlEl) {
+      successCopyGeneratedBtn.addEventListener("click", function () {
+        successCopyUrl(successGeneratedUrlEl, successCopyGeneratedBtn);
+      });
+    }
+    if (successOpenGeneratedEl) {
+      successOpenGeneratedEl.addEventListener("click", function (e) {
+        if (!successOpenGeneratedEl.getAttribute("href") || successOpenGeneratedEl.getAttribute("href") === "#") e.preventDefault();
       });
     }
 
@@ -1754,6 +2147,8 @@
         successUrlEl.value = liveUrl;
         var successOpenEl = document.getElementById("publish-success-open");
         if (successOpenEl) successOpenEl.setAttribute("href", "https://" + liveUrl);
+        successRenderParamRows();
+        successGenerateUrl();
         successTimeEl.textContent = formatPublishTime(new Date());
 
         var landerName = (document.getElementById("editor-lander-title").textContent || "").trim();

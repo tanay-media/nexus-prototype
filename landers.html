@@ -632,11 +632,11 @@
         items.push({ kind: "unpublish", icon: ICON.unpublish, label: "Unpublish",   sub: "Take this lander offline"          });
       } else if (status === "unpublished") {
         items.push({ kind: "republish", icon: ICON.republish, label: "Republish",  sub: "Bring it back live (3-step wizard)" });
+        items.push({ kind: "archive", icon: ICON.trash, label: "Archive", sub: "Move to archive · 7-day undo", danger: true });
       } else if (status === "draft") {
         items.push({ kind: "publish",   icon: ICON.publish,   label: "Publish",    sub: "Set up route, settings & ship"     });
       }
       items.push({ kind: "clone",  icon: ICON.clone, label: "Clone",  sub: "Duplicate with 0 metrics" });
-      items.push({ kind: "archive", icon: ICON.trash, label: "Archive", sub: "Move to archive · 7-day undo", danger: true });
 
       var lis = items.map(function (it) {
         var cls = "lander-more__item" + (it.danger ? " lander-more__item--danger" : "");
