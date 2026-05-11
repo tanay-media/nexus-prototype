@@ -25,8 +25,8 @@
     <main class="main">
       <div class="page-header">
         <h1>Domains</h1>
-        <div class="page-header__right">
-          <button class="btn btn--black">+ Add Domain</button>
+        <div class="page-header__right" id="page-header-actions">
+          <button class="btn btn--black" id="add-domain-btn">+ Add Domain</button>
         </div>
       </div>
 
@@ -77,7 +77,7 @@
                 <td>ACME Growth</td>
                 <td class="muted">7 days ago</td>
                 <td class="right"><button class="shell-btn js-edit-shell" data-domain="offers.acme.com">Site shell</button></td>
-                <td class="right"><button class="icon-btn" aria-label="More">⋯</button></td>
+                <td class="right"><button type="button" class="icon-btn js-domain-ns" data-domain="offers.acme.com" title="Show nameservers" aria-label="Show nameservers"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
               </tr>
               <tr><td colspan="6" style="padding:0; border:none;">
                 <div class="nested-landers" id="nested-offers">
@@ -97,7 +97,7 @@
                 <td>ACME Growth</td>
                 <td class="muted">10 days ago</td>
                 <td class="right"><button class="shell-btn js-edit-shell" data-domain="refer.acme.com">Site shell</button></td>
-                <td class="right"><button class="icon-btn">⋯</button></td>
+                <td class="right"><button type="button" class="icon-btn js-domain-ns" data-domain="refer.acme.com" title="Show nameservers" aria-label="Show nameservers"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
               </tr>
               <tr><td colspan="6" style="padding:0; border:none;"><div class="nested-landers" id="nested-refer" hidden></div></td></tr>
 
@@ -109,7 +109,7 @@
                 <td>ACME Growth</td>
                 <td class="muted">12 days ago</td>
                 <td class="right"><button class="shell-btn js-edit-shell" data-domain="try.acme.com">Site shell</button></td>
-                <td class="right"><button class="icon-btn">⋯</button></td>
+                <td class="right"><button type="button" class="icon-btn js-domain-ns" data-domain="try.acme.com" title="Show nameservers" aria-label="Show nameservers"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
               </tr>
               <tr><td colspan="6" style="padding:0; border:none;"><div class="nested-landers" id="nested-try" hidden></div></td></tr>
 
@@ -121,7 +121,7 @@
                 <td>FinanceEdge</td>
                 <td class="muted">2 days ago</td>
                 <td class="right"><button class="shell-btn js-edit-shell" data-domain="edge.financeapp.com">Site shell</button></td>
-                <td class="right"><button class="icon-btn">⋯</button></td>
+                <td class="right"><button type="button" class="icon-btn js-domain-ns" data-domain="edge.financeapp.com" title="Show nameservers" aria-label="Show nameservers"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
               </tr>
               <tr class="domain-row" data-domain-row data-domain="insights.financeapp.com" data-workspace="FinanceEdge" data-status="active" data-added="2026-04-03">
                 <td><strong class="mono">insights.financeapp.com</strong>
@@ -131,7 +131,7 @@
                 <td>FinanceEdge</td>
                 <td class="muted">20 days ago</td>
                 <td class="right"><button class="shell-btn js-edit-shell" data-domain="insights.financeapp.com">Site shell</button></td>
-                <td class="right"><button class="icon-btn">⋯</button></td>
+                <td class="right"><button type="button" class="icon-btn js-domain-ns" data-domain="insights.financeapp.com" title="Show nameservers" aria-label="Show nameservers"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
               </tr>
             </tbody>
           </table>
@@ -142,7 +142,7 @@
         <section data-tab-panel="dsk" hidden>
           <div class="card">
             <div class="toolbar" style="padding-top:0.5rem;">
-              <p class="muted" style="margin:0; flex:1; font-size:12px;">Keys used for server-side calls (webhooks, APIs). Prototype — nothing is persisted.</p>
+              <p class="muted" style="margin:0; flex:1; font-size:12px;">Provider credentials for DNS/CDN automation. Prototype — nothing is persisted.</p>
               <button type="button" class="btn btn--black" id="dsk-add-btn">+ Add key</button>
             </div>
             <div class="table-scroll" role="region" aria-label="Domain service keys">
@@ -150,10 +150,9 @@
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Key ID</th>
-                    <th>Domains</th>
+                    <th>Provider</th>
+                    <th>Email</th>
                     <th>Created</th>
-                    <th>Last used</th>
                     <th class="right">Actions</th>
                   </tr>
                 </thead>
@@ -168,50 +167,131 @@
 
   <!-- Site shell: right drawer + preview (see site-shell.js) -->
 
-  <!-- DSK: add / edit (same dialog, mode) -->
-  <dialog class="modal" id="dialog-dsk-form">
+  <!-- DSK: add / edit (same dialog, mode) — improved UI -->
+  <dialog class="modal modal--dsk-pro" id="dialog-dsk-form">
     <form method="dialog" class="modal__inner" id="form-dsk">
-      <div class="modal__header">
-        <div>
-          <h2 class="modal__title" id="dsk-form-title">Add service key</h2>
-          <p class="modal__hint" id="dsk-form-hint">Display name and which domains may use this key.</p>
+      <div class="dskp__head">
+        <div class="dskp__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3M14 9l3 3"/></svg>
         </div>
-        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+        <div class="dskp__head-text">
+          <div class="dskp__eyebrow">Domain service keys</div>
+          <h2 class="dskp__title" id="dsk-form-title">Add a new key</h2>
+          <p class="dskp__sub" id="dsk-form-hint">Connect a DNS / CDN provider so nexus can publish, verify, and route traffic for your domains.</p>
+        </div>
+        <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
       </div>
-      <input type="hidden" id="dsk-edit-id" value="" />
-      <div class="field"><label for="dsk-name">Name</label><input type="text" id="dsk-name" required placeholder="e.g. Stripe payouts" /></div>
-      <div class="field"><label for="dsk-domains">Domains (comma-separated)</label><input type="text" id="dsk-domains" placeholder="offers.acme.com, try.acme.com" /></div>
-      <div class="field" id="dsk-secret-wrap">
-        <label for="dsk-secret">Secret (shown once)</label>
-        <input type="text" id="dsk-secret" placeholder="sk_live_…" autocomplete="off" />
-        <div class="field__hint">Prototype only — not stored securely.</div>
+
+      <div class="dskp__body">
+        <input type="hidden" id="dsk-edit-id" value="" />
+
+        <div class="dskp__field">
+          <div class="dskp__label">Name <span class="dskp__opt">visible to your team</span></div>
+          <input class="dskp__input" type="text" id="dsk-name" required placeholder="e.g. Production Cloudflare" autocomplete="off" />
+        </div>
+
+        <div class="dskp__row dskp__row--2">
+          <div class="dskp__field">
+            <div class="dskp__label">Provider</div>
+            <select class="dskp__select" id="dsk-provider" required>
+              <option value="">Select provider…</option>
+              <option value="Cloudflare">Cloudflare</option>
+              <option value="AWS Route 53">AWS Route 53</option>
+              <option value="GoDaddy">GoDaddy</option>
+              <option value="Google Cloud DNS">Google Cloud DNS</option>
+              <option value="Namecheap">Namecheap</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="dskp__field">
+            <div class="dskp__label">Owner email</div>
+            <input class="dskp__input" type="email" id="dsk-email" required placeholder="ops@company.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="dskp__field" id="dsk-token-wrap">
+          <div class="dskp__label">
+            API token
+            <span class="dskp__opt"><a href="https://www.youtube.com/watch?v=01ijKtbfcuQ" id="dsk-token-help" target="_blank" rel="noopener">How to find it</a></span>
+          </div>
+          <div class="dskp__token">
+            <input id="dsk-api-token" type="password" placeholder="Paste API token" autocomplete="new-password" />
+            <button type="button" class="dskp__token-btn" id="dsk-token-paste" title="Paste from clipboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v13a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/></svg>
+              Paste
+            </button>
+            <button type="button" class="dskp__token-btn" id="dsk-token-toggle" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span data-token-toggle-label>Show</span>
+            </button>
+          </div>
+          <div class="dskp__hint" id="dsk-token-hint">Stored encrypted at rest.</div>
+        </div>
+
+        <div class="dskp__test-row" id="dsk-test-row" hidden>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+          <span id="dsk-test-msg">Authenticated · 4 zones detected</span>
+          <span class="dskp__pill dskp__pill--ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>
+            Verified
+          </span>
+        </div>
       </div>
-      <div class="modal__actions">
-        <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="submit" class="btn btn--black" id="dsk-form-save">Save</button>
+
+      <div class="dskp__foot">
+        <div class="dskp__foot-spacer"></div>
+        <button type="button" class="dskp__b" id="dsk-test-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+          Test connection
+        </button>
+        <button type="submit" class="dskp__b dskp__b--primary" id="dsk-form-save">Save key</button>
       </div>
     </form>
   </dialog>
 
-  <dialog class="modal" id="dialog-dsk-rename">
-    <form method="dialog" class="modal__inner">
-      <div class="modal__header">
-        <div><h2 class="modal__title">Rename key</h2></div>
-        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+  <!-- DSK: DNS records — improved UI -->
+  <dialog class="modal modal--dns-pro" id="dialog-dsk-dns">
+    <div class="modal__inner">
+      <div class="dnsp__head">
+        <h2 class="dnsp__title">Domain Nameservers</h2>
+        <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
       </div>
-      <input type="hidden" id="dsk-rename-id" />
-      <div class="field"><label for="dsk-rename-input">New name</label><input type="text" id="dsk-rename-input" required /></div>
-      <div class="modal__actions">
-        <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="button" class="btn btn--black" id="dsk-rename-save">Save</button>
+
+      <div class="dnsp__body">
+        <p class="dnsp__intro" id="dsk-dns-hint">Please login to the registrar where you purchased the domain (Namecheap, GoDaddy, etc) and change the name server records to point to the ones listed below.</p>
+
+        <div class="rec-list" id="dsk-dns-body"></div>
+
+        <div class="dnsp__help">
+          <div class="dnsp__help-title">Need help with name servers? Checkout the articles below</div>
+          <div class="dnsp__help-row"><span>GoDaddy:</span><a href="https://www.godaddy.com/help/change-nameservers-for-my-domains-664" target="_blank" rel="noopener">How to change GoDaddy nameservers</a></div>
+          <div class="dnsp__help-row"><span>Namecheap:</span><a href="https://www.namecheap.com/support/knowledgebase/article.aspx/767/10/how-to-change-dns-for-a-domain" target="_blank" rel="noopener">How to change Namecheap nameservers</a></div>
+        </div>
       </div>
-    </form>
+
+      <div class="dnsp__foot">
+        <div class="dnsp__foot-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          Sample records — prototype only.
+        </div>
+        <div class="dnsp__foot-right">
+          <button type="button" class="dskp__b dskp__b--primary" data-close-dialog>Done</button>
+        </div>
+      </div>
+    </div>
   </dialog>
 
   <dialog class="modal" id="dialog-dsk-delete">
     <div class="modal__inner">
       <div class="modal__header">
-        <div><h2 class="modal__title">Delete key</h2><p class="modal__hint" id="dsk-delete-msg"></p></div>
+        <div>
+          <h2 class="modal__title">Delete this key?</h2>
+          <p class="modal__hint" id="dsk-delete-msg"></p>
+        </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
       <div class="modal__actions">
@@ -224,6 +304,20 @@
   <script src="app.js"></script>
   <script src="site-shell.js"></script>
   <script>
+    // --- Hide "Add Domain" button on DSK tab ---
+    (function () {
+      var btn = document.getElementById("add-domain-btn");
+      var tabs = document.querySelectorAll('[data-tabs="domains-page"] .tab');
+      if (!btn || !tabs.length) return;
+      function sync() {
+        var active = document.querySelector('[data-tabs="domains-page"] .tab.is-active');
+        var key = active ? active.getAttribute("data-tab") : "domains";
+        btn.style.display = key === "dsk" ? "none" : "";
+      }
+      tabs.forEach(function (t) { t.addEventListener("click", function () { setTimeout(sync, 0); }); });
+      sync();
+    })();
+
     // --- Domains tab: search + status + date-added filters ---
     (function () {
       var rows = document.querySelectorAll("tr[data-domain-row]");
@@ -271,20 +365,21 @@
       var formHint = document.getElementById("dsk-form-hint");
       var editId = document.getElementById("dsk-edit-id");
       var nameIn = document.getElementById("dsk-name");
-      var domIn = document.getElementById("dsk-domains");
-      var secIn = document.getElementById("dsk-secret");
-      var secWrap = document.getElementById("dsk-secret-wrap");
-      var renameDlg = document.getElementById("dialog-dsk-rename");
-      var renameId = document.getElementById("dsk-rename-id");
-      var renameIn = document.getElementById("dsk-rename-input");
+      var provIn = document.getElementById("dsk-provider");
+      var emailIn = document.getElementById("dsk-email");
+      var tokenIn = document.getElementById("dsk-api-token");
+      var tokenHint = document.getElementById("dsk-token-hint");
+      var dnsDlg = document.getElementById("dialog-dsk-dns");
+      var dnsBody = document.getElementById("dsk-dns-body");
+      var dnsHint = document.getElementById("dsk-dns-hint");
       var delDlg = document.getElementById("dialog-dsk-delete");
       var delMsg = document.getElementById("dsk-delete-msg");
       var delPending = null;
 
       var keys = [
-        { id: "k1", name: "Meta CAPI", prefix: "nxd_sk_a3f9", domains: "offers.acme.com, refer.acme.com", created: "Mar 2, 2026", lastUsed: "2h ago" },
-        { id: "k2", name: "Lead webhook HMAC", prefix: "nxd_sk_8b21", domains: "offers.acme.com", created: "Jan 18, 2026", lastUsed: "1d ago" },
-        { id: "k3", name: "Partner API", prefix: "nxd_sk_ee02", domains: "try.acme.com", created: "Apr 1, 2026", lastUsed: "—" }
+        { id: "k1", name: "Production CF", provider: "Cloudflare", email: "ops@acme.com", prefix: "cf_api_a3f9", created: "Mar 2, 2026", lastUsed: "2h ago" },
+        { id: "k2", name: "Route53 prod", provider: "AWS Route 53", email: "infra@acme.com", prefix: "AKIA8b21", created: "Jan 18, 2026", lastUsed: "1d ago" },
+        { id: "k3", name: "Marketing DNS", provider: "GoDaddy", email: "marketing@acme.com", prefix: "gd_key_ee02", created: "Apr 1, 2026", lastUsed: "—" }
       ];
 
       function render() {
@@ -293,16 +388,18 @@
         keys.forEach(function (k) {
           var tr = document.createElement("tr");
           tr.innerHTML =
-            "<td><strong>" + escapeHtml(k.name) + "</strong></td>" +
-            "<td><code class=\"mono\">" + escapeHtml(k.prefix) + "••••••••</code></td>" +
-            "<td class=\"muted\">" + escapeHtml(k.domains) + "</td>" +
+            "<td><button type=\"button\" class=\"dsk-row-name js-dsk-edit\" data-id=\"" +
+            k.id +
+            "\" title=\"Edit key\"><strong>" +
+            escapeHtml(k.name) +
+            "</strong></button></td>" +
+            "<td>" + escapeHtml(k.provider || "—") + "</td>" +
+            "<td class=\"muted\">" + escapeHtml(k.email || "—") + "</td>" +
             "<td class=\"muted\">" + escapeHtml(k.created) + "</td>" +
-            "<td class=\"muted\">" + escapeHtml(k.lastUsed) + "</td>" +
-            "<td class=\"right\"><div class=\"actions\">" +
-            "<button type=\"button\" class=\"icon-btn js-dsk-copy\" data-id=\"" + k.id + "\" title=\"Copy key id\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg></button>" +
-            "<button type=\"button\" class=\"icon-btn js-dsk-edit\" data-id=\"" + k.id + "\" title=\"Edit\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z\"/></svg></button>" +
-            "<button type=\"button\" class=\"icon-btn js-dsk-rename\" data-id=\"" + k.id + "\" title=\"Rename\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 7V4h16v3\"/><path d=\"M9 20h6\"/><path d=\"M12 4v16\"/></svg></button>" +
-            "<button type=\"button\" class=\"icon-btn js-dsk-del\" data-id=\"" + k.id + "\" title=\"Delete\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\"/></svg></button>" +
+            "<td class=\"right\"><div class=\"actions table--dsk-actions\">" +
+            "<button type=\"button\" class=\"icon-btn js-dsk-del\" data-id=\"" + k.id + "\" title=\"Delete\" aria-label=\"Delete\">" +
+              "<svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3\"/></svg>" +
+            "</button>" +
             "</div></td>";
           body.appendChild(tr);
         });
@@ -312,14 +409,142 @@
         return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\"/g, "&quot;");
       }
 
+      function openDnsRecords(domain) {
+        if (!dnsDlg || !dnsBody) return;
+        dnsHint.textContent =
+          "Please login to the registrar where you purchased the domain (Namecheap, GoDaddy, etc) and change the name server records to point to the ones listed below.";
+        var nses = ["london.ns.cloudflare.com", "reston.ns.cloudflare.com"];
+        dnsBody.innerHTML = nses
+          .map(function (ns) {
+            return (
+              "<div class=\"rec rec--ns\">" +
+                "<div class=\"rec__value\" title=\"" + escapeHtml(ns) + "\">" + escapeHtml(ns) + "</div>" +
+                "<button type=\"button\" class=\"rec__copy js-rec-copy\" data-copy=\"" + escapeHtml(ns) + "\">Copy</button>" +
+              "</div>"
+            );
+          })
+          .join("");
+        dnsBody.setAttribute("data-records", JSON.stringify(nses));
+        dnsDlg.showModal();
+      }
+
+      // Robust copy that works inside <dialog> and sandboxed iframes
+      function copyText(text, anchorEl) {
+        if (!text) return Promise.resolve(false);
+        if (navigator.clipboard && window.isSecureContext) {
+          return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () { return execCopy(text, anchorEl); });
+        }
+        return Promise.resolve(execCopy(text, anchorEl));
+      }
+      function execCopy(text, anchorEl) {
+        try {
+          var ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          ta.style.left = "0";
+          ta.style.top = "0";
+          (anchorEl && anchorEl.ownerDocument ? anchorEl.ownerDocument.body : document.body).appendChild(ta);
+          ta.focus();
+          ta.select();
+          ta.setSelectionRange(0, ta.value.length);
+          var ok = document.execCommand("copy");
+          ta.remove();
+          return ok;
+        } catch (e) { return false; }
+      }
+
+      // Per-row copy + Copy all
+      if (dnsBody) {
+        dnsBody.addEventListener("click", function (e) {
+          var b = e.target.closest(".js-rec-copy");
+          if (!b) return;
+          var v = b.getAttribute("data-copy") || "";
+          copyText(v, b);
+          var orig = b.innerHTML;
+          b.classList.add("rec__copy--done");
+          b.innerHTML = "<svg viewBox=\"0 0 24 24\" width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12l5 5L20 6\"/></svg> Copied";
+          setTimeout(function () { b.classList.remove("rec__copy--done"); b.innerHTML = orig; }, 1400);
+        });
+      }
+      var copyAllBtn = document.getElementById("dsk-dns-copy-all");
+      if (copyAllBtn) {
+        copyAllBtn.addEventListener("click", function () {
+          var raw = dnsBody.getAttribute("data-records");
+          if (!raw) return;
+          var recs = JSON.parse(raw);
+          var text = (Array.isArray(recs) ? recs : []).map(function (r) {
+            return typeof r === "string" ? r : (r.value || "");
+          }).join("\n");
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).catch(function () { execCopy(text, copyAllBtn); });
+          } else { execCopy(text, copyAllBtn); }
+          var label = copyAllBtn.innerHTML;
+          copyAllBtn.innerHTML = "<svg viewBox=\"0 0 24 24\" width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12l5 5L20 6\"/></svg> Copied all";
+          setTimeout(function () { copyAllBtn.innerHTML = label; }, 1400);
+        });
+      }
+
+      // Token show/hide + paste + test connection (DSK form)
+      var tokToggle = document.getElementById("dsk-token-toggle");
+      if (tokToggle) {
+        tokToggle.addEventListener("click", function () {
+          var showing = tokenIn.type === "text";
+          tokenIn.type = showing ? "password" : "text";
+          tokToggle.setAttribute("aria-pressed", String(!showing));
+          var lbl = tokToggle.querySelector("[data-token-toggle-label]");
+          if (lbl) lbl.textContent = showing ? "Show" : "Hide";
+        });
+      }
+      var tokPaste = document.getElementById("dsk-token-paste");
+      if (tokPaste) {
+        tokPaste.addEventListener("click", function () {
+          if (!navigator.clipboard || !navigator.clipboard.readText) return;
+          navigator.clipboard.readText().then(function (t) {
+            if (t) { tokenIn.value = t; tokenIn.removeAttribute("aria-invalid"); }
+          }).catch(function(){});
+        });
+      }
+      var testBtn = document.getElementById("dsk-test-btn");
+      var testRow = document.getElementById("dsk-test-row");
+      var testMsg = document.getElementById("dsk-test-msg");
+      if (testBtn) {
+        testBtn.addEventListener("click", function () {
+          if (!tokenIn.value.trim() && !editId.value) { tokenIn.focus(); return; }
+          var label = testBtn.innerHTML;
+          testBtn.disabled = true;
+          testBtn.innerHTML = "Testing…";
+          setTimeout(function () {
+            testBtn.disabled = false;
+            testBtn.innerHTML = label;
+            if (testRow && testMsg) {
+              testMsg.innerHTML = "Authenticated as <strong style=\"color:var(--text)\">" + escapeHtml(emailIn.value || "ops@company.com") + "</strong> · 4 zones detected";
+              testRow.hidden = false;
+            }
+          }, 700);
+        });
+      }
+
+      function tokenPrefixFromInput(raw) {
+        var s = String(raw || "").trim();
+        if (!s) return "";
+        return s.length <= 12 ? s : s.slice(0, 12);
+      }
+
       function openAdd() {
         editId.value = "";
-        formTitle.textContent = "Add service key";
-        formHint.textContent = "Display name and which domains may use this key.";
+        formTitle.textContent = "Add a new key";
+        formHint.textContent = "Connect a DNS / CDN provider so nexus can publish, verify, and route traffic for your domains.";
         nameIn.value = "";
-        domIn.value = "";
-        secIn.value = "";
-        secWrap.hidden = false;
+        provIn.value = "";
+        emailIn.value = "";
+        tokenIn.value = "";
+        tokenIn.type = "password";
+        tokenIn.required = true;
+        tokenIn.removeAttribute("aria-invalid");
+        tokenHint.textContent = "Stored encrypted at rest.";
+        if (testRow) testRow.hidden = true;
         formDlg.showModal();
       }
 
@@ -327,11 +552,16 @@
         var k = keys.find(function (x) { return x.id === id; });
         if (!k) return;
         editId.value = id;
-        formTitle.textContent = "Edit service key";
-        formHint.textContent = "Update domains allowed for this key.";
+        formTitle.textContent = "Edit key";
+        formHint.textContent = "Update name, provider, or contact. Leave API token blank to keep the current token.";
         nameIn.value = k.name;
-        domIn.value = k.domains;
-        secWrap.hidden = true;
+        provIn.value = k.provider || "";
+        emailIn.value = k.email || "";
+        tokenIn.value = "";
+        tokenIn.type = "password";
+        tokenIn.required = false;
+        tokenHint.textContent = "Leave blank to keep existing token. Enter a new value to rotate.";
+        if (testRow) testRow.hidden = true;
         formDlg.showModal();
       }
 
@@ -341,18 +571,32 @@
         e.preventDefault();
         var id = editId.value;
         var nm = nameIn.value.trim();
-        var dm = domIn.value.trim();
-        if (!nm) return;
+        var pv = provIn.value;
+        var em = emailIn.value.trim();
+        var tok = tokenIn.value;
+        if (!nm || !pv || !em) return;
+        if (!id && !tok.trim()) {
+          tokenIn.focus();
+          tokenIn.setAttribute("aria-invalid", "true");
+          return;
+        }
         if (id) {
           var kk = keys.find(function (x) { return x.id === id; });
-          if (kk) { kk.name = nm; kk.domains = dm || kk.domains; }
+          if (kk) {
+            kk.name = nm;
+            kk.provider = pv;
+            kk.email = em;
+            var pre = tokenPrefixFromInput(tok);
+            if (pre) kk.prefix = pre;
+          }
         } else {
-          var prefix = "nxd_sk_" + Math.random().toString(36).slice(2, 6);
+          var prefix = tokenPrefixFromInput(tok) || ("tok_" + Math.random().toString(36).slice(2, 8));
           keys.push({
             id: "k" + Date.now(),
             name: nm,
+            provider: pv,
+            email: em,
             prefix: prefix,
-            domains: dm || "—",
             created: new Date().toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }),
             lastUsed: "—"
           });
@@ -361,42 +605,36 @@
         render();
       });
 
+      document.addEventListener("click", function (e) {
+        var ns = e.target.closest(".js-domain-ns");
+        if (ns) { openDnsRecords(ns.getAttribute("data-domain")); return; }
+      });
       document.getElementById("dsk-body").addEventListener("click", function (e) {
-        var t = e.target.closest(".js-dsk-copy");
+        var t = e.target.closest(".js-dsk-dns");
         if (t) {
-          var k = keys.find(function (x) { return x.id === t.getAttribute("data-id"); });
-          if (k && navigator.clipboard) navigator.clipboard.writeText(k.prefix + "•••••••• (mock)");
+          openDnsRecords(t.getAttribute("data-id"));
           return;
         }
         t = e.target.closest(".js-dsk-edit");
-        if (t) { openEdit(t.getAttribute("data-id")); return; }
-        t = e.target.closest(".js-dsk-rename");
         if (t) {
-          var kk = keys.find(function (x) { return x.id === t.getAttribute("data-id"); });
-          if (kk) {
-            renameId.value = kk.id;
-            renameIn.value = kk.name;
-            renameDlg.showModal();
-          }
+          openEdit(t.getAttribute("data-id"));
           return;
         }
         t = e.target.closest(".js-dsk-del");
         if (t) {
           delPending = t.getAttribute("data-id");
           var kk = keys.find(function (x) { return x.id === delPending; });
-          delMsg.textContent = kk ? "Remove \"" + kk.name + "\"? Integrations using it will break." : "";
+          delMsg.textContent = kk
+            ? "This will remove \"" +
+              kk.name +
+              "\" (" +
+              (kk.provider || "provider") +
+              ", " +
+              (kk.email || "—") +
+              "). DNS automation that relies on this key will stop working."
+            : "";
           delDlg.showModal();
         }
-      });
-
-      document.getElementById("dsk-rename-save").addEventListener("click", function () {
-        var id = renameId.value;
-        var nm = renameIn.value.trim();
-        if (!nm) return;
-        var kk = keys.find(function (x) { return x.id === id; });
-        if (kk) kk.name = nm;
-        renameDlg.close();
-        render();
       });
 
       document.getElementById("dsk-delete-confirm").addEventListener("click", function () {

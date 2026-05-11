@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DSK · Create key — improvements</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Canvas / artboard fills — mimic the dialog over the domains page */
+    .dlg-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(120% 80% at 50% 0%, rgba(231, 109, 47, 0.05), transparent 60%),
+        var(--bg);
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    /* Faint backdrop hint — a few row stripes peeking behind the dialog */
+    .dlg-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(var(--border) 1px, transparent 1px) 0 80px / 100% 56px;
+      opacity: 0.35;
+      mask: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+      z-index: 0;
+    }
+    .dlg-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(20, 14, 4, 0.18);
+      z-index: 1;
+    }
+    .dlg {
+      position: relative;
+      z-index: 2;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      box-shadow: 0 30px 80px rgba(26, 20, 10, 0.22), 0 2px 4px rgba(0,0,0,0.04);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      color: var(--text);
+    }
+
+    /* ---------- Shared dialog primitives (scoped, don't fight styles.css) ---------- */
+    .dlg__head {
+      padding: 20px 22px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #fffaf2 0%, var(--surface) 100%);
+    }
+    .dlg__icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      background: var(--brand-soft);
+      color: var(--brand);
+      flex-shrink: 0;
+    }
+    .dlg__icon svg { width: 20px; height: 20px; }
+    .dlg__head-text { flex: 1; min-width: 0; }
+    .dlg__eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .dlg__title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+    }
+    .dlg__sub {
+      margin: 4px 0 0;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .dlg__x {
+      appearance: none;
+      background: transparent;
+      border: 1px solid transparent;
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .dlg__x:hover { background: var(--bg); border-color: var(--border); color: var(--text); }
+    .dlg__body { padding: 18px 22px 6px; }
+    .dlg__foot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 22px 18px;
+      border-top: 1px solid var(--border);
+      background: #fbf8f1;
+    }
+    .dlg__foot-spacer { flex: 1; }
+    .dlg__hint-foot {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dlg__hint-foot svg { width: 13px; height: 13px; }
+
+    /* ---------- Form: tighter field rhythm ---------- */
+    .f { margin-bottom: 14px; }
+    .f__label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .f__label .f__opt {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .f__input,
+    .f__select {
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      border-radius: 9px;
+      padding: 9px 11px;
+      font: inherit;
+      font-size: 13px;
+      color: var(--text);
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    .f__input:focus, .f__select:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(231, 109, 47, 0.18);
+    }
+    .f__input::placeholder { color: #b6ad97; }
+    .f__hint {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .f__row { display: grid; gap: 12px; }
+    .f__row--2 { grid-template-columns: 1fr 1fr; }
+
+    /* token field with reveal + paste */
+    .token {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border-strong);
+      border-radius: 9px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .token:focus-within {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(231, 109, 47, 0.18);
+    }
+    .token__input {
+      flex: 1;
+      border: none;
+      padding: 9px 8px 9px 11px;
+      font: inherit;
+      font-size: 13px;
+      font-family: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+      color: var(--text);
+      background: transparent;
+      outline: none;
+      letter-spacing: 0.02em;
+    }
+    .token__action {
+      appearance: none;
+      background: transparent;
+      border: none;
+      border-left: 1px solid var(--border);
+      padding: 0 10px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .token__action:hover { background: var(--bg); color: var(--text); }
+    .token__action svg { width: 13px; height: 13px; }
+
+    /* status pills (for inline validation / test connection) */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .pill svg { width: 11px; height: 11px; }
+    .pill--ok { background: var(--green-soft); color: var(--green); }
+    .pill--warn { background: var(--amber-soft); color: var(--amber); }
+    .pill--err { background: #fbe2e2; color: #a31a1a; }
+    .pill--neutral { background: var(--bg); color: var(--text-muted); }
+
+    /* ---------- Provider tiles ---------- */
+    .providers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .prov {
+      appearance: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 10px 10px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+      transition: border-color 0.12s, background 0.12s, transform 0.05s;
+      position: relative;
+    }
+    .prov:hover { border-color: var(--border-strong); background: #fffdf8; }
+    .prov[aria-pressed="true"] {
+      border-color: var(--brand);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(231, 109, 47, 0.16);
+    }
+    .prov[aria-pressed="true"]::after {
+      content: "";
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--brand);
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-size: 11px 11px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .prov__logo {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      display: grid; place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .prov__name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .prov__meta {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    /* tiny section header inside dialog body */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 4px 0 10px;
+    }
+    .section-head__title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .section-head__note {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* permissions / help card */
+    .help-card {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 4px 0 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .help-card__icon {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid var(--border);
+      display: grid; place-items: center;
+      color: var(--brand);
+      flex-shrink: 0;
+    }
+    .help-card__icon svg { width: 12px; height: 12px; }
+    .help-card__body { flex: 1; min-width: 0; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+    .help-card__body strong { color: var(--text); font-weight: 600; }
+    .help-card__body a, .help-card__body button.linklike {
+      color: var(--blue);
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+    .help-card__body a:hover, .help-card__body button.linklike:hover { text-decoration: underline; }
+    .scope-list {
+      list-style: none;
+      padding: 0;
+      margin: 6px 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 6px;
+    }
+    .scope-list code {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 10.5px;
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 5px;
+      color: var(--text);
+    }
+
+    /* buttons (scoped — avoid clashes with .btn) */
+    .b {
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+      transition: background 0.1s, border-color 0.1s;
+    }
+    .b:hover { background: var(--bg-hover); }
+    .b svg { width: 13px; height: 13px; }
+    .b--primary {
+      background: var(--black);
+      border-color: var(--black);
+      color: #fff;
+    }
+    .b--primary:hover { background: #000; }
+    .b--ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-muted);
+    }
+    .b--ghost:hover { background: var(--bg-hover); color: var(--text); }
+    .b[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+    /* ---------- Stepper (v3) ---------- */
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 22px;
+      margin: -4px 0 16px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .step__dot {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      display: grid; place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .step--active { color: var(--text); }
+    .step--active .step__dot {
+      background: var(--black);
+      border-color: var(--black);
+      color: #fff;
+    }
+    .step--done .step__dot {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .step__line {
+      flex: 1;
+      height: 1px;
+      background: var(--border-strong);
+      max-width: 36px;
+    }
+
+    /* per-variant header colors */
+    .v2 .dlg__icon { background: #e4eefb; color: var(--blue); }
+    .v3 .dlg__icon { background: #e7f3eb; color: var(--green); }
+
+    /* test-connection inline result row */
+    .test-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 10px;
+      margin: -2px 0 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: #fffdf6;
+    }
+    .test-row .pill { margin-left: auto; }
+
+    /* variant 3 helper rail */
+    .rail {
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      gap: 20px;
+    }
+    .rail__aside {
+      border-left: 1px solid var(--border);
+      padding-left: 18px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    .rail__aside h4 {
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .rail__aside ol {
+      margin: 8px 0 12px;
+      padding-left: 16px;
+    }
+    .rail__aside ol li { margin-bottom: 4px; }
+    .rail__aside .doc-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--blue);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .rail__aside .doc-link svg { width: 11px; height: 11px; }
+    .rail__aside .doc-link:hover { text-decoration: underline; }
+
+    /* toggle row */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+    .toggle-row__text { flex: 1; min-width: 0; }
+    .toggle-row__title { font-size: 12.5px; font-weight: 600; color: var(--text); }
+    .toggle-row__hint { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .switch {
+      width: 32px; height: 18px;
+      border-radius: 999px;
+      background: var(--border-strong);
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+      transition: transform 0.15s;
+    }
+    .switch[aria-checked="true"] { background: var(--green); }
+    .switch[aria-checked="true"]::after { transform: translateX(14px); }
+
+    /* Notes layout */
+    .notes {
+      max-width: 720px;
+      margin: 0 auto;
+      font-family: Inter, sans-serif;
+      color: var(--text);
+      padding: 18px 24px;
+    }
+    .notes h3 { font-size: 14px; margin: 0 0 6px; }
+    .notes p { font-size: 12.5px; color: var(--text-muted); line-height: 1.55; margin: 0 0 8px; }
+    .notes ul { margin: 4px 0 0 18px; padding: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
+
+    /* "before" caption mini */
+    .before-stage { padding: 20px; }
+    .before {
+      max-width: 460px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 18px 22px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .before h2 { margin: 0 0 4px; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+    .before p.sub { margin: 0 0 14px; font-size: 12px; color: var(--text-muted); }
+    .before .lbl {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .before .inp {
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+    .before .row-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .before .row-foot .b1 {
+      border: 1px solid var(--border-strong);
+      background: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .before .row-foot .b2 {
+      border: 1px solid #111;
+      background: #111;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    /* ---------- DNS records dialog (nameservers style) ---------- */
+    .dlg--dns .dlg__head {
+      padding: 18px 22px 14px;
+      background: var(--surface);
+    }
+    .dlg--dns .dlg__head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
+    .dlg--dns .dlg__title { font-size: 19px; }
+    .dlg--dns .dlg__body { padding: 16px 22px 4px; }
+    .dlg--dns .dlg__intro {
+      margin: 0 0 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    .dlg--dns .dlg__intro strong { color: var(--text); font-weight: 600; }
+
+    .rec-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .rec {
+      border: 1px solid var(--border);
+      background: #faf7ef;
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .rec__type {
+      flex-shrink: 0;
+      width: 52px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 0;
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+    .rec__type--A { color: var(--blue); }
+    .rec__type--CNAME { color: var(--brand); }
+    .rec__type--TXT { color: var(--green); }
+    .rec__type--MX { color: var(--amber); }
+    .rec__main { flex: 1; min-width: 0; display: grid; gap: 2px; }
+    .rec__name {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+    }
+    .rec__name code {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--text);
+      background: transparent;
+      padding: 0;
+    }
+    .rec__value {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .rec__ttl {
+      flex-shrink: 0;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+    .rec__copy {
+      flex-shrink: 0;
+      appearance: none;
+      background: transparent;
+      border: none;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .rec__copy:hover { background: rgba(29, 97, 201, 0.08); }
+    .rec__copy svg { width: 13px; height: 13px; }
+    .rec__copy--done { color: var(--green); }
+
+    .dns-help {
+      margin: 4px 0 18px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .dns-help__title {
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .dns-help__row {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .dns-help__row span { color: var(--text-muted); min-width: 86px; flex-shrink: 0; }
+    .dns-help__row a {
+      color: var(--blue);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .dns-help__row a:hover { text-decoration: underline; }
+
+    .dns-actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 0 22px 18px;
+    }
+    .dns-actions-bar__left {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dns-actions-bar__left svg { width: 13px; height: 13px; }
+
+    /* shrink dialog padding on narrow */
+    @media (max-width: 520px) {
+      .rail { grid-template-columns: 1fr; }
+      .rail__aside { border-left: 0; padding-left: 0; border-top: 1px solid var(--border); padding-top: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <div id="root"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // ---------- Tiny helpers ----------
+    const Icon = ({ name, ...p }) => {
+      const props = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round", viewBox: "0 0 24 24", ...p };
+      switch (name) {
+        case "key":   return <svg {...props}><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3M14 9l3 3"/></svg>;
+        case "shield":return <svg {...props}><path d="M12 3l8 3v6c0 4.5-3.5 8.5-8 9-4.5-.5-8-4.5-8-9V6l8-3z"/></svg>;
+        case "wand":  return <svg {...props}><path d="M15 4l5 5M4 20l11-11M14 3l1 3 3 1-3 1-1 3-1-3-3-1 3-1zM4 13l.5 1.5L6 15l-1.5.5L4 17l-.5-1.5L2 15l1.5-.5z"/></svg>;
+        case "eye":   return <svg {...props}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>;
+        case "eyeOff":return <svg {...props}><path d="M3 3l18 18M10.6 6.1C11 6 11.5 6 12 6c6.5 0 10 7 10 7-1 1.7-2.3 3-3.7 4M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7c1.6 0 3-.3 4.3-.9M9.9 9.9a3 3 0 004.2 4.2"/></svg>;
+        case "paste": return <svg {...props}><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v13a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/></svg>;
+        case "check": return <svg {...props}><path d="M4 12l5 5L20 6"/></svg>;
+        case "alert": return <svg {...props}><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>;
+        case "info":  return <svg {...props}><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>;
+        case "ext":   return <svg {...props}><path d="M14 4h6v6M20 4l-9 9M19 13v6a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1h6"/></svg>;
+        case "x":     return <svg {...props}><path d="M6 6l12 12M18 6L6 18"/></svg>;
+        case "arrow": return <svg {...props}><path d="M5 12h14M13 6l6 6-6 6"/></svg>;
+        case "back":  return <svg {...props}><path d="M19 12H5M11 6l-6 6 6 6"/></svg>;
+        case "zap":   return <svg {...props}><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>;
+        case "globe": return <svg {...props}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></svg>;
+        default: return null;
+      }
+    };
+
+    const PROVIDERS = [
+      { id: "cloudflare", name: "Cloudflare",     short: "CF", color: "#F38020", meta: "DNS · CDN · Edge",   prefixSample: "cf_api_a3f9", tokenPlaceholder: "cf_api_••••••••••••••••" },
+      { id: "route53",    name: "AWS Route 53",   short: "AW", color: "#FF9900", meta: "DNS · AWS",          prefixSample: "AKIA8b21",    tokenPlaceholder: "AKIA••••••••••••••••" },
+      { id: "godaddy",    name: "GoDaddy",        short: "GD", color: "#1BDBDB", meta: "Registrar · DNS",    prefixSample: "gd_key_ee02", tokenPlaceholder: "gd_••••••••••••••••" },
+      { id: "gcdns",      name: "Google Cloud DNS",short:"GC", color: "#4285F4", meta: "DNS · GCP",          prefixSample: "ya29_b88f",   tokenPlaceholder: "ya29.••••••••••••••••" },
+      { id: "namecheap",  name: "Namecheap",      short: "NC", color: "#DE3723", meta: "Registrar · DNS",    prefixSample: "nc_key_77ab", tokenPlaceholder: "nc_••••••••••••••••" },
+      { id: "other",      name: "Other",          short: "··", color: "#6b6865", meta: "Custom endpoint",    prefixSample: "key_xxxx",    tokenPlaceholder: "Paste API token" }
+    ];
+
+    const ProvLogo = ({ p, size = 28 }) => (
+      <div className="prov__logo" style={{ width: size, height: size, background: p.color, fontSize: size > 28 ? 14 : 12 }}>
+        {p.short}
+      </div>
+    );
+
+    // ---------- V0 — "Before" snapshot ----------
+    const Before = () => (
+      <div className="before">
+        <h2>Add domain service key</h2>
+        <p className="sub">Credentials for your DNS/CDN provider. Prototype — not stored securely.</p>
+        <span className="lbl">Name</span>
+        <input className="inp" placeholder="e.g. Production Cloudflare" />
+        <span className="lbl">Provider</span>
+        <select className="inp"><option>Select provider…</option></select>
+        <span className="lbl">Email</span>
+        <input className="inp" placeholder="ops@company.com" />
+        <span className="lbl">API token</span>
+        <input className="inp" placeholder="Paste API token" type="password" />
+        <div className="row-foot">
+          <button className="b1">Cancel</button>
+          <button className="b2">Save</button>
+        </div>
+      </div>
+    );
+
+    // ---------- V1 — Refined classic ----------
+    const V1 = () => {
+      const [show, setShow] = useState(false);
+      const [token, setToken] = useState("cf_api_8a72f1b9d3e44a2c");
+      const [provider, setProvider] = useState("Cloudflare");
+      const [tested, setTested] = useState(false);
+
+      return (
+        <div className="dlg v1" role="dialog" aria-modal="true">
+          <div className="dlg__head">
+            <div className="dlg__icon"><Icon name="key" /></div>
+            <div className="dlg__head-text">
+              <div className="dlg__eyebrow">Domain service keys</div>
+              <h2 className="dlg__title">Add a new key</h2>
+              <p className="dlg__sub">Connect a DNS / CDN provider so nexus can publish, verify, and route traffic for your domains.</p>
+            </div>
+            <button className="dlg__x" aria-label="Close"><Icon name="x" /></button>
+          </div>
+
+          <div className="dlg__body">
+            <div className="f">
+              <div className="f__label">Name <span className="f__opt">visible to your team</span></div>
+              <input className="f__input" defaultValue="Production Cloudflare" />
+            </div>
+
+            <div className="f__row f__row--2">
+              <div className="f">
+                <div className="f__label">Provider</div>
+                <select className="f__select" value={provider} onChange={(e) => setProvider(e.target.value)}>
+                  {PROVIDERS.map(p => <option key={p.id}>{p.name}</option>)}
+                </select>
+              </div>
+              <div className="f">
+                <div className="f__label">Owner email</div>
+                <input className="f__input" type="email" defaultValue="ops@acme.com" />
+              </div>
+            </div>
+
+            <div className="f">
+              <div className="f__label">
+                API token
+                <span className="f__opt">
+                  <a href="#" style={{ color: "var(--blue)", textDecoration: "none", fontWeight: 600 }}>How to find it</a>
+                </span>
+              </div>
+              <div className="token">
+                <input
+                  className="token__input"
+                  type={show ? "text" : "password"}
+                  value={token}
+                  onChange={(e) => { setToken(e.target.value); setTested(false); }}
+                  placeholder="Paste API token"
+                />
+                <button type="button" className="token__action" title="Paste from clipboard" onClick={async () => {
+                  try { const t = await navigator.clipboard.readText(); if (t) { setToken(t); setTested(false); } } catch {}
+                }}>
+                  <Icon name="paste" /> Paste
+                </button>
+                <button type="button" className="token__action" onClick={() => setShow(s => !s)} aria-pressed={show}>
+                  <Icon name={show ? "eyeOff" : "eye"} /> {show ? "Hide" : "Show"}
+                </button>
+              </div>
+              <div className="f__hint">Stored encrypted at rest. Last 4 characters shown after save.</div>
+            </div>
+
+            {tested && (
+              <div className="test-row">
+                <Icon name="check" />
+                <span>Authenticated as <strong style={{color:"var(--text)"}}>ops@acme.com</strong> · 4 zones detected</span>
+                <span className="pill pill--ok"><Icon name="check" /> Verified</span>
+              </div>
+            )}
+          </div>
+
+          <div className="dlg__foot">
+            <div className="dlg__hint-foot"><Icon name="shield" /> Tokens never leave your workspace.</div>
+            <div className="dlg__foot-spacer" />
+            <button className="b b--ghost">Cancel</button>
+            <button className="b" onClick={() => setTested(true)}>
+              <Icon name="zap" /> Test connection
+            </button>
+            <button className="b b--primary">Save key</button>
+          </div>
+        </div>
+      );
+    };
+
+    // ---------- V2 — Provider-first ----------
+    const V2 = () => {
+      const [selId, setSelId] = useState("cloudflare");
+      const [show, setShow] = useState(false);
+      const [token, setToken] = useState("");
+      const sel = PROVIDERS.find(p => p.id === selId);
+
+      const scopesFor = (id) => ({
+        cloudflare: ["Zone:Read", "DNS:Edit", "SSL:Edit"],
+        route53:    ["route53:ChangeResourceRecordSets", "route53:ListHostedZones"],
+        godaddy:    ["dns:read", "dns:write"],
+        gcdns:      ["dns.changes.create", "dns.managedZones.list"],
+        namecheap:  ["domains.dns.setHosts", "domains.getList"],
+        other:      ["Read", "Write"]
+      }[id] || []);
+
+      return (
+        <div className="dlg v2" role="dialog" aria-modal="true">
+          <div className="dlg__head">
+            <div className="dlg__icon"><Icon name="globe" /></div>
+            <div className="dlg__head-text">
+              <div className="dlg__eyebrow">Step · Add domain service key</div>
+              <h2 className="dlg__title">Pick a provider, then paste a token</h2>
+              <p className="dlg__sub">We'll auto-detect zones and configure routing once the connection is verified.</p>
+            </div>
+            <button className="dlg__x" aria-label="Close"><Icon name="x" /></button>
+          </div>
+
+          <div className="dlg__body">
+            <div className="section-head">
+              <span className="section-head__title">Provider</span>
+              <span className="section-head__note">{PROVIDERS.length} supported · don't see yours? <a href="#" style={{color:"var(--blue)", fontWeight:600, textDecoration:"none"}}>Request</a></span>
+            </div>
+            <div className="providers">
+              {PROVIDERS.map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className="prov"
+                  aria-pressed={selId === p.id}
+                  onClick={() => setSelId(p.id)}
+                >
+                  <ProvLogo p={p} />
+                  <div>
+                    <div className="prov__name">{p.name}</div>
+                    <div className="prov__meta">{p.meta}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="help-card">
+              <div className="help-card__icon"><Icon name="shield" /></div>
+              <div className="help-card__body">
+                <strong>{sel.name} requires these scopes</strong>
+                <ul className="scope-list">
+                  {scopesFor(selId).map(s => <li key={s}><code>{s}</code></li>)}
+                </ul>
+                <div style={{marginTop:6}}>
+                  <button className="linklike">Create a scoped token in {sel.name}</button> · <button className="linklike">Read docs</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="f">
+              <div className="f__label">Key name <span className="f__opt">just a label</span></div>
+              <input className="f__input" defaultValue={`${sel.name} – production`} />
+            </div>
+
+            <div className="f__row f__row--2">
+              <div className="f">
+                <div className="f__label">Owner email</div>
+                <input className="f__input" type="email" placeholder="ops@company.com" />
+              </div>
+              <div className="f">
+                <div className="f__label">Environment <span className="f__opt">optional</span></div>
+                <select className="f__select" defaultValue="Production">
+                  <option>Production</option>
+                  <option>Staging</option>
+                  <option>Development</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="f">
+              <div className="f__label">
+                API token
+                <span className="f__opt">
+                  <span className="pill pill--neutral"><Icon name="info" /> Encrypted at rest</span>
+                </span>
+              </div>
+              <div className="token">
+                <input
+                  className="token__input"
+                  type={show ? "text" : "password"}
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  placeholder={sel.tokenPlaceholder}
+                />
+                <button type="button" className="token__action" onClick={() => setShow(s => !s)}>
+                  <Icon name={show ? "eyeOff" : "eye"} /> {show ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="dlg__foot">
+            <div className="dlg__hint-foot"><Icon name="shield" /> Prototype — not stored securely.</div>
+            <div className="dlg__foot-spacer" />
+            <button className="b b--ghost">Cancel</button>
+            <button className="b b--primary">
+              Save & verify <Icon name="arrow" />
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    // ---------- V3 — Two-step wizard with help rail ----------
+    const V3 = () => {
+      const [step, setStep] = useState(1);
+      const [selId, setSelId] = useState("cloudflare");
+      const [show, setShow] = useState(false);
+      const [autoDetect, setAutoDetect] = useState(true);
+      const sel = PROVIDERS.find(p => p.id === selId);
+
+      const docSteps = ({
+        cloudflare: ["Open Cloudflare dashboard → My Profile → API Tokens.", "Create a token with template \"Edit zone DNS\".", "Scope it to the zones you want nexus to manage."],
+        route53:    ["IAM → Users → Create user (programmatic access).", "Attach AmazonRoute53FullAccess (or a scoped policy).", "Copy the Access key ID and Secret access key."],
+        godaddy:    ["Visit developer.godaddy.com → API Keys.", "Generate a Production key + secret.", "Paste below as KEY:SECRET."],
+        gcdns:      ["IAM → Service Accounts → New service account.", "Grant role \"DNS Administrator\".", "Create a JSON key and paste its contents."],
+        namecheap:  ["Profile → Tools → Namecheap API Access.", "Whitelist your nexus egress IP.", "Copy the API key for this account."],
+        other:      ["Use any provider supporting bearer auth.", "Paste the endpoint and token below.", "We'll detect record support on first use."]
+      })[selId];
+
+      return (
+        <div className="dlg v3" role="dialog" aria-modal="true">
+          <div className="dlg__head">
+            <div className="dlg__icon"><Icon name="wand" /></div>
+            <div className="dlg__head-text">
+              <div className="dlg__eyebrow">Domain service keys</div>
+              <h2 className="dlg__title">{step === 1 ? "Connect a DNS provider" : `Sign in to ${sel.name}`}</h2>
+              <p className="dlg__sub">
+                {step === 1
+                  ? "Pick the service that hosts the domains you want nexus to publish to."
+                  : "Generate a scoped token and paste it below — we'll verify before saving."}
+              </p>
+            </div>
+            <button className="dlg__x" aria-label="Close"><Icon name="x" /></button>
+          </div>
+
+          <div className="steps" aria-label="Progress">
+            <div className={`step ${step === 1 ? "step--active" : "step--done"}`}>
+              <div className="step__dot">{step === 1 ? "1" : <Icon name="check" />}</div>
+              <span>Provider</span>
+            </div>
+            <div className="step__line" />
+            <div className={`step ${step === 2 ? "step--active" : ""}`}>
+              <div className="step__dot">2</div>
+              <span>Credentials</span>
+            </div>
+            <div className="step__line" />
+            <div className="step">
+              <div className="step__dot">3</div>
+              <span>Verify</span>
+            </div>
+          </div>
+
+          <div className="dlg__body">
+            {step === 1 && (
+              <>
+                <div className="providers">
+                  {PROVIDERS.map(p => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className="prov"
+                      aria-pressed={selId === p.id}
+                      onClick={() => setSelId(p.id)}
+                    >
+                      <ProvLogo p={p} />
+                      <div>
+                        <div className="prov__name">{p.name}</div>
+                        <div className="prov__meta">{p.meta}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="toggle-row">
+                  <div className="toggle-row__text">
+                    <div className="toggle-row__title">Auto-detect zones after save</div>
+                    <div className="toggle-row__hint">We'll list your hosted zones so you can attach domains in one click.</div>
+                  </div>
+                  <div className="switch" role="switch" aria-checked={autoDetect} onClick={() => setAutoDetect(v => !v)} />
+                </div>
+              </>
+            )}
+
+            {step === 2 && (
+              <div className="rail">
+                <div>
+                  <div className="f">
+                    <div className="f__label">Key name <span className="f__opt">visible to your team</span></div>
+                    <input className="f__input" defaultValue={`${sel.name} – production`} />
+                  </div>
+                  <div className="f">
+                    <div className="f__label">Owner email</div>
+                    <input className="f__input" type="email" placeholder="ops@company.com" />
+                  </div>
+                  <div className="f">
+                    <div className="f__label">
+                      API token
+                      <span className="f__opt">
+                        <span className="pill pill--warn"><Icon name="alert" /> Scoped, not root</span>
+                      </span>
+                    </div>
+                    <div className="token">
+                      <input
+                        className="token__input"
+                        type={show ? "text" : "password"}
+                        defaultValue=""
+                        placeholder={sel.tokenPlaceholder}
+                      />
+                      <button type="button" className="token__action">
+                        <Icon name="paste" /> Paste
+                      </button>
+                      <button type="button" className="token__action" onClick={() => setShow(s => !s)}>
+                        <Icon name={show ? "eyeOff" : "eye"} /> {show ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <aside className="rail__aside">
+                  <h4>How to get a token</h4>
+                  <ol>
+                    {docSteps.map((d, i) => <li key={i}>{d}</li>)}
+                  </ol>
+                  <a href="#" className="doc-link">Open {sel.name} docs <Icon name="ext" /></a>
+                </aside>
+              </div>
+            )}
+          </div>
+
+          <div className="dlg__foot">
+            <div className="dlg__hint-foot">
+              {step === 1
+                ? <><Icon name="info" /> Step 1 of 3 · choose a provider</>
+                : <><Icon name="shield" /> Encrypted in transit & at rest</>}
+            </div>
+            <div className="dlg__foot-spacer" />
+            {step === 2 && (
+              <button className="b" onClick={() => setStep(1)}>
+                <Icon name="back" /> Back
+              </button>
+            )}
+            <button className="b b--ghost">Cancel</button>
+            {step === 1 ? (
+              <button className="b b--primary" onClick={() => setStep(2)}>
+                Continue <Icon name="arrow" />
+              </button>
+            ) : (
+              <button className="b b--primary">
+                Verify & save
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // ---------- DNS records dialog (nameservers-style) ----------
+    const RecRow = ({ rec }) => {
+      const [copied, setCopied] = useState(false);
+      const onCopy = async () => {
+        try { await navigator.clipboard.writeText(rec.value); } catch {}
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1400);
+      };
+      return (
+        <div className="rec">
+          <div className={`rec__type rec__type--${rec.type}`}>{rec.type}</div>
+          <div className="rec__main">
+            <div className="rec__name">Name <code>{rec.name}</code></div>
+            <div className="rec__value" title={rec.value}>{rec.value}</div>
+          </div>
+          <div className="rec__ttl">TTL {rec.ttl}</div>
+          <button type="button" className={`rec__copy ${copied ? "rec__copy--done" : ""}`} onClick={onCopy}>
+            {copied ? <><Icon name="check" /> Copied</> : <>Copy</>}
+          </button>
+        </div>
+      );
+    };
+
+    const DnsDialog = () => {
+      const records = [
+        { type: "A",     name: "@",              value: "192.0.2.10",          ttl: "Auto" },
+        { type: "CNAME", name: "www",            value: "sites.nexus.test",    ttl: "300"  },
+        { type: "TXT",   name: "_nexus-verify",  value: "nexus-key=k1-a3f9c2", ttl: "3600" }
+      ];
+      const [copiedAll, setCopiedAll] = useState(false);
+      const copyAll = async () => {
+        const text = records.map(r => `${r.type}\t${r.name}\t${r.value}\t${r.ttl}`).join("\n");
+        try { await navigator.clipboard.writeText(text); } catch {}
+        setCopiedAll(true);
+        setTimeout(() => setCopiedAll(false), 1400);
+      };
+      return (
+        <div className="dlg dlg--dns" role="dialog" aria-modal="true">
+          <div className="dlg__head">
+            <div className="dlg__head-row">
+              <h2 className="dlg__title">DNS records</h2>
+              <button className="dlg__x" aria-label="Close"><Icon name="x" /></button>
+            </div>
+          </div>
+
+          <div className="dlg__body">
+            <p className="dlg__intro">
+              Add the records below at your DNS provider (Cloudflare, GoDaddy, Route&nbsp;53, etc.) so nexus can publish and verify <strong>Production CF</strong>. Changes can take a few minutes to propagate.
+            </p>
+
+            <div className="rec-list">
+              {records.map((r, i) => <RecRow key={i} rec={r} />)}
+            </div>
+
+            <div className="dns-help">
+              <div className="dns-help__title">Need help with DNS records? Checkout the articles below</div>
+              <div className="dns-help__row"><span>Cloudflare:</span><a href="#">How to add records in Cloudflare</a></div>
+              <div className="dns-help__row"><span>GoDaddy:</span><a href="#">How to add records in GoDaddy</a></div>
+              <div className="dns-help__row"><span>Namecheap:</span><a href="#">How to add records in Namecheap</a></div>
+            </div>
+          </div>
+
+          <div className="dns-actions-bar">
+            <span className="dns-actions-bar__left"><Icon name="info" /> Sample records — prototype only.</span>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button className="b" onClick={copyAll}>
+                <Icon name="paste" /> {copiedAll ? "Copied all" : "Copy all"}
+              </button>
+              <button className="b b--primary">Done</button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ---------- Notes ----------
+    const Notes = () => (
+      <div className="notes">
+        <h3>What changed</h3>
+        <p>The original dialog is functional but flat: tiny uppercase labels, a long stack of identical inputs, no signal that the token is sensitive, no verification before save, and no provider context. The three directions below explore progressively richer takes on the same flow.</p>
+        <ul>
+          <li><strong>Refined</strong> — Same shape, tightened. Header gets a key icon + supporting copy; the token field gets paste/show controls + a security footer line; a "Test connection" button surfaces verification before save.</li>
+          <li><strong>Provider-first</strong> — Provider selection moves up front as visual tiles. The dialog adapts its scopes hint, token placeholder, and key name to whatever you pick — most fields only matter once a provider is chosen.</li>
+          <li><strong>Wizard + help rail</strong> — Splits the work into <em>Provider → Credentials → Verify</em> and pairs the credentials step with provider-specific instructions on the right, so users don't have to leave to find the token.</li>
+        </ul>
+        <p style={{marginTop: 10}}>All three preserve the existing visual language: cream canvas, Inter, dark primary button, brand orange, 1px borders. Drop the one that fits your team's pace — or mix (e.g. Refined header + provider tiles).</p>
+      </div>
+    );
+
+    // ---------- Canvas ----------
+    const { DesignCanvas, DCSection, DCArtboard } = window;
+
+    function App() {
+      return (
+        <DesignCanvas title="DSK · Create key — improvements" initialZoom={0.85}>
+          <DCSection id="before" title="Today" subtitle="The current Add domain service key dialog in domains.html">
+            <DCArtboard id="before" label="Current — domains.html" width={560} height={520}>
+              <div className="dlg-stage before-stage">
+                <Before />
+              </div>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="after" title="Three directions" subtitle="From a gentle polish to a guided wizard. All match the nexus visual language.">
+            <DCArtboard id="v1" label="A · Refined classic" width={700} height={720}>
+              <div className="dlg-stage"><V1 /></div>
+            </DCArtboard>
+            <DCArtboard id="v2" label="B · Provider-first" width={700} height={820}>
+              <div className="dlg-stage"><V2 /></div>
+            </DCArtboard>
+            <DCArtboard id="v3" label="C · Two-step wizard" width={760} height={820}>
+              <div className="dlg-stage"><V3 /></div>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="dns" title="DNS records dialog" subtitle="Re-skinned in the nameservers pattern you sent — keeps the nexus theme.">
+            <DCArtboard id="dns-records" label="DNS records — list + copy" width={700} height={680}>
+              <div className="dlg-stage"><DnsDialog /></div>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="notes" title="Notes">
+            <DCArtboard id="notes" label="What changed & why" width={780} height={320}>
+              <Notes />
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
