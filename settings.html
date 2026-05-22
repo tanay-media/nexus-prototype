@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Settings · nexus</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <div class="top-strip"></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <a href="index.html" class="brand-tile" title="Home" aria-label="nexus"><img src="img/nexus-logo.svg" alt="nexus" class="brand-tile__img" width="24" height="24" decoding="async" /></a>
+      <nav class="nav">
+        <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+        <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="widgets.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
+        <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
+        <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
+        <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
+        <a href="settings.html" data-nav="settings" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</a>
+      </nav>
+      <div class="avatar">K</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1>Settings</h1>
+        <div class="page-header__right">
+          <span class="ws-pill">
+            <span class="ws-pill__dot"></span>
+            ACME Growth
+          </span>
+        </div>
+      </div>
+
+      <div class="page-body" data-tabs="settings-page">
+        <div class="tabs">
+          <button type="button" class="tab is-active" data-tab="dest">Conversion destinations</button>
+          <button type="button" class="tab" data-tab="members" disabled title="Coming later">Members</button>
+          <button type="button" class="tab" data-tab="api" disabled title="Coming later">API & webhooks</button>
+        </div>
+
+        <!-- ============================================================
+             Conversion destinations
+             ============================================================ -->
+        <section data-tab-panel="dest">
+          <div class="settings-intro">
+            <div>
+              <h2 class="settings-intro__title">Conversion destinations</h2>
+              <p class="settings-intro__sub">
+                Where Nexus fires server-side conversions for landers in this workspace. Each row is one
+                destination (e.g. one Meta pixel + token). Mark one as <strong>default</strong> — every
+                lander uses it unless the lander picks a specific destination. Secrets are stored in the
+                vault; only references are saved with landers.
+              </p>
+            </div>
+            <button class="btn btn--black" id="cd-add-btn">+ Add destination</button>
+          </div>
+
+          <div class="card cd-card">
+            <div class="table-scroll" role="region" aria-label="Conversion destinations">
+              <table class="table table--cd" id="cd-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Buy source</th>
+                    <th>Identifiers</th>
+                    <th>Events</th>
+                    <th>Default</th>
+                    <th class="right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="cd-body"></tbody>
+              </table>
+            </div>
+            <div class="cd-empty" id="cd-empty" hidden>
+              <div class="cd-empty__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+              </div>
+              <h3>No conversion destinations yet</h3>
+              <p>Add a destination so Nexus can fire server-side conversions to Meta, Google, or Taboola when your landers convert.</p>
+              <button class="btn btn--black" id="cd-add-empty">+ Add destination</button>
+            </div>
+          </div>
+
+          <div class="cd-help">
+            <div class="cd-help__title">How resolution works</div>
+            <div class="cd-help__steps">
+              <div class="cd-help__step"><span class="cd-help__num">1</span><div><strong>Lander picks one</strong> — or inherits this workspace's default.</div></div>
+              <div class="cd-help__step"><span class="cd-help__num">2</span><div><strong>On publish</strong>, Nexus resolves the destination + any overrides into a single config and ships it with the lander.</div></div>
+              <div class="cd-help__step"><span class="cd-help__num">3</span><div><strong>On a MAX postback</strong>, dispatch fires to the buy source using <code>visit_id</code> data + <code>conversion_id</code> as <code>event_id</code>.</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section data-tab-panel="members" hidden></section>
+        <section data-tab-panel="api" hidden></section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ============================================================
+       Add / edit destination dialog
+       ============================================================ -->
+  <dialog class="modal modal--cd" id="dialog-cd-form">
+    <form method="dialog" class="modal__inner" id="form-cd" autocomplete="off">
+      <div class="dskp__head">
+        <div class="dskp__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l4 4 14-14"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="dskp__head-text">
+          <div class="dskp__eyebrow">Conversion destination</div>
+          <h2 class="dskp__title" id="cd-form-title">Add destination</h2>
+          <p class="dskp__sub" id="cd-form-hint">Save credentials for one buy source. You can add more destinations later and switch the default at any time.</p>
+        </div>
+        <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="dskp__body">
+        <input type="hidden" id="cd-edit-id" value="" />
+
+        <div class="dskp__field">
+          <div class="dskp__label">Buy source</div>
+          <div class="cd-providers" role="radiogroup" aria-label="Buy source">
+            <button type="button" class="cd-prov" data-source="facebook" aria-pressed="true">
+              <span class="cd-prov__logo cd-prov__logo--fb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>
+              <div>
+                <div class="cd-prov__name">Meta (Facebook)</div>
+                <div class="cd-prov__meta">CAPI · Pixel + token</div>
+              </div>
+            </button>
+            <button type="button" class="cd-prov" data-source="google" aria-pressed="false">
+              <span class="cd-prov__logo cd-prov__logo--g"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg></span>
+              <div>
+                <div class="cd-prov__name">Google Ads</div>
+                <div class="cd-prov__meta">Offline conversion upload</div>
+              </div>
+            </button>
+            <button type="button" class="cd-prov" data-source="taboola" aria-pressed="false">
+              <span class="cd-prov__logo cd-prov__logo--tb">Tb</span>
+              <div>
+                <div class="cd-prov__name">Taboola</div>
+                <div class="cd-prov__meta">S2S conversion</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="dskp__field">
+          <div class="dskp__label">Display name</div>
+          <input class="dskp__input" type="text" id="cd-name" required placeholder="e.g. Meta — ACME Growth" />
+        </div>
+
+        <!-- Facebook fields -->
+        <div data-source-fields="facebook">
+          <div class="dskp__row dskp__row--2">
+            <div class="dskp__field">
+              <div class="dskp__label">Pixel ID <span class="dskp__opt"><a href="https://www.facebook.com/business/help/952192354843755" target="_blank" rel="noopener">Find it</a></span></div>
+              <input class="dskp__input" type="text" id="cd-fb-pixel" placeholder="123456789012345" inputmode="numeric" />
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Action source</div>
+              <select class="dskp__select" id="cd-fb-action-source">
+                <option value="website">website</option>
+                <option value="app">app</option>
+                <option value="chat">chat</option>
+                <option value="email">email</option>
+                <option value="phone_call">phone_call</option>
+                <option value="physical_store">physical_store</option>
+                <option value="system_generated">system_generated</option>
+                <option value="other">other</option>
+              </select>
+            </div>
+          </div>
+          <div class="dskp__field">
+            <div class="dskp__label">
+              CAPI access token
+              <span class="dskp__opt"><a href="https://developers.facebook.com/docs/marketing-api/conversions-api/get-started#access-token" target="_blank" rel="noopener">Generate one</a></span>
+            </div>
+            <div class="dskp__token">
+              <input id="cd-fb-token" type="password" placeholder="EAAB••••••••••••••••" />
+              <button type="button" class="dskp__token-btn" data-token-paste data-target="cd-fb-token" title="Paste from clipboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/></svg>
+                Paste
+              </button>
+              <button type="button" class="dskp__token-btn" data-token-toggle data-target="cd-fb-token" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span data-token-toggle-label>Show</span>
+              </button>
+            </div>
+            <div class="dskp__hint">Stored as a vault reference. Never synced in plaintext to Nexus.</div>
+          </div>
+        </div>
+
+        <!-- Google fields -->
+        <div data-source-fields="google" hidden>
+          <div class="dskp__row dskp__row--2">
+            <div class="dskp__field">
+              <div class="dskp__label">Customer ID</div>
+              <input class="dskp__input" type="text" id="cd-g-customer" placeholder="123-456-7890" />
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Conversion action ID</div>
+              <input class="dskp__input" type="text" id="cd-g-action" placeholder="customers/123/conversionActions/4567" />
+            </div>
+          </div>
+          <div class="dskp__field">
+            <div class="dskp__label">OAuth refresh token</div>
+            <div class="dskp__token">
+              <input id="cd-g-token" type="password" placeholder="1//••••••••••••••••" />
+              <button type="button" class="dskp__token-btn" data-token-paste data-target="cd-g-token">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/></svg>
+                Paste
+              </button>
+              <button type="button" class="dskp__token-btn" data-token-toggle data-target="cd-g-token" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span data-token-toggle-label>Show</span>
+              </button>
+            </div>
+            <div class="dskp__hint">Stored as a vault reference. Never synced in plaintext to Nexus.</div>
+          </div>
+        </div>
+
+        <!-- Taboola fields -->
+        <div data-source-fields="taboola" hidden>
+          <div class="dskp__row dskp__row--2">
+            <div class="dskp__field">
+              <div class="dskp__label">Advertiser ID</div>
+              <input class="dskp__input" type="text" id="cd-t-advertiser" placeholder="123456" />
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">S2S secret</div>
+              <input class="dskp__input" type="password" id="cd-t-secret" placeholder="••••••••" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Event map (shared) -->
+        <div class="dskp__field">
+          <div class="dskp__label">Event map</div>
+          <div class="cd-eventmap-head">
+            <div>
+              <div class="cd-eventmap-head__name">Advertiser event</div>
+              <div class="cd-eventmap-head__sub">from postback · <code>conversion_type</code></div>
+            </div>
+            <div></div>
+            <div>
+              <div class="cd-eventmap-head__name" data-source-event-label>Meta event name</div>
+              <div class="cd-eventmap-head__sub" data-source-event-sub>sent in CAPI · <code>event_name</code></div>
+            </div>
+            <div></div>
+          </div>
+          <div class="cd-eventmap" id="cd-eventmap">
+            <!-- rows injected by JS -->
+          </div>
+          <button type="button" class="cd-eventmap__add" id="cd-eventmap-add">+ Add mapping</button>
+        </div>
+
+        <label class="cd-default-check">
+          <input type="checkbox" id="cd-set-default" />
+          <span>Set as workspace default after saving</span>
+        </label>
+
+        <!-- ============= Test event panel (collapsible) ============= -->
+        <div class="cd-test" id="cd-test-panel" hidden>
+          <div class="cd-test__head">
+            <div>
+              <div class="cd-test__title">Send a test event</div>
+              <div class="cd-test__sub">Fires a single event using this destination's credentials. Use a test code to keep it out of production reporting.</div>
+            </div>
+            <button type="button" class="cd-test__x" id="cd-test-close" aria-label="Close test panel">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+
+          <div class="cd-test__form">
+            <div class="cd-test__row">
+              <div class="dskp__field" style="margin:0;flex:1">
+                <div class="dskp__label">Event name</div>
+                <select class="dskp__select" id="cd-test-event">
+                  <option value="Lead">Lead</option>
+                  <option value="Purchase">Purchase</option>
+                  <option value="ViewContent">ViewContent</option>
+                  <option value="AddToCart">AddToCart</option>
+                  <option value="CompleteRegistration">CompleteRegistration</option>
+                </select>
+              </div>
+              <div class="dskp__field" style="margin:0;flex:1">
+                <div class="dskp__label">Test event code <span class="dskp__opt">optional</span></div>
+                <input class="dskp__input" type="text" id="cd-test-code" placeholder="TEST12345" />
+              </div>
+            </div>
+            <div class="cd-test__row">
+              <div class="dskp__field" style="margin:0;flex:1">
+                <div class="dskp__label">Sample value</div>
+                <input class="dskp__input" type="text" id="cd-test-value" value="49.00" />
+              </div>
+              <div class="dskp__field" style="margin:0;width:120px">
+                <div class="dskp__label">Currency</div>
+                <select class="dskp__select" id="cd-test-currency">
+                  <option>USD</option><option>EUR</option><option>GBP</option><option>INR</option>
+                </select>
+              </div>
+              <div class="dskp__field" style="margin:0;align-self:flex-end">
+                <button type="button" class="dskp__b dskp__b--primary" id="cd-test-run">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+                  Run test
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cd-test__result" id="cd-test-result" hidden></div>
+        </div>
+      </div>
+
+      <div class="dskp__foot">
+        <div class="dskp__foot-spacer"></div>
+        <button type="button" class="dskp__b dskp__b--ghost" data-close-dialog>Cancel</button>
+        <button type="button" class="dskp__b" id="cd-test-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+          Send test event
+        </button>
+        <button type="submit" class="dskp__b dskp__b--primary" id="cd-save-btn">Save destination</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete confirm -->
+  <dialog class="modal modal--dsk-pro" id="dialog-cd-delete">
+    <div class="modal__inner">
+      <div class="dskp__head">
+        <div class="dskp__icon" style="background:#fbe2e2;color:#a31a1a" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+        </div>
+        <div class="dskp__head-text">
+          <h2 class="dskp__title">Delete destination?</h2>
+          <p class="dskp__sub" id="cd-delete-msg"></p>
+        </div>
+        <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="dskp__foot">
+        <div class="dskp__foot-spacer"></div>
+        <button type="button" class="dskp__b dskp__b--ghost" data-close-dialog>Cancel</button>
+        <button type="button" class="dskp__b dskp__b--primary" id="cd-delete-confirm" style="background:#a31a1a;border-color:#a31a1a">Delete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+  <script src="site-shell.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>
