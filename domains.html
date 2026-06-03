@@ -68,7 +68,7 @@
                 <th class="right"></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="domains-tbody">
               <tr class="domain-row" data-domain-row data-domain="offers.acme.com" data-workspace="ACME Growth" data-status="active" data-added="2026-04-16">
                 <td>
                   <strong class="mono">offers.acme.com</strong>
@@ -302,9 +302,144 @@
     </div>
   </dialog>
 
+  <!-- Add Domain dialog -->
+  <dialog class="modal modal--dsk-pro" id="dialog-add-domain">
+    <form method="dialog" class="modal__inner" id="form-add-domain" autocomplete="off">
+      <div class="dskp__head">
+        <div class="dskp__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+        </div>
+        <div class="dskp__head-text">
+          <div class="dskp__eyebrow">Domains</div>
+          <h2 class="dskp__title">Add a domain</h2>
+          <p class="dskp__sub">Connect a domain to this workspace, then point its nameservers to Nexus. Pick a service key to automate DNS.</p>
+        </div>
+        <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="dskp__body">
+        <div class="dskp__field">
+          <div class="dskp__label">Domain name</div>
+          <input class="dskp__input" type="text" id="add-domain-name" required placeholder="e.g. promo.acme.com" autocomplete="off" />
+          <div class="dskp__hint" id="add-domain-name-err" hidden style="color:#a31a1a">Enter a valid domain like <strong>promo.acme.com</strong> (no http://, no path).</div>
+        </div>
+
+        <div class="dskp__row dskp__row--2">
+          <div class="dskp__field">
+            <div class="dskp__label">Workspace</div>
+            <select class="dskp__select" id="add-domain-ws">
+              <option>All workspaces</option>
+              <option>ACME Growth</option>
+              <option>FinanceEdge</option>
+            </select>
+          </div>
+          <div class="dskp__field">
+            <div class="dskp__label">Service key <span class="dskp__opt">required for DNS automation</span></div>
+            <select class="dskp__select" id="add-domain-key" required>
+              <option value="">Select a service key…</option>
+            </select>
+            <div class="dskp__hint" id="add-domain-key-err" hidden style="color:#a31a1a">Pick a service key to continue.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dskp__foot">
+        <div class="dskp__foot-spacer"></div>
+        <button type="button" class="dskp__b dskp__b--ghost" data-close-dialog>Cancel</button>
+        <button type="submit" class="dskp__b dskp__b--primary">Add domain</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="app.js"></script>
   <script src="site-shell.js"></script>
+  <script src="thumbs.js"></script>
   <script>
+    // --- Add Domain dialog ---
+    (function () {
+      var openBtn = document.getElementById("add-domain-btn");
+      var dlg = document.getElementById("dialog-add-domain");
+      if (!openBtn || !dlg) return;
+      var form = document.getElementById("form-add-domain");
+      var nameIn = document.getElementById("add-domain-name");
+      var wsIn = document.getElementById("add-domain-ws");
+      var keyIn = document.getElementById("add-domain-key");
+      var nameErr = document.getElementById("add-domain-name-err");
+      var keyErr = document.getElementById("add-domain-key-err");
+      var tbody = document.getElementById("domains-tbody");
+
+      function populateKeys() {
+        var keys = window.__dskKeys || [];
+        keyIn.innerHTML = '<option value="">Select a service key…</option>' +
+          keys.map(function (k) {
+            return '<option value="' + k.id + '">' + k.name + " · " + (k.provider || "—") + '</option>';
+          }).join("");
+      }
+
+      function open() {
+        populateKeys();
+        nameIn.value = "";
+        wsIn.value = "All workspaces";
+        keyIn.value = "";
+        nameErr.hidden = true;
+        keyErr.hidden = true;
+        nameIn.removeAttribute("aria-invalid");
+        dlg.showModal();
+        setTimeout(function () { nameIn.focus(); }, 30);
+      }
+      openBtn.addEventListener("click", open);
+
+      function normalizeDomain(v) {
+        return String(v || "").trim().toLowerCase()
+          .replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/\s+/g, "");
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var domain = normalizeDomain(nameIn.value);
+        var valid = /^([a-z0-9-]+\.)+[a-z]{2,}$/.test(domain);
+        if (!valid) {
+          nameErr.hidden = false;
+          nameIn.setAttribute("aria-invalid", "true");
+          nameIn.focus();
+          return;
+        }
+        var ws = wsIn.value;
+        var keyId = keyIn.value;
+        if (!keyId) {
+          keyErr.hidden = false;
+          keyIn.focus();
+          return;
+        }
+        keyErr.hidden = true;
+        var keyName = keyId ? (keyIn.options[keyIn.selectedIndex].text) : "";
+
+        var tr = document.createElement("tr");
+        tr.className = "domain-row";
+        tr.setAttribute("data-domain-row", "");
+        tr.setAttribute("data-domain", domain);
+        tr.setAttribute("data-workspace", ws);
+        tr.setAttribute("data-status", "pending");
+        tr.setAttribute("data-added", new Date().toISOString().slice(0, 10));
+        tr.innerHTML =
+          '<td><strong class="mono">' + domain + '</strong>' +
+            '<div class="domain-row__meta">0 landers' + (keyName ? ' · <span class="muted">key: ' + keyName + '</span>' : '') + '</div>' +
+          '</td>' +
+          '<td><span class="badge badge--pending">Pending</span></td>' +
+          '<td>' + ws + '</td>' +
+          '<td class="muted">just now</td>' +
+          '<td class="right"><button class="shell-btn js-edit-shell" data-domain="' + domain + '">Site shell</button></td>' +
+          '<td class="right"><button type="button" class="icon-btn js-domain-ns" data-domain="' + domain + '" title="Show nameservers" aria-label="Show nameservers"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></td>';
+        tbody.insertBefore(tr, tbody.firstChild);
+        tr.style.background = "var(--brand-soft)";
+        setTimeout(function () { tr.style.transition = "background 0.6s"; tr.style.background = ""; }, 400);
+
+        dlg.close();
+      });
+    })();
+
     // --- Hide "Add Domain" button on DSK tab ---
     (function () {
       var btn = document.getElementById("add-domain-btn");
@@ -382,6 +517,7 @@
         { id: "k2", name: "Route53 prod", provider: "AWS Route 53", email: "infra@acme.com", prefix: "AKIA8b21", created: "Jan 18, 2026", lastUsed: "1d ago" },
         { id: "k3", name: "Marketing DNS", provider: "GoDaddy", email: "marketing@acme.com", prefix: "gd_key_ee02", created: "Apr 1, 2026", lastUsed: "—" }
       ];
+      window.__dskKeys = keys;
 
       function render() {
         if (!body) return;

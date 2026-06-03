@@ -585,6 +585,8 @@ button[hidden],
   height: 28px;
   border-radius: 4px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--bg) 72%, var(--border-strong) 28%), color-mix(in srgb, var(--bg) 58%, var(--border-strong) 42%));
+  background-size: cover;
+  background-position: top center;
   border: 1px solid var(--border-strong);
   display: inline-block;
   flex-shrink: 0;

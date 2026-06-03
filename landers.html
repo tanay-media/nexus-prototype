@@ -306,6 +306,7 @@
   </dialog>
 
   <script src="app.js"></script>
+  <script src="thumbs.js"></script>
   <script>
     // --------------------------------------------------------------------
     // Data — published landers (drafts live as static HTML in the panel)
@@ -578,7 +579,7 @@
           : '') + '</td>' +
         '<td>' +
           '<div class="lander-cell">' +
-            '<span class="lander-thumb"></span>' +
+            '<span class="lander-thumb"' + (l.variants && l.variants.length ? ' data-thumb-name="' + escapeHtml(l.variants[0].name) + '"' : '') + '></span>' +
             '<div class="lander-name">' +
               '<strong>' + l.name +
                 ' <span class="variants-badge">' + l.variants.length + ' variant' + (l.variants.length===1?'':'s') + '</span>' +
@@ -665,7 +666,7 @@
         '<td></td>' +
         '<td>' +
           '<div class="lander-cell">' +
-            '<span class="lander-thumb"></span>' +
+            '<span class="lander-thumb" data-thumb-name="'+escapeHtml(v.name)+'"></span>' +
             '<div class="lander-name">' +
               '<strong>'+v.name+'</strong>' +
               '<small>'+vPreview+' <a href="https://'+vPreview+'" target="_blank" rel="noopener" class="preview-link" title="Open variant preview">↗</a></small>' +

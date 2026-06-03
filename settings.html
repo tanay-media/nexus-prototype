@@ -28,44 +28,72 @@
       <div class="page-header">
         <h1>Settings</h1>
         <div class="page-header__right">
-          <span class="ws-pill">
-            <span class="ws-pill__dot"></span>
-            ACME Growth
-          </span>
+          <div class="ms" id="tw-ms">
+            <button type="button" class="ms__btn" id="tw-ms-btn" aria-haspopup="true" aria-expanded="false">
+              <span class="ws-pill__dot"></span>
+              <span id="tw-ms-label">All teams &amp; workspaces</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="ms__pop" id="tw-ms-pop" hidden></div>
+          </div>
         </div>
       </div>
 
       <div class="page-body" data-tabs="settings-page">
         <div class="tabs">
-          <button type="button" class="tab is-active" data-tab="dest">Conversion destinations</button>
-          <button type="button" class="tab" data-tab="members" disabled title="Coming later">Members</button>
-          <button type="button" class="tab" data-tab="api" disabled title="Coming later">API & webhooks</button>
+          <button type="button" class="tab is-active" data-tab="general">General</button>
+          <button type="button" class="tab" data-tab="dest">Integrations</button>
+          <button type="button" class="tab" data-tab="mcp">MCP <span class="tab-beta">beta</span></button>
+          <button type="button" class="tab" data-tab="changelog" disabled title="Coming later">Changelog</button>
+          <button type="button" class="tab" data-tab="billing" disabled title="Coming later">Billing</button>
         </div>
 
         <!-- ============================================================
-             Conversion destinations
+             General — workspaces in the selected team
              ============================================================ -->
-        <section data-tab-panel="dest">
+        <section data-tab-panel="general">
           <div class="settings-intro">
             <div>
-              <h2 class="settings-intro__title">Conversion destinations</h2>
+              <h2 class="settings-intro__title">Workspaces</h2>
               <p class="settings-intro__sub">
-                Where Nexus fires server-side conversions for landers in this workspace. Each row is one
-                destination (e.g. one Meta pixel + token). Mark one as <strong>default</strong> — every
-                lander uses it unless the lander picks a specific destination. Secrets are stored in the
-                vault; only references are saved with landers.
+                Workspaces across your selected teams. Rename or remove a workspace, or spin up a new one.
+                Landers, domains, and integrations all live inside a workspace.
               </p>
             </div>
-            <button class="btn btn--black" id="cd-add-btn">+ Add destination</button>
+          </div>
+
+          <div class="card gen-card">
+            <div id="gen-ws-list"></div>
+            <button type="button" class="gen-add" id="gen-add-ws">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              Create workspace
+            </button>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             Integrations (formerly Conversion destinations)
+             ============================================================ -->
+        <section data-tab-panel="dest" hidden>
+          <div class="settings-intro">
+            <div>
+              <h2 class="settings-intro__title">Integrations</h2>
+              <p class="settings-intro__sub">
+                Connect ad platforms and tag managers for this workspace. <strong>Meta</strong> and
+                <strong>Google</strong> receive server-side conversions (buy-source firing);
+                <strong>Google Tag Manager</strong> handles client-side behavioral events on your landers.
+              </p>
+            </div>
+            <button class="btn btn--black" id="cd-add-btn">+ Add integration</button>
           </div>
 
           <div class="card cd-card">
-            <div class="table-scroll" role="region" aria-label="Conversion destinations">
+            <div class="table-scroll" role="region" aria-label="Integrations">
               <table class="table table--cd" id="cd-table">
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Buy source</th>
+                    <th>Provider</th>
                     <th>Identifiers</th>
                     <th>Events</th>
                     <th>Default</th>
@@ -79,9 +107,9 @@
               <div class="cd-empty__icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
               </div>
-              <h3>No conversion destinations yet</h3>
-              <p>Add a destination so Nexus can fire server-side conversions to Meta, Google, or Taboola when your landers convert.</p>
-              <button class="btn btn--black" id="cd-add-empty">+ Add destination</button>
+              <h3>No integrations yet</h3>
+              <p>Connect Meta or Google for server-side conversions, or Google Tag Manager for client-side behavioral events.</p>
+              <button class="btn btn--black" id="cd-add-empty">+ Add integration</button>
             </div>
           </div>
 
@@ -95,11 +123,166 @@
           </div>
         </section>
 
-        <section data-tab-panel="members" hidden></section>
-        <section data-tab-panel="api" hidden></section>
+        <!-- ============================================================
+             MCP (beta)
+             ============================================================ -->
+        <section data-tab-panel="mcp" hidden>
+          <div class="settings-intro">
+            <div>
+              <h2 class="settings-intro__title">Nexus MCP <span class="mcp-beta">beta</span></h2>
+              <p class="settings-intro__sub">
+                Connect your IDE or AI client (Cursor, Claude Code, Claude Desktop) to Nexus over MCP, then
+                create and edit landers straight from chat. Auth uses the <strong>same SSO as this app</strong> —
+                no separate API key.
+              </p>
+            </div>
+          </div>
+
+          <div class="card mcp-conn">
+            <div class="mcp-conn__row">
+              <div>
+                <div class="mcp-conn__label">Server URL</div>
+                <div class="mcp-copy" data-copy="https://mcp.nexus.app/sse">
+                  <code>https://mcp.nexus.app/sse</code>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                </div>
+              </div>
+              <div>
+                <div class="mcp-conn__label">Workspace</div>
+                <div class="mcp-copy" data-copy="ws_acme_growth_8PRN625DH">
+                  <code>ws_acme_growth_8PRN625DH</code>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                </div>
+              </div>
+              <div class="mcp-conn__status">
+                <span class="mcp-status mcp-status--ok"><span class="mcp-status__dot"></span>Signed in as kyle@acme.com</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mcp-card">
+            <div class="mcp-card__head">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
+              IDE MCP (OAuth)
+            </div>
+
+            <details class="mcp-step" open>
+              <summary><span class="mcp-step__num">1</span>OAuth only (same SSO as this app)<svg class="mcp-step__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+              <div class="mcp-step__body">
+                <p>MCP connects with <strong>OAuth 2.1 (PKCE)</strong> through the same identity provider as the web app. <strong>API-key auth is not supported</strong> for MCP — do not add <code>X-API-Key</code> headers in your client config.</p>
+                <p>Stay signed in here in the browser. The first MCP tool call from Cursor or Claude opens a browser window to finish authorization if your IDE doesn't already have a valid token.</p>
+              </div>
+            </details>
+
+            <details class="mcp-step">
+              <summary><span class="mcp-step__num">2</span>Choose environment<svg class="mcp-step__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+              <div class="mcp-step__body">
+                <p>Production is the default. Point at staging only for testing.</p>
+                <div class="mcp-pre" data-copy="https://mcp.nexus.app/sse"><code>Production · https://mcp.nexus.app/sse</code></div>
+                <div class="mcp-pre" data-copy="https://mcp.staging.nexus.app/sse"><code>Staging · https://mcp.staging.nexus.app/sse</code></div>
+              </div>
+            </details>
+
+            <details class="mcp-step">
+              <summary><span class="mcp-step__num">3</span>Cursor (remote URL — no npx)<svg class="mcp-step__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+              <div class="mcp-step__body">
+                <p>Add to <code>~/.cursor/mcp.json</code>:</p>
+                <pre class="mcp-code" data-copy='{
+  "mcpServers": {
+    "nexus": {
+      "url": "https://mcp.nexus.app/sse"
+    }
+  }
+}'><code>{
+  "mcpServers": {
+    "nexus": {
+      "url": "https://mcp.nexus.app/sse"
+    }
+  }
+}</code><button type="button" class="mcp-code__copy" aria-label="Copy">Copy</button></pre>
+              </div>
+            </details>
+
+            <details class="mcp-step">
+              <summary><span class="mcp-step__num">4</span>Claude Code (HTTP transport — not the same as Cursor)<svg class="mcp-step__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+              <div class="mcp-step__body">
+                <p>Run in your project root:</p>
+                <pre class="mcp-code" data-copy="claude mcp add --transport http nexus https://mcp.nexus.app/mcp"><code>claude mcp add --transport http nexus https://mcp.nexus.app/mcp</code><button type="button" class="mcp-code__copy" aria-label="Copy">Copy</button></pre>
+              </div>
+            </details>
+
+            <details class="mcp-step">
+              <summary><span class="mcp-step__num">5</span>Claude Desktop (npx + mcp-remote bridge)<svg class="mcp-step__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+              <div class="mcp-step__body">
+                <p>Add to <code>claude_desktop_config.json</code>:</p>
+                <pre class="mcp-code" data-copy='{
+  "mcpServers": {
+    "nexus": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://mcp.nexus.app/sse"]
+    }
+  }
+}'><code>{
+  "mcpServers": {
+    "nexus": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://mcp.nexus.app/sse"]
+    }
+  }
+}</code><button type="button" class="mcp-code__copy" aria-label="Copy">Copy</button></pre>
+              </div>
+            </details>
+
+            <details class="mcp-step">
+              <summary><span class="mcp-step__num">6</span>Start creating landers in chat<svg class="mcp-step__chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+              <div class="mcp-step__body">
+                <p>Once connected, ask your assistant things like:</p>
+                <ul class="mcp-examples">
+                  <li>“Create a walk-in-shower lander on <code>house.bestlivingideas.com</code> with a hero + lead form.”</li>
+                  <li>“Clone the Summer Sale lander and swap the headline for a Black Friday angle.”</li>
+                  <li>“Add a Meta destination to this workspace and set it as default.”</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section data-tab-panel="changelog" hidden></section>
+        <section data-tab-panel="billing" hidden></section>
+        <section data-tab-panel="billing" hidden></section>
       </div>
     </main>
   </div>
+
+  <!-- Browse integrations catalog -->
+  <dialog class="modal modal--browse" id="dialog-cd-browse">
+    <div class="modal__inner brws">
+      <div class="brws__head">
+        <div>
+          <h2 class="brws__title">Add integration</h2>
+          <p class="brws__sub">Connect your accounts so they're available across all your landing pages.</p>
+        </div>
+        <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="brws__body">
+        <aside class="brws__nav" id="brws-nav">
+          <div class="brws__nav-title">Browse</div>
+          <button type="button" class="brws__cat is-active" data-cat="all">All integrations <span class="brws__cat-count" data-count="all"></span></button>
+          <button type="button" class="brws__cat" data-cat="ads">Buy sources <span class="brws__cat-count" data-count="ads"></span></button>
+          <button type="button" class="brws__cat" data-cat="tag">Tracking platforms <span class="brws__cat-count" data-count="tag"></span></button>
+        </aside>
+        <div class="brws__main">
+          <div class="brws__search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="search" id="brws-search" placeholder="Search by name or capability…" />
+          </div>
+          <div class="brws__list" id="brws-list"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
   <!-- ============================================================
        Add / edit destination dialog
@@ -111,7 +294,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l4 4 14-14"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         </div>
         <div class="dskp__head-text">
-          <div class="dskp__eyebrow">Conversion destination</div>
+          <div class="dskp__eyebrow" id="cd-eyebrow">Integration</div>
           <h2 class="dskp__title" id="cd-form-title">Add destination</h2>
           <p class="dskp__sub" id="cd-form-hint">Save credentials for one buy source. You can add more destinations later and switch the default at any time.</p>
         </div>
@@ -123,9 +306,9 @@
       <div class="dskp__body">
         <input type="hidden" id="cd-edit-id" value="" />
 
-        <div class="dskp__field">
-          <div class="dskp__label">Buy source</div>
-          <div class="cd-providers" role="radiogroup" aria-label="Buy source">
+        <div class="dskp__field" id="cd-provider-field" hidden>
+          <div class="dskp__label">Provider</div>
+          <div class="cd-providers" role="radiogroup" aria-label="Provider">
             <button type="button" class="cd-prov" data-source="facebook" aria-pressed="true">
               <span class="cd-prov__logo cd-prov__logo--fb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>
               <div>
@@ -140,11 +323,11 @@
                 <div class="cd-prov__meta">Offline conversion upload</div>
               </div>
             </button>
-            <button type="button" class="cd-prov" data-source="taboola" aria-pressed="false">
-              <span class="cd-prov__logo cd-prov__logo--tb">Tb</span>
+            <button type="button" class="cd-prov" data-source="gtm" aria-pressed="false">
+              <span class="cd-prov__logo cd-prov__logo--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>
               <div>
-                <div class="cd-prov__name">Taboola</div>
-                <div class="cd-prov__meta">S2S conversion</div>
+                <div class="cd-prov__name">Google Tag Manager</div>
+                <div class="cd-prov__meta">Client-side behavioral events</div>
               </div>
             </button>
           </div>
@@ -225,17 +408,19 @@
           </div>
         </div>
 
-        <!-- Taboola fields -->
-        <div data-source-fields="taboola" hidden>
-          <div class="dskp__row dskp__row--2">
-            <div class="dskp__field">
-              <div class="dskp__label">Advertiser ID</div>
-              <input class="dskp__input" type="text" id="cd-t-advertiser" placeholder="123456" />
-            </div>
-            <div class="dskp__field">
-              <div class="dskp__label">S2S secret</div>
-              <input class="dskp__input" type="password" id="cd-t-secret" placeholder="••••••••" />
-            </div>
+        <!-- GTM fields -->
+        <div data-source-fields="gtm" hidden>
+          <div class="dskp__field">
+            <div class="dskp__label">Container ID</div>
+            <input class="dskp__input" type="text" id="cd-gtm-container" placeholder="GTM-XXXXXXX" />
+            <div class="dskp__hint">The GTM container that loads on your landers. Events below are pushed to its <code>dataLayer</code>.</div>
+          </div>
+          <div class="dskp__field">
+            <div class="dskp__label">Environment <span class="dskp__opt">optional</span></div>
+            <select class="dskp__select" id="cd-gtm-env">
+              <option value="live">Live</option>
+              <option value="latest">Latest</option>
+            </select>
           </div>
         </div>
 
@@ -356,5 +541,6 @@
   <script src="app.js"></script>
   <script src="site-shell.js"></script>
   <script src="settings.js"></script>
+  <script src="settings-general.js"></script>
 </body>
 </html>

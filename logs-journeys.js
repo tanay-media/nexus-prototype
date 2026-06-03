@@ -241,6 +241,12 @@
     }
   ];
 
+  // Expose to other scripts (e.g. logs-flat.js)
+  window.NEXUS_JOURNEYS = SEED_JOURNEYS;
+
+  // Journeys UI was removed — if its DOM isn't present, stop here (data is still exposed above).
+  if (!document.getElementById("jr-list")) return;
+
   // ===== State =====
   var state = {
     filter: "all",

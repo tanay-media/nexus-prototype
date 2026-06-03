@@ -33,18 +33,18 @@
 
       <div class="page-body" data-tabs="logs-page">
         <div class="tabs">
-          <button type="button" class="tab is-active" data-tab="journeys">Journeys</button>
+          <button type="button" class="tab is-active" data-tab="flat">Conversions</button>
           <button type="button" class="tab" data-tab="events">All events</button>
         </div>
 
         <!-- ==========================================================
-             Journeys (default)
+             Conversions — stitched, one row per conversion_id
              ========================================================== -->
-        <section data-tab-panel="journeys">
+        <section data-tab-panel="flat">
           <details class="jr-flowchart-wrap" open>
             <summary class="jr-flowchart-summary">
               <span class="jr-flowchart-summary__title">How conversions flow</span>
-              <span class="jr-flowchart-summary__hint">3 systems · 4 hops · each row below ties to one journey across them</span>
+              <span class="jr-flowchart-summary__hint">3 systems · 4 hops · each row below is one stitched conversion across them</span>
               <svg class="jr-flowchart-summary__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="jr-flowchart">
@@ -80,7 +80,7 @@
               <div class="jr-fc-arrows">
                 <div class="jr-fc-arrow jr-fc-arrow--right">
                   <span class="jr-fc-arrow__num">2</span>
-                  <span class="jr-fc-arrow__label">CTA forward</span>
+                  <span class="jr-fc-arrow__label">Click</span>
                   <span class="jr-fc-arrow__sub">user clicks CTA · macros resolved</span>
                 </div>
                 <div class="jr-fc-arrow jr-fc-arrow--left">
@@ -100,55 +100,72 @@
             </div>
           </details>
 
-          <div class="jr-state-bar">
-            <button type="button" class="jr-state is-active" data-state="all">All <span id="jr-count-all">·</span></button>
-            <button type="button" class="jr-state" data-state="visit_only"><span class="jr-state__dot jr-state__dot--visit"></span>Visit only <span id="jr-count-visit_only">·</span></button>
-            <button type="button" class="jr-state" data-state="awaiting_fire"><span class="jr-state__dot jr-state__dot--awaiting"></span>Awaiting fire <span id="jr-count-awaiting_fire">·</span></button>
-            <button type="button" class="jr-state" data-state="fired"><span class="jr-state__dot jr-state__dot--fired"></span>Fired <span id="jr-count-fired">·</span></button>
-            <button type="button" class="jr-state" data-state="failed"><span class="jr-state__dot jr-state__dot--failed"></span>Failed fire <span id="jr-count-failed">·</span></button>
-            <button type="button" class="jr-state" data-state="retried"><span class="jr-state__dot jr-state__dot--retried"></span>Retried <span id="jr-count-retried">·</span></button>
-            <button type="button" class="jr-state" data-state="orphan"><span class="jr-state__dot jr-state__dot--orphan"></span>Orphan postback <span id="jr-count-orphan">·</span></button>
-            <span class="logs-refresh-note muted" id="jr-refresh-note" style="margin-left:auto">auto-refreshing</span>
-          </div>
-
-          <div class="toolbar">
+          <div class="toolbar flat-toolbar">
             <div class="search-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-              <input class="input" type="search" id="jr-search" placeholder="Search visit_id / conversion_id / click_id…" />
+              <input class="input" type="search" id="flat-f-search" placeholder="Search conversion_id / URL…" />
             </div>
-            <select class="select" id="jr-source-filter" aria-label="Buy source">
-              <option value="">All buy sources</option>
-              <option value="facebook">Facebook / Meta</option>
-              <option value="google">Google</option>
-              <option value="taboola">Taboola</option>
-              <option value="tiktok">TikTok</option>
-            </select>
-            <select class="select" id="jr-lander-filter" aria-label="Lander">
-              <option value="">All landers</option>
-            </select>
-            <select class="select" id="jr-destination-filter" aria-label="Destination">
-              <option value="">All destinations</option>
+            <div class="ms" id="flat-ms">
+              <button type="button" class="select ms__btn" id="flat-ms-btn" aria-haspopup="true" aria-expanded="false">
+                <span id="flat-ms-label">All teams &amp; workspaces</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="ms__pop" id="flat-ms-pop" hidden></div>
+            </div>
+            <select class="select" id="flat-f-lander" aria-label="Lander"><option value="">All landers</option></select>
+            <select class="select" id="flat-f-status" aria-label="Buy source response">
+              <option value="ok">Fired (200)</option>
+              <option value="error">Failed (4xx / 5xx)</option>
+              <option value="pending">Queued</option>
+              <option value="">All responses</option>
             </select>
             <div class="date-range" role="group" aria-label="Date range">
-              <input type="date" class="date-range__input" id="jr-date-from" aria-label="From date" />
+              <input type="date" class="date-range__input" id="flat-f-date-from" aria-label="From date" />
               <span class="date-range__sep" aria-hidden="true">→</span>
-              <input type="date" class="date-range__input" id="jr-date-to" aria-label="To date" />
+              <input type="date" class="date-range__input" id="flat-f-date-to" aria-label="To date" />
             </div>
           </div>
 
-          <div class="card jr-card">
-            <div class="jr-list-head">
-              <div class="jr-col-time">When</div>
-              <div class="jr-col-id">Visit</div>
-              <div class="jr-col-place">Lander · Variant</div>
-              <div class="jr-col-flow">Flow</div>
-              <div class="jr-col-dest">Destination</div>
-              <div class="jr-col-x"></div>
+          <div class="flat-bulkbar">
+            <label class="flat-selall">
+              <input type="checkbox" id="flat-select-all" />
+              <span id="flat-sel-label">Select all</span>
+            </label>
+            <span class="flat-bulkbar__count muted" id="flat-count">·</span>
+            <div class="flat-bulkbar__spacer"></div>
+            <button type="button" class="btn" id="flat-download">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+              Download CSV
+            </button>
+          </div>
+
+          <div class="card flat-card">
+            <div class="flat-wrap">
+              <table class="flat-table">
+                <colgroup>
+                  <col class="c-check">
+                  <col class="c-recv">
+                  <col class="c-lander">
+                  <col class="c-entry">
+                  <col class="c-click">
+                  <col class="c-cvid">
+                  <col class="c-resp">
+                </colgroup>
+                <thead>
+                  <tr class="flat-thead-cols">
+                    <th class="flat-th-check"></th>
+                    <th class="sortable" data-sort="time">Conversion received at</th>
+                    <th>Lander</th>
+                    <th>Entry URL</th>
+                    <th>Click URL</th>
+                    <th>conversion_id</th>
+                    <th>Buy source response</th>
+                  </tr>
+                </thead>
+                <tbody id="flat-tbody"></tbody>
+              </table>
             </div>
-            <div id="jr-list"></div>
-            <div class="jr-empty" id="jr-empty" hidden>
-              <p>No journeys match your filters.</p>
-            </div>
+            <div class="flat-empty" id="flat-empty" hidden>No conversions match these filters.</div>
           </div>
         </section>
 
@@ -651,8 +668,11 @@
   </div>
 
   <link rel="stylesheet" href="logs-journeys.css" />
+  <link rel="stylesheet" href="logs-flat.css" />
   <script src="app.js"></script>
   <script src="logs-journeys.js"></script>
+  <script src="logs-flat.js"></script>
+  <script src="thumbs.js"></script>
   <script>
     // Combined filters for the logs table. app.js also toggles rows based on the
     // event-type pill; this runs after it and intersects with the other filters.
