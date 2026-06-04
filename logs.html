@@ -33,21 +33,25 @@
 
       <div class="page-body" data-tabs="logs-page">
         <div class="tabs">
-          <button type="button" class="tab is-active" data-tab="flat">Conversions</button>
-          <button type="button" class="tab" data-tab="events">All events</button>
+          <button type="button" class="tab is-active" data-tab="flat">All logs</button>
+          <button type="button" class="tab" data-tab="events">Logs Dump <span class="tab-beta">beta</span></button>
         </div>
 
         <!-- ==========================================================
              Conversions — stitched, one row per conversion_id
              ========================================================== -->
         <section data-tab-panel="flat">
-          <details class="jr-flowchart-wrap" open>
-            <summary class="jr-flowchart-summary">
-              <span class="jr-flowchart-summary__title">How conversions flow</span>
-              <span class="jr-flowchart-summary__hint">3 systems · 4 hops · each row below is one stitched conversion across them</span>
-              <svg class="jr-flowchart-summary__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            </summary>
-            <div class="jr-flowchart">
+          <div class="flow-pop-wrap">
+            <button type="button" class="flow-pop-trigger" id="flow-pop-trigger" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+              How conversions flow
+            </button>
+            <div class="flow-pop" id="flow-pop" hidden>
+              <div class="flow-pop__head">
+                <div><div class="flow-pop__title">How conversions flow</div><div class="flow-pop__hint">3 systems · 4 hops · each row below is one stitched conversion across them</div></div>
+                <button type="button" class="flow-pop__x" id="flow-pop-close" aria-label="Close"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+              </div>
+              <div class="jr-flowchart">
               <div class="jr-fc-node jr-fc-node--buy">
                 <div class="jr-fc-node__icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l10-4 10 4-10 4L2 7z"/><path d="M2 13l10 4 10-4M2 19l10 4 10-4"/></svg>
@@ -57,12 +61,12 @@
               </div>
 
               <div class="jr-fc-arrows">
-                <div class="jr-fc-arrow jr-fc-arrow--right">
+                <div class="jr-fc-arrow jr-fc-arrow--right jr-fc-arrow--visit">
                   <span class="jr-fc-arrow__num">1</span>
                   <span class="jr-fc-arrow__label">Visit</span>
                   <span class="jr-fc-arrow__sub">user lands on lander · campaign params arrive</span>
                 </div>
-                <div class="jr-fc-arrow jr-fc-arrow--left jr-fc-arrow--accent">
+                <div class="jr-fc-arrow jr-fc-arrow--left jr-fc-arrow--fire">
                   <span class="jr-fc-arrow__num">4</span>
                   <span class="jr-fc-arrow__label">Destination fire</span>
                   <span class="jr-fc-arrow__sub">CAPI · offline upload · S2S</span>
@@ -78,14 +82,14 @@
               </div>
 
               <div class="jr-fc-arrows">
-                <div class="jr-fc-arrow jr-fc-arrow--right">
+                <div class="jr-fc-arrow jr-fc-arrow--right jr-fc-arrow--click">
                   <span class="jr-fc-arrow__num">2</span>
                   <span class="jr-fc-arrow__label">Click</span>
                   <span class="jr-fc-arrow__sub">user clicks CTA · macros resolved</span>
                 </div>
-                <div class="jr-fc-arrow jr-fc-arrow--left">
+                <div class="jr-fc-arrow jr-fc-arrow--left jr-fc-arrow--pb">
                   <span class="jr-fc-arrow__num">3</span>
-                  <span class="jr-fc-arrow__label">Postback</span>
+                  <span class="jr-fc-arrow__label">Conversion received</span>
                   <span class="jr-fc-arrow__sub">conversion_id assigned · joined on visit_id</span>
                 </div>
               </div>
@@ -98,13 +102,10 @@
                 <div class="jr-fc-node__sub">MAX · external trackers</div>
               </div>
             </div>
-          </details>
+            </div>
+          </div>
 
           <div class="toolbar flat-toolbar">
-            <div class="search-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-              <input class="input" type="search" id="flat-f-search" placeholder="Search conversion_id / URL…" />
-            </div>
             <div class="ms" id="flat-ms">
               <button type="button" class="select ms__btn" id="flat-ms-btn" aria-haspopup="true" aria-expanded="false">
                 <span id="flat-ms-label">All teams &amp; workspaces</span>
@@ -112,18 +113,9 @@
               </button>
               <div class="ms__pop" id="flat-ms-pop" hidden></div>
             </div>
-            <select class="select" id="flat-f-lander" aria-label="Lander"><option value="">All landers</option></select>
-            <select class="select" id="flat-f-status" aria-label="Buy source response">
-              <option value="ok">Fired (200)</option>
-              <option value="error">Failed (4xx / 5xx)</option>
-              <option value="pending">Queued</option>
-              <option value="">All responses</option>
-            </select>
-            <div class="date-range" role="group" aria-label="Date range">
-              <input type="date" class="date-range__input" id="flat-f-date-from" aria-label="From date" />
-              <span class="date-range__sep" aria-hidden="true">→</span>
-              <input type="date" class="date-range__input" id="flat-f-date-to" aria-label="To date" />
-            </div>
+            <label class="flat-toggle flat-toggle--imp"><input type="checkbox" id="flat-f-imp" />Has impressions</label>
+            <label class="flat-toggle flat-toggle--click"><input type="checkbox" id="flat-f-click" />Has clicks</label>
+            <label class="flat-toggle flat-toggle--conv"><input type="checkbox" id="flat-f-conv" />Has conversions</label>
           </div>
 
           <div class="flat-bulkbar">
@@ -133,33 +125,84 @@
             </label>
             <span class="flat-bulkbar__count muted" id="flat-count">·</span>
             <div class="flat-bulkbar__spacer"></div>
-            <button type="button" class="btn" id="flat-download">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
-              Download CSV
-            </button>
+            <div class="flat-dl" id="flat-dl">
+              <button type="button" class="btn" id="flat-download" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>
+                Download
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="flat-dl__menu" id="flat-dl-menu" hidden>
+                <button type="button" class="flat-dl__item" data-dl="csv">Download CSV</button>
+                <button type="button" class="flat-dl__item" data-dl="xls">Download Excel</button>
+              </div>
+            </div>
           </div>
 
           <div class="card flat-card">
             <div class="flat-wrap">
-              <table class="flat-table">
+              <table class="flat-table flat-table--grouped">
                 <colgroup>
                   <col class="c-check">
-                  <col class="c-recv">
-                  <col class="c-lander">
-                  <col class="c-entry">
-                  <col class="c-click">
-                  <col class="c-cvid">
-                  <col class="c-resp">
+                  <col class="g-base">
+                  <col class="g-visit"><col class="g-visit"><col class="g-visit"><col class="g-visit"><col class="g-visit"><col class="g-visit">
+                  <col class="g-click"><col class="g-click"><col class="g-click">
+                  <col class="g-pb"><col class="g-pb"><col class="g-pb"><col class="g-pb">
+                  <col class="g-fire"><col class="g-fire"><col class="g-fire"><col class="g-fire">
+                  <col class="c-view">
                 </colgroup>
                 <thead>
+                  <tr class="flat-thead-groups">
+                    <th></th>
+                    <th class="grp grp--base" colspan="1">Lander</th>
+                    <th class="grp grp--visit" colspan="6">① Visit <small>Buy source → Nexus</small></th>
+                    <th class="grp grp--click" colspan="3">② Click on lander <small>Nexus → Tracking</small></th>
+                    <th class="grp grp--pb" colspan="4">③ Conversion received <small>Tracking → Nexus</small></th>
+                    <th class="grp grp--fire" colspan="4">④ Destination fire <small>Nexus → Buy source</small></th>
+                    <th></th>
+                  </tr>
                   <tr class="flat-thead-cols">
                     <th class="flat-th-check"></th>
-                    <th class="sortable" data-sort="time">Conversion received at</th>
-                    <th>Lander</th>
-                    <th>Entry URL</th>
-                    <th>Click URL</th>
-                    <th>conversion_id</th>
-                    <th>Buy source response</th>
+                    <th class="col--base sortable" data-sort="lander">lander</th>
+                    <th class="col--visit sortable" data-sort="clid">clid</th>
+                    <th class="col--visit sortable" data-sort="variant">variant</th>
+                    <th class="col--visit sortable" data-sort="visit_time">visit_time</th>
+                    <th class="col--visit sortable" data-sort="visit_id">visit_id</th>
+                    <th class="col--visit sortable" data-sort="entry_url">visit_url</th>
+                    <th class="col--visit sortable" data-sort="impression_id">impression_id</th>
+                    <th class="col--click sortable" data-sort="click_url">click_url</th>
+                    <th class="col--click sortable" data-sort="click_id">click_id</th>
+                    <th class="col--click sortable" data-sort="click_time">click_time</th>
+                    <th class="col--pb sortable" data-sort="time">conv_received_at</th>
+                    <th class="col--pb sortable" data-sort="conversion_id">conversion_id</th>
+                    <th class="col--pb sortable" data-sort="conversion_type">conversion_type</th>
+                    <th class="col--pb sortable" data-sort="conversion_value">conversion_value</th>
+                    <th class="col--fire sortable" data-sort="fired_time">conv_fired_at</th>
+                    <th class="col--fire sortable" data-sort="buy_source">buy_source</th>
+                    <th class="col--fire sortable" data-sort="destination">buy_source_id</th>
+                    <th class="col--fire sortable" data-sort="response">conv_fire_response</th>
+                    <th></th>
+                  </tr>
+                  <tr class="flat-thead-filters">
+                    <th></th>
+                    <th class="col--base"><input class="flat-cf" data-col="lander" placeholder="filter…" /></th>
+                    <th class="col--visit"><input class="flat-cf" data-col="clid" placeholder="filter…" /></th>
+                    <th class="col--visit"><input class="flat-cf" data-col="variant" placeholder="filter…" /></th>
+                    <th class="col--visit"></th>
+                    <th class="col--visit"><input class="flat-cf" data-col="visit_id" placeholder="filter…" /></th>
+                    <th class="col--visit"><input class="flat-cf" data-col="entry_url" placeholder="filter…" /></th>
+                    <th class="col--visit"><input class="flat-cf" data-col="impression_id" placeholder="filter…" /></th>
+                    <th class="col--click"><input class="flat-cf" data-col="click_url" placeholder="filter…" /></th>
+                    <th class="col--click"><input class="flat-cf" data-col="click_id" placeholder="filter…" /></th>
+                    <th class="col--click"></th>
+                    <th class="col--pb"></th>
+                    <th class="col--pb"><input class="flat-cf" data-col="conversion_id" placeholder="filter…" /></th>
+                    <th class="col--pb"><input class="flat-cf" data-col="conversion_type" placeholder="filter…" /></th>
+                    <th class="col--pb"><input class="flat-cf" data-col="conversion_value" placeholder="filter…" /></th>
+                    <th class="col--fire"></th>
+                    <th class="col--fire"><input class="flat-cf" data-col="buy_source" placeholder="filter…" /></th>
+                    <th class="col--fire"><input class="flat-cf" data-col="destination" placeholder="filter…" /></th>
+                    <th class="col--fire"><input class="flat-cf" data-col="response" placeholder="filter…" /></th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody id="flat-tbody"></tbody>
@@ -178,7 +221,7 @@
             <button type="button" class="log-filter-pill is-active" data-filter="all">All <span class="log-filter-count" id="log-count-all">·</span></button>
             <button type="button" class="log-filter-pill" data-filter="visit" title="Buy source → Nexus"><span class="dot" aria-hidden="true"></span>Visit <small class="logs-pill-sub">Buy source → Nexus</small> <span class="log-filter-count" id="log-count-visit">·</span></button>
             <button type="button" class="log-filter-pill" data-filter="cta_forward" title="Nexus → Tracking"><span class="dot" aria-hidden="true"></span>CTA forward <small class="logs-pill-sub">Nexus → Tracking</small> <span class="log-filter-count" id="log-count-cta_forward">·</span></button>
-            <button type="button" class="log-filter-pill" data-filter="postback" title="Tracking → Nexus"><span class="dot" aria-hidden="true"></span>Postback <small class="logs-pill-sub">Tracking → Nexus</small> <span class="log-filter-count" id="log-count-postback">·</span></button>
+            <button type="button" class="log-filter-pill" data-filter="postback" title="Tracking → Nexus"><span class="dot" aria-hidden="true"></span>Conversion received <small class="logs-pill-sub">Tracking → Nexus</small> <span class="log-filter-count" id="log-count-postback">·</span></button>
             <button type="button" class="log-filter-pill" data-filter="destination_fire" title="Nexus → Buy source"><span class="dot" aria-hidden="true"></span>Destination fire <small class="logs-pill-sub">Nexus → Buy source</small> <span class="log-filter-count" id="log-count-destination_fire">·</span></button>
           </div>
           <span class="logs-refresh-note muted" id="logs-refresh-note">auto-refreshing</span>
@@ -336,7 +379,7 @@
                 <tr class="log-data-row" data-log-row data-event="postback" data-lander="Summer Sale" data-variant="var_ss_03" data-url="offers.acme.com/summer-sale-hero" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:42:11</td>
-                  <td><span class="log-event log-event--postback">Postback</span></td>
+                  <td><span class="log-event log-event--postback">Conversion received</span></td>
                   <td><strong>Summer Sale</strong></td>
                   <td><span class="log-variant-pill mono">var_ss_03</span></td>
                   <td class="muted">offers.acme.com</td>
@@ -490,7 +533,7 @@
                 <tr class="log-data-row" data-log-row data-event="postback" data-lander="Partner Announce" data-variant="var_pa_01" data-url="try.acme.com/partner-announce" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 09:02:18</td>
-                  <td><span class="log-event log-event--postback">Postback</span></td>
+                  <td><span class="log-event log-event--postback">Conversion received</span></td>
                   <td><strong>Partner Announce</strong></td>
                   <td><span class="log-variant-pill mono">var_pa_01</span></td>
                   <td class="muted">try.acme.com</td>
@@ -644,7 +687,7 @@
                 <tr class="log-data-row" data-log-row data-event="postback" data-lander="Fall Preview" data-variant="var_fp_01" data-url="offers.acme.com/fall-preview" data-ts="2026-04-21" tabindex="0" role="button" aria-expanded="false" aria-label="Log row, press to expand metadata">
                   <td class="log-chev-cell"><span class="log-chev" aria-hidden="true">▸</span></td>
                   <td class="muted log-ts">2026-04-21 08:21:03</td>
-                  <td><span class="log-event log-event--postback">Postback</span></td>
+                  <td><span class="log-event log-event--postback">Conversion received</span></td>
                   <td><strong>Fall Preview</strong></td>
                   <td><span class="log-variant-pill mono">var_fp_01</span></td>
                   <td class="muted">offers.acme.com</td>
@@ -712,7 +755,7 @@
           <div class="logs-footer">
             <div>
               <p class="logs-footer-range" id="logs-footer-range"><strong>Showing 1–12 of 12</strong></p>
-              <p class="logs-footer-disclaimer muted">Each log is one event across the 4-system flow: Visit (buy source → nexus) · CTA forward (nexus → tracking) · Postback (tracking → nexus) · Destination fire (nexus → buy source).</p>
+              <p class="logs-footer-disclaimer muted">Each log is one event across the 4-system flow: Visit (buy source → nexus) · CTA forward (nexus → tracking) · Conversion received (tracking → nexus) · Destination fire (nexus → buy source).</p>
             </div>
             <div class="logs-pagination">
               <button type="button" class="btn" disabled>← Prev</button>
@@ -730,9 +773,9 @@
   <link rel="stylesheet" href="logs-journeys.css" />
   <link rel="stylesheet" href="logs-flat.css" />
   <script src="app.js"></script>
+  <script src="thumbs.js"></script>
   <script src="logs-journeys.js"></script>
   <script src="logs-flat.js"></script>
-  <script src="thumbs.js"></script>
   <script>
     // Combined filters for the logs table. app.js also toggles rows based on the
     // event-type pill; this runs after it and intersects with the other filters.

@@ -62,7 +62,7 @@
         params: { utm_source: "tiktok", utm_medium: "paid", ttclid: "C0gO3-Test1234" }, clickId: "cl_tt8a01" },
       ctaForward: { ts: "2026-04-21 09:15:34", ctaId: "cta_apply", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_f1bd4408&offer=partner_announce&ttclid=C0gO3-Test1234" },
       postback: { ts: "2026-04-21 09:16:12", conversionId: "cv_t99102", conversionType: "lead", value: 0, currency: "USD", externalId: "tl_2210", source: "max", raw: {} },
-      destinationFire: { ts: "2026-04-21 09:16:13", status: "ok", latencyMs: 250, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST graph.facebook.com/v18.0/319847562103948/events", request: { data: [{ event_id: "cv_t99102", event_name: "Lead" }] }, response: { events_received: 1 }, retries: [] }
+      destinationFire: { ts: "2026-04-21 09:16:13", status: "error", httpCode: 500, latencyMs: 1840, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST graph.facebook.com/v18.0/319847562103948/events", request: { data: [{ event_id: "cv_t99102", event_name: "Lead" }] }, response: { error: { message: "An unknown error occurred", type: "FacebookApiException", code: 2, http_status: 500 } }, retries: [{ ts: "2026-04-21 09:16:14", n: 1, code: 500, latencyMs: 1820, error: "Server error" }, { ts: "2026-04-21 09:16:40", n: 2, code: 500, latencyMs: 1840, error: "Server error (final)" }] }
     },
     {
       visitId: "v_g9402a18", buySource: "facebook",
@@ -86,7 +86,7 @@
         params: { utm_source: "google", utm_campaign: "ht_brand", gclid: "EAIaIQ-AU-teaser-9981" } },
       ctaForward: { ts: "2026-04-20 18:35:48", ctaId: "cta_notify", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_j2918c41&offer=holiday_teaser&gclid=EAIaIQ-AU-teaser-9981" },
       postback: { ts: "2026-04-20 18:39:48", conversionId: "cv_j1019b", conversionType: "signup", value: 0, currency: "AUD", externalId: "u_au_3301", source: "max", raw: {} },
-      destinationFire: { ts: "2026-04-20 18:39:50", status: "ok", latencyMs: 350, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST googleads.googleapis.com/v15/customers/2846197723:uploadClickConversions", request: { conversions: [{ conversion_action: "customers/2846197723/conversionActions/8841502", gclid: "EAIaIQ-AU-teaser-9981", order_id: "cv_j1019b" }] }, response: { results: [{ gclid: "EAIaIQ-AU-teaser-9981" }] }, retries: [] }
+      destinationFire: { ts: "2026-04-20 18:39:50", status: "error", httpCode: 403, latencyMs: 612, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST googleads.googleapis.com/v15/customers/2846197723:uploadClickConversions", request: { conversions: [{ conversion_action: "customers/2846197723/conversionActions/8841502", gclid: "EAIaIQ-AU-teaser-9981", order_id: "cv_j1019b" }] }, response: { error: { code: 403, status: "PERMISSION_DENIED", message: "The caller does not have permission for this conversion action." } }, retries: [] }
     },
 
     // ---- Visit only (no postback yet) (3) ----
@@ -238,6 +238,216 @@
         error: "visit_id 'v_unknown_4421' not found in visit_served"
       },
       destinationFire: null
+    },
+    {
+      visitId: "v_g7d0", buySource: "facebook",
+      visit: { ts: "2026-04-20 08:00:00", lander: "Summer Sale", landerId: "summer-sale", variant: "var_ss_03", domain: "offers.acme.com", path: "/summer-sale-hero", country: "US", device: "Desktop", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-20 08:01:00", ctaId: "cta_summ", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d0&offer=summer-sale" },
+      postback: { ts: "2026-04-20 09:00:00", conversionId: "cv_g3e80", conversionType: "lead", value: 0, currency: "USD", externalId: "ord_5000", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-20 09:02:00", status: "ok", latencyMs: 180, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7d1", buySource: "google",
+      visit: { ts: "2026-04-19 09:07:13", lander: "Black Friday", landerId: "black-friday", variant: "var_bf_02", domain: "offers.acme.com", path: "/black-friday-2026", country: "CA", device: "Mobile", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-19 09:08:13", ctaId: "cta_blac", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d1&offer=black-friday" },
+      postback: { ts: "2026-04-19 10:07:13", conversionId: "cv_g3e961", conversionType: "purchase", value: 27, currency: "EUR", externalId: "ord_5001", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-19 10:09:13", status: "ok", latencyMs: 189, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7d2", buySource: "tiktok",
+      visit: { ts: "2026-04-18 10:14:26", lander: "Referral Q2", landerId: "referral-q2", variant: "var_rq_01", domain: "refer.acme.com", path: "/q2", country: "UK", device: "Tablet", os: "Windows", params: {} },
+      ctaForward: { ts: "2026-04-18 10:15:26", ctaId: "cta_refe", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d2&offer=referral-q2" },
+      postback: { ts: "2026-04-18 11:14:26", conversionId: "cv_g3eac2", conversionType: "signup", value: 0, currency: "GBP", externalId: "ord_5002", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-18 11:16:26", status: "ok", latencyMs: 198, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7d3", buySource: "taboola",
+      visit: { ts: "2026-04-17 11:21:39", lander: "Founder Letter", landerId: "founder-letter", variant: "var_fl_01", domain: "offers.acme.com", path: "/founder-letter", country: "DE", device: "Desktop", os: "Android", params: {} },
+      ctaForward: { ts: "2026-04-17 11:22:39", ctaId: "cta_foun", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d3&offer=founder-letter" },
+      postback: { ts: "2026-04-17 12:21:39", conversionId: "cv_g3eb123", conversionType: "purchase", value: 41, currency: "INR", externalId: "ord_5003", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-17 12:23:39", status: "ok", latencyMs: 207, destinationId: "cd_taboola_default", destinationName: "Taboola — default", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7d4", buySource: "facebook",
+      visit: { ts: "2026-04-16 12:28:52", lander: "Walk-in Tubs", landerId: "walk-in-tubs", variant: "var_wt_01", domain: "edge.financeapp.com", path: "/tubs", country: "IN", device: "Mobile", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-16 12:29:52", ctaId: "cta_walk", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d4&offer=walk-in-tubs" },
+      postback: { ts: "2026-04-16 13:28:52", conversionId: "cv_g3ec184", conversionType: "lead", value: 0, currency: "USD", externalId: "ord_5004", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-16 13:30:52", status: "error", httpCode: 401, latencyMs: 444, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 401, message: "Invalid OAuth access token" } }, retries: [{ ts: "2026-04-16 13:30:52", n: 1, code: 401, error: "Invalid OAuth access token" }] }
+    },
+    {
+      visitId: "v_g7d5", buySource: "google",
+      visit: { ts: "2026-04-15 13:35:05", lander: "Holiday Teaser", landerId: "holiday-teaser", variant: "var_ht_01", domain: "try.acme.com", path: "/teaser", country: "AU", device: "Tablet", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-15 13:36:05", ctaId: "cta_holi", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d5&offer=holiday-teaser" },
+      postback: { ts: "2026-04-15 14:35:05", conversionId: "cv_g3ed1e5", conversionType: "lead", value: 0, currency: "EUR", externalId: "ord_5005", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-15 14:37:05", status: "error", httpCode: 400, latencyMs: 455, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", request: {}, response: { error: { code: 400, message: "Missing required user_data" } }, retries: [{ ts: "2026-04-15 14:37:05", n: 1, code: 400, error: "Missing required user_data" }] }
+    },
+    {
+      visitId: "v_g7d6", buySource: "tiktok",
+      visit: { ts: "2026-04-20 14:42:18", lander: "Fall Preview", landerId: "fall-preview", variant: "var_fp_01", domain: "offers.acme.com", path: "/fall-preview", country: "FR", device: "Desktop", os: "Windows", params: {} },
+      ctaForward: { ts: "2026-04-20 14:43:18", ctaId: "cta_fall", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d6&offer=fall-preview" },
+      postback: { ts: "2026-04-20 15:42:18", conversionId: "cv_g3ee246", conversionType: "purchase", value: 62, currency: "GBP", externalId: "ord_5006", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-20 15:44:18", status: "error", httpCode: 500, latencyMs: 466, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 500, message: "Internal server error" } }, retries: [{ ts: "2026-04-20 15:44:18", n: 1, code: 500, error: "Internal server error" }] }
+    },
+    {
+      visitId: "v_g7d7", buySource: "taboola",
+      visit: { ts: "2026-04-19 15:49:31", lander: "Partner Announce", landerId: "partner-announce", variant: "var_pa_02", domain: "try.acme.com", path: "/partner", country: "BR", device: "Mobile", os: "Android", params: {} },
+      ctaForward: { ts: "2026-04-19 15:50:31", ctaId: "cta_part", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d7&offer=partner-announce" },
+      postback: { ts: "2026-04-19 16:49:31", conversionId: "cv_g3ef2a7", conversionType: "signup", value: 0, currency: "INR", externalId: "ord_5007", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-19 16:51:31", status: "error", httpCode: 403, latencyMs: 477, destinationId: "cd_taboola_default", destinationName: "Taboola — default", endpoint: "POST dispatch", request: {}, response: { error: { code: 403, message: "Permission denied" } }, retries: [{ ts: "2026-04-19 16:51:31", n: 1, code: 403, error: "Permission denied" }] }
+    },
+    {
+      visitId: "v_g7d8", buySource: "facebook",
+      visit: { ts: "2026-04-18 16:56:44", lander: "Summer Sale", landerId: "summer-sale", variant: "var_ss_03", domain: "offers.acme.com", path: "/summer-sale-hero", country: "US", device: "Tablet", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-18 16:57:44", ctaId: "cta_summ", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d8&offer=summer-sale" },
+      postback: { ts: "2026-04-18 17:56:44", conversionId: "cv_g3f0308", conversionType: "purchase", value: 76, currency: "USD", externalId: "ord_5008", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-18 17:58:44", status: "error", httpCode: 429, latencyMs: 488, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 429, message: "Rate limit exceeded" } }, retries: [{ ts: "2026-04-18 17:58:44", n: 1, code: 429, error: "Rate limit exceeded" }] }
+    },
+    {
+      visitId: "v_g7d9", buySource: "google",
+      visit: { ts: "2026-04-17 17:03:57", lander: "Black Friday", landerId: "black-friday", variant: "var_bf_02", domain: "offers.acme.com", path: "/black-friday-2026", country: "CA", device: "Desktop", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-17 17:04:57", ctaId: "cta_blac", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7d9&offer=black-friday" },
+      postback: { ts: "2026-04-17 18:03:57", conversionId: "cv_g3f1369", conversionType: "lead", value: 0, currency: "EUR", externalId: "ord_5009", source: "max", raw: {} },
+      destinationFire: { ts: null, status: "pending", destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", queuedAt: "2026-04-17 18:03:57", retries: [] }
+    },
+    {
+      visitId: "v_g7da", buySource: "tiktok",
+      visit: { ts: "2026-04-16 08:10:10", lander: "Referral Q2", landerId: "referral-q2", variant: "var_rq_01", domain: "refer.acme.com", path: "/q2", country: "UK", device: "Mobile", os: "Windows", params: {} },
+      ctaForward: { ts: "2026-04-16 08:11:10", ctaId: "cta_refe", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7da&offer=referral-q2" },
+      postback: { ts: "2026-04-16 09:10:10", conversionId: "cv_g3f23ca", conversionType: "lead", value: 0, currency: "GBP", externalId: "ord_5010", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-16 09:12:10", status: "ok", latencyMs: 270, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7db", buySource: "taboola",
+      visit: { ts: "2026-04-15 09:17:23", lander: "Founder Letter", landerId: "founder-letter", variant: "var_fl_01", domain: "offers.acme.com", path: "/founder-letter", country: "DE", device: "Tablet", os: "Android", params: {} },
+      ctaForward: { ts: "2026-04-15 09:18:23", ctaId: "cta_foun", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7db&offer=founder-letter" },
+      postback: { ts: "2026-04-15 10:17:23", conversionId: "cv_g3f342b", conversionType: "purchase", value: 97, currency: "INR", externalId: "ord_5011", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-15 10:19:23", status: "ok", latencyMs: 279, destinationId: "cd_taboola_default", destinationName: "Taboola — default", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7dc", buySource: "facebook",
+      visit: { ts: "2026-04-20 10:24:36", lander: "Walk-in Tubs", landerId: "walk-in-tubs", variant: "var_wt_01", domain: "edge.financeapp.com", path: "/tubs", country: "IN", device: "Desktop", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-20 10:25:36", ctaId: "cta_walk", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7dc&offer=walk-in-tubs" },
+      postback: { ts: "2026-04-20 11:24:36", conversionId: "cv_g3f448c", conversionType: "signup", value: 0, currency: "USD", externalId: "ord_5012", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-20 11:26:36", status: "ok", latencyMs: 288, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7dd", buySource: "google",
+      visit: { ts: "2026-04-19 11:31:49", lander: "Holiday Teaser", landerId: "holiday-teaser", variant: "var_ht_01", domain: "try.acme.com", path: "/teaser", country: "AU", device: "Mobile", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-19 11:32:49", ctaId: "cta_holi", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7dd&offer=holiday-teaser" },
+      postback: { ts: "2026-04-19 12:31:49", conversionId: "cv_g3f54ed", conversionType: "purchase", value: 111, currency: "EUR", externalId: "ord_5013", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-19 12:33:49", status: "ok", latencyMs: 297, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7de", buySource: "tiktok",
+      visit: { ts: "2026-04-18 12:38:02", lander: "Fall Preview", landerId: "fall-preview", variant: "var_fp_01", domain: "offers.acme.com", path: "/fall-preview", country: "FR", device: "Tablet", os: "Windows", params: {} },
+      ctaForward: { ts: "2026-04-18 12:39:02", ctaId: "cta_fall", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7de&offer=fall-preview" },
+      postback: { ts: "2026-04-18 13:38:02", conversionId: "cv_g3f654e", conversionType: "lead", value: 0, currency: "GBP", externalId: "ord_5014", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-18 13:40:02", status: "error", httpCode: 401, latencyMs: 554, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 401, message: "Invalid OAuth access token" } }, retries: [{ ts: "2026-04-18 13:40:02", n: 1, code: 401, error: "Invalid OAuth access token" }] }
+    },
+    {
+      visitId: "v_g7df", buySource: "taboola",
+      visit: { ts: "2026-04-17 13:45:15", lander: "Partner Announce", landerId: "partner-announce", variant: "var_pa_02", domain: "try.acme.com", path: "/partner", country: "BR", device: "Desktop", os: "Android", params: {} },
+      ctaForward: { ts: "2026-04-17 13:46:15", ctaId: "cta_part", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7df&offer=partner-announce" },
+      postback: { ts: "2026-04-17 14:45:15", conversionId: "cv_g3f75af", conversionType: "lead", value: 0, currency: "INR", externalId: "ord_5015", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-17 14:47:15", status: "error", httpCode: 400, latencyMs: 565, destinationId: "cd_taboola_default", destinationName: "Taboola — default", endpoint: "POST dispatch", request: {}, response: { error: { code: 400, message: "Missing required user_data" } }, retries: [{ ts: "2026-04-17 14:47:15", n: 1, code: 400, error: "Missing required user_data" }] }
+    },
+    {
+      visitId: "v_g7e0", buySource: "facebook",
+      visit: { ts: "2026-04-16 14:52:28", lander: "Summer Sale", landerId: "summer-sale", variant: "var_ss_03", domain: "offers.acme.com", path: "/summer-sale-hero", country: "US", device: "Mobile", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-16 14:53:28", ctaId: "cta_summ", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e0&offer=summer-sale" },
+      postback: { ts: "2026-04-16 15:52:28", conversionId: "cv_g3f8610", conversionType: "purchase", value: 132, currency: "USD", externalId: "ord_5016", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-16 15:54:28", status: "error", httpCode: 500, latencyMs: 576, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 500, message: "Internal server error" } }, retries: [{ ts: "2026-04-16 15:54:28", n: 1, code: 500, error: "Internal server error" }] }
+    },
+    {
+      visitId: "v_g7e1", buySource: "google",
+      visit: { ts: "2026-04-15 15:59:41", lander: "Black Friday", landerId: "black-friday", variant: "var_bf_02", domain: "offers.acme.com", path: "/black-friday-2026", country: "CA", device: "Tablet", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-15 15:00:41", ctaId: "cta_blac", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e1&offer=black-friday" },
+      postback: { ts: "2026-04-15 16:59:41", conversionId: "cv_g3f9671", conversionType: "signup", value: 0, currency: "EUR", externalId: "ord_5017", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-15 16:01:41", status: "error", httpCode: 403, latencyMs: 587, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", request: {}, response: { error: { code: 403, message: "Permission denied" } }, retries: [{ ts: "2026-04-15 16:01:41", n: 1, code: 403, error: "Permission denied" }] }
+    },
+    {
+      visitId: "v_g7e2", buySource: "tiktok",
+      visit: { ts: "2026-04-20 16:06:54", lander: "Referral Q2", landerId: "referral-q2", variant: "var_rq_01", domain: "refer.acme.com", path: "/q2", country: "UK", device: "Desktop", os: "Windows", params: {} },
+      ctaForward: { ts: "2026-04-20 16:07:54", ctaId: "cta_refe", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e2&offer=referral-q2" },
+      postback: { ts: "2026-04-20 17:06:54", conversionId: "cv_g3fa6d2", conversionType: "purchase", value: 146, currency: "GBP", externalId: "ord_5018", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-20 17:08:54", status: "error", httpCode: 429, latencyMs: 598, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 429, message: "Rate limit exceeded" } }, retries: [{ ts: "2026-04-20 17:08:54", n: 1, code: 429, error: "Rate limit exceeded" }] }
+    },
+    {
+      visitId: "v_g7e3", buySource: "taboola",
+      visit: { ts: "2026-04-19 17:13:07", lander: "Founder Letter", landerId: "founder-letter", variant: "var_fl_01", domain: "offers.acme.com", path: "/founder-letter", country: "DE", device: "Mobile", os: "Android", params: {} },
+      ctaForward: { ts: "2026-04-19 17:14:07", ctaId: "cta_foun", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e3&offer=founder-letter" },
+      postback: { ts: "2026-04-19 18:13:07", conversionId: "cv_g3fb733", conversionType: "lead", value: 0, currency: "INR", externalId: "ord_5019", source: "max", raw: {} },
+      destinationFire: { ts: null, status: "pending", destinationId: "cd_taboola_default", destinationName: "Taboola — default", endpoint: "POST dispatch", queuedAt: "2026-04-19 18:13:07", retries: [] }
+    },
+    {
+      visitId: "v_g7e4", buySource: "facebook",
+      visit: { ts: "2026-04-18 08:20:20", lander: "Walk-in Tubs", landerId: "walk-in-tubs", variant: "var_wt_01", domain: "edge.financeapp.com", path: "/tubs", country: "IN", device: "Tablet", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-18 08:21:20", ctaId: "cta_walk", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e4&offer=walk-in-tubs" },
+      postback: { ts: "2026-04-18 09:20:20", conversionId: "cv_g3fc794", conversionType: "lead", value: 0, currency: "USD", externalId: "ord_5020", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-18 09:22:20", status: "ok", latencyMs: 360, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7e5", buySource: "google",
+      visit: { ts: "2026-04-17 09:27:33", lander: "Holiday Teaser", landerId: "holiday-teaser", variant: "var_ht_01", domain: "try.acme.com", path: "/teaser", country: "AU", device: "Desktop", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-17 09:28:33", ctaId: "cta_holi", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e5&offer=holiday-teaser" },
+      postback: { ts: "2026-04-17 10:27:33", conversionId: "cv_g3fd7f5", conversionType: "purchase", value: 167, currency: "EUR", externalId: "ord_5021", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-17 10:29:33", status: "ok", latencyMs: 369, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7e6", buySource: "tiktok",
+      visit: { ts: "2026-04-16 10:34:46", lander: "Fall Preview", landerId: "fall-preview", variant: "var_fp_01", domain: "offers.acme.com", path: "/fall-preview", country: "FR", device: "Mobile", os: "Windows", params: {} },
+      ctaForward: { ts: "2026-04-16 10:35:46", ctaId: "cta_fall", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e6&offer=fall-preview" },
+      postback: { ts: "2026-04-16 11:34:46", conversionId: "cv_g3fe856", conversionType: "signup", value: 0, currency: "GBP", externalId: "ord_5022", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-16 11:36:46", status: "ok", latencyMs: 378, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7e7", buySource: "taboola",
+      visit: { ts: "2026-04-15 11:41:59", lander: "Partner Announce", landerId: "partner-announce", variant: "var_pa_02", domain: "try.acme.com", path: "/partner", country: "BR", device: "Tablet", os: "Android", params: {} },
+      ctaForward: { ts: "2026-04-15 11:42:59", ctaId: "cta_part", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e7&offer=partner-announce" },
+      postback: { ts: "2026-04-15 12:41:59", conversionId: "cv_g3ff8b7", conversionType: "purchase", value: 181, currency: "INR", externalId: "ord_5023", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-15 12:43:59", status: "ok", latencyMs: 387, destinationId: "cd_taboola_default", destinationName: "Taboola — default", endpoint: "POST dispatch", request: {}, response: { events_received: 1 }, retries: [] }
+    },
+    {
+      visitId: "v_g7e8", buySource: "facebook",
+      visit: { ts: "2026-04-20 12:48:12", lander: "Summer Sale", landerId: "summer-sale", variant: "var_ss_03", domain: "offers.acme.com", path: "/summer-sale-hero", country: "US", device: "Desktop", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-20 12:49:12", ctaId: "cta_summ", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e8&offer=summer-sale" },
+      postback: { ts: "2026-04-20 13:48:12", conversionId: "cv_g400918", conversionType: "lead", value: 0, currency: "USD", externalId: "ord_5024", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-20 13:50:12", status: "error", httpCode: 401, latencyMs: 664, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 401, message: "Invalid OAuth access token" } }, retries: [{ ts: "2026-04-20 13:50:12", n: 1, code: 401, error: "Invalid OAuth access token" }] }
+    },
+    {
+      visitId: "v_g7e9", buySource: "google",
+      visit: { ts: "2026-04-19 13:55:25", lander: "Black Friday", landerId: "black-friday", variant: "var_bf_02", domain: "offers.acme.com", path: "/black-friday-2026", country: "CA", device: "Mobile", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-19 13:56:25", ctaId: "cta_blac", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7e9&offer=black-friday" },
+      postback: { ts: "2026-04-19 14:55:25", conversionId: "cv_g401979", conversionType: "lead", value: 0, currency: "EUR", externalId: "ord_5025", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-19 14:57:25", status: "error", httpCode: 400, latencyMs: 675, destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", request: {}, response: { error: { code: 400, message: "Missing required user_data" } }, retries: [{ ts: "2026-04-19 14:57:25", n: 1, code: 400, error: "Missing required user_data" }] }
+    },
+    {
+      visitId: "v_g7ea", buySource: "tiktok",
+      visit: { ts: "2026-04-18 14:02:38", lander: "Referral Q2", landerId: "referral-q2", variant: "var_rq_01", domain: "refer.acme.com", path: "/q2", country: "UK", device: "Tablet", os: "Windows", params: {} },
+      ctaForward: { ts: "2026-04-18 14:03:38", ctaId: "cta_refe", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7ea&offer=referral-q2" },
+      postback: { ts: "2026-04-18 15:02:38", conversionId: "cv_g4029da", conversionType: "purchase", value: 22, currency: "GBP", externalId: "ord_5026", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-18 15:04:38", status: "error", httpCode: 500, latencyMs: 686, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 500, message: "Internal server error" } }, retries: [{ ts: "2026-04-18 15:04:38", n: 1, code: 500, error: "Internal server error" }] }
+    },
+    {
+      visitId: "v_g7eb", buySource: "taboola",
+      visit: { ts: "2026-04-17 15:09:51", lander: "Founder Letter", landerId: "founder-letter", variant: "var_fl_01", domain: "offers.acme.com", path: "/founder-letter", country: "DE", device: "Desktop", os: "Android", params: {} },
+      ctaForward: { ts: "2026-04-17 15:10:51", ctaId: "cta_foun", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7eb&offer=founder-letter" },
+      postback: { ts: "2026-04-17 16:09:51", conversionId: "cv_g403a3b", conversionType: "signup", value: 0, currency: "INR", externalId: "ord_5027", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-17 16:11:51", status: "error", httpCode: 403, latencyMs: 697, destinationId: "cd_taboola_default", destinationName: "Taboola — default", endpoint: "POST dispatch", request: {}, response: { error: { code: 403, message: "Permission denied" } }, retries: [{ ts: "2026-04-17 16:11:51", n: 1, code: 403, error: "Permission denied" }] }
+    },
+    {
+      visitId: "v_g7ec", buySource: "facebook",
+      visit: { ts: "2026-04-16 16:16:04", lander: "Walk-in Tubs", landerId: "walk-in-tubs", variant: "var_wt_01", domain: "edge.financeapp.com", path: "/tubs", country: "IN", device: "Mobile", os: "macOS", params: {} },
+      ctaForward: { ts: "2026-04-16 16:17:04", ctaId: "cta_walk", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7ec&offer=walk-in-tubs" },
+      postback: { ts: "2026-04-16 17:16:04", conversionId: "cv_g404a9c", conversionType: "purchase", value: 36, currency: "USD", externalId: "ord_5028", source: "max", raw: {} },
+      destinationFire: { ts: "2026-04-16 17:18:04", status: "error", httpCode: 429, latencyMs: 708, destinationId: "cd_meta_prod", destinationName: "Meta — ACME Growth", endpoint: "POST dispatch", request: {}, response: { error: { code: 429, message: "Rate limit exceeded" } }, retries: [{ ts: "2026-04-16 17:18:04", n: 1, code: 429, error: "Rate limit exceeded" }] }
+    },
+    {
+      visitId: "v_g7ed", buySource: "google",
+      visit: { ts: "2026-04-15 17:23:17", lander: "Holiday Teaser", landerId: "holiday-teaser", variant: "var_ht_01", domain: "try.acme.com", path: "/teaser", country: "AU", device: "Tablet", os: "iOS", params: {} },
+      ctaForward: { ts: "2026-04-15 17:24:17", ctaId: "cta_holi", zone: "hero", outboundUrl: "https://tracker.acme.com/r?vid=v_g7ed&offer=holiday-teaser" },
+      postback: { ts: "2026-04-15 18:23:17", conversionId: "cv_g405afd", conversionType: "lead", value: 0, currency: "EUR", externalId: "ord_5029", source: "max", raw: {} },
+      destinationFire: { ts: null, status: "pending", destinationId: "cd_google_main", destinationName: "Google Ads — main", endpoint: "POST dispatch", queuedAt: "2026-04-15 18:23:17", retries: [] }
     }
   ];
 
