@@ -29,26 +29,84 @@
   };
   window.NEXUS_DATA = NEXUS_DATA;
 
-  // Workspaces — mutable (New workspace adds here).
-  var workspaces = [
-    { id: "acme-growth",      name: "ACME Growth",      sub: "12 landers · 4 domains" },
-    { id: "acme-performance", name: "ACME Performance", sub: "7 landers · 2 domains" },
-    { id: "finance-edge",     name: "FinanceEdge",      sub: "21 landers · 6 domains" }
+  // Teams → workspaces (team selection comes BEFORE workspace).
+  var TEAMS = [
+    { id: "acme", name: "Acme Inc", workspaces: [
+      { id: "acme-growth",      name: "ACME Growth",      sub: "12 landers · 4 domains" },
+      { id: "acme-performance", name: "ACME Performance", sub: "7 landers · 2 domains" }
+    ]},
+    { id: "finedge", name: "FinanceEdge", workspaces: [
+      { id: "finance-edge", name: "FinanceEdge", sub: "21 landers · 6 domains" },
+      { id: "insights",     name: "Insights",    sub: "5 landers · 1 domain" }
+    ]}
   ];
-
-  function wsOptionRow(w, isActive) {
-    return '<button type="button" class="ws-option' + (isActive ? " is-active" : "") + '" data-ws="' + w.id + '">' +
-             '<span class="ws-option__body"><strong>' + w.name + '</strong><small>' + w.sub + '</small></span>' +
-             (isActive ? '<span class="ws-option__check">✓</span>' : '') +
-           '</button>';
+  function teamOf(wsId) {
+    for (var i = 0; i < TEAMS.length; i++) {
+      if (TEAMS[i].workspaces.some(function (w) { return w.id === wsId; })) return TEAMS[i];
+    }
+    return TEAMS[0];
+  }
+  function allWorkspaces() {
+    var out = []; TEAMS.forEach(function (t) { out = out.concat(t.workspaces); }); return out;
   }
 
-  function workspaceMenuInner(activeId) {
-    var cur = workspaces.find(function (w) { return w.id === activeId; }) || workspaces[0];
-    return '<div class="ws-menu__label">Switch workspace</div>' +
-      workspaces.map(function (w) { return wsOptionRow(w, w.id === cur.id); }).join("") +
-      '<div class="ws-menu__sep"></div>' +
-      '<div class="ws-menu__foot"><a href="#" class="js-new-workspace">＋ New workspace</a><a href="#">Manage</a></div>';
+  // ---- Combined nested team→workspace multi-select ----
+  // selection: null = all; else array of selected workspace ids
+  var wsSelection = null;
+  (function () {
+    try {
+      var raw = JSON.parse(localStorage.getItem("nexus:wsSel") || "null");
+      if (Array.isArray(raw)) wsSelection = raw;
+    } catch (e) {}
+  })();
+  function selIds() { return wsSelection ? wsSelection.slice() : allWorkspaces().map(function (w) { return w.id; }); }
+  function isWsSel(id) { return !wsSelection || wsSelection.indexOf(id) !== -1; }
+  function commitSel(arr) {
+    var total = allWorkspaces().length;
+    wsSelection = (arr.length >= total) ? null : arr;
+    try { localStorage.setItem("nexus:wsSel", JSON.stringify(wsSelection)); } catch (e) {}
+    var root = document.getElementById("scope-menu-root");
+    if (root) { root.innerHTML = scopeMenuInner(); applyIndet(root); }
+    var lbl = document.getElementById("scope-active-name");
+    if (lbl) lbl.textContent = scopeLabel();
+  }
+  function scopeLabel() {
+    if (!wsSelection) return "All workspaces";
+    if (!wsSelection.length) return "None";
+    if (wsSelection.length === 1) {
+      var w = allWorkspaces().find(function (x) { return x.id === wsSelection[0]; });
+      return w ? w.name : "1 workspace";
+    }
+    // whole-team shorthand
+    var fullTeams = TEAMS.filter(function (t) { return t.workspaces.every(function (w) { return isWsSel(w.id); }); });
+    if (fullTeams.length === 1 && wsSelection.length === fullTeams[0].workspaces.length) return fullTeams[0].name;
+    return wsSelection.length + " workspaces";
+  }
+  function scopeMenuInner() {
+    var html = '<div class="scope-menu__actions">' +
+      '<button type="button" class="scope-act" data-scope-act="all">Select all</button>' +
+      '<button type="button" class="scope-act" data-scope-act="none">Clear</button>' +
+      '</div>';
+    TEAMS.forEach(function (t) {
+      var ids = t.workspaces.map(function (w) { return w.id; });
+      var on = ids.every(isWsSel), some = ids.some(isWsSel);
+      html += '<div class="scope-group">' +
+        '<label class="scope-team"><input type="checkbox" data-scope-team="' + t.id + '"' +
+          (on ? " checked" : "") + (!on && some ? ' data-indet="1"' : '') + ' />' +
+          '<span>' + t.name + '</span></label>';
+      t.workspaces.forEach(function (w) {
+        html += '<label class="scope-ws"><input type="checkbox" data-scope-ws="' + w.id + '"' + (isWsSel(w.id) ? " checked" : "") + ' />' +
+          '<span class="scope-ws__name">' + w.name + '</span></label>';
+      });
+      html += '</div>';
+    });
+    html += '<div class="ws-menu__sep"></div>' +
+      '<div class="ws-menu__foot"><a href="#" class="js-new-workspace">＋ New Workspace</a><a href="settings.html">Manage</a></div>';
+    return html;
+  }
+  function applyIndet(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-indet="1"]').forEach(function (cb) { cb.indeterminate = true; });
   }
 
   // -------------------------------------------------------------------
@@ -59,7 +117,6 @@
   if (strip && !strip.children.length) {
     var stored = null;
     try { stored = JSON.parse(localStorage.getItem("nexus:ws") || "null"); } catch (e) {}
-    var active = workspaces.find(function (w) { return stored && w.id === stored; }) || workspaces[0];
 
     // Detect the current page name from the sidebar's active link (fallback to filename).
     var pathFile = (location.pathname.split("/").pop() || "index.html").toLowerCase();
@@ -82,12 +139,12 @@
     strip.innerHTML =
       '<div class="top-strip__left">' +
         brandAnchor +
-        '<details class="ws pop">' +
-          '<summary class="ws-switch" title="Switch workspace">' +
-            '<span class="ws-name" id="ws-active-name">' + active.name + '</span>' +
+        '<details class="ws pop" id="scope-pop">' +
+          '<summary class="ws-switch" title="Filter teams & workspaces">' +
+            '<span class="ws-name" id="scope-active-name">' + scopeLabel() + '</span>' +
             '<span class="ws-caret">▾</span>' +
           '</summary>' +
-          '<div class="ws-menu" role="menu" id="ws-menu-root">' + workspaceMenuInner(active.id) + '</div>' +
+          '<div class="ws-menu ws-menu--scope" role="menu" id="scope-menu-root">' + scopeMenuInner() + '</div>' +
         '</details>' +
         '<span class="top-sep" aria-hidden="true">/</span>' +
         '<span class="top-page" id="top-page-name">' + pageName + '</span>' +
@@ -103,6 +160,7 @@
       '</div>';
 
     document.querySelectorAll(".sidebar .brand-tile, .sidebar > .avatar").forEach(function (n) { n.remove(); });
+    applyIndet(document.getElementById("scope-menu-root"));
 
     strip.addEventListener("click", function (ev) {
       if (ev.target.closest(".js-new-workspace")) {
@@ -118,17 +176,32 @@
         }
         return;
       }
-      var opt = ev.target.closest(".ws-option");
-      if (!opt) return;
-      var id = opt.getAttribute("data-ws");
-      var w  = workspaces.find(function (x) { return x.id === id; });
-      if (!w) return;
-      document.getElementById("ws-active-name").textContent = w.name;
-      var root = document.getElementById("ws-menu-root");
-      if (root) root.innerHTML = workspaceMenuInner(id);
-      try { localStorage.setItem("nexus:ws", JSON.stringify(id)); } catch (e) {}
-      var det = opt.closest("details.ws");
-      if (det) det.removeAttribute("open");
+      // Select all / clear
+      var act = ev.target.closest("[data-scope-act]");
+      if (act) {
+        ev.preventDefault();
+        commitSel(act.getAttribute("data-scope-act") === "all" ? allWorkspaces().map(function (w) { return w.id; }) : []);
+        return;
+      }
+    });
+
+    // Nested checkbox changes
+    strip.addEventListener("change", function (ev) {
+      var set = selIds();
+      var wsCb = ev.target.closest("[data-scope-ws]");
+      var teamCb = ev.target.closest("[data-scope-team]");
+      if (wsCb) {
+        var id = wsCb.getAttribute("data-scope-ws");
+        if (wsCb.checked) { if (set.indexOf(id) === -1) set.push(id); }
+        else set = set.filter(function (x) { return x !== id; });
+        commitSel(set);
+      } else if (teamCb) {
+        var t = TEAMS.find(function (x) { return x.id === teamCb.getAttribute("data-scope-team"); });
+        var ids = t.workspaces.map(function (w) { return w.id; });
+        if (teamCb.checked) ids.forEach(function (i) { if (set.indexOf(i) === -1) set.push(i); });
+        else set = set.filter(function (x) { return ids.indexOf(x) === -1; });
+        commitSel(set);
+      }
     });
   }
 
@@ -145,11 +218,9 @@
         '</div>' +
         '<div class="field"><label for="nw-name">Workspace name</label>' +
         '<input type="text" id="nw-name" placeholder="e.g. Q3 Performance" autocomplete="off" /></div>' +
-        '<div class="field"><label for="nw-desc">Description <span class="muted">(optional)</span></label>' +
-        '<input type="text" id="nw-desc" placeholder="What is this workspace for?" /></div>' +
         '<div class="modal__actions">' +
           '<button type="button" class="btn" data-close-dialog>Cancel</button>' +
-          '<button type="button" class="btn btn--black" id="nw-create">Create workspace</button>' +
+          '<button type="button" class="btn btn--black" id="nw-create">＋ New Workspace</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(nwDlg);
@@ -160,15 +231,14 @@
       var inp = document.getElementById("nw-name");
       var name = inp && inp.value.trim();
       if (!name) { if (inp) inp.focus(); return; }
-      var descInp = document.getElementById("nw-desc");
-      if (descInp) descInp.value = "";
       var id = "ws-" + Date.now();
-      workspaces.push({ id: id, name: name, sub: "0 landers · 0 domains" });
-      var nameEl = document.getElementById("ws-active-name");
-      if (nameEl) nameEl.textContent = name;
-      var root = document.getElementById("ws-menu-root");
-      if (root) root.innerHTML = workspaceMenuInner(id);
-      try { localStorage.setItem("nexus:ws", JSON.stringify(id)); } catch (e) {}
+      var firstTeam = TEAMS[0];
+      firstTeam.workspaces.push({ id: id, name: name, sub: "0 landers · 0 domains" });
+      if (wsSelection) wsSelection.push(id);
+      var root = document.getElementById("scope-menu-root");
+      if (root) root.innerHTML = scopeMenuInner();
+      var lbl = document.getElementById("scope-active-name");
+      if (lbl) lbl.textContent = scopeLabel();
       nwDlg.close();
     });
   }

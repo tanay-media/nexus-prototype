@@ -28,14 +28,8 @@
       <div class="page-header">
         <h1>Settings</h1>
         <div class="page-header__right">
-          <div class="ms" id="tw-ms">
-            <button type="button" class="ms__btn" id="tw-ms-btn" aria-haspopup="true" aria-expanded="false">
-              <span class="ws-pill__dot"></span>
-              <span id="tw-ms-label">All teams &amp; workspaces</span>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-            <div class="ms__pop" id="tw-ms-pop" hidden></div>
-          </div>
+          <button type="button" class="btn btn--black" id="gen-add-ws-top" data-tab-action="general">+ New Workspace</button>
+          <button type="button" class="btn btn--black" id="cd-add-top" data-tab-action="dest" hidden>+ New Integration</button>
         </div>
       </div>
 
@@ -63,11 +57,18 @@
           </div>
 
           <div class="card gen-card">
-            <div id="gen-ws-list"></div>
-            <button type="button" class="gen-add" id="gen-add-ws">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-              Create workspace
-            </button>
+            <div class="table-scroll" role="region" aria-label="Workspaces">
+              <table class="table table--gen">
+                <thead>
+                  <tr>
+                    <th>Workspace</th>
+                    <th>Workspace ID</th>
+                    <th class="right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="gen-ws-list"></tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -82,9 +83,9 @@
                 Connect ad platforms and tag managers for this workspace. <strong>Meta</strong> and
                 <strong>Google</strong> receive server-side conversions (buy-source firing);
                 <strong>Google Tag Manager</strong> handles client-side behavioral events on your landers.
+                You can connect several accounts per provider and mark <strong>one default per provider</strong>.
               </p>
             </div>
-            <button class="btn btn--black" id="cd-add-btn">+ Add integration</button>
           </div>
 
           <div class="card cd-card">
@@ -93,9 +94,8 @@
                 <thead>
                   <tr>
                     <th>Name</th>
-                    <th>Provider</th>
                     <th>Identifiers</th>
-                    <th>Events</th>
+                    <th>Applied to</th>
                     <th>Default</th>
                     <th class="right">Actions</th>
                   </tr>
@@ -110,15 +110,6 @@
               <h3>No integrations yet</h3>
               <p>Connect Meta or Google for server-side conversions, or Google Tag Manager for client-side behavioral events.</p>
               <button class="btn btn--black" id="cd-add-empty">+ Add integration</button>
-            </div>
-          </div>
-
-          <div class="cd-help">
-            <div class="cd-help__title">How resolution works</div>
-            <div class="cd-help__steps">
-              <div class="cd-help__step"><span class="cd-help__num">1</span><div><strong>Lander picks one</strong> — or inherits this workspace's default.</div></div>
-              <div class="cd-help__step"><span class="cd-help__num">2</span><div><strong>On publish</strong>, Nexus resolves the destination + any overrides into a single config and ships it with the lander.</div></div>
-              <div class="cd-help__step"><span class="cd-help__num">3</span><div><strong>On a MAX postback</strong>, dispatch fires to the buy source using <code>visit_id</code> data + <code>conversion_id</code> as <code>event_id</code>.</div></div>
             </div>
           </div>
         </section>
@@ -413,19 +404,11 @@
           <div class="dskp__field">
             <div class="dskp__label">Container ID</div>
             <input class="dskp__input" type="text" id="cd-gtm-container" placeholder="GTM-XXXXXXX" />
-            <div class="dskp__hint">The GTM container that loads on your landers. Events below are pushed to its <code>dataLayer</code>.</div>
-          </div>
-          <div class="dskp__field">
-            <div class="dskp__label">Environment <span class="dskp__opt">optional</span></div>
-            <select class="dskp__select" id="cd-gtm-env">
-              <option value="live">Live</option>
-              <option value="latest">Latest</option>
-            </select>
           </div>
         </div>
 
         <!-- Event map (shared) -->
-        <div class="dskp__field">
+        <div class="dskp__field" data-em-section>
           <div class="dskp__label">Event map</div>
           <div class="cd-eventmap-head">
             <div>
@@ -445,7 +428,7 @@
           <button type="button" class="cd-eventmap__add" id="cd-eventmap-add">+ Add mapping</button>
         </div>
 
-        <label class="cd-default-check">
+        <label class="cd-default-check" data-default-section>
           <input type="checkbox" id="cd-set-default" />
           <span>Set as workspace default after saving</span>
         </label>
@@ -510,7 +493,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
           Send test event
         </button>
-        <button type="submit" class="dskp__b dskp__b--primary" id="cd-save-btn">Save destination</button>
+        <button type="submit" class="dskp__b dskp__b--primary" id="cd-save-btn">Save integration</button>
       </div>
     </form>
   </dialog>
@@ -540,6 +523,7 @@
 
   <script src="app.js"></script>
   <script src="site-shell.js"></script>
+  <script src="thumbs.js"></script>
   <script src="settings.js"></script>
   <script src="settings-general.js"></script>
 </body>

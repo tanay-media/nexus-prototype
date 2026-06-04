@@ -2,11 +2,11 @@
 // Prototype only — state in localStorage so toggles persist across navigation.
 
 (function () {
-  var STORAGE_KEY = "nexus.cd.v1";
+  var STORAGE_KEY = "nexus.cd.v2";
 
   // ----- Defaults / seed data -----
   var seed = {
-    defaultId: "cd_meta_prod",
+    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", gtm: "cd_gtm_main" },
     rows: [
       {
         id: "cd_meta_prod",
@@ -55,19 +55,46 @@
           { from: "purchase", to: "purchase_offline" }
         ],
         createdAt: "2026-04-04"
+      },
+      {
+        id: "cd_gtm_main",
+        name: "GTM — house.bestlivingideas.com",
+        source: "gtm",
+        fields: { gtm_container: "GTM-WX7K2PL", gtm_env: "live" },
+        eventMap: [],
+        createdAt: "2026-03-28"
+      },
+      {
+        id: "cd_gtm_staging",
+        name: "GTM — staging sandbox",
+        source: "gtm",
+        fields: { gtm_container: "GTM-5QF9D02", gtm_env: "latest" },
+        eventMap: [],
+        createdAt: "2026-04-19"
       }
     ]
   };
 
   // ----- State -----
   var state = load();
+  var collapsed = {}; // provider id -> collapsed bool
 
   function load() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.rows)) return parsed;
+        if (parsed && Array.isArray(parsed.rows)) {
+          // migrate old single-default model → per-provider defaults
+          if (!parsed.defaults) {
+            parsed.defaults = { facebook: null, google: null, gtm: null };
+            if (parsed.defaultId) {
+              var dr = parsed.rows.find(function (x) { return x.id === parsed.defaultId; });
+              if (dr) parsed.defaults[dr.source] = dr.id;
+            }
+          }
+          return parsed;
+        }
       }
     } catch (e) {}
     return JSON.parse(JSON.stringify(seed));
@@ -137,6 +164,29 @@
     return "—";
   }
 
+  // Which landers each integration is applied to (prototype mapping by integration id)
+  var APPLIED_LANDERS = {
+    cd_meta_prod: ["Summer Sale", "Black Friday", "Founder Letter"],
+    cd_meta_promo: ["Holiday Teaser"],
+    cd_google_main: ["Referral Q2", "Partner Announce"],
+    cd_gtm_main: ["Summer Sale", "Walk-in Tubs", "Fall Preview"],
+    cd_gtm_staging: []
+  };
+  function landersCell(row) {
+    var ls = APPLIED_LANDERS[row.id] || [];
+    if (!ls.length) return '<span class="cd-applied cd-applied--none">Not applied yet</span>';
+    var img = window.nexusLanderImage || function () { return "img/lander-1.png"; };
+    var shown = ls.slice(0, 5);
+    var extra = ls.length - shown.length;
+    var stack = shown.map(function (n, i) {
+      return '<span class="cd-appl-thumb" style="background-image:url(\'' + img(n) + '\');z-index:' + (10 - i) + '" title="' + escapeHtml(n) + '"></span>';
+    }).join("");
+    return '<div class="cd-applied" title="' + escapeHtml(ls.join(", ")) + '">' +
+      '<span class="cd-appl-stack">' + stack + '</span>' +
+      '<span class="cd-appl-count">' + ls.length + (ls.length === 1 ? " lander" : " landers") + '</span>' +
+    '</div>';
+  }
+
   function eventsCell(row) {
     if (!row.eventMap || !row.eventMap.length) return '<span class="muted" style="font-size:11px">—</span>';
     var destLabel = ({ facebook: "Meta", google: "Google", gtm: "GTM" })[row.source] || "dest";
@@ -150,8 +200,8 @@
   }
 
   function defaultCell(row) {
-    if (state.defaultId === row.id) {
-      return '<span class="cd-default" title="Default destination for this workspace">' +
+    if (state.defaults && state.defaults[row.source] === row.id) {
+      return '<span class="cd-default" title="Default for ' + escapeHtml((SOURCE_LABEL[row.source] || {}).name || row.source) + ' in this workspace">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>Default</span>';
     }
     return '<button type="button" class="cd-make-default js-cd-default" data-id="' + row.id + '">Make default</button>';
@@ -170,21 +220,20 @@
     if (tableScroll) tableScroll.hidden = false;
     if (emptyEl) emptyEl.hidden = true;
 
-    body.innerHTML = rows.map(function (r) {
-      var label = SOURCE_LABEL[r.source] || { name: r.source };
-      return '<tr>' +
+    var GROUP_ORDER = ["facebook", "google", "gtm"];
+    function rowHtml(r) {
+      return '<tr class="cd-acct-row" data-group="' + r.source + '"' + (collapsed[r.source] ? ' hidden' : '') + '>' +
         '<td>' +
           '<div class="cd-name-cell">' +
             (SOURCE_THUMB[r.source] || "") +
             '<div>' +
-              '<button type="button" class="dsk-row-name js-cd-edit" data-id="' + r.id + '" title="Edit destination"><strong>' + escapeHtml(r.name) + '</strong></button>' +
+              '<button type="button" class="dsk-row-name js-cd-edit" data-id="' + r.id + '" title="Edit integration"><strong>' + escapeHtml(r.name) + '</strong></button>' +
               '<small class="cd-id">' + escapeHtml(r.id) + '</small>' +
             '</div>' +
           '</div>' +
         '</td>' +
-        '<td><span class="cd-source-pill cd-source-pill--' + r.source + '">' + escapeHtml(label.short) + '</span></td>' +
         '<td>' + idsCell(r) + '</td>' +
-        '<td>' + eventsCell(r) + '</td>' +
+        '<td>' + landersCell(r) + '</td>' +
         '<td>' + defaultCell(r) + '</td>' +
         '<td class="right"><div class="actions">' +
           '<button type="button" class="icon-btn js-cd-edit" data-id="' + r.id + '" title="Edit" aria-label="Edit">' +
@@ -195,7 +244,26 @@
           '</button>' +
         '</div></td>' +
       '</tr>';
-    }).join("");
+    }
+
+    var html = "";
+    GROUP_ORDER.forEach(function (src) {
+      var grp = rows.filter(function (r) { return r.source === src; });
+      if (!grp.length) return;
+      var label = SOURCE_LABEL[src] || { name: src };
+      var n = grp.length;
+      var isCol = !!collapsed[src];
+      html += '<tr class="cd-group-row' + (isCol ? ' is-collapsed' : '') + '" data-toggle-group="' + src + '"><td colspan="5">' +
+        '<div class="cd-group-head">' +
+          '<svg class="cd-group-chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>' +
+          (SOURCE_THUMB[src] || "") +
+          '<span class="cd-group-name">' + escapeHtml(label.name) + '</span>' +
+          '<span class="cd-group-count">' + n + (n === 1 ? " account" : " accounts") + '</span>' +
+        '</div>' +
+        '</td></tr>';
+      html += grp.map(rowHtml).join("");
+    });
+    body.innerHTML = html;
   }
 
   // ----- Dialog: provider switching -----
@@ -205,9 +273,25 @@
     var btns = document.querySelectorAll(".cd-prov");
     btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-source") === src)); });
     formDlg.setAttribute("data-source", src);
+    var isGtm = src === "gtm";
+    var emSec = document.querySelector("[data-em-section]");
+    var defSec = document.querySelector("[data-default-section]");
+    if (emSec) emSec.hidden = isGtm;
+    if (defSec) defSec.hidden = isGtm;
     var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", gtm: "Google Tag Manager" })[src] || "Integration";
     var eyebrow = document.getElementById("cd-eyebrow");
     if (eyebrow) eyebrow.textContent = provName;
+
+    // Swap the dialog header icon to the provider logo
+    var iconEl = document.querySelector("#form-cd .dskp__icon");
+    if (iconEl) {
+      iconEl.style.background = "#fff";
+      iconEl.innerHTML = ({
+        facebook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>',
+        google:   '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg>',
+        gtm:      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg>'
+      })[src] || '';
+    }
 
     // Update event-map header to reflect chosen destination
     var labelMap = {
@@ -216,6 +300,14 @@
       gtm:      { name: "dataLayer event", sub: 'pushed client-side · <code>event</code>' }
     };
     var l = labelMap[src] || labelMap.facebook;
+    // GTM has no server-side test — relabel the action button
+    if (testBtn) {
+      var tlbl = isGtm ? "Verify with Tag Assistant" : "Send test event";
+      var span = testBtn.querySelector("span");
+      testBtn.innerHTML = (isGtm
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>') + " " + tlbl;
+    }
     var nameEl = document.querySelector("[data-source-event-label]");
     var subEl = document.querySelector("[data-source-event-sub]");
     if (nameEl) nameEl.textContent = l.name;
@@ -468,7 +560,7 @@
       { from: "lead", to: "Lead" },
       { from: "purchase", to: "Purchase" }
     ]);
-    setDefaultIn.checked = r ? state.defaultId === r.id : (state.rows.length === 0);
+    setDefaultIn.checked = r ? (state.defaults && state.defaults[r.source] === r.id) : false;
   }
 
   function openAdd(src) {
@@ -538,9 +630,15 @@
         eventMap: collectEventMap(),
         createdAt: new Date().toISOString().slice(0, 10)
       });
-      if (setDefaultIn.checked || !state.defaultId) state.defaultId = nid;
+      if (setDefaultIn.checked || !(state.defaults && state.defaults[src])) {
+        state.defaults = state.defaults || {};
+        state.defaults[src] = nid;
+      }
     }
-    if (id && setDefaultIn.checked) state.defaultId = id;
+    if (id && setDefaultIn.checked) {
+      var er = state.rows.find(function (x) { return x.id === id; });
+      if (er) { state.defaults = state.defaults || {}; state.defaults[er.source] = id; }
+    }
     save();
     render();
     formDlg.close();
@@ -581,6 +679,11 @@
 
   if (testBtn) {
     testBtn.addEventListener("click", function () {
+      // GTM: there's no server fire to test — send users to Tag Assistant to verify dataLayer
+      if ((formDlg.getAttribute("data-source") || "") === "gtm") {
+        window.open("https://chromewebstore.google.com/detail/tag-assistant/kejbdjndbnbjgmefkgdddjlbokphdefk?hl=en", "_blank", "noopener");
+        return;
+      }
       if (testPanel.hidden) { openTestPanel(); }
       else { testPanel.hidden = true; testResult.hidden = true; }
     });
@@ -688,9 +791,18 @@
   if (body) {
     body.addEventListener("click", function (e) {
       var t;
+      var grp = e.target.closest("[data-toggle-group]");
+      if (grp) {
+        var src = grp.getAttribute("data-toggle-group");
+        collapsed[src] = !collapsed[src];
+        render();
+        return;
+      }
       if ((t = e.target.closest(".js-cd-edit"))) { openEdit(t.getAttribute("data-id")); return; }
       if ((t = e.target.closest(".js-cd-default"))) {
-        state.defaultId = t.getAttribute("data-id");
+        var did = t.getAttribute("data-id");
+        var dr = state.rows.find(function (x) { return x.id === did; });
+        if (dr) { state.defaults = state.defaults || {}; state.defaults[dr.source] = did; }
         save(); render();
         return;
       }
@@ -698,7 +810,7 @@
         deletePending = t.getAttribute("data-id");
         var r = state.rows.find(function (x) { return x.id === deletePending; });
         if (!r) return;
-        var isDefault = state.defaultId === r.id;
+        var isDefault = state.defaults && state.defaults[r.source] === r.id;
         deleteMsg.innerHTML =
           'You are about to delete <strong>' + escapeHtml(r.name) + '</strong>. ' +
           'Landers inheriting this destination ' +
@@ -712,8 +824,13 @@
     deleteBtn.addEventListener("click", function () {
       if (!deletePending) { deleteDlg.close(); return; }
       state.rows = state.rows.filter(function (x) { return x.id !== deletePending; });
-      if (state.defaultId === deletePending) {
-        state.defaultId = state.rows.length ? state.rows[0].id : null;
+      if (state.defaults) {
+        Object.keys(state.defaults).forEach(function (src) {
+          if (state.defaults[src] === deletePending) {
+            var next = state.rows.find(function (x) { return x.source === src; });
+            state.defaults[src] = next ? next.id : null;
+          }
+        });
       }
       deletePending = null;
       save();
@@ -725,7 +842,7 @@
   // ----- Add buttons → open browse catalog -----
   var browseDlg = document.getElementById("dialog-cd-browse");
   function openBrowse() { if (browseDlg) { renderBrowse(); browseDlg.showModal(); } }
-  var addBtn = document.getElementById("cd-add-btn");
+  var addBtn = document.getElementById("cd-add-top");
   var addEmpty = document.getElementById("cd-add-empty");
   if (addBtn) addBtn.addEventListener("click", openBrowse);
   if (addEmpty) addEmpty.addEventListener("click", openBrowse);

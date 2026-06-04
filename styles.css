@@ -241,6 +241,55 @@ details.ws { position: relative; }
 .ws-option.is-active { background: #eaf2fc; }
 .ws-option__body { display: flex; flex-direction: column; line-height: 1.25; }
 .ws-option__check { margin-left: auto; color: var(--brand); font-weight: 700; }
+
+/* Nested team→workspace multi-select scope menu */
+.ws-menu--scope { min-width: 280px; padding: 0.5rem; }
+.scope-menu__actions {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.1rem 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.4rem;
+}
+.scope-act {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 5px;
+}
+.scope-act:hover { background: var(--bg); }
+.scope-group + .scope-group { border-top: 1px solid var(--border); margin-top: 0.35rem; padding-top: 0.4rem; }
+.scope-team, .scope-ws {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--text);
+}
+.scope-team { font-weight: 700; font-size: 13px; }
+.scope-team__n {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 0.45rem;
+}
+.scope-ws { padding-left: 1.7rem; font-size: 12.5px; font-weight: 500; }
+.scope-ws__name { font-weight: 500; }
+.scope-ws__sub { margin-left: auto; font-size: 10.5px; color: var(--text-muted); }
+.scope-team:hover, .scope-ws:hover { background: var(--bg); }
+.scope-team input, .scope-ws input { width: 14px; height: 14px; accent-color: var(--brand); cursor: pointer; flex-shrink: 0; }
 .ws-menu__sep { height: 1px; background: var(--border); margin: 0.35rem 0; }
 .ws-menu__foot {
   padding: 0.35rem 0.55rem 0.15rem;

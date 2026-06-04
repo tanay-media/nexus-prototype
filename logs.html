@@ -245,7 +245,7 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
                   <td><strong>US</strong></td>
-                  <td class="log-meta-preview mono">{"destination":"Meta — ACME Growth","event_name":"Purchase","status":"200","latency_ms":312…</td>
+                  <td class="log-meta-preview mono">{"destination_id":"cd_meta_prod","destination":"Meta — ACM…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
@@ -255,11 +255,11 @@
   "destination_id": "cd_meta_prod",
   "destination": "Meta — ACME Growth",
   "endpoint": "POST graph.facebook.com/v18.0/319847562103948/events",
-  "event_id": "cv_x82b40a7e1c",
+  "event_id": "cv_4261d228d9",
   "event_name": "Purchase",
   "status": 200,
-  "latency_ms": 312,
-  "visit_id": "v_a7f239c8"
+  "latency_ms": 415,
+  "visit_id": "v_a10ec9aa"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: fire-001 · Full timestamp: 2026-04-21 09:43:50</div>
                     </div>
@@ -276,7 +276,7 @@
                   <td class="muted">Mobile</td>
                   <td class="muted">iOS</td>
                   <td><strong>CA</strong></td>
-                  <td class="log-meta-preview mono">{"destination":"Meta — ACME Growth","event_name":"Lead","status":"200","latency_ms":198…</td>
+                  <td class="log-meta-preview mono">{"destination_id":"cd_meta_prod","destination":"Meta — ACM…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
@@ -286,11 +286,11 @@
   "destination_id": "cd_meta_prod",
   "destination": "Meta — ACME Growth",
   "endpoint": "POST graph.facebook.com/v18.0/319847562103948/events",
-  "event_id": "cv_p44d9e8201",
-  "event_name": "Lead",
+  "event_id": "cv_e769858999",
+  "event_name": "Purchase",
   "status": 200,
-  "latency_ms": 198,
-  "visit_id": "v_b1ce4710"
+  "latency_ms": 212,
+  "visit_id": "v_1f105248"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: fire-002 · Full timestamp: 2026-04-21 09:38:55</div>
                     </div>
@@ -307,7 +307,7 @@
                   <td class="muted">Mobile</td>
                   <td class="muted">Android</td>
                   <td><strong>BR</strong></td>
-                  <td class="log-meta-preview mono">{"destination":"Meta — ACME Growth","status":"401","error":"OAuthException: Invalid token","retries":3…</td>
+                  <td class="log-meta-preview mono">{"destination_id":"cd_meta_prod","destination":"Meta — ACM…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
@@ -317,7 +317,7 @@
   "destination_id": "cd_meta_prod",
   "destination": "Meta — ACME Growth",
   "endpoint": "POST graph.facebook.com/v18.0/319847562103948/events",
-  "event_id": "cv_r4488e",
+  "event_id": "cv_a5949e295f",
   "event_name": "Purchase",
   "status": 401,
   "error": {
@@ -326,7 +326,7 @@
     "message": "Invalid OAuth access token. Token has expired."
   },
   "retries": 3,
-  "visit_id": "v_r29a0e18"
+  "visit_id": "v_54bde6b4"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: fire-003 · Full timestamp: 2026-04-20 22:17:48</div>
                     </div>
@@ -343,16 +343,20 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
                   <td><strong>US</strong></td>
-                  <td class="log-meta-preview mono">{"clickId":"cl_9f2a","value":42,"fbc…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_adaca551","conversion_id":"cv_e625311d9d","…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "clickId": "cl_9f2a",
-  "value": 42,
-  "fbclid": "fb.1.abc123"
+  "visit_id": "v_adaca551",
+  "conversion_id": "cv_e625311d9d",
+  "conversion_type": "purchase",
+  "value": 80.95,
+  "currency": "USD",
+  "external_id": "ord_hezqqd",
+  "source": "max"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-001 · Full timestamp: 2026-04-21 09:42:11</div>
                     </div>
@@ -369,16 +373,17 @@
                   <td class="muted">Mobile</td>
                   <td class="muted">iOS</td>
                   <td><strong>CA</strong></td>
-                  <td class="log-meta-preview mono">{"clickId":"cl_8b1c","zone":"hero-primary"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_458ad589","cta_id":"cta_g52xrr","zone":"her…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "clickId": "cl_8b1c",
+  "visit_id": "v_458ad589",
+  "cta_id": "cta_g52xrr",
   "zone": "hero-primary",
-  "latencyMs": 118
+  "outbound_url": "https://trk.pmsrv.co/v2/trk?adid=0ArbchMv&akey=775f5ba2-11e9-35fd-322c-4e4114ed8607&ppid=QGW8VMKUB&purl=https://offers.acme.com/black-friday-2026"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-002 · Full timestamp: 2026-04-21 09:38:02</div>
                     </div>
@@ -395,16 +400,25 @@
                   <td class="muted">Tablet</td>
                   <td class="muted">iPadOS</td>
                   <td><strong>GB</strong></td>
-                  <td class="log-meta-preview mono">{"sessionId":"sess_k4m","placement":"above-fold"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_f500d9d0","lander":"Referral Q2","domain":"…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "sessionId": "sess_k4m",
-  "placement": "above-fold",
-  "creativeId": "cr_991"
+  "visit_id": "v_f500d9d0",
+  "lander": "Referral Q2",
+  "domain": "refer.acme.com",
+  "path": "/referral-q2",
+  "params": {
+    "utm_source": "fb",
+    "utm_medium": "paid",
+    "utm_campaign": "120249356059214306",
+    "utm_content": "120239220346894276",
+    "utm_term": "120205174029140352",
+    "fbclid": "IwZXh0bgNhZW0BMABhovm2Q8ylxqRBThrqcgjPV3xjE2ENPHVzPZB1G50p"
+  }
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-003 · Full timestamp: 2026-04-21 09:31:44</div>
                     </div>
@@ -421,16 +435,25 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">Windows</td>
                   <td><strong>DE</strong></td>
-                  <td class="log-meta-preview mono">{"landingPath":"/founder-letter","ref":"newsletter"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_c460c944","lander":"Founder Letter","domain…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "landingPath": "/founder-letter",
-  "ref": "newsletter",
-  "utm_source": "email"
+  "visit_id": "v_c460c944",
+  "lander": "Founder Letter",
+  "domain": "offers.acme.com",
+  "path": "/founder-letter",
+  "params": {
+    "utm_source": "fb",
+    "utm_medium": "paid",
+    "utm_campaign": "120270593145683229",
+    "utm_content": "120219629143154513",
+    "utm_term": "120299522897234759",
+    "fbclid": "IwZXh0bgNhZW0BMABhNRNwIqO4NRmEGo2fRvKw7Ic4sJafHgrG5sFh1M3M"
+  }
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-004 · Full timestamp: 2026-04-21 09:22:09</div>
                     </div>
@@ -447,16 +470,17 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
                   <td><strong>US</strong></td>
-                  <td class="log-meta-preview mono">{"clickId":"cl_7aa0","cta":"Shop now"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_62d2637f","cta_id":"cta_8vudm3","zone":"her…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "clickId": "cl_7aa0",
-  "cta": "Shop now",
-  "scrollDepth": 0.42
+  "visit_id": "v_62d2637f",
+  "cta_id": "cta_8vudm3",
+  "zone": "hero-primary",
+  "outbound_url": "https://trk.pmsrv.co/v2/trk?adid=1ozBlG3V&akey=3c3dc2c6-ece2-0ab1-a643-de9cf938804e&ppid=HQ6DIWJT6&purl=https://offers.acme.com/summer-sale-hero"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-005 · Full timestamp: 2026-04-21 09:15:33</div>
                     </div>
@@ -473,16 +497,20 @@
                   <td class="muted">Mobile</td>
                   <td class="muted">Android</td>
                   <td><strong>IN</strong></td>
-                  <td class="log-meta-preview mono">{"clickId":"cl_6d02","value":1,"goal":"signup"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_5f4efa6d","conversion_id":"cv_7812ac2b13","…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "clickId": "cl_6d02",
-  "value": 1,
-  "goal": "signup"
+  "visit_id": "v_5f4efa6d",
+  "conversion_id": "cv_7812ac2b13",
+  "conversion_type": "signup",
+  "value": 0,
+  "currency": "USD",
+  "external_id": "ord_ktiwx0",
+  "source": "max"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-006 · Full timestamp: 2026-04-21 09:02:18</div>
                     </div>
@@ -499,16 +527,25 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">Linux</td>
                   <td><strong>BR</strong></td>
-                  <td class="log-meta-preview mono">{"sessionId":"sess_p2n","variant":"orange-bold"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_354747f8","lander":"Black Friday","domain":…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "sessionId": "sess_p2n",
-  "variant": "orange-bold",
-  "bidId": "bid_8841"
+  "visit_id": "v_354747f8",
+  "lander": "Black Friday",
+  "domain": "offers.acme.com",
+  "path": "/black-friday-2026",
+  "params": {
+    "utm_source": "fb",
+    "utm_medium": "paid",
+    "utm_campaign": "120267726144089723",
+    "utm_content": "120214588003644873",
+    "utm_term": "120217424203975418",
+    "fbclid": "IwZXh0bgNhZW0BMABhoXHzm6BZvsMHFG4QiLV43Zo3DQEGsdDetVW1aDdw"
+  }
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-007 · Full timestamp: 2026-04-21 08:55:01</div>
                     </div>
@@ -525,16 +562,17 @@
                   <td class="muted">Mobile</td>
                   <td class="muted">iOS</td>
                   <td><strong>US</strong></td>
-                  <td class="log-meta-preview mono">{"clickId":"cl_5c91","section":"financing"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_ddca8cdf","cta_id":"cta_reihoa","zone":"her…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "clickId": "cl_5c91",
-  "section": "financing",
-  "dwellMs": 4200
+  "visit_id": "v_ddca8cdf",
+  "cta_id": "cta_reihoa",
+  "zone": "hero-primary",
+  "outbound_url": "https://trk.pmsrv.co/v2/trk?adid=0h5CExiU&akey=290dd968-50a8-e301-2e58-f1cedf004904&ppid=6XDZAORR3&purl=https://try.acme.com/walk-in-tubs"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-008 · Full timestamp: 2026-04-21 08:48:27</div>
                     </div>
@@ -551,16 +589,25 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
                   <td><strong>US</strong></td>
-                  <td class="log-meta-preview mono">{"landingPath":"/holiday-teaser","ref":"paid-search"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_65c12f06","lander":"Holiday Teaser","domain…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "landingPath": "/holiday-teaser",
-  "ref": "paid-search",
-  "gclid": "CjwK..."
+  "visit_id": "v_65c12f06",
+  "lander": "Holiday Teaser",
+  "domain": "offers.acme.com",
+  "path": "/holiday-teaser",
+  "params": {
+    "utm_source": "fb",
+    "utm_medium": "paid",
+    "utm_campaign": "120246456545656669",
+    "utm_content": "120207586850935479",
+    "utm_term": "120215397316947036",
+    "fbclid": "IwZXh0bgNhZW0BMABhHV9S62BJ65o59adkc98TXAl7ceLovsUqOcLI5Ec2"
+  }
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-009 · Full timestamp: 2026-04-21 08:40:12</div>
                     </div>
@@ -577,16 +624,17 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">Windows</td>
                   <td><strong>UK</strong></td>
-                  <td class="log-meta-preview mono">{"clickId":"cl_4b10","zone":"sticky-footer"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_7afed637","cta_id":"cta_i21s85","zone":"her…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "clickId": "cl_4b10",
-  "zone": "sticky-footer",
-  "experiment": "exp_footer_v2"
+  "visit_id": "v_7afed637",
+  "cta_id": "cta_i21s85",
+  "zone": "hero-primary",
+  "outbound_url": "https://trk.pmsrv.co/v2/trk?adid=h9NZwny9&akey=601006b5-1a94-9020-8c25-62904316083f&ppid=X7IV891VR&purl=https://refer.acme.com/referral-q2"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-010 · Full timestamp: 2026-04-21 08:33:56</div>
                     </div>
@@ -603,17 +651,20 @@
                   <td class="muted">Mobile</td>
                   <td class="muted">Android</td>
                   <td><strong>MX</strong></td>
-                  <td class="log-meta-preview mono">{"clickId":"cl_3a77","value":19.99,"currency":"USD"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_0dd9f781","conversion_id":"cv_313f8152d6","…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "clickId": "cl_3a77",
-  "value": 19.99,
+  "visit_id": "v_0dd9f781",
+  "conversion_id": "cv_313f8152d6",
+  "conversion_type": "signup",
+  "value": 0,
   "currency": "USD",
-  "sku": "fall-bundle"
+  "external_id": "ord_xao9b1",
+  "source": "max"
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-011 · Full timestamp: 2026-04-21 08:21:03</div>
                     </div>
@@ -630,16 +681,25 @@
                   <td class="muted">Desktop</td>
                   <td class="muted">macOS</td>
                   <td><strong>US</strong></td>
-                  <td class="log-meta-preview mono">{"sessionId":"sess_z01","placement":"interstitial"…</td>
+                  <td class="log-meta-preview mono">{"visit_id":"v_739da489","lander":"Summer Sale","domain":"…</td>
                 </tr>
                 <tr class="log-expand-row" hidden>
                   <td colspan="10">
                     <div class="log-expand-inner">
                       <div class="log-expand-label">Raw metadata</div>
                       <pre class="log-raw-json">{
-  "sessionId": "sess_z01",
-  "placement": "interstitial",
-  "viewability": 0.91
+  "visit_id": "v_739da489",
+  "lander": "Summer Sale",
+  "domain": "offers.acme.com",
+  "path": "/summer-sale-hero",
+  "params": {
+    "utm_source": "fb",
+    "utm_medium": "paid",
+    "utm_campaign": "120280296308354734",
+    "utm_content": "120261783497651683",
+    "utm_term": "120253798757361335",
+    "fbclid": "IwZXh0bgNhZW0BMABhZKoYz07lEwSjXEgblckDJ8r8MmS7mTuUf8TgCSxy"
+  }
 }</pre>
                       <div class="log-expand-foot muted">Event ID: log-012 · Full timestamp: 2026-04-21 08:10:41</div>
                     </div>

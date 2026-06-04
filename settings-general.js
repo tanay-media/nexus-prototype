@@ -2,17 +2,17 @@
 (function () {
   var TEAMS = [
     { id: "acme", name: "Acme Inc", workspaces: [
-      { id: "ws_acme_growth", name: "ACME Growth", active: true },
-      { id: "ws_acme_retail", name: "ACME Retail", active: false }
+      { id: "7c2a9f10-4b3d-4e21-9a8c-1f5e8d220a31", name: "ACME Growth", active: true },
+      { id: "b8e1d472-2c6a-49f3-8d10-7a93c4e1b520", name: "ACME Retail", active: false }
     ]},
     { id: "finedge", name: "FinanceEdge", workspaces: [
-      { id: "ws_finedge", name: "FinanceEdge", active: false },
-      { id: "ws_insights", name: "Insights", active: false }
+      { id: "3f9a0c61-8d24-4b7e-a512-6e0b9d83f140", name: "FinanceEdge", active: false },
+      { id: "d50b7e93-1a4f-4c08-bb29-9c71e2a0d365", name: "Insights", active: false }
     ]}
   ];
 
   var list = document.getElementById("gen-ws-list");
-  var addBtn = document.getElementById("gen-add-ws");
+  var addBtn = document.getElementById("gen-add-ws-top");
   var msBtn = document.getElementById("tw-ms-btn");
   var msPop = document.getElementById("tw-ms-pop");
   var msLabel = document.getElementById("tw-ms-label");
@@ -32,11 +32,7 @@
     return ids;
   }
   function isSel(id) { return !selectedWs || selectedWs.indexOf(id) !== -1; }
-  function fakeUuid(id) {
-    var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i) + 7) >>> 0;
-    function seg(n) { var s = ""; for (var i = 0; i < n; i++) { h = (Math.imul(h, 1103515245) + 12345) >>> 0; s += "0123456789abcdef"[(h >>> 8) % 16]; } return s; }
-    return seg(8) + "-" + seg(4) + "-" + seg(4) + "-" + seg(4) + "-" + seg(12);
-  }
+  function fakeUuid(id) { return id; }
 
   // ---- General list (workspaces from selected teams) ----
   function render() {
@@ -44,22 +40,23 @@
     TEAMS.forEach(function (t) {
       var shown = t.workspaces.filter(function (w) { return isSel(w.id); });
       if (!shown.length) return;
-      html += '<div class="gen-team-row">' + escapeHtml(t.name) + '</div>';
+      html += '<tr class="gen-team-row"><td colspan="3">' +
+        '<span class="gen-team-name">' + escapeHtml(t.name) + '</span>' +
+        '<span class="gen-team-count">' + shown.length + (shown.length === 1 ? " workspace" : " workspaces") + '</span>' +
+        '</td></tr>';
       shown.forEach(function (w) {
-        html += '<div class="gen-ws" data-ws="' + w.id + '">' +
-          '<div class="gen-ws__main">' +
-            '<div class="gen-ws__name"><span class="gen-ws__name-text">' + escapeHtml(w.name) + '</span>' +
-              (w.active ? '<span class="gen-ws__badge">Active</span>' : '') + '</div>' +
-            '<div class="gen-ws__id">' + fakeUuid(w.id) + '</div>' +
-          '</div>' +
-          '<div class="gen-ws__actions">' +
-            (w.active ? '' : '<button type="button" class="gen-switch" data-act="switch">Switch to</button>') +
-            '<button type="button" class="gen-ws__icon" data-act="rename" title="Rename" aria-label="Rename"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4v16h16v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>' +
-            '<button type="button" class="gen-ws__icon gen-ws__icon--danger" data-act="delete" title="Delete" aria-label="Delete"' + (w.active ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></button>' +
-          '</div>' +
-        '</div>';
+        html += '<tr class="gen-ws" data-ws="' + w.id + '">' +
+          '<td><div class="gen-ws__name"><span class="gen-ws__name-text">' + escapeHtml(w.name) + '</span>' +
+            (w.active ? '<span class="gen-ws__badge">Active</span>' : '') + '</div></td>' +
+          '<td><span class="gen-ws__id">' + fakeUuid(w.id) + '</span></td>' +
+          '<td class="right"><div class="gen-ws__actions">' +
+            '<button type="button" class="icon-btn" data-act="rename" title="Rename" aria-label="Rename"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4v16h16v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>' +
+            '<button type="button" class="icon-btn" data-act="delete" title="Delete" aria-label="Delete"' + (w.active ? ' disabled style="opacity:.4;cursor:not-allowed"' : '') + '><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></button>' +
+          '</div></td>' +
+        '</tr>';
+      });
     });
-    if (!html) html = '<div class="gen-empty">No workspaces in the selected teams.</div>';
+    if (!html) html = '<tr><td colspan="3" class="gen-empty">No workspaces in the selected teams.</td></tr>';
     list.innerHTML = html;
   }
 
@@ -105,7 +102,7 @@
     // add to first selected team (or first team)
     var target = TEAMS[0];
     if (selectedWs && selectedWs.length) { var f = findWs(selectedWs[0]); if (f) target = f.team; }
-    var w = { id: "ws_new_" + (uid++), name: "New workspace", active: false };
+    var w = { id: "" + (Math.random().toString(16).slice(2, 10)) + "-0000-4000-8000-" + Date.now().toString(16).slice(-12), name: "New workspace", active: false };
     target.workspaces.push(w);
     if (selectedWs) selectedWs.push(w.id);
     render(); renderPop(); updateLabel();
@@ -173,6 +170,21 @@
 
   updateLabel();
   render();
+
+  // ---- Toggle the page-header add button per active tab ----
+  (function () {
+    var genBtn = document.getElementById("gen-add-ws-top");
+    var cdBtn = document.getElementById("cd-add-top");
+    var tabs = document.querySelectorAll('[data-tabs="settings-page"] .tab');
+    function sync() {
+      var active = document.querySelector('[data-tabs="settings-page"] .tab.is-active');
+      var key = active ? active.getAttribute("data-tab") : "general";
+      if (genBtn) genBtn.hidden = key !== "general";
+      if (cdBtn) cdBtn.hidden = key !== "dest";
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { setTimeout(sync, 0); }); });
+    sync();
+  })();
 
   // ---- MCP copy ----
   function flash(el) { el.classList.add("is-copied"); setTimeout(function () { el.classList.remove("is-copied"); }, 1100); }
