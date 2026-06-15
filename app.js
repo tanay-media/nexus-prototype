@@ -335,20 +335,60 @@
     });
   });
 
-  // Tabs (Published / Drafts & Archived)
+  // Tabs — click + deep-link via location hash (e.g. settings.html#integrations)
+  var TAB_HASH_ALIASES = { integrations: "dest", destinations: "dest" };
+
+  function resolveTabHash(hash) {
+    var h = String(hash || "").replace(/^#/, "").trim().toLowerCase();
+    if (!h) return null;
+    return TAB_HASH_ALIASES[h] || h;
+  }
+
+  function panelsForTabGroup(group) {
+    var scope = group.closest("[data-tabs]") || group;
+    var inner = scope.querySelectorAll("[data-tab-panel]");
+    if (inner.length) return inner;
+    var parent = scope.parentElement;
+    if (parent) return parent.querySelectorAll("[data-tab-panel]");
+    return document.querySelectorAll("[data-tab-panel]");
+  }
+
+  function activateTabGroup(group, key) {
+    if (!group || !key) return false;
+    var buttons = group.querySelectorAll(".tab");
+    var target = null;
+    buttons.forEach(function (b) {
+      if (b.getAttribute("data-tab") === key && !b.disabled) target = b;
+    });
+    if (!target) return false;
+    var panels = panelsForTabGroup(group);
+    buttons.forEach(function (b) { b.classList.toggle("is-active", b === target); });
+    panels.forEach(function (p) {
+      p.hidden = p.getAttribute("data-tab-panel") !== key;
+    });
+    return true;
+  }
+
+  function applyHashTab() {
+    var key = resolveTabHash(location.hash);
+    if (!key) return;
+    document.querySelectorAll("[data-tabs]").forEach(function (group) {
+      activateTabGroup(group, key);
+    });
+  }
+
   document.querySelectorAll("[data-tabs]").forEach(function (group) {
     var buttons = group.querySelectorAll(".tab");
-    var panels = document.querySelectorAll("[data-tab-panel]");
     buttons.forEach(function (btn) {
       btn.addEventListener("click", function () {
         var key = btn.getAttribute("data-tab");
-        buttons.forEach(function (b) { b.classList.toggle("is-active", b === btn); });
-        panels.forEach(function (p) {
-          p.hidden = p.getAttribute("data-tab-panel") !== key;
-        });
+        activateTabGroup(group, key);
       });
     });
   });
+
+  applyHashTab();
+  window.addEventListener("hashchange", applyHashTab);
 
   // Chrome dialog tabs (Header / Footer / CMP)
   document.querySelectorAll(".chrome-tabs").forEach(function (tabs) {

@@ -183,6 +183,7 @@
       if (cdBtn) cdBtn.hidden = key !== "dest";
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { setTimeout(sync, 0); }); });
+    window.addEventListener("hashchange", function () { setTimeout(sync, 0); });
     sync();
   })();
 
