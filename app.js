@@ -337,11 +337,26 @@
 
   // Tabs — click + deep-link via location hash (e.g. settings.html#integrations)
   var TAB_HASH_ALIASES = { integrations: "dest", destinations: "dest" };
+  var TAB_HASH_CANONICAL = { dest: "integrations", general: "general", mcp: "mcp" };
 
   function resolveTabHash(hash) {
     var h = String(hash || "").replace(/^#/, "").trim().toLowerCase();
     if (!h) return null;
     return TAB_HASH_ALIASES[h] || h;
+  }
+
+  function hashForTabKey(key) {
+    return TAB_HASH_CANONICAL[key] || key;
+  }
+
+  function syncTabHash(key) {
+    if (!key) return;
+    var hash = "#" + hashForTabKey(key);
+    var next = location.pathname + location.search + hash;
+    var current = location.pathname + location.search + location.hash;
+    if (current === next) return;
+    if (history.replaceState) history.replaceState(null, "", next);
+    else location.hash = hash;
   }
 
   function panelsForTabGroup(group) {
@@ -382,7 +397,7 @@
     buttons.forEach(function (btn) {
       btn.addEventListener("click", function () {
         var key = btn.getAttribute("data-tab");
-        activateTabGroup(group, key);
+        if (activateTabGroup(group, key)) syncTabHash(key);
       });
     });
   });
