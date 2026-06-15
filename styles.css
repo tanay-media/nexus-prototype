@@ -3880,13 +3880,27 @@ body.editor-open .shell { padding-top: 0; grid-template-columns: 1fr; }
   color: var(--text-muted);
   line-height: 1.35;
 }
-.publish-pixel-row__input {
+.publish-pixel-row__input,
+.publish-pixel-row__select {
   width: 100%;
   min-width: 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
   padding: 0.42rem 0.6rem;
   box-sizing: border-box;
+}
+.publish-pixel-row__select {
+  font-family: inherit;
+  cursor: pointer;
+}
+.publish-tracking__foot {
+  margin: 0.35rem 0 0;
+  font-size: 11.5px;
+}
+.publish-tracking__foot a {
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .publish-event-row {
@@ -3905,7 +3919,8 @@ body.editor-open .shell { padding-top: 0; grid-template-columns: 1fr; }
 @media (max-width: 640px) {
   .publish-route__row { grid-template-columns: 1fr; }
   .publish-pixel-row { grid-template-columns: 36px 1fr; }
-  .publish-pixel-row__input { grid-column: 1 / -1; }
+  .publish-pixel-row__input,
+  .publish-pixel-row__select { grid-column: 1 / -1; }
 }
 
 /* Step 3 — review */

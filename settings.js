@@ -6,7 +6,7 @@
 
   // ----- Defaults / seed data -----
   var seed = {
-    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", gtm: "cd_gtm_main" },
+    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
     rows: [
       {
         id: "cd_meta_prod",
@@ -71,6 +71,14 @@
         fields: { gtm_container: "GTM-5QF9D02", gtm_env: "latest" },
         eventMap: [],
         createdAt: "2026-04-19"
+      },
+      {
+        id: "cd_meta_pixel_main",
+        name: "Meta Pixel — ACME Growth",
+        source: "meta_pixel",
+        fields: { pixel_id: "319847562103948" },
+        eventMap: [],
+        createdAt: "2026-03-15"
       }
     ]
   };
@@ -87,11 +95,18 @@
         if (parsed && Array.isArray(parsed.rows)) {
           // migrate old single-default model → per-provider defaults
           if (!parsed.defaults) {
-            parsed.defaults = { facebook: null, google: null, gtm: null };
+            parsed.defaults = { facebook: null, google: null, gtm: null, meta_pixel: null };
             if (parsed.defaultId) {
               var dr = parsed.rows.find(function (x) { return x.id === parsed.defaultId; });
               if (dr) parsed.defaults[dr.source] = dr.id;
             }
+          }
+          if (!parsed.defaults.meta_pixel && seed.defaults.meta_pixel) {
+            parsed.defaults.meta_pixel = seed.defaults.meta_pixel;
+          }
+          if (!parsed.rows.some(function (r) { return r.id === "cd_meta_pixel_main"; })) {
+            var mp = seed.rows.find(function (r) { return r.id === "cd_meta_pixel_main"; });
+            if (mp) parsed.rows.push(JSON.parse(JSON.stringify(mp)));
           }
           return parsed;
         }
@@ -134,12 +149,14 @@
   var SOURCE_LABEL = {
     facebook: { name: "Meta", short: "Meta" },
     google:   { name: "Google Ads", short: "Google" },
-    gtm:      { name: "Google Tag Manager", short: "GTM" }
+    gtm:      { name: "Google Tag Manager", short: "GTM" },
+    meta_pixel: { name: "Meta Pixel", short: "Pixel" }
   };
   var SOURCE_THUMB = {
     facebook: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>',
     google: '<span class="cd-thumb cd-thumb--google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg></span>',
-    gtm: '<span class="cd-thumb cd-thumb--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>'
+    gtm: '<span class="cd-thumb cd-thumb--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>',
+    meta_pixel: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>'
   };
 
   function idsCell(row) {
@@ -161,6 +178,12 @@
         '<small>client-side · dataLayer</small>' +
       '</div>';
     }
+    if (row.source === "meta_pixel") {
+      return '<div class="cd-ids">' +
+        '<code>pixel ' + escapeHtml(row.fields.pixel_id || "—") + '</code>' +
+        '<small>client-side · fbq</small>' +
+      '</div>';
+    }
     return "—";
   }
 
@@ -170,7 +193,8 @@
     cd_meta_promo: ["Holiday Teaser"],
     cd_google_main: ["Referral Q2", "Partner Announce"],
     cd_gtm_main: ["Summer Sale", "Walk-in Tubs", "Fall Preview"],
-    cd_gtm_staging: []
+    cd_gtm_staging: [],
+    cd_meta_pixel_main: ["Summer Sale", "Black Friday"]
   };
   function landersCell(row) {
     var ls = APPLIED_LANDERS[row.id] || [];
@@ -189,7 +213,7 @@
 
   function eventsCell(row) {
     if (!row.eventMap || !row.eventMap.length) return '<span class="muted" style="font-size:11px">—</span>';
-    var destLabel = ({ facebook: "Meta", google: "Google", gtm: "GTM" })[row.source] || "dest";
+    var destLabel = ({ facebook: "Meta", google: "Google", gtm: "GTM", meta_pixel: "Meta Pixel" })[row.source] || "dest";
     return '<div class="cd-events" title="Advertiser event → ' + destLabel + ' event">' +
       row.eventMap.map(function (m) {
         return '<code><span class="cd-events__from">' + escapeHtml(m.from) + '</span>' +
@@ -273,12 +297,12 @@
     var btns = document.querySelectorAll(".cd-prov");
     btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-source") === src)); });
     formDlg.setAttribute("data-source", src);
-    var isGtm = src === "gtm";
+    var isClientPixel = src === "gtm" || src === "meta_pixel";
     var emSec = document.querySelector("[data-em-section]");
     var defSec = document.querySelector("[data-default-section]");
-    if (emSec) emSec.hidden = isGtm;
-    if (defSec) defSec.hidden = isGtm;
-    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", gtm: "Google Tag Manager" })[src] || "Integration";
+    if (emSec) emSec.hidden = isClientPixel;
+    if (defSec) defSec.hidden = isClientPixel;
+    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src] || "Integration";
     var eyebrow = document.getElementById("cd-eyebrow");
     if (eyebrow) eyebrow.textContent = provName;
 
@@ -289,7 +313,8 @@
       iconEl.innerHTML = ({
         facebook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>',
         google:   '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg>',
-        gtm:      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg>'
+        gtm:      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg>',
+        meta_pixel: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>'
       })[src] || '';
     }
 
@@ -300,11 +325,10 @@
       gtm:      { name: "dataLayer event", sub: 'pushed client-side · <code>event</code>' }
     };
     var l = labelMap[src] || labelMap.facebook;
-    // GTM has no server-side test — relabel the action button
+    // Client-side pixels have no server-side test — relabel the action button
     if (testBtn) {
-      var tlbl = isGtm ? "Verify with Tag Assistant" : "Send test event";
-      var span = testBtn.querySelector("span");
-      testBtn.innerHTML = (isGtm
+      var tlbl = isClientPixel ? (src === "gtm" ? "Verify with Tag Assistant" : "Verify pixel") : "Send test event";
+      testBtn.innerHTML = (isClientPixel
         ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg>'
         : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>') + " " + tlbl;
     }
@@ -556,6 +580,7 @@
     document.getElementById("cd-g-token").placeholder = r && r.source === "google" && r.fields.g_token_ref ? "Leave blank to keep existing token (vault ref)" : "1//••••••••••••••••";
     document.getElementById("cd-gtm-container").value = r && r.source === "gtm" ? (r.fields.gtm_container || "") : "";
     if (document.getElementById("cd-gtm-env")) document.getElementById("cd-gtm-env").value = r && r.source === "gtm" ? (r.fields.gtm_env || "live") : "live";
+    if (document.getElementById("cd-meta-pixel-id")) document.getElementById("cd-meta-pixel-id").value = r && r.source === "meta_pixel" ? (r.fields.pixel_id || "") : "";
     renderEventMap(r ? r.eventMap : [
       { from: "lead", to: "Lead" },
       { from: "purchase", to: "Purchase" }
@@ -604,6 +629,8 @@
     } else if (src === "gtm") {
       fields.gtm_container = document.getElementById("cd-gtm-container").value.trim();
       fields.gtm_env = document.getElementById("cd-gtm-env").value;
+    } else if (src === "meta_pixel") {
+      fields.pixel_id = document.getElementById("cd-meta-pixel-id").value.trim();
     }
 
     var id = editIdIn.value;
@@ -855,12 +882,14 @@
       logo: '<span class="cd-thumb cd-thumb--google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg></span>' },
     { id: "gtm", name: "Google Tag Manager", cat: "tag", desc: "Client-side behavioral events on your landers.", connectable: true,
       logo: '<span class="cd-thumb cd-thumb--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>' },
+    { id: "meta_pixel", name: "Meta Pixel", cat: "tag", desc: "Browser pixel for PageView and on-site events (fbq).", connectable: true,
+      logo: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>' },
     { id: "taboola", name: "Taboola", cat: "ads", desc: "S2S conversions for Taboola campaigns.", connectable: false,
       logo: '<span class="cd-thumb cd-thumb--taboola" style="background:#1652DA">Tb</span>' },
     { id: "ga4", name: "Google Analytics 4", cat: "tag", desc: "Measurement Protocol events.", connectable: false,
       logo: '<span class="cd-thumb" style="background:#E8710A;color:#fff;font-weight:700">GA</span>' }
   ];
-  var CAT_LABEL = { all: "All integrations", ads: "Buy sources", tag: "Tracking platforms" };
+  var CAT_LABEL = { all: "All integrations", ads: "Buy sources", tag: "Client-side pixels" };
   var browseState = { cat: "all", q: "" };
 
   function connectedSources() {

@@ -69,7 +69,7 @@
               <label for="settings-keywords">Keywords</label>
               <input type="text" id="settings-keywords" placeholder="comma, separated, keywords" value="summer sale, deals, shop" />
             </div>
-            <p class="editor-settings-panel__foot">Saved on the <strong>variant</strong> in Base · pixels stay on the lander.</p>
+            <p class="editor-settings-panel__foot">Saved on the <strong>variant</strong> in Base · <strong>tracking integrations</strong> on the lander.</p>
           </div>
         </details>
         <button class="btn" type="button">Save</button>
@@ -442,16 +442,8 @@
               </div>
             </div>
 
-          <ul class="publish-pixel-list">
-            <li class="publish-pixel-row">
-              <span class="publish-pixel-row__icon publish-pixel-row__icon--gtm" aria-hidden="true">GTM</span>
-              <div class="publish-pixel-row__text">
-                <strong>Tag Manager</strong>
-                <small>Container ID that wraps GA, Meta and other tags.</small>
-              </div>
-              <input type="text" class="input publish-pixel-row__input" id="publish-gtm" value="" placeholder="GTM-XXXXXXX" />
-            </li>
-          </ul>
+          <ul class="publish-pixel-list" id="publish-tracking-list" aria-label="Tracking integrations"></ul>
+          <p class="publish-tracking__foot muted"><a href="settings.html#integrations">Manage workspace integrations</a></p>
           </div>
         </div>
       </section>
@@ -593,6 +585,7 @@
     </div>
   </dialog>
 
+  <script src="integrations-catalog.js"></script>
   <script src="site-shell.js"></script>
   <script>
     // ---- Read ?name=... to rename the title (e.g. when opened from "+ New Lander")
@@ -1163,6 +1156,85 @@
       { key: "Offer code",     value: "SUMMER60" }
     ];
 
+    var LANDER_INT_KEY = "nexus.lander.integrations.v1";
+    var PUBLISH_TRACK_SOURCES = [
+      { source: "facebook", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Meta", title: "Meta CAPI", sub: "Server-side conversions to Meta (convDestinations)." },
+      { source: "google", iconClass: "publish-pixel-row__icon--ga", iconLabel: "G", title: "Google Ads", sub: "Offline conversion upload on postback." },
+      { source: "gtm", iconClass: "publish-pixel-row__icon--gtm", iconLabel: "GTM", title: "Tag Manager", sub: "Container ID baked into serving HTML." },
+      { source: "meta_pixel", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Px", title: "Meta Pixel", sub: "Browser pixel (fbq) on the lander." }
+    ];
+    var publishTrackingList = document.getElementById("publish-tracking-list");
+
+    function loadAllLanderIntegrations() {
+      try { return JSON.parse(localStorage.getItem(LANDER_INT_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function getLanderIntegrationPicks(landerName) {
+      return loadAllLanderIntegrations()[landerName] || {};
+    }
+    function saveLanderIntegrationPicks(landerName, picks) {
+      var all = loadAllLanderIntegrations();
+      all[landerName] = picks;
+      try { localStorage.setItem(LANDER_INT_KEY, JSON.stringify(all)); } catch (e) {}
+    }
+    function publishCurrentLanderName() {
+      return (document.getElementById("editor-lander-title").textContent || "").trim() || "default";
+    }
+    function publishResolvedIntegrationId(source) {
+      var sel = document.getElementById("publish-int-" + source);
+      var picked = sel ? sel.value : "";
+      if (picked) return picked;
+      var landerPicks = getLanderIntegrationPicks(publishCurrentLanderName());
+      if (landerPicks[source]) return landerPicks[source];
+      return window.nexusIntegrations ? window.nexusIntegrations.defaultIdForSource(source) : null;
+    }
+    function publishIntegrationLabel(source, id) {
+      if (!id || !window.nexusIntegrations) return null;
+      var row = window.nexusIntegrations.rowById(id);
+      return row ? row.name : null;
+    }
+    function publishRenderTracking() {
+      if (!publishTrackingList || !window.nexusIntegrations) return;
+      var ni = window.nexusIntegrations;
+      var landerPicks = getLanderIntegrationPicks(publishCurrentLanderName());
+      publishTrackingList.innerHTML = PUBLISH_TRACK_SOURCES.map(function (cfg) {
+        var rows = ni.rowsForSource(cfg.source);
+        var defId = ni.defaultIdForSource(cfg.source);
+        var defRow = defId ? ni.rowById(defId) : null;
+        var inheritLabel = defRow ? ("Workspace default · " + defRow.name) : "Workspace default (none set)";
+        var selected = landerPicks[cfg.source] || "";
+        var opts = '<option value="">' + publishEscape(inheritLabel) + '</option>';
+        rows.forEach(function (r) {
+          opts += '<option value="' + publishEscape(r.id) + '"' + (selected === r.id ? " selected" : "") + '>' + publishEscape(r.name) + '</option>';
+        });
+        return '<li class="publish-pixel-row">' +
+          '<span class="publish-pixel-row__icon ' + cfg.iconClass + '" aria-hidden="true">' + publishEscape(cfg.iconLabel) + '</span>' +
+          '<div class="publish-pixel-row__text"><strong>' + publishEscape(cfg.title) + '</strong><small>' + publishEscape(cfg.sub) + '</small></div>' +
+          '<select class="input publish-pixel-row__select" id="publish-int-' + cfg.source + '" data-int-source="' + cfg.source + '">' + opts + '</select>' +
+        '</li>';
+      }).join("");
+    }
+    function publishReadTrackingPicks() {
+      var picks = {};
+      PUBLISH_TRACK_SOURCES.forEach(function (cfg) {
+        var sel = document.getElementById("publish-int-" + cfg.source);
+        picks[cfg.source] = sel && sel.value ? sel.value : null;
+      });
+      return picks;
+    }
+    function publishSaveTrackingPicks() {
+      saveLanderIntegrationPicks(publishCurrentLanderName(), publishReadTrackingPicks());
+    }
+    function publishTrackingSummary() {
+      if (!window.nexusIntegrations) return "Not configured";
+      var parts = [];
+      PUBLISH_TRACK_SOURCES.forEach(function (cfg) {
+        var id = publishResolvedIntegrationId(cfg.source);
+        var label = publishIntegrationLabel(cfg.source, id);
+        if (label) parts.push(label);
+      });
+      return parts.length ? parts.join(" · ") : "None selected";
+    }
+
     function publishGoToStep(n) {
       publishCurrentStep = n;
       document.querySelectorAll(".publish-step").forEach(function (s) {
@@ -1586,8 +1658,7 @@
       var varCount = EDITOR_LANDER_VARS.length;
       var varsText = varCount + " variable" + (varCount === 1 ? "" : "s") + " · edited values applied to live rotation";
 
-      var gtm = (document.getElementById("publish-gtm") || {}).value || "";
-      var trackingText = gtm ? "GTM " + gtm : "Not configured";
+      var trackingText = publishTrackingSummary();
 
       var rL = document.getElementById("review-lander");
       var rU = document.getElementById("review-url");
@@ -1683,6 +1754,7 @@
       publishCheckShell();
       publishSyncPageFromEditor();
       publishRenderVariables();
+      publishRenderTracking();
     }
 
     if (publishPathSuggestions) {
@@ -1857,6 +1929,7 @@
         if (!shellReady) return;
         publishGoToStep(2);
       } else if (publishCurrentStep === 2) {
+        publishSaveTrackingPicks();
         publishGoToStep(3);
       }
     });
@@ -2113,6 +2186,12 @@
       }
     }
 
+    if (publishTrackingList) {
+      publishTrackingList.addEventListener("change", function (e) {
+        if (e.target.matches("[data-int-source]") && publishCurrentStep === 3) publishUpdateReview();
+      });
+    }
+
     publishLive.addEventListener("click", function () {
       if (!publishDomain.value) {
         publishErr.hidden = false;
@@ -2123,6 +2202,7 @@
         publishGoToStep(1);
         return;
       }
+      publishSaveTrackingPicks();
       var originalLabel = publishLive.textContent;
       publishLive.disabled = true;
       publishLive.classList.add("is-loading");

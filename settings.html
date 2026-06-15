@@ -262,7 +262,7 @@
           <div class="brws__nav-title">Browse</div>
           <button type="button" class="brws__cat is-active" data-cat="all">All integrations <span class="brws__cat-count" data-count="all"></span></button>
           <button type="button" class="brws__cat" data-cat="ads">Buy sources <span class="brws__cat-count" data-count="ads"></span></button>
-          <button type="button" class="brws__cat" data-cat="tag">Tracking platforms <span class="brws__cat-count" data-count="tag"></span></button>
+          <button type="button" class="brws__cat" data-cat="tag">Client-side pixels <span class="brws__cat-count" data-count="tag"></span></button>
         </aside>
         <div class="brws__main">
           <div class="brws__search">
@@ -319,6 +319,13 @@
               <div>
                 <div class="cd-prov__name">Google Tag Manager</div>
                 <div class="cd-prov__meta">Client-side behavioral events</div>
+              </div>
+            </button>
+            <button type="button" class="cd-prov" data-source="meta_pixel" aria-pressed="false">
+              <span class="cd-prov__logo cd-prov__logo--fb"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>
+              <div>
+                <div class="cd-prov__name">Meta Pixel</div>
+                <div class="cd-prov__meta">Browser pixel · fbq</div>
               </div>
             </button>
           </div>
@@ -404,6 +411,14 @@
           <div class="dskp__field">
             <div class="dskp__label">Container ID</div>
             <input class="dskp__input" type="text" id="cd-gtm-container" placeholder="GTM-XXXXXXX" />
+          </div>
+        </div>
+
+        <!-- Meta Pixel fields -->
+        <div data-source-fields="meta_pixel" hidden>
+          <div class="dskp__field">
+            <div class="dskp__label">Pixel ID <span class="dskp__opt"><a href="https://www.facebook.com/business/help/952192354843755" target="_blank" rel="noopener">Find it</a></span></div>
+            <input class="dskp__input" type="text" id="cd-meta-pixel-id" placeholder="123456789012345" inputmode="numeric" />
           </div>
         </div>
 
@@ -524,6 +539,7 @@
   <script src="app.js"></script>
   <script src="site-shell.js"></script>
   <script src="thumbs.js"></script>
+  <script src="integrations-catalog.js"></script>
   <script src="settings.js"></script>
   <script src="settings-general.js"></script>
 </body>
