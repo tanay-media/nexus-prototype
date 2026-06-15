@@ -1,6 +1,54 @@
 // Shared workspace integration catalog (Settings + Editor publish flow).
+//
+// UI_FIELD_MAP — prototype localStorage names ↔ Base / Serving contract
+// (see docs/02-base-system/workspace-integrations.md §3.1–3.2)
+//
+// Row shape (UI):           { id, name, source, fields, eventMap[], createdAt }
+// WorkspaceIntegration:     { integrationId, integrationName, provider, kind, config, … }
+// convDestinations element: { convDestinationId, convDestinationName, buySource, …flat config }
+//
+// source (UI) → provider (Base) → buySource (Serving, buy_source only):
+//   facebook    → meta_capi      → fb
+//   google      → google_ads    → google
+//   gtm         → gtm           → (client_pixel — baked in servingHtml)
+//   meta_pixel  → meta_pixel    → (client_pixel — baked in servingHtml)
+//
+// fields (UI) → config (Base) → Serving element:
+//   fb_pixel_id      → pixelId              → pixelId
+//   fb_action_source → actionSource         → actionSource
+//   fb_token_ref     → accessToken          → accessToken
+//   g_customer_id    → customerId           → customerId
+//   g_action_id      → conversionActionId   → conversionActionId
+//   g_token_ref      → accessToken          → accessToken
+//   gtm_container    → containerId          → (HTML bake)
+//   gtm_env          → environment          → (HTML bake)
+//   pixel_id         → pixelId (meta_pixel) → (HTML bake)
+//
+// eventMap (UI): [{ from: "lead", to: "Lead" }, …]
+// eventMap (Base/Serving): { "lead": { "eventName": "Lead" }, … }
+//
+// defaults[source] (UI)           → defaultIntegrationIds[provider] (Base)
+// nexus.lander.integrations.v1    → selectedIntegrationIds (Base)
+
 (function () {
   var STORAGE_KEY = "nexus.cd.v2";
+
+  var UI_FIELD_MAP = {
+    sourceToProvider: { facebook: "meta_capi", google: "google_ads", gtm: "gtm", meta_pixel: "meta_pixel" },
+    providerToBuySource: { meta_capi: "fb", google_ads: "google" },
+    rowKeys: { id: "integrationId", name: "integrationName", source: "provider" },
+    configFields: {
+      fb_pixel_id: "pixelId",
+      fb_action_source: "actionSource",
+      fb_token_ref: "accessToken",
+      g_customer_id: "customerId",
+      g_action_id: "conversionActionId",
+      g_token_ref: "accessToken",
+      gtm_container: "containerId",
+      gtm_env: "environment",
+      pixel_id: "pixelId"
+    }
+  };
 
   var SEED = {
     defaults: { facebook: "cd_meta_prod", google: "cd_google_main", gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
@@ -95,6 +143,7 @@
 
   window.nexusIntegrations = {
     STORAGE_KEY: STORAGE_KEY,
+    UI_FIELD_MAP: UI_FIELD_MAP,
     SEED: SEED,
     load: load,
     rowsForSource: rowsForSource,

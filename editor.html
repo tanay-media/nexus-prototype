@@ -1156,6 +1156,8 @@
       { key: "Offer code",     value: "SUMMER60" }
     ];
 
+    // Publish tracking — UI source keys; map to Base provider via nexusIntegrations.UI_FIELD_MAP
+    // (facebook→meta_capi, google→google_ads, gtm, meta_pixel). Lander picks → selectedIntegrationIds.
     var LANDER_INT_KEY = "nexus.lander.integrations.v1";
     var PUBLISH_TRACK_SOURCES = [
       { source: "facebook", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Meta", title: "Meta CAPI", sub: "Server-side conversions to Meta (convDestinations)." },

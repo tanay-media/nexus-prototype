@@ -1,5 +1,8 @@
 // Settings page — Conversion destinations (workspace catalog).
 // Prototype only — state in localStorage so toggles persist across navigation.
+//
+// UI field names ↔ Base / Serving: see integrations-catalog.js (UI_FIELD_MAP)
+// and docs/02-base-system/workspace-integrations.md §3.2.
 
 (function () {
   var STORAGE_KEY = "nexus.cd.v2";
