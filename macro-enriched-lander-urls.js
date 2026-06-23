@@ -15,7 +15,6 @@
         { key: "buySource", value: "fb" },
         { key: "utm_source", value: "{{site_source_name}}" },
         { key: "utm_medium", value: "cpc" },
-        { key: "utm_campaign", value: "{{campaign.name}}" },
         { key: "utm_id", value: "{{campaign.id}}" },
         { key: "utm_content", value: "{{ad.id}}" },
         { key: "utm_term", value: "{{adset.id}}" },
