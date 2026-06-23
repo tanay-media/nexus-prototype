@@ -12,13 +12,11 @@
       shortLabel: "Meta",
       params: [
         { key: "clid", value: "{{fbclid}}" },
-        { key: "buySource", value: "fb" },
-        { key: "utm_source", value: "{{site_source_name}}" },
-        { key: "utm_medium", value: "cpc" },
-        { key: "utm_id", value: "{{campaign.id}}" },
-        { key: "utm_content", value: "{{ad.id}}" },
-        { key: "utm_term", value: "{{adset.id}}" },
-        { key: "utm_placement", value: "{{placement}}" }
+        { key: "ad_name", value: "{{ad.name}}" },
+        { key: "adset_name", value: "{{adset.name}}" },
+        { key: "campaign_name", value: "{{campaign.name}}" },
+        { key: "placement", value: "{{placement}}" },
+        { key: "site_source_name", value: "{{site_source_name}}" }
       ]
     },
     google: {
