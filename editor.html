@@ -528,31 +528,38 @@
         </div>
       </div>
 
-      <div class="publish-success__field publish-success__field--params">
-        <div class="publish-success__label">Query params (pick & choose)</div>
-        <ul class="success-param-list" id="publish-success-param-list"></ul>
-        <div class="success-param-actions">
-          <button type="button" class="btn btn--ghost btn--sm" id="publish-success-param-add">+ Add param</button>
-          <button type="button" class="btn btn--black btn--sm" id="publish-success-generate">Generate URL</button>
-        </div>
+      <div class="publish-success__field publish-success__field--platforms">
+        <div class="publish-success__label">Macro-enriched lander URLs by source</div>
+        <p class="publish-success__platform-intro muted">Auto-generated per buy source. Paste into your ad platform — macros expand on click.</p>
+        <div class="publish-success__platforms" id="publish-success-platform-urls" aria-live="polite"></div>
       </div>
 
-      <div class="publish-success__field publish-success__field--platforms">
-        <div class="publish-success__label">Generated URL</div>
-        <div class="publish-success__generated-row">
-          <input type="text" id="publish-success-url-generated" readonly value="" />
-          <a class="copy-row__btn" id="publish-success-open-generated" href="#" target="_blank" rel="noopener noreferrer" title="Open generated URL" aria-label="Open generated URL">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 4h6v6"/><path d="M10 14L20 4"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/>
-            </svg>
-          </a>
-          <button type="button" class="copy-row__btn" id="publish-success-copy-generated" title="Copy generated URL" aria-label="Copy generated URL">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>
-            </svg>
-          </button>
+      <details class="publish-success__advanced">
+        <summary class="publish-success__advanced-summary">Advanced — custom query params</summary>
+        <div class="publish-success__field publish-success__field--params">
+          <ul class="success-param-list" id="publish-success-param-list"></ul>
+          <div class="success-param-actions">
+            <button type="button" class="btn btn--ghost btn--sm" id="publish-success-param-add">+ Add param</button>
+            <button type="button" class="btn btn--black btn--sm" id="publish-success-generate">Generate URL</button>
+          </div>
         </div>
-      </div>
+        <div class="publish-success__field publish-success__field--generated">
+          <div class="publish-success__label">Custom generated URL</div>
+          <div class="publish-success__generated-row">
+            <input type="text" id="publish-success-url-generated" readonly value="" />
+            <a class="copy-row__btn" id="publish-success-open-generated" href="#" target="_blank" rel="noopener noreferrer" title="Open generated URL" aria-label="Open generated URL">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 4h6v6"/><path d="M10 14L20 4"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/>
+              </svg>
+            </a>
+            <button type="button" class="copy-row__btn" id="publish-success-copy-generated" title="Copy generated URL" aria-label="Copy generated URL">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </details>
 
       <p class="publish-success__hint">Click the link above to preview your page. Your browser may display an older version for a short period after publishing.</p>
 
@@ -586,6 +593,7 @@
   </dialog>
 
   <script src="integrations-catalog.js"></script>
+  <script src="macro-enriched-lander-urls.js"></script>
   <script src="site-shell.js"></script>
   <script>
     // ---- Read ?name=... to rename the title (e.g. when opened from "+ New Lander")
@@ -2042,6 +2050,7 @@
     var successTimeEl  = document.getElementById("publish-success-time");
     var successCopyBtn = document.getElementById("publish-success-copy");
     var successReports = document.getElementById("publish-success-reports");
+    var successPlatformUrlsEl = document.getElementById("publish-success-platform-urls");
     var successParamRows = [
       { enabled: true, key: "utm_source" },
       { enabled: true, key: "utm_campaign" },
@@ -2128,6 +2137,48 @@
         try { document.execCommand("copy"); } catch (e) {}
         done();
       }
+    }
+
+    var SUCCESS_PLATFORM_ICONS =
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M14 4h6v6"/><path d="M10 14L20 4"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/>' +
+      '</svg>';
+    var SUCCESS_COPY_ICON =
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>' +
+      '</svg>';
+
+    function successRenderMacroLanderUrls() {
+      if (!successPlatformUrlsEl || !window.nexusMacroLanderUrls) return;
+      var base = successNormalizeBaseUrl();
+      var keys = window.nexusMacroLanderUrls.SOURCE_KEYS || [];
+      successPlatformUrlsEl.innerHTML = keys.map(function (key) {
+        var def = window.nexusMacroLanderUrls.BY_SOURCE[key];
+        if (!def) return "";
+        var url = window.nexusMacroLanderUrls.buildMacroLanderUrl(base, key);
+        return (
+          '<div class="publish-success__platform-row" data-buy-source="' + publishEscape(key) + '">' +
+            '<span class="publish-success__platform-name" title="' + publishEscape(def.label) + '">' + publishEscape(def.shortLabel) + '</span>' +
+            '<input type="text" readonly value="' + publishEscape(url) + '" data-platform-url aria-label="' + publishEscape(def.label) + ' macro-enriched lander URL" />' +
+            '<a class="copy-row__btn" href="' + publishEscape(url || "#") + '" target="_blank" rel="noopener noreferrer" title="Open ' + publishEscape(def.label) + ' URL" aria-label="Open ' + publishEscape(def.label) + ' URL">' +
+              SUCCESS_PLATFORM_ICONS +
+            '</a>' +
+            '<button type="button" class="copy-row__btn" data-platform-copy title="Copy ' + publishEscape(def.label) + ' URL" aria-label="Copy ' + publishEscape(def.label) + ' URL">' +
+              SUCCESS_COPY_ICON +
+            '</button>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    if (successPlatformUrlsEl) {
+      successPlatformUrlsEl.addEventListener("click", function (e) {
+        var copyBtn = e.target.closest("[data-platform-copy]");
+        if (!copyBtn) return;
+        var row = copyBtn.closest("[data-buy-source]");
+        var input = row ? row.querySelector("[data-platform-url]") : null;
+        successCopyUrl(input, copyBtn);
+      });
     }
 
     if (successParamListEl) {
@@ -2229,6 +2280,7 @@
         successUrlEl.value = liveUrl;
         var successOpenEl = document.getElementById("publish-success-open");
         if (successOpenEl) successOpenEl.setAttribute("href", "https://" + liveUrl);
+        successRenderMacroLanderUrls();
         successRenderParamRows();
         successGenerateUrl();
         successTimeEl.textContent = formatPublishTime(new Date());
