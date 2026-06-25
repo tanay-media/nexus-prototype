@@ -41,7 +41,7 @@
         { key: "device", value: "{device}" },
         { key: "creative", value: "{creative}" },
         { key: "matchtype", value: "{matchtype}" },
-        { key: "utm_term", value: "{search_term}" }
+        { key: "utm_term", value: "{keyword}" }
       ]
     },
     taboola: {
