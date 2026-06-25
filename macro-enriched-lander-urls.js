@@ -1,8 +1,7 @@
 // Macro-enriched lander URLs by source (Published screen).
 // Canonical spec: docs/02-base-system/macro-enriched-lander-urls-by-source.md (lander project)
 //
-// Lander query-param keys → ad-platform macro values at click time.
-// Nexus Serving reads resolved params as {{key}} macros; CAPI uses clid + buySource.
+// Nexus Param → platform macro at click time. Static values are literals; others expand on click.
 
 (function () {
   var BY_SOURCE = {
@@ -12,11 +11,17 @@
       shortLabel: "Meta",
       params: [
         { key: "clid", value: "{{fbclid}}" },
-        { key: "ad_name", value: "{{ad.name}}" },
-        { key: "adset_name", value: "{{adset.name}}" },
-        { key: "campaign_name", value: "{{campaign.name}}" },
+        { key: "utm_source", value: "facebook" },
+        { key: "utm_medium", value: "paid_social" },
+        { key: "utm_campaign", value: "{{campaign.name}}" },
+        { key: "campaign_id", value: "{{campaign.id}}" },
+        { key: "adset_id", value: "{{adset.id}}" },
+        { key: "ad_id", value: "{{ad.id}}" },
         { key: "placement", value: "{{placement}}" },
-        { key: "site_source_name", value: "{{site_source_name}}" }
+        { key: "publisher", value: "{{site_source_name}}" },
+        { key: "device", value: "{{device_type}}" },
+        { key: "creative", value: "{{ad.name}}" },
+        { key: "utm_term", value: "{{adset.id}}" }
       ]
     },
     google: {
@@ -25,14 +30,18 @@
       shortLabel: "Google",
       params: [
         { key: "clid", value: "{gclid}" },
-        { key: "buySource", value: "google" },
         { key: "utm_source", value: "google" },
-        { key: "utm_medium", value: "cpc" },
-        { key: "utm_campaign", value: "{campaignid}" },
-        { key: "utm_content", value: "{creative}" },
-        { key: "keyword", value: "{keyword}" },
-        { key: "wbraid", value: "{wbraid}" },
-        { key: "gbraid", value: "{gbraid}" }
+        { key: "utm_medium", value: "search" },
+        { key: "utm_campaign", value: "{campaign}" },
+        { key: "campaign_id", value: "{campaignid}" },
+        { key: "adset_id", value: "{adgroupid}" },
+        { key: "ad_id", value: "{adid}" },
+        { key: "placement", value: "{placement}" },
+        { key: "publisher", value: "{placement}" },
+        { key: "device", value: "{device}" },
+        { key: "creative", value: "{creative}" },
+        { key: "matchtype", value: "{matchtype}" },
+        { key: "utm_term", value: "{search_term}" }
       ]
     },
     taboola: {
@@ -41,10 +50,15 @@
       shortLabel: "Taboola",
       params: [
         { key: "clid", value: "{click_id}" },
-        { key: "buySource", value: "taboola" },
         { key: "utm_source", value: "taboola" },
-        { key: "utm_medium", value: "cpc" },
-        { key: "utm_campaign", value: "{campaign_id}" }
+        { key: "utm_medium", value: "native" },
+        { key: "utm_campaign", value: "{campaign_name}" },
+        { key: "campaign_id", value: "{campaign_id}" },
+        { key: "ad_id", value: "{campaign_item_id}" },
+        { key: "placement", value: "{placement_name}" },
+        { key: "publisher", value: "{site}" },
+        { key: "device", value: "{platform}" },
+        { key: "creative", value: "{title}" }
       ]
     }
   };
