@@ -172,31 +172,37 @@
       </div>
 
       <div class="settings-section">
-        <p class="settings-section__title">Pixels</p>
-        <div class="field-row">
-          <div class="field"><label>GTM container ID</label><input type="text" value="GTM-ACME42" placeholder="GTM-XXXXXXX" /></div>
-          <div class="field"><label>Meta pixel ID</label><input type="text" value="398201746" placeholder="e.g. 398201746" /></div>
-        </div>
+        <p class="settings-section__title">Integrations</p>
+        <p class="settings-section__hint muted">Inherited from workspace defaults — override per lander if needed.</p>
+        <ul class="publish-pixel-list" id="settings-integrations-list" aria-label="Tracking integrations"></ul>
+        <p class="publish-tracking__foot muted"><a href="settings.html#integrations">Manage workspace integrations</a></p>
       </div>
 
-      <!-- Custom variables — reusable components across variants -->
       <div class="settings-section">
         <p class="settings-section__title">
           Custom variables
-          <span class="info-tip" tabindex="0" aria-label="What are custom variables?">
+          <span class="info-tip" tabindex="0" aria-label="What is CTA URL?">
             <span class="info-tip__icon">i</span>
             <span class="info-tip__body">
-              Custom variables are reusable components shared across variants of this lander. Reference one anywhere with <code>{{Publisher}}</code>, <code>{{CTA}}</code>, etc. — edit it once here and every variant updates.
+              The outbound destination for CTA clicks on this lander. Pick a saved tracker URL from the workspace or create a new one.
             </span>
           </span>
         </p>
-        <div class="kv-editor" id="kv-editor">
-          <div class="kv-row"><input data-kv="key" value="Publisher" /><input data-kv="value" value="BestLivingIdeas" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button></div>
-          <div class="kv-row"><input data-kv="key" value="CTA" /><input data-kv="value" value="Shop Now →" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button></div>
-          <div class="kv-row"><input data-kv="key" value="Hero headline" /><input data-kv="value" value="60% off everything, ends Sunday" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button></div>
-          <div class="kv-row"><input data-kv="key" value="Offer code" /><input data-kv="value" value="SUMMER60" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button></div>
+        <div class="field">
+          <label for="settings-cta-url">CTA URL</label>
+          <select id="settings-cta-url" data-settings="cta-url"></select>
         </div>
-        <button type="button" class="kv-add" id="kv-add">+ Add variable</button>
+        <div class="field" id="settings-cta-url-new-wrap" hidden>
+          <label for="settings-cta-url-new">New CTA URL</label>
+          <input type="url" id="settings-cta-url-new" placeholder="https://tracker.acme.com/r?offer=…" />
+          <div class="field__hint">Saved to the workspace catalog when you click Save settings.</div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <p class="settings-section__title">Macro-enriched URLs</p>
+        <p class="settings-section__hint muted">Auto-generated per buy source from domain + path. Paste into your ad platform — macros expand on click.</p>
+        <div class="publish-success__platforms" id="settings-macro-urls" aria-live="polite"></div>
       </div>
 
       <div class="modal__actions">
@@ -305,6 +311,8 @@
     </div>
   </dialog>
 
+  <script src="integrations-catalog.js"></script>
+  <script src="macro-enriched-lander-urls.js"></script>
   <script src="app.js"></script>
   <script src="thumbs.js"></script>
   <script>
@@ -825,6 +833,239 @@
     // --------------------------------------------------------------------
     var settingsDlg   = document.getElementById("dialog-lander-settings");
     var settingsTitle = document.getElementById("lander-settings-title");
+    var settingsIntegrationsList = document.getElementById("settings-integrations-list");
+    var settingsCtaUrlSel = document.getElementById("settings-cta-url");
+    var settingsCtaUrlNewWrap = document.getElementById("settings-cta-url-new-wrap");
+    var settingsCtaUrlNewInput = document.getElementById("settings-cta-url-new");
+    var settingsMacroUrlsEl = document.getElementById("settings-macro-urls");
+    var settingsActiveLanderName = "";
+    var LANDER_INT_KEY = "nexus.lander.integrations.v1";
+    var LANDER_CTA_URL_KEY = "nexus.lander.ctaUrl.v1";
+    var CTA_URL_CATALOG_KEY = "nexus.ctaUrls.v1";
+    var CTA_URL_SEED = [
+      { id: "cta_summer", name: "Summer Sale — ACME tracker", url: "https://tracker.acme.com/r?offer=summer_2026" },
+      { id: "cta_bf", name: "Black Friday — main", url: "https://tracker.acme.com/r?offer=bf_2026" },
+      { id: "cta_referral", name: "Referral Q2", url: "https://tracker.acme.com/r?offer=referral_q2" },
+      { id: "cta_partner", name: "Partner announce", url: "https://tracker.acme.com/r?offer=partner_announce" }
+    ];
+    var SETTINGS_INT_SOURCES = [
+      { source: "facebook", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Meta", title: "Meta CAPI", sub: "Server-side conversions to Meta." },
+      { source: "google", iconClass: "publish-pixel-row__icon--ga", iconLabel: "G", title: "Google Ads", sub: "Offline conversion upload on postback." },
+      { source: "gtm", iconClass: "publish-pixel-row__icon--gtm", iconLabel: "GTM", title: "Google Tag Manager", sub: "Container ID baked into serving HTML." }
+    ];
+    var SETTINGS_COPY_ICON =
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>' +
+      '</svg>';
+    var SETTINGS_OPEN_ICON =
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M14 4h6v6"/><path d="M10 14L20 4"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/>' +
+      '</svg>';
+
+    function loadCtaUrlCatalog() {
+      try {
+        var raw = localStorage.getItem(CTA_URL_CATALOG_KEY);
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length) return parsed;
+        }
+      } catch (e) {}
+      return CTA_URL_SEED.slice();
+    }
+    function saveCtaUrlCatalog(rows) {
+      try { localStorage.setItem(CTA_URL_CATALOG_KEY, JSON.stringify(rows)); } catch (e) {}
+    }
+    function loadAllLanderCtaUrls() {
+      try { return JSON.parse(localStorage.getItem(LANDER_CTA_URL_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function saveLanderCtaUrlPick(landerName, ctaId) {
+      var all = loadAllLanderCtaUrls();
+      all[landerName] = ctaId;
+      try { localStorage.setItem(LANDER_CTA_URL_KEY, JSON.stringify(all)); } catch (e) {}
+    }
+    function loadAllLanderIntegrations() {
+      try { return JSON.parse(localStorage.getItem(LANDER_INT_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function saveLanderIntegrationPicks(landerName, picks) {
+      var all = loadAllLanderIntegrations();
+      all[landerName] = picks;
+      try { localStorage.setItem(LANDER_INT_KEY, JSON.stringify(all)); } catch (e) {}
+    }
+    function settingsCurrentBaseUrl() {
+      var domainSel = settingsDlg.querySelector('[data-settings="domain"]');
+      var pathInput = settingsDlg.querySelector('[data-settings="path"]');
+      var domain = domainSel ? (domainSel.value || domainSel.options[domainSel.selectedIndex].textContent) : "";
+      var path = pathInput ? pathInput.value.trim() : "";
+      if (!path) path = "/";
+      if (path.charAt(0) !== "/") path = "/" + path;
+      return domain ? (domain + path) : "";
+    }
+    function settingsRenderIntegrations(landerName) {
+      if (!settingsIntegrationsList || !window.nexusIntegrations) return;
+      var ni = window.nexusIntegrations;
+      var landerPicks = loadAllLanderIntegrations()[landerName] || {};
+      settingsIntegrationsList.innerHTML = SETTINGS_INT_SOURCES.map(function (cfg) {
+        var rows = ni.rowsForSource(cfg.source);
+        var defId = ni.defaultIdForSource(cfg.source);
+        var defRow = defId ? ni.rowById(defId) : null;
+        var inheritLabel = defRow ? ("Workspace default · " + defRow.name) : "Workspace default (none set)";
+        var selected = landerPicks[cfg.source] || "";
+        var opts = '<option value="">' + escapeHtml(inheritLabel) + '</option>';
+        rows.forEach(function (r) {
+          opts += '<option value="' + escapeHtml(r.id) + '"' + (selected === r.id ? " selected" : "") + '>' + escapeHtml(r.name) + '</option>';
+        });
+        return '<li class="publish-pixel-row">' +
+          '<span class="publish-pixel-row__icon ' + cfg.iconClass + '" aria-hidden="true">' + escapeHtml(cfg.iconLabel) + '</span>' +
+          '<div class="publish-pixel-row__text"><strong>' + escapeHtml(cfg.title) + '</strong><small>' + escapeHtml(cfg.sub) + '</small></div>' +
+          '<select class="input publish-pixel-row__select" id="settings-int-' + cfg.source + '" data-int-source="' + cfg.source + '">' + opts + '</select>' +
+        '</li>';
+      }).join("");
+    }
+    function settingsRenderCtaUrlOptions(landerName) {
+      if (!settingsCtaUrlSel) return;
+      var catalog = loadCtaUrlCatalog();
+      var picked = loadAllLanderCtaUrls()[landerName] || catalog[0].id;
+      settingsCtaUrlSel.innerHTML =
+        '<option value="">— Select CTA URL —</option>' +
+        catalog.map(function (row) {
+          return '<option value="' + escapeHtml(row.id) + '"' + (picked === row.id ? " selected" : "") + '>' + escapeHtml(row.name) + '</option>';
+        }).join("") +
+        '<option value="__new__">+ Create new URL…</option>';
+      settingsToggleCtaUrlNew(picked === "__new__");
+    }
+    function settingsToggleCtaUrlNew(show) {
+      if (!settingsCtaUrlNewWrap) return;
+      settingsCtaUrlNewWrap.hidden = !show;
+      if (show && settingsCtaUrlNewInput) setTimeout(function () { settingsCtaUrlNewInput.focus(); }, 30);
+    }
+    function settingsRenderMacroUrls() {
+      if (!settingsMacroUrlsEl || !window.nexusMacroLanderUrls) return;
+      var base = settingsCurrentBaseUrl();
+      var keys = window.nexusMacroLanderUrls.SOURCE_KEYS || [];
+      if (!base) {
+        settingsMacroUrlsEl.innerHTML = '<p class="muted" style="margin:0;font-size:12px;">Set domain and path to preview macro-enriched URLs.</p>';
+        return;
+      }
+      settingsMacroUrlsEl.innerHTML = keys.map(function (key) {
+        var def = window.nexusMacroLanderUrls.BY_SOURCE[key];
+        if (!def) return "";
+        var url = window.nexusMacroLanderUrls.buildMacroLanderUrl(base, key);
+        return (
+          '<div class="publish-success__platform-row" data-buy-source="' + escapeHtml(key) + '">' +
+            '<span class="publish-success__platform-name" title="' + escapeHtml(def.label) + '">' + escapeHtml(def.shortLabel) + '</span>' +
+            '<input type="text" readonly value="' + escapeHtml(url) + '" data-platform-url aria-label="' + escapeHtml(def.label) + ' macro-enriched lander URL" />' +
+            '<a class="copy-row__btn" href="' + escapeHtml(url || "#") + '" target="_blank" rel="noopener noreferrer" title="Open ' + escapeHtml(def.label) + ' URL" aria-label="Open ' + escapeHtml(def.label) + ' URL">' +
+              SETTINGS_OPEN_ICON +
+            '</a>' +
+            '<button type="button" class="copy-row__btn" data-platform-copy title="Copy ' + escapeHtml(def.label) + ' URL" aria-label="Copy ' + escapeHtml(def.label) + ' URL">' +
+              SETTINGS_COPY_ICON +
+            '</button>' +
+          '</div>'
+        );
+      }).join("");
+    }
+    function settingsReadIntegrationPicks() {
+      var picks = {};
+      SETTINGS_INT_SOURCES.forEach(function (cfg) {
+        var sel = document.getElementById("settings-int-" + cfg.source);
+        picks[cfg.source] = sel && sel.value ? sel.value : null;
+      });
+      return picks;
+    }
+    function settingsSave() {
+      if (!settingsActiveLanderName) return;
+      saveLanderIntegrationPicks(settingsActiveLanderName, settingsReadIntegrationPicks());
+      if (settingsCtaUrlSel) {
+        var val = settingsCtaUrlSel.value;
+        if (val === "__new__" && settingsCtaUrlNewInput) {
+          var newUrl = settingsCtaUrlNewInput.value.trim();
+          if (newUrl) {
+            var catalog = loadCtaUrlCatalog();
+            var newId = "cta_" + Date.now();
+            var label = newUrl.replace(/^https?:\/\//, "").slice(0, 48);
+            catalog.push({ id: newId, name: label, url: newUrl });
+            saveCtaUrlCatalog(catalog);
+            saveLanderCtaUrlPick(settingsActiveLanderName, newId);
+          }
+        } else if (val) {
+          saveLanderCtaUrlPick(settingsActiveLanderName, val);
+        }
+      }
+    }
+    function settingsCopyUrl(input, btn) {
+      if (!input || !input.value) return;
+      var done = function () {
+        if (btn) {
+          btn.classList.add("is-copied");
+          setTimeout(function () { btn.classList.remove("is-copied"); }, 1200);
+        }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(done, done);
+      } else {
+        input.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        done();
+      }
+    }
+    function openLanderSettings(lname, lid) {
+      settingsActiveLanderName = lname;
+      settingsTitle.textContent = "Lander settings — " + lname;
+      var l = landers.find(function (x) { return x.id === lid; });
+      var nameInput  = settingsDlg.querySelector('[data-settings="name"]');
+      var domainSel  = settingsDlg.querySelector('[data-settings="domain"]');
+      var pathInput  = settingsDlg.querySelector('[data-settings="path"]');
+      if (nameInput) nameInput.value = l ? l.name : lname;
+      if (l && domainSel && pathInput) {
+        var clean = l.url.replace(/^https?:\/\//, "");
+        var slash = clean.indexOf("/");
+        var domain = slash === -1 ? clean : clean.slice(0, slash);
+        var path   = slash === -1 ? "/"   : clean.slice(slash);
+        var matched = false;
+        Array.prototype.forEach.call(domainSel.options, function (opt) {
+          if (opt.value === domain || opt.textContent === domain) {
+            domainSel.value = opt.value || opt.textContent; matched = true;
+          }
+        });
+        if (!matched && domain) {
+          var opt = document.createElement("option");
+          opt.textContent = domain; domainSel.appendChild(opt);
+          domainSel.value = domain;
+        }
+        pathInput.value = path;
+      }
+      settingsRenderIntegrations(lname);
+      settingsRenderCtaUrlOptions(lname);
+      settingsRenderMacroUrls();
+      settingsDlg.showModal();
+    }
+
+    if (settingsCtaUrlSel) {
+      settingsCtaUrlSel.addEventListener("change", function () {
+        settingsToggleCtaUrlNew(settingsCtaUrlSel.value === "__new__");
+      });
+    }
+    if (settingsDlg) {
+      settingsDlg.querySelectorAll('[data-settings="domain"], [data-settings="path"]').forEach(function (el) {
+        el.addEventListener("input", settingsRenderMacroUrls);
+        el.addEventListener("change", settingsRenderMacroUrls);
+      });
+      var settingsForm = settingsDlg.querySelector("form");
+      if (settingsForm) {
+        settingsForm.addEventListener("submit", function () {
+          settingsSave();
+        });
+      }
+    }
+    if (settingsMacroUrlsEl) {
+      settingsMacroUrlsEl.addEventListener("click", function (e) {
+        var copyBtn = e.target.closest("[data-platform-copy]");
+        if (!copyBtn) return;
+        var row = copyBtn.closest("[data-buy-source]");
+        var input = row ? row.querySelector("[data-platform-url]") : null;
+        settingsCopyUrl(input, copyBtn);
+      });
+    }
     var weightsDlg    = document.getElementById("dialog-manage-weights");
     var weightsSub    = document.getElementById("weights-dialog-sub");
     var weightsBody   = document.getElementById("weights-dialog-body");
@@ -1008,34 +1249,10 @@
       // Settings
       var sBtn = e.target.closest(".js-lander-settings");
       if (sBtn) {
-        var lname = sBtn.getAttribute("data-lander") || "Lander";
-        var lid   = sBtn.getAttribute("data-lander-id");
-        settingsTitle.textContent = "Lander settings — " + lname;
-        // Pre-fill Identity fields from the clicked lander's data
-        var l = landers.find(function (x) { return x.id === lid; });
-        var nameInput  = settingsDlg.querySelector('[data-settings="name"]');
-        var domainSel  = settingsDlg.querySelector('[data-settings="domain"]');
-        var pathInput  = settingsDlg.querySelector('[data-settings="path"]');
-        if (nameInput) nameInput.value = l ? l.name : lname;
-        if (l && domainSel && pathInput) {
-          var clean = l.url.replace(/^https?:\/\//, "");
-          var slash = clean.indexOf("/");
-          var domain = slash === -1 ? clean : clean.slice(0, slash);
-          var path   = slash === -1 ? "/"   : clean.slice(slash);
-          var matched = false;
-          Array.prototype.forEach.call(domainSel.options, function (opt) {
-            if (opt.value === domain || opt.textContent === domain) {
-              domainSel.value = opt.value || opt.textContent; matched = true;
-            }
-          });
-          if (!matched && domain) {
-            var opt = document.createElement("option");
-            opt.textContent = domain; domainSel.appendChild(opt);
-            domainSel.value = domain;
-          }
-          pathInput.value = path;
-        }
-        settingsDlg.showModal();
+        openLanderSettings(
+          sBtn.getAttribute("data-lander") || "Lander",
+          sBtn.getAttribute("data-lander-id")
+        );
         return;
       }
 
@@ -1090,15 +1307,6 @@
         openBuilder(mode, lid2);
         return;
       }
-    });
-
-    // + Add variable in settings
-    document.getElementById("kv-add").addEventListener("click", function () {
-      var row = document.createElement("div");
-      row.className = "kv-row";
-      row.innerHTML = '<input data-kv="key" placeholder="Key" /><input data-kv="value" placeholder="Value" /><button type="button" class="icon-btn" aria-label="Remove" onclick="this.parentNode.remove()">✕</button>';
-      document.getElementById("kv-editor").appendChild(row);
-      row.querySelector('[data-kv="key"]').focus();
     });
 
     // --------------------------------------------------------------------

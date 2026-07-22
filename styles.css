@@ -2962,8 +2962,17 @@ button.dsk-row-name:focus-visible strong {
 
 /* ---------- Settings dialog (bigger, sectioned) ---------- */
 
-.modal--settings { max-width: 640px; }
+.modal--settings { max-width: 680px; }
+.modal--settings .modal__inner {
+  max-height: min(88vh, 820px);
+  overflow-y: auto;
+}
 .settings-section { margin-bottom: 1.1rem; }
+.settings-section__hint {
+  margin: -0.35rem 0 0.55rem;
+  font-size: 12px;
+  line-height: 1.4;
+}
 .settings-section__title {
   font-size: 10px;
   font-weight: 700;

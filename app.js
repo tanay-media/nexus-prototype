@@ -595,7 +595,7 @@
         actRows.push({
           icon: "⚙",
           title: "Lander settings — " + (hitName ? wrapMatch(l.name, q) : "<strong>" + escapeHtml(l.name) + "</strong>"),
-          desc:  "Pixels, path, custom variables · editor · " + EX_TUB,
+          desc:  "Integrations, CTA URL, macro URLs · editor · " + EX_TUB,
           hint:  "Act",
           action: function () { window.location.href = "editor.html?name=" + encodeURIComponent(l.name); }
         });
