@@ -179,30 +179,43 @@
       </div>
 
       <div class="settings-section">
-        <p class="settings-section__title">
-          Custom variables
-          <span class="info-tip" tabindex="0" aria-label="What is CTA URL?">
-            <span class="info-tip__icon">i</span>
-            <span class="info-tip__body">
-              The outbound destination for CTA clicks on this lander. Pick a saved tracker URL from the workspace or create a new one.
-            </span>
-          </span>
-        </p>
-        <div class="field">
-          <label for="settings-cta-url">CTA URL</label>
-          <select id="settings-cta-url" data-settings="cta-url"></select>
-        </div>
-        <div class="field" id="settings-cta-url-new-wrap" hidden>
-          <label for="settings-cta-url-new">New CTA URL</label>
-          <input type="url" id="settings-cta-url-new" placeholder="https://tracker.acme.com/r?offer=…" />
-          <div class="field__hint">Saved to the workspace catalog when you click Save settings.</div>
-        </div>
-      </div>
-
-      <div class="settings-section">
         <p class="settings-section__title">Macro-enriched URLs</p>
         <p class="settings-section__hint muted">Auto-generated per buy source from domain + path. Paste into your ad platform — macros expand on click.</p>
         <div class="publish-success__platforms" id="settings-macro-urls" aria-live="polite"></div>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="submit" class="btn btn--black">Save settings</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Variant settings (variant name + CTA URL) -->
+  <dialog class="modal modal--settings" id="dialog-variant-settings">
+    <form method="dialog" class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title" id="variant-settings-title">Variant settings</h2>
+          <p class="modal__hint">Variant-level record — overridable per variant.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="field">
+          <label for="variant-settings-name">Variant name</label>
+          <input type="text" id="variant-settings-name" placeholder="e.g. Main hero" />
+        </div>
+        <div class="field">
+          <label for="variant-settings-cta-url">CTA URL</label>
+          <select id="variant-settings-cta-url"></select>
+        </div>
+        <div class="field" id="variant-settings-cta-url-new-wrap" hidden>
+          <label for="variant-settings-cta-url-new">New CTA URL</label>
+          <input type="url" id="variant-settings-cta-url-new" placeholder="https://tracker.acme.com/r?offer=…" />
+          <div class="field__hint">Saved to the workspace catalog when you click Save settings.</div>
+        </div>
       </div>
 
       <div class="modal__actions">
@@ -692,7 +705,7 @@
         '<td class="right num">'+v.score.toFixed(2)+'</td>' +
         '<td class="right"><div class="actions">' +
           '<a class="icon-btn" href="editor.html?name='+encodeURIComponent(l.name)+'&variant='+encodeURIComponent(v.name)+'" title="Edit in editor">'+ICON.edit+'</a>' +
-          '<button type="button" class="icon-btn js-manage-weights" data-lander-id="' + l.id + '" data-variant="' + encodeURIComponent(v.name) + '" title="Manage traffic weights">'+ICON.settings+'</button>' +
+          '<button type="button" class="icon-btn js-variant-settings" data-lander="'+l.name+'" data-lander-id="'+l.id+'" data-variant="'+escapeHtml(v.name)+'" title="Variant settings">'+ICON.settings+'</button>' +
           '<button class="icon-btn js-clone-variant" data-lander="'+l.name+'" data-lander-id="'+l.id+'" data-variant="'+v.name+'" title="Clone variant">'+ICON.clone+'</button>' +
           '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'" title="Analyse in Reports">'+ICON.analyse+'</a>' +
         '</div></td>';
@@ -834,13 +847,17 @@
     var settingsDlg   = document.getElementById("dialog-lander-settings");
     var settingsTitle = document.getElementById("lander-settings-title");
     var settingsIntegrationsList = document.getElementById("settings-integrations-list");
-    var settingsCtaUrlSel = document.getElementById("settings-cta-url");
-    var settingsCtaUrlNewWrap = document.getElementById("settings-cta-url-new-wrap");
-    var settingsCtaUrlNewInput = document.getElementById("settings-cta-url-new");
     var settingsMacroUrlsEl = document.getElementById("settings-macro-urls");
     var settingsActiveLanderName = "";
+    var variantSettingsDlg = document.getElementById("dialog-variant-settings");
+    var variantSettingsTitle = document.getElementById("variant-settings-title");
+    var variantSettingsNameInput = document.getElementById("variant-settings-name");
+    var variantSettingsCtaUrlSel = document.getElementById("variant-settings-cta-url");
+    var variantSettingsCtaUrlNewWrap = document.getElementById("variant-settings-cta-url-new-wrap");
+    var variantSettingsCtaUrlNewInput = document.getElementById("variant-settings-cta-url-new");
+    var variantSettingsContext = { landerId: null, landerName: "", variantName: "" };
     var LANDER_INT_KEY = "nexus.lander.integrations.v1";
-    var LANDER_CTA_URL_KEY = "nexus.lander.ctaUrl.v1";
+    var VARIANT_CTA_URL_KEY = "nexus.variant.ctaUrl.v1";
     var CTA_URL_CATALOG_KEY = "nexus.ctaUrls.v1";
     var CTA_URL_SEED = [
       { id: "cta_summer", name: "Summer Sale — ACME tracker", url: "https://tracker.acme.com/r?offer=summer_2026" },
@@ -875,13 +892,16 @@
     function saveCtaUrlCatalog(rows) {
       try { localStorage.setItem(CTA_URL_CATALOG_KEY, JSON.stringify(rows)); } catch (e) {}
     }
-    function loadAllLanderCtaUrls() {
-      try { return JSON.parse(localStorage.getItem(LANDER_CTA_URL_KEY)) || {}; } catch (e) { return {}; }
+    function variantCtaKey(landerName, variantName) {
+      return landerName + "::" + variantName;
     }
-    function saveLanderCtaUrlPick(landerName, ctaId) {
-      var all = loadAllLanderCtaUrls();
-      all[landerName] = ctaId;
-      try { localStorage.setItem(LANDER_CTA_URL_KEY, JSON.stringify(all)); } catch (e) {}
+    function loadAllVariantCtaUrls() {
+      try { return JSON.parse(localStorage.getItem(VARIANT_CTA_URL_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function saveVariantCtaUrlPick(landerName, variantName, ctaId) {
+      var all = loadAllVariantCtaUrls();
+      all[variantCtaKey(landerName, variantName)] = ctaId;
+      try { localStorage.setItem(VARIANT_CTA_URL_KEY, JSON.stringify(all)); } catch (e) {}
     }
     function loadAllLanderIntegrations() {
       try { return JSON.parse(localStorage.getItem(LANDER_INT_KEY)) || {}; } catch (e) { return {}; }
@@ -921,22 +941,22 @@
         '</li>';
       }).join("");
     }
-    function settingsRenderCtaUrlOptions(landerName) {
-      if (!settingsCtaUrlSel) return;
+    function variantSettingsRenderCtaUrlOptions(landerName, variantName) {
+      if (!variantSettingsCtaUrlSel) return;
       var catalog = loadCtaUrlCatalog();
-      var picked = loadAllLanderCtaUrls()[landerName] || catalog[0].id;
-      settingsCtaUrlSel.innerHTML =
+      var picked = loadAllVariantCtaUrls()[variantCtaKey(landerName, variantName)] || (catalog[0] ? catalog[0].id : "");
+      variantSettingsCtaUrlSel.innerHTML =
         '<option value="">— Select CTA URL —</option>' +
         catalog.map(function (row) {
           return '<option value="' + escapeHtml(row.id) + '"' + (picked === row.id ? " selected" : "") + '>' + escapeHtml(row.name) + '</option>';
         }).join("") +
         '<option value="__new__">+ Create new URL…</option>';
-      settingsToggleCtaUrlNew(picked === "__new__");
+      variantSettingsToggleCtaUrlNew(false);
     }
-    function settingsToggleCtaUrlNew(show) {
-      if (!settingsCtaUrlNewWrap) return;
-      settingsCtaUrlNewWrap.hidden = !show;
-      if (show && settingsCtaUrlNewInput) setTimeout(function () { settingsCtaUrlNewInput.focus(); }, 30);
+    function variantSettingsToggleCtaUrlNew(show) {
+      if (!variantSettingsCtaUrlNewWrap) return;
+      variantSettingsCtaUrlNewWrap.hidden = !show;
+      if (show && variantSettingsCtaUrlNewInput) setTimeout(function () { variantSettingsCtaUrlNewInput.focus(); }, 30);
     }
     function settingsRenderMacroUrls() {
       if (!settingsMacroUrlsEl || !window.nexusMacroLanderUrls) return;
@@ -975,22 +995,44 @@
     function settingsSave() {
       if (!settingsActiveLanderName) return;
       saveLanderIntegrationPicks(settingsActiveLanderName, settingsReadIntegrationPicks());
-      if (settingsCtaUrlSel) {
-        var val = settingsCtaUrlSel.value;
-        if (val === "__new__" && settingsCtaUrlNewInput) {
-          var newUrl = settingsCtaUrlNewInput.value.trim();
+    }
+    function variantSettingsSave() {
+      var ctx = variantSettingsContext;
+      if (!ctx.landerId || !ctx.variantName) return;
+      var l = landers.find(function (x) { return x.id === ctx.landerId; });
+      if (!l) return;
+      var newName = variantSettingsNameInput ? variantSettingsNameInput.value.trim() : "";
+      if (newName && newName !== ctx.variantName) {
+        var v = l.variants.find(function (x) { return x.name === ctx.variantName; });
+        if (v) v.name = newName;
+        ctx.variantName = newName;
+      }
+      if (variantSettingsCtaUrlSel) {
+        var val = variantSettingsCtaUrlSel.value;
+        if (val === "__new__" && variantSettingsCtaUrlNewInput) {
+          var newUrl = variantSettingsCtaUrlNewInput.value.trim();
           if (newUrl) {
             var catalog = loadCtaUrlCatalog();
             var newId = "cta_" + Date.now();
             var label = newUrl.replace(/^https?:\/\//, "").slice(0, 48);
             catalog.push({ id: newId, name: label, url: newUrl });
             saveCtaUrlCatalog(catalog);
-            saveLanderCtaUrlPick(settingsActiveLanderName, newId);
+            saveVariantCtaUrlPick(ctx.landerName, ctx.variantName, newId);
           }
         } else if (val) {
-          saveLanderCtaUrlPick(settingsActiveLanderName, val);
+          saveVariantCtaUrlPick(ctx.landerName, ctx.variantName, val);
         }
       }
+      render();
+      if (ctx.landerId) expandLander(ctx.landerId);
+    }
+    function openVariantSettings(landerId, landerName, variantName) {
+      variantSettingsContext = { landerId: landerId, landerName: landerName, variantName: variantName };
+      if (variantSettingsTitle) variantSettingsTitle.textContent = "Variant settings — " + variantName;
+      if (variantSettingsNameInput) variantSettingsNameInput.value = variantName;
+      variantSettingsRenderCtaUrlOptions(landerName, variantName);
+      if (variantSettingsCtaUrlNewInput) variantSettingsCtaUrlNewInput.value = "";
+      if (variantSettingsDlg) variantSettingsDlg.showModal();
     }
     function settingsCopyUrl(input, btn) {
       if (!input || !input.value) return;
@@ -1035,15 +1077,22 @@
         pathInput.value = path;
       }
       settingsRenderIntegrations(lname);
-      settingsRenderCtaUrlOptions(lname);
       settingsRenderMacroUrls();
       settingsDlg.showModal();
     }
 
-    if (settingsCtaUrlSel) {
-      settingsCtaUrlSel.addEventListener("change", function () {
-        settingsToggleCtaUrlNew(settingsCtaUrlSel.value === "__new__");
+    if (variantSettingsCtaUrlSel) {
+      variantSettingsCtaUrlSel.addEventListener("change", function () {
+        variantSettingsToggleCtaUrlNew(variantSettingsCtaUrlSel.value === "__new__");
       });
+    }
+    if (variantSettingsDlg) {
+      var variantSettingsForm = variantSettingsDlg.querySelector("form");
+      if (variantSettingsForm) {
+        variantSettingsForm.addEventListener("submit", function () {
+          variantSettingsSave();
+        });
+      }
     }
     if (settingsDlg) {
       settingsDlg.querySelectorAll('[data-settings="domain"], [data-settings="path"]').forEach(function (el) {
@@ -1246,6 +1295,17 @@
     });
 
     document.addEventListener("click", function (e) {
+      // Variant settings
+      var vSetBtn = e.target.closest(".js-variant-settings");
+      if (vSetBtn) {
+        openVariantSettings(
+          vSetBtn.getAttribute("data-lander-id"),
+          vSetBtn.getAttribute("data-lander") || "",
+          vSetBtn.getAttribute("data-variant") || "variant"
+        );
+        return;
+      }
+
       // Settings
       var sBtn = e.target.closest(".js-lander-settings");
       if (sBtn) {

@@ -36,42 +36,13 @@
       </div>
 
       <div class="editor-top__right">
-        <details class="pop editor-settings-pop">
-          <summary class="btn btn--ghost">Settings</summary>
-          <div class="editor-settings-panel">
-            <p class="editor-settings-panel__title">Page &amp; SEO</p>
-            <div class="field">
-              <label for="settings-page-title">Page title</label>
-              <input type="text" id="settings-page-title" value="Summer Sale — Up to 60% Off" />
-            </div>
-            <div class="field">
-              <label>Favicon</label>
-              <div class="favicon-upload" data-favicon="settings">
-                <input type="file" id="settings-favicon-file" class="favicon-upload__file" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,image/vnd.microsoft.icon" hidden />
-                <div class="favicon-upload__preview" data-favicon-preview aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
-                </div>
-                <div class="favicon-upload__meta">
-                  <strong class="favicon-upload__name" data-favicon-name>No file selected</strong>
-                  <small class="favicon-upload__hint">PNG, JPG, WebP, SVG or ICO · up to 1MB</small>
-                </div>
-                <div class="favicon-upload__actions">
-                  <button type="button" class="btn btn--ghost btn--sm" data-favicon-pick>Choose file</button>
-                  <button type="button" class="btn btn--ghost btn--sm favicon-upload__remove" data-favicon-remove hidden>Remove</button>
-                </div>
-              </div>
-            </div>
-            <div class="field">
-              <label for="settings-description">Description</label>
-              <textarea id="settings-description" rows="2" placeholder="Meta description for search &amp; social…">Limited time. Shop the biggest deals of the season before they're gone.</textarea>
-            </div>
-            <div class="field">
-              <label for="settings-keywords">Keywords</label>
-              <input type="text" id="settings-keywords" placeholder="comma, separated, keywords" value="summer sale, deals, shop" />
-            </div>
-            <p class="editor-settings-panel__foot">Saved on the <strong>variant</strong> in Base · <strong>tracking integrations</strong> on the lander.</p>
-          </div>
-        </details>
+        <button class="btn btn--ghost" type="button" id="editor-variant-settings-open">Settings</button>
+        <div hidden aria-hidden="true">
+          <input type="text" id="settings-page-title" value="Summer Sale — Up to 60% Off" />
+          <textarea id="settings-description" rows="2">Limited time. Shop the biggest deals of the season before they're gone.</textarea>
+          <input type="text" id="settings-keywords" value="summer sale, deals, shop" />
+          <input type="file" id="settings-favicon-file" />
+        </div>
         <button class="btn" type="button">Save</button>
         <button class="btn btn--ghost editor-preview-btn" type="button" id="editor-preview-btn" title="Open a preview of this variant in a new tab">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -592,6 +563,40 @@
     </div>
   </dialog>
 
+  <!-- Variant settings (variant name + CTA URL) -->
+  <dialog class="modal modal--settings" id="dialog-variant-settings">
+    <form method="dialog" class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title" id="variant-settings-title">Variant settings</h2>
+          <p class="modal__hint">Variant-level record — overridable per variant.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="field">
+          <label for="variant-settings-name">Variant name</label>
+          <input type="text" id="variant-settings-name" placeholder="e.g. Main hero" />
+        </div>
+        <div class="field">
+          <label for="variant-settings-cta-url">CTA URL</label>
+          <select id="variant-settings-cta-url"></select>
+        </div>
+        <div class="field" id="variant-settings-cta-url-new-wrap" hidden>
+          <label for="variant-settings-cta-url-new">New CTA URL</label>
+          <input type="url" id="variant-settings-cta-url-new" placeholder="https://tracker.acme.com/r?offer=…" />
+          <div class="field__hint">Saved to the workspace catalog when you click Save settings.</div>
+        </div>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="submit" class="btn btn--black">Save settings</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="integrations-catalog.js"></script>
   <script src="macro-enriched-lander-urls.js"></script>
   <script src="site-shell.js"></script>
@@ -1093,6 +1098,127 @@
       var landerName = document.getElementById("editor-lander-title").textContent || "Summer Sale";
       if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + t;
     });
+
+    // ---- Variant settings modal (variant name + CTA URL)
+    (function () {
+      var openBtn = document.getElementById("editor-variant-settings-open");
+      var dlg = document.getElementById("dialog-variant-settings");
+      var titleEl = document.getElementById("variant-settings-title");
+      var nameInput = document.getElementById("variant-settings-name");
+      var ctaSel = document.getElementById("variant-settings-cta-url");
+      var ctaNewWrap = document.getElementById("variant-settings-cta-url-new-wrap");
+      var ctaNewInput = document.getElementById("variant-settings-cta-url-new");
+      var VARIANT_CTA_URL_KEY = "nexus.variant.ctaUrl.v1";
+      var CTA_URL_CATALOG_KEY = "nexus.ctaUrls.v1";
+      var CTA_URL_SEED = [
+        { id: "cta_summer", name: "Summer Sale — ACME tracker", url: "https://tracker.acme.com/r?offer=summer_2026" },
+        { id: "cta_bf", name: "Black Friday — main", url: "https://tracker.acme.com/r?offer=bf_2026" },
+        { id: "cta_referral", name: "Referral Q2", url: "https://tracker.acme.com/r?offer=referral_q2" },
+        { id: "cta_partner", name: "Partner announce", url: "https://tracker.acme.com/r?offer=partner_announce" }
+      ];
+
+      function currentLanderName() {
+        return (document.getElementById("editor-lander-title").textContent || "").trim() || "default";
+      }
+      function currentVariantName() {
+        if (!variantSel || !variantSel.options[variantSel.selectedIndex]) return "";
+        return variantSel.options[variantSel.selectedIndex].text || "";
+      }
+      function variantCtaKey(landerName, variantName) {
+        return landerName + "::" + variantName;
+      }
+      function loadCtaUrlCatalog() {
+        try {
+          var raw = localStorage.getItem(CTA_URL_CATALOG_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length) return parsed;
+          }
+        } catch (e) {}
+        return CTA_URL_SEED.slice();
+      }
+      function saveCtaUrlCatalog(rows) {
+        try { localStorage.setItem(CTA_URL_CATALOG_KEY, JSON.stringify(rows)); } catch (e) {}
+      }
+      function loadAllVariantCtaUrls() {
+        try { return JSON.parse(localStorage.getItem(VARIANT_CTA_URL_KEY)) || {}; } catch (e) { return {}; }
+      }
+      function saveVariantCtaUrlPick(landerName, variantName, ctaId) {
+        var all = loadAllVariantCtaUrls();
+        all[variantCtaKey(landerName, variantName)] = ctaId;
+        try { localStorage.setItem(VARIANT_CTA_URL_KEY, JSON.stringify(all)); } catch (e) {}
+      }
+      function toggleCtaNew(show) {
+        if (!ctaNewWrap) return;
+        ctaNewWrap.hidden = !show;
+        if (show && ctaNewInput) setTimeout(function () { ctaNewInput.focus(); }, 30);
+      }
+      function renderCtaOptions(landerName, variantName) {
+        if (!ctaSel) return;
+        var catalog = loadCtaUrlCatalog();
+        var picked = loadAllVariantCtaUrls()[variantCtaKey(landerName, variantName)] || (catalog[0] ? catalog[0].id : "");
+        ctaSel.innerHTML =
+          '<option value="">— Select CTA URL —</option>' +
+          catalog.map(function (row) {
+            var sel = picked === row.id ? " selected" : "";
+            return '<option value="' + variantEsc(row.id) + '"' + sel + '>' + variantEsc(row.name) + '</option>';
+          }).join("") +
+          '<option value="__new__">+ Create new URL…</option>';
+        toggleCtaNew(false);
+      }
+      function openVariantSettings() {
+        if (!dlg || !variantSel || variantSel.value === "__new__") return;
+        var landerName = currentLanderName();
+        var variantName = currentVariantName();
+        if (titleEl) titleEl.textContent = "Variant settings — " + variantName;
+        if (nameInput) nameInput.value = variantName;
+        if (ctaNewInput) ctaNewInput.value = "";
+        renderCtaOptions(landerName, variantName);
+        dlg.showModal();
+      }
+      function saveVariantSettings() {
+        if (!variantSel || variantSel.value === "__new__") return;
+        var landerName = currentLanderName();
+        var oldName = currentVariantName();
+        var newName = nameInput ? nameInput.value.trim() : "";
+        if (newName && newName !== oldName) {
+          var opt = variantSel.options[variantSel.selectedIndex];
+          opt.textContent = newName;
+          var ctaPick = loadAllVariantCtaUrls()[variantCtaKey(landerName, oldName)];
+          if (ctaPick) {
+            saveVariantCtaUrlPick(landerName, newName, ctaPick);
+            var all = loadAllVariantCtaUrls();
+            delete all[variantCtaKey(landerName, oldName)];
+            try { localStorage.setItem(VARIANT_CTA_URL_KEY, JSON.stringify(all)); } catch (e) {}
+          }
+          if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + newName;
+        }
+        if (ctaSel) {
+          var val = ctaSel.value;
+          var vName = newName || oldName;
+          if (val === "__new__" && ctaNewInput) {
+            var newUrl = ctaNewInput.value.trim();
+            if (newUrl) {
+              var catalog = loadCtaUrlCatalog();
+              var newId = "cta_" + Date.now();
+              var label = newUrl.replace(/^https?:\/\//, "").slice(0, 48);
+              catalog.push({ id: newId, name: label, url: newUrl });
+              saveCtaUrlCatalog(catalog);
+              saveVariantCtaUrlPick(landerName, vName, newId);
+            }
+          } else if (val) {
+            saveVariantCtaUrlPick(landerName, vName, val);
+          }
+        }
+      }
+
+      if (openBtn) openBtn.addEventListener("click", openVariantSettings);
+      if (ctaSel) ctaSel.addEventListener("change", function () { toggleCtaNew(ctaSel.value === "__new__"); });
+      if (dlg) {
+        var form = dlg.querySelector("form");
+        if (form) form.addEventListener("submit", saveVariantSettings);
+      }
+    })();
 
     // ---- Preview button (opens a non-indexed preview URL in a new tab)
     var previewBtn = document.getElementById("editor-preview-btn");
