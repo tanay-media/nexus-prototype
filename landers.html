@@ -198,8 +198,8 @@
   </dialog>
 
   <!-- Re-publish confirmation dialog -->
-  <dialog class="modal" id="dialog-republish-confirm">
-    <div class="modal__inner" style="max-width:420px;">
+  <dialog class="modal modal--settings" id="dialog-republish-confirm">
+    <div class="modal__inner" style="max-width:440px;">
       <div class="modal__header">
         <div>
           <h2 class="modal__title">Re-publish lander?</h2>
@@ -207,13 +207,11 @@
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
-      <div style="padding:0 24px 12px;">
-        <div class="republish-info-tile">
-          <div class="republish-info-tile__icon">✓</div>
-          <div class="republish-info-tile__body">
-            <strong>Your new route will go live with the latest HTML &amp; settings.</strong>
-            <p>The previous route stays active separately — nothing breaks. Auto-redirect from old → new is coming soon.</p>
-          </div>
+      <div class="republish-info-tile">
+        <div class="republish-info-tile__icon">✓</div>
+        <div class="republish-info-tile__body">
+          <strong>Your new route will go live with the latest HTML &amp; settings.</strong>
+          <p>The previous route stays active separately — nothing breaks. Auto-redirect from old → new is coming soon.</p>
         </div>
       </div>
       <div class="modal__actions">
