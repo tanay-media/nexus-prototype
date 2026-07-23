@@ -6337,3 +6337,70 @@ details.pop.pop--more[open] > summary { background: var(--bg-hover); }
 }
 .dnsp__foot-left svg { width: 13px; height: 13px; }
 .dnsp__foot-right { display: inline-flex; gap: 8px; }
+
+/* ---- Offer CTA URL rows ---- */
+.offer-cta-url-list { display: flex; flex-direction: column; gap: 10px; }
+.offer-cta-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 8px 10px;
+  background: var(--bg-subtle, #fafaf8);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.offer-cta-url-row .icon-btn { flex-shrink: 0; }
+.offer-params-preview { margin-top: .5rem; }
+.table--compact { font-size: 12.5px; }
+.table--compact td, .table--compact th { padding: 5px 10px; }
+.offer-enriched-preview { margin-top: .25rem; }
+
+/* ---- Lander settings: re-publish flow ---- */
+.settings-draft-warning {
+  display: flex;
+  gap: 12px;
+  padding: 14px 18px;
+  margin: 12px 0 4px;
+  background: #fef6e7;
+  border: 1px solid #f5d68a;
+  border-radius: 10px;
+}
+.settings-draft-warning__icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1.3;
+  color: #c28b00;
+}
+.settings-draft-warning__body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.settings-draft-warning__body strong { display: block; margin-bottom: 2px; }
+.settings-draft-warning__body p { margin: 0 0 8px; color: var(--text-muted); }
+.btn--outline-warn {
+  background: transparent;
+  border: 1px solid #d4940a;
+  color: #c28b00;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn--outline-warn:hover { background: #fef0d1; }
+.btn--disabled { opacity: .45; cursor: not-allowed; }
+
+.settings-variant-status { margin: 14px 0 4px; padding: 0 2px; }
+.settings-variant-status-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.settings-vs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.settings-vs-row--ok { background: #f0faf2; border: 1px solid #b6e2c0; }
+.settings-vs-row--warn { background: #fef6e7; border: 1px solid #f5d68a; }
+.settings-vs-icon { font-size: 15px; flex-shrink: 0; }

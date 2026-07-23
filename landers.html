@@ -144,20 +144,19 @@
     </main>
   </div>
 
-  <!-- Lander settings (typed key/value + canonical fields from the-lander-project) -->
+  <!-- Lander settings (publish-aware) -->
   <dialog class="modal modal--settings" id="dialog-lander-settings">
     <form method="dialog" class="modal__inner">
       <div class="modal__header">
         <div>
           <h2 class="modal__title" id="lander-settings-title">Lander settings</h2>
-          <p class="modal__hint">Lander-level record — overridable per variant.</p>
+          <p class="modal__hint">Lander-level record — changes here affect the published lander.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
 
       <div class="settings-section">
-        <p class="settings-section__title">Identity</p>
-        <div class="field"><label>Lander name</label><input type="text" data-settings="name" value="Summer Sale" /></div>
+        <p class="settings-section__title">Route</p>
         <div class="field-row">
           <div class="field">
             <label>Domain</label>
@@ -185,11 +184,46 @@
         <div class="publish-success__platforms" id="settings-macro-urls" aria-live="polite"></div>
       </div>
 
+      <!-- Unsaved-draft warning tile (hidden by default) -->
+      <div class="settings-draft-warning" id="settings-draft-warning" hidden>
+        <div class="settings-draft-warning__icon">⚠</div>
+        <div class="settings-draft-warning__body">
+          <strong>Preview newer than last saved version</strong>
+          <p>Re-publishing uses the latest <strong>saved</strong> Base version. Save current HTML first to ship the latest changes.</p>
+          <button type="button" class="btn btn--outline-warn" id="settings-save-drafts-btn">Save latest drafts</button>
+        </div>
+      </div>
+
+      <!-- Variant draft status (shown when re-publish is relevant) -->
+      <div class="settings-variant-status" id="settings-variant-status" hidden>
+        <p class="settings-section__title" style="margin-bottom:.5rem;">WHAT WILL PUBLISH</p>
+        <ul id="settings-variant-status-list" class="settings-variant-status-list"></ul>
+      </div>
+
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
         <button type="submit" class="btn btn--black">Save settings</button>
+        <button type="button" class="btn btn--black" id="settings-republish-btn" hidden>Re-publish</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Re-publish confirmation dialog -->
+  <dialog class="modal" id="dialog-republish-confirm">
+    <div class="modal__inner" style="max-width:420px;">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title">Re-publish lander?</h2>
+          <p class="modal__hint">This will impact your currently published lander too. Changes to domain, path, or integrations will go live immediately.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <p id="republish-confirm-detail" class="muted" style="padding:0 24px 8px;">Are you sure you want to re-publish?</p>
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="republish-confirm-yes">Yes, re-publish</button>
+      </div>
+    </div>
   </dialog>
 
   <!-- Variant settings (variant name + CTA URL) -->
@@ -1051,14 +1085,80 @@
         done();
       }
     }
+    var settingsRepublishBtn = document.getElementById("settings-republish-btn");
+    var settingsDraftWarning = document.getElementById("settings-draft-warning");
+    var settingsSaveDraftsBtn = document.getElementById("settings-save-drafts-btn");
+    var settingsVariantStatus = document.getElementById("settings-variant-status");
+    var settingsVariantStatusList = document.getElementById("settings-variant-status-list");
+    var republishConfirmDlg = document.getElementById("dialog-republish-confirm");
+    var republishConfirmYes = document.getElementById("republish-confirm-yes");
+    var settingsActiveLanderId = null;
+    var settingsInitialSnapshot = {};
+    var settingsDirty = false;
+    var settingsHasUnsavedDrafts = true;
+
+    function settingsTakeSnapshot() {
+      var domainSel = settingsDlg.querySelector('[data-settings="domain"]');
+      var pathInput = settingsDlg.querySelector('[data-settings="path"]');
+      var intPicks = settingsReadIntegrationPicks();
+      return {
+        domain: domainSel ? domainSel.value : "",
+        path: pathInput ? pathInput.value : "",
+        integrations: JSON.stringify(intPicks)
+      };
+    }
+    function settingsCheckDirty() {
+      var current = settingsTakeSnapshot();
+      settingsDirty =
+        current.domain !== settingsInitialSnapshot.domain ||
+        current.path !== settingsInitialSnapshot.path ||
+        current.integrations !== settingsInitialSnapshot.integrations;
+      settingsUpdateRepublishUI();
+    }
+    function settingsUpdateRepublishUI() {
+      var l = landers.find(function (x) { return x.id === settingsActiveLanderId; });
+      var isPublished = l && l.status === "published";
+      if (!isPublished || !settingsDirty) {
+        if (settingsRepublishBtn) settingsRepublishBtn.hidden = true;
+        if (settingsDraftWarning) settingsDraftWarning.hidden = true;
+        if (settingsVariantStatus) settingsVariantStatus.hidden = true;
+        return;
+      }
+      if (settingsRepublishBtn) settingsRepublishBtn.hidden = false;
+      if (settingsVariantStatus) settingsVariantStatus.hidden = false;
+      settingsRenderVariantStatus(l);
+      if (settingsHasUnsavedDrafts) {
+        if (settingsDraftWarning) settingsDraftWarning.hidden = false;
+        if (settingsRepublishBtn) { settingsRepublishBtn.disabled = true; settingsRepublishBtn.classList.add("btn--disabled"); }
+      } else {
+        if (settingsDraftWarning) settingsDraftWarning.hidden = true;
+        if (settingsRepublishBtn) { settingsRepublishBtn.disabled = false; settingsRepublishBtn.classList.remove("btn--disabled"); }
+      }
+    }
+    function settingsRenderVariantStatus(l) {
+      if (!settingsVariantStatusList || !l) return;
+      settingsVariantStatusList.innerHTML = l.variants.map(function (v, i) {
+        var hasDraft = i === 1 && settingsHasUnsavedDrafts;
+        var icon = hasDraft ? '⚠' : '✓';
+        var cls = hasDraft ? 'settings-vs-row--warn' : 'settings-vs-row--ok';
+        var label = hasDraft
+          ? 'v1 · saved just now · newer draft pending'
+          : 'v' + (i + 1 + (i >= 1 && !settingsHasUnsavedDrafts ? 0 : 0)) + ' · saved just now';
+        return '<li class="settings-vs-row ' + cls + '">' +
+          '<span class="settings-vs-icon">' + icon + '</span>' +
+          '<strong>' + escapeHtml(v.name) + '</strong>' +
+          '<span class="muted" style="margin-left:.5rem;">' + label + '</span>' +
+        '</li>';
+      }).join("");
+    }
+
     function openLanderSettings(lname, lid) {
       settingsActiveLanderName = lname;
+      settingsActiveLanderId = lid;
       settingsTitle.textContent = "Lander settings — " + lname;
       var l = landers.find(function (x) { return x.id === lid; });
-      var nameInput  = settingsDlg.querySelector('[data-settings="name"]');
       var domainSel  = settingsDlg.querySelector('[data-settings="domain"]');
       var pathInput  = settingsDlg.querySelector('[data-settings="path"]');
-      if (nameInput) nameInput.value = l ? l.name : lname;
       if (l && domainSel && pathInput) {
         var clean = l.url.replace(/^https?:\/\//, "");
         var slash = clean.indexOf("/");
@@ -1079,6 +1179,10 @@
       }
       settingsRenderIntegrations(lname);
       settingsRenderMacroUrls();
+      settingsHasUnsavedDrafts = l && l.variants.length > 1;
+      settingsDirty = false;
+      settingsInitialSnapshot = settingsTakeSnapshot();
+      settingsUpdateRepublishUI();
       settingsDlg.showModal();
     }
 
@@ -1097,8 +1201,11 @@
     }
     if (settingsDlg) {
       settingsDlg.querySelectorAll('[data-settings="domain"], [data-settings="path"]').forEach(function (el) {
-        el.addEventListener("input", settingsRenderMacroUrls);
-        el.addEventListener("change", settingsRenderMacroUrls);
+        el.addEventListener("input", function () { settingsRenderMacroUrls(); settingsCheckDirty(); });
+        el.addEventListener("change", function () { settingsRenderMacroUrls(); settingsCheckDirty(); });
+      });
+      settingsDlg.addEventListener("change", function (e) {
+        if (e.target.closest("[data-int-source]")) settingsCheckDirty();
       });
       var settingsForm = settingsDlg.querySelector("form");
       if (settingsForm) {
@@ -1106,6 +1213,30 @@
           settingsSave();
         });
       }
+    }
+
+    if (settingsSaveDraftsBtn) {
+      settingsSaveDraftsBtn.addEventListener("click", function () {
+        settingsHasUnsavedDrafts = false;
+        settingsUpdateRepublishUI();
+        landerToast("All variant drafts saved");
+      });
+    }
+
+    if (settingsRepublishBtn) {
+      settingsRepublishBtn.addEventListener("click", function () {
+        if (settingsRepublishBtn.disabled) return;
+        settingsDlg.close();
+        if (republishConfirmDlg) republishConfirmDlg.showModal();
+      });
+    }
+
+    if (republishConfirmYes && republishConfirmDlg) {
+      republishConfirmYes.addEventListener("click", function () {
+        republishConfirmDlg.close();
+        settingsSave();
+        landerToast("Lander re-published successfully");
+      });
     }
     if (settingsMacroUrlsEl) {
       settingsMacroUrlsEl.addEventListener("click", function (e) {
