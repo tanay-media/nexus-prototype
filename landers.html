@@ -1134,12 +1134,15 @@
 
       if (step === 1) {
         if (settingsHint) settingsHint.textContent = "Confirm settings, then publish.";
-        if (settingsHasUnsavedDrafts && isPublished) {
+        if (isPublished && l && l.variants.length > 1) {
           if (settingsVariantStatus) settingsVariantStatus.hidden = false;
           settingsRenderVariantStatus(l);
-          if (settingsContinueBtn) { settingsContinueBtn.textContent = "Continue →"; settingsContinueBtn.disabled = true; settingsContinueBtn.classList.add("btn--disabled"); }
         } else {
           if (settingsVariantStatus) settingsVariantStatus.hidden = true;
+        }
+        if (settingsHasUnsavedDrafts && isPublished) {
+          if (settingsContinueBtn) { settingsContinueBtn.textContent = "Continue →"; settingsContinueBtn.disabled = true; settingsContinueBtn.classList.add("btn--disabled"); }
+        } else {
           if (settingsContinueBtn) { settingsContinueBtn.textContent = "Continue →"; settingsContinueBtn.disabled = false; settingsContinueBtn.classList.remove("btn--disabled"); }
         }
       } else {
