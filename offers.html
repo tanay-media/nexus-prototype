@@ -94,26 +94,16 @@
         <div class="field"><label for="offer-name">Offer name</label><input type="text" id="offer-name" /></div>
         <div class="field-row">
           <div class="field">
-            <label for="offer-advertiser-select">Advertiser</label>
-            <select id="offer-advertiser-select">
-              <option value="">— Select —</option>
-              <option value="__new__">+ New advertiser</option>
-            </select>
-            <input type="text" id="offer-advertiser-new" placeholder="New advertiser name" hidden />
+            <label>Advertiser</label>
+            <div class="radio-picker" id="offer-advertiser-picker">
+              <!-- populated by JS -->
+            </div>
           </div>
           <div class="field">
-            <label for="offer-vertical">Vertical</label>
-            <select id="offer-vertical">
-              <option value="">— Select —</option>
-              <option value="Finance">Finance</option>
-              <option value="Home & Garden">Home &amp; Garden</option>
-              <option value="Travel">Travel</option>
-              <option value="Autos">Autos</option>
-              <option value="Health - wellness">Health - wellness</option>
-              <option value="Health - Pharma">Health - Pharma</option>
-              <option value="Shopping deals">Shopping deals</option>
-              <option value="Others">Others</option>
-            </select>
+            <label>Vertical</label>
+            <div class="radio-picker" id="offer-vertical-picker">
+              <!-- populated by JS -->
+            </div>
           </div>
         </div>
         <div class="field-row">
@@ -425,35 +415,70 @@
       }).join("");
     }
 
-    function renderAdvertiserDropdown(selectedName) {
-      var sel = document.getElementById("offer-advertiser-select");
-      var newInput = document.getElementById("offer-advertiser-new");
-      if (!sel) return;
+    var VERTICALS = ["Finance","Home & Garden","Travel","Autos","Health - wellness","Health - Pharma","Shopping deals","Others"];
+
+    function buildRadioPicker(container, items, selectedVal, groupName, newLabel) {
+      if (!container) return;
+      var html = items.map(function (item) {
+        var checked = item === selectedVal ? " checked" : "";
+        return '<label class="radio-picker__item">' +
+          '<input type="radio" name="' + groupName + '" value="' + escapeHtml(item) + '"' + checked + ' />' +
+          '<span>' + escapeHtml(item) + '</span></label>';
+      }).join("");
+      var newChecked = (selectedVal && items.indexOf(selectedVal) === -1 && selectedVal !== "") ? " checked" : "";
+      var showInput = newChecked ? true : false;
+      html += '<label class="radio-picker__item radio-picker__item--new">' +
+        '<input type="radio" name="' + groupName + '" value="__new__"' + newChecked + ' />' +
+        '<span>' + escapeHtml(newLabel) + '</span>' +
+        '<input type="text" class="radio-picker__new-input" placeholder="Type here…"' +
+        (showInput ? ' value="' + escapeHtml(selectedVal) + '"' : ' style="display:none"') +
+        ' /></label>';
+      container.innerHTML = html;
+
+      container.addEventListener("change", function (e) {
+        if (e.target.type !== "radio") return;
+        var inp = container.querySelector(".radio-picker__new-input");
+        if (e.target.value === "__new__") {
+          inp.style.display = "";
+          setTimeout(function () { inp.focus(); }, 30);
+        } else {
+          inp.style.display = "none";
+        }
+      });
+    }
+
+    function getRadioPickerValue(container) {
+      if (!container) return "";
+      var checked = container.querySelector('input[type="radio"]:checked');
+      if (!checked) return "";
+      if (checked.value === "__new__") {
+        var inp = container.querySelector(".radio-picker__new-input");
+        return inp ? inp.value.trim() : "";
+      }
+      return checked.value;
+    }
+
+    function renderAdvertiserPicker(selectedName) {
+      var picker = document.getElementById("offer-advertiser-picker");
       var names = [];
       offers.forEach(function (o) {
         if (o.advertiserName && names.indexOf(o.advertiserName) === -1) names.push(o.advertiserName);
       });
       names.sort();
-      sel.innerHTML = '<option value="">— Select —</option>' +
-        names.map(function (n) {
-          return '<option value="' + escapeHtml(n) + '"' + (selectedName === n ? ' selected' : '') + '>' + escapeHtml(n) + '</option>';
-        }).join("") +
-        '<option value="__new__">+ New advertiser</option>';
-      if (selectedName && names.indexOf(selectedName) === -1 && selectedName !== "") {
-        var opt = document.createElement("option");
-        opt.value = selectedName;
-        opt.textContent = selectedName;
-        opt.selected = true;
-        sel.insertBefore(opt, sel.lastElementChild);
-      }
-      if (newInput) newInput.hidden = true;
+      buildRadioPicker(picker, names, selectedName, "offer-adv", "+ New advertiser");
+    }
+
+    function renderVerticalPicker(selectedVal) {
+      var picker = document.getElementById("offer-vertical-picker");
+      buildRadioPicker(picker, VERTICALS, selectedVal, "offer-vert", "+ New vertical");
     }
 
     function getAdvertiserValue() {
-      var sel = document.getElementById("offer-advertiser-select");
-      var newInput = document.getElementById("offer-advertiser-new");
-      if (sel && sel.value === "__new__" && newInput) return newInput.value.trim();
-      return sel ? sel.value : "";
+      return getRadioPickerValue(document.getElementById("offer-advertiser-picker"));
+    }
+
+    function getVerticalValue() {
+      return getRadioPickerValue(document.getElementById("offer-vertical-picker"));
     }
 
     function openOfferDetail(id) {
@@ -463,8 +488,8 @@
       document.getElementById("offer-detail-title").textContent = o.name || "New offer";
       document.getElementById("offer-detail-sub").textContent = (o.advertiserName || "New advertiser") + (o.vertical ? " · " + o.vertical : "");
       document.getElementById("offer-name").value = o.name;
-      renderAdvertiserDropdown(o.advertiserName);
-      document.getElementById("offer-vertical").value = o.vertical || "";
+      renderAdvertiserPicker(o.advertiserName);
+      renderVerticalPicker(o.vertical || "");
       document.getElementById("offer-status").value = o.status || "active";
       document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa ? o.cpaGoal.targetCpa : "";
       document.getElementById("offer-cpa-currency").value = (o.cpaGoal && o.cpaGoal.currency) || "USD";
@@ -484,7 +509,7 @@
       if (!o) return;
       o.name = document.getElementById("offer-name").value.trim() || o.name;
       o.advertiserName = getAdvertiserValue() || o.advertiserName;
-      o.vertical = document.getElementById("offer-vertical").value;
+      o.vertical = getVerticalValue() || o.vertical;
       o.status = document.getElementById("offer-status").value;
       o.cpaGoal = {
         targetCpa: parseFloat(document.getElementById("offer-cpa-target").value) || 0,
@@ -525,16 +550,7 @@
     document.getElementById("offers-status-filter").addEventListener("change", render);
     document.getElementById("offers-advertiser-filter").addEventListener("change", render);
 
-    var advSelect = document.getElementById("offer-advertiser-select");
-    var advNewInput = document.getElementById("offer-advertiser-new");
-    if (advSelect) {
-      advSelect.addEventListener("change", function () {
-        if (advNewInput) {
-          advNewInput.hidden = advSelect.value !== "__new__";
-          if (!advNewInput.hidden) setTimeout(function () { advNewInput.focus(); }, 30);
-        }
-      });
-    }
+    /* Advertiser & Vertical pickers are initialized in openOfferDetail via buildRadioPicker */
 
     var ctaTpsPreview = document.getElementById("offer-cta-tps-preview");
     if (ctaTpsPreview) ctaTpsPreview.addEventListener("change", refreshEnrichedPreview);

@@ -6485,3 +6485,47 @@ details.pop.pop--more[open] > summary { background: var(--bg-hover); }
 }
 .republish-info-tile__body strong { display: block; margin-bottom: 3px; }
 .republish-info-tile__body p { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+
+/* Radio picker (Google-Forms-style) */
+.radio-picker {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  background: #fff;
+}
+.radio-picker__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 13.5px;
+  transition: background .12s;
+}
+.radio-picker__item:hover { background: var(--hover-bg, #f7f7f5); }
+.radio-picker__item input[type="radio"] {
+  accent-color: var(--primary, #222);
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.radio-picker__item--new {
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+  padding-top: 9px;
+  color: var(--primary, #222);
+  font-weight: 500;
+}
+.radio-picker__new-input {
+  flex: 1;
+  border: none;
+  border-bottom: 2px solid var(--primary, #222);
+  outline: none;
+  font-size: 13.5px;
+  padding: 2px 0;
+  background: transparent;
+  margin-left: 2px;
+}
