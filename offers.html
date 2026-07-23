@@ -198,6 +198,12 @@
       if (!goal || goal.targetCpa == null || goal.targetCpa === 0) return "—";
       return "$" + Number(goal.targetCpa).toFixed(goal.targetCpa % 1 ? 2 : 0);
     }
+    function wsNames(ids) {
+      if (!ids || !ids.length) return '<span class="muted">—</span>';
+      var wsMap = {};
+      TEAM_WORKSPACES.forEach(function (ws) { wsMap[ws.id] = ws.name; });
+      return ids.map(function (id) { return escapeHtml(wsMap[id] || id); }).join(", ");
+    }
     function statusBadge(status) {
       return status === "inactive"
         ? '<span class="badge badge--archived">Inactive</span>'
@@ -273,7 +279,7 @@
             '<td><strong>' + escapeHtml(o.name) + '</strong></td>' +
             '<td class="muted">' + escapeHtml(o.vertical) + '</td>' +
             '<td>' + statusBadge(o.status) + '</td>' +
-            '<td class="right num">' + (o.workspaceIds ? o.workspaceIds.length : 0) + '</td>' +
+            '<td class="muted" style="font-size:12.5px;">' + wsNames(o.workspaceIds) + '</td>' +
             '<td class="right num">' + fmtCpa(o.cpaGoal) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-offer-settings" data-offer-id="' + escapeHtml(o.id) + '" title="Offer settings">' + ICON.settings + '</button>' +

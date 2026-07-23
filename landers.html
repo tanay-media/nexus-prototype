@@ -47,6 +47,14 @@
           <input class="input" type="search" id="landers-search" placeholder="Search by name, url, variant" />
         </div>
         <select class="select" id="landers-domain-filter" aria-label="Domain filter"><option value="">All domains</option><option>offers.acme.com</option><option>refer.acme.com</option><option>try.acme.com</option></select>
+        <select class="select" id="landers-offer-filter" aria-label="Offer filter">
+          <option value="">All offers</option>
+          <option>Walk-in showers</option>
+          <option>Walk-in Tubs</option>
+          <option>Roofing</option>
+          <option>VIN Search</option>
+          <option>Auto Insurance</option>
+        </select>
         <select class="select" id="landers-editor-filter" aria-label="Editor filter"><option value="">All editors</option><option>Kyle</option><option>Maya</option><option>Sam</option><option>Dana</option></select>
         <div class="date-range" role="group" aria-label="Updated date range">
           <input type="date" class="date-range__input" id="landers-date-from" aria-label="From date" />
@@ -370,7 +378,7 @@
       {
         id: "summer-sale", name: "Summer Sale", url: "https://offers.acme.com/summer-sale-hero",
         split: "60/40%", updated: "2h ago", updatedDate: "Apr 20, 2026", by: "Kyle",
-        status: "published",
+        status: "published", offerName: "Walk-in showers",
         visits: 200000, impressions: 169700, clicks: 114374, conversions: 78608, score: 0.46,
         variants: [
           { name: "Main hero",          split: "60%", updated: "2h ago", by: "Kyle", visits: 150000, impressions: 128492, clicks: 91710, conversions: 66188, score: 0.52 },
@@ -380,7 +388,7 @@
       {
         id: "referral-q2", name: "Referral Q2", url: "https://refer.acme.com/referral-q2",
         split: "70/30%", updated: "5h ago", updatedDate: "Apr 19, 2026", by: "Maya",
-        status: "published",
+        status: "published", offerName: "Walk-in Tubs",
         visits: 32000, impressions: 25545, clicks: 12973, conversions: 7019, score: 0.27,
         variants: [
           { name: "Single-field entry", split: "70%", updated: "5h ago", by: "Maya", visits: 22400, impressions: 17881, clicks: 9082, conversions: 4913, score: 0.28 },
@@ -390,7 +398,7 @@
       {
         id: "founder-letter", name: "Founder Letter", url: "https://offers.acme.com/founder-letter",
         split: "100%", updated: "6h ago", updatedDate: "Apr 20, 2026", by: "Sam",
-        status: "published",
+        status: "published", offerName: "Roofing",
         visits: 28000, impressions: 22104, clicks: 9947, conversions: 3580, score: 0.16,
         variants: [
           { name: "Long form", split: "100%", updated: "6h ago", by: "Sam", visits: 28000, impressions: 22104, clicks: 9947, conversions: 3580, score: 0.16 }
@@ -399,7 +407,7 @@
       {
         id: "black-friday", name: "Black Friday", url: "https://offers.acme.com/black-friday-2026",
         split: "100%", updated: "5d ago", updatedDate: "Apr 15, 2026", by: "Dana",
-        status: "published",
+        status: "published", offerName: "VIN Search",
         visits: 11000, impressions: 8720, clicks: 1570, conversions: 279, score: 0.03,
         variants: [
           { name: "Orange bold", split: "100%", updated: "5d ago", by: "Dana", visits: 11000, impressions: 8720, clicks: 1570, conversions: 279, score: 0.03 }
@@ -408,7 +416,7 @@
       {
         id: "spring-promo", name: "Spring Promo", url: "https://offers.acme.com/spring-promo",
         split: "100%", updated: "1d ago", updatedDate: "Apr 19, 2026", by: "Kyle",
-        status: "published",
+        status: "published", offerName: "Auto Insurance",
         visits: 8200, impressions: 6100, clicks: 2100, conversions: 380, score: 0.12,
         variants: [
           { name: "Main promo", split: "100%", updated: "1d ago", by: "Kyle", visits: 8200, impressions: 6100, clicks: 2100, conversions: 380, score: 0.12 }
@@ -417,7 +425,7 @@
       {
         id: "partner-announce", name: "Partner Announce", url: "https://try.acme.com/partner-announce",
         split: "100%", updated: "1d ago", updatedDate: "Apr 19, 2026", by: "Kyle",
-        status: "published",
+        status: "published", offerName: "Roofing",
         visits: 4500, impressions: 3441, clicks: 1307, conversions: 497, score: 0.14,
         variants: [
           { name: "Press style", split: "100%", updated: "1d ago", by: "Kyle", visits: 4500, impressions: 3441, clicks: 1307, conversions: 497, score: 0.14 }
@@ -427,7 +435,7 @@
       {
         id: "fall-preview", name: "Fall Preview", url: "https://offers.acme.com/fall-preview",
         split: "100%", updated: "3w ago", updatedDate: "Apr 01, 2026", by: "Maya",
-        status: "unpublished",
+        status: "unpublished", offerName: "Walk-in showers",
         visits: 620, impressions: 412, clicks: 118, conversions: 21, score: 0.05,
         variants: [
           { name: "Cozy warm palette", split: "100%", updated: "3w ago", by: "Maya", visits: 620, impressions: 412, clicks: 118, conversions: 21, score: 0.05 }
@@ -436,7 +444,7 @@
       {
         id: "holiday-teaser", name: "Holiday Teaser", url: "https://offers.acme.com/holiday-teaser",
         split: "100%", updated: "2mo ago", updatedDate: "Feb 18, 2026", by: "Sam",
-        status: "unpublished",
+        status: "unpublished", offerName: "VIN Search",
         visits: 180, impressions: 96, clicks: 22, conversions: 3, score: 0.03,
         variants: [
           { name: "Gift-led hero", split: "100%", updated: "2mo ago", by: "Sam", visits: 180, impressions: 96, clicks: 22, conversions: 3, score: 0.03 }
@@ -445,7 +453,7 @@
       {
         id: "partner-pulse-draft", name: "Partner Pulse", url: "https://try.acme.com/partner-pulse",
         split: "100%", updated: "just now", updatedDate: "Apr 23, 2026", by: "Kyle",
-        status: "unpublished",
+        status: "unpublished", offerName: "Auto Insurance",
         visits: 0, impressions: 0, clicks: 0, conversions: 0, score: 0,
         variants: [
           { name: "V1 — Draft hero", split: "100%", updated: "just now", by: "Kyle", visits: 0, impressions: 0, clicks: 0, conversions: 0, score: 0 }
@@ -581,6 +589,7 @@
       var statusFilter = document.getElementById("status-filter").value;
       var q        = (document.getElementById("landers-search").value || "").trim();
       var dom      = document.getElementById("landers-domain-filter").value;
+      var offerF   = document.getElementById("landers-offer-filter").value;
       var editor   = document.getElementById("landers-editor-filter").value;
       var fromRaw  = document.getElementById("landers-date-from").value;
       var toRaw    = document.getElementById("landers-date-to").value;
@@ -591,6 +600,7 @@
         if (statusFilter === "published"   && l.status !== "published")   return false;
         if (statusFilter === "unpublished" && l.status !== "unpublished") return false;
         if (dom && l.url.indexOf(dom) === -1) return false;
+        if (offerF && l.offerName !== offerF) return false;
         if (editor && l.by !== editor) return false;
         if (!matchesSearch(l, q)) return false;
         if (!inDateRange(l, fromD, toD)) return false;
@@ -764,7 +774,7 @@
       render();
     });
 
-    ["landers-search", "landers-domain-filter", "landers-editor-filter",
+    ["landers-search", "landers-domain-filter", "landers-offer-filter", "landers-editor-filter",
      "landers-date-from", "landers-date-to"].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
