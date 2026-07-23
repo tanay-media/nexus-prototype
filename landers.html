@@ -201,18 +201,17 @@
 
       <!-- Step 2: Review -->
       <div class="publish-pane" id="settings-pane-2" hidden>
-        <!-- Variant draft status -->
-        <div class="settings-variant-status" id="settings-variant-status">
-          <p class="settings-section__title" style="margin-bottom:.5rem;">WHAT WILL PUBLISH</p>
-          <ul id="settings-variant-status-list" class="settings-variant-status-list"></ul>
-        </div>
-
-        <div class="republish-info-tile" style="margin-top:1rem;">
+        <div class="republish-info-tile">
           <div class="republish-info-tile__icon">✓</div>
           <div class="republish-info-tile__body">
-            <strong>Your new route will go live with the latest HTML &amp; settings.</strong>
+            <strong id="settings-review-summary">2 variants will go live with the latest HTML &amp; settings.</strong>
             <p>The previous route stays active separately — nothing breaks. Auto-redirect from old → new is coming soon.</p>
           </div>
+        </div>
+
+        <!-- Only shown when a variant has unsaved drafts -->
+        <div class="settings-variant-status" id="settings-variant-status" hidden>
+          <ul id="settings-variant-status-list" class="settings-variant-status-list"></ul>
         </div>
       </div>
 
@@ -1136,19 +1135,20 @@
         if (settingsContinueBtn) { settingsContinueBtn.textContent = "Continue →"; settingsContinueBtn.disabled = false; settingsContinueBtn.classList.remove("btn--disabled"); }
         if (settingsHint) settingsHint.textContent = "Confirm settings, then publish.";
       } else {
-        settingsRenderVariantStatus(l);
         var label = isPublished ? "Yes, re-publish" : "Publish";
-        if (settingsContinueBtn) {
-          settingsContinueBtn.textContent = label;
-          if (settingsHasUnsavedDrafts && isPublished) {
-            settingsContinueBtn.disabled = true;
-            settingsContinueBtn.classList.add("btn--disabled");
-          } else {
-            settingsContinueBtn.disabled = false;
-            settingsContinueBtn.classList.remove("btn--disabled");
-          }
+        var count = l ? l.variants.length : 0;
+        var summaryEl = document.getElementById("settings-review-summary");
+        if (summaryEl) summaryEl.textContent = count + " variant" + (count === 1 ? "" : "s") + " will go live with the latest HTML & settings.";
+        if (settingsHasUnsavedDrafts && isPublished) {
+          if (settingsVariantStatus) settingsVariantStatus.hidden = false;
+          settingsRenderVariantStatus(l);
+          if (settingsContinueBtn) { settingsContinueBtn.disabled = true; settingsContinueBtn.classList.add("btn--disabled"); }
+        } else {
+          if (settingsVariantStatus) settingsVariantStatus.hidden = true;
+          if (settingsContinueBtn) { settingsContinueBtn.disabled = false; settingsContinueBtn.classList.remove("btn--disabled"); }
         }
-        if (settingsHint) settingsHint.textContent = "Review variants and confirm.";
+        if (settingsContinueBtn) settingsContinueBtn.textContent = label;
+        if (settingsHint) settingsHint.textContent = "Review and confirm.";
       }
     }
     function settingsUpdateRepublishUI() {
