@@ -33,7 +33,7 @@
       </div>
 
       <div class="page-body">
-        <p class="offers-intro muted">Team-scoped offers — CTA URLs and CPA goals inherit to all landers on this offer.</p>
+        <p class="offers-intro muted">Team-scoped offers — CTA URL and CPA goals inherit to all landers on this offer.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
@@ -61,8 +61,7 @@
                   <th>Status</th>
                   <th class="right">Workspaces</th>
                   <th class="right">CPA goal</th>
-                  <th class="right">CTA URLs</th>
-                  <th class="right" style="min-width:80px;">Actions</th>
+                  <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="offers-body"></tbody>
@@ -79,14 +78,14 @@
       <div class="modal__header">
         <div>
           <h2 class="modal__title" id="offer-detail-title">Offer</h2>
-          <p class="modal__hint" id="offer-detail-sub">Team-scoped · CTA URLs + CPA inherit to landers</p>
+          <p class="modal__hint" id="offer-detail-sub">Team-scoped · CTA URL + CPA inherit to landers</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
 
       <div class="tabs offer-detail-tabs" role="tablist" data-tabs="offer-detail">
         <button type="button" class="tab is-active" data-tab="general" role="tab" aria-selected="true">General</button>
-        <button type="button" class="tab" data-tab="cta-urls" role="tab" aria-selected="false">CTA URLs</button>
+        <button type="button" class="tab" data-tab="cta-url" role="tab" aria-selected="false">CTA URL</button>
         <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
       </div>
 
@@ -110,65 +109,61 @@
             </select>
           </div>
         </div>
-        <div class="field">
-          <label for="offer-status">Status</label>
-          <select id="offer-status">
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-        <div class="settings-section" style="margin-top:1rem;">
-          <p class="settings-section__title">CPA goal</p>
-          <div class="field-row">
-            <div class="field">
-              <label for="offer-cpa-target">Target CPA</label>
-              <input type="number" id="offer-cpa-target" min="0" step="0.01" placeholder="e.g. 85" />
-            </div>
-            <div class="field">
-              <label for="offer-cpa-currency">Currency</label>
-              <select id="offer-cpa-currency">
+        <div class="field-row">
+          <div class="field">
+            <label for="offer-status">Status</label>
+            <select id="offer-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="offer-cpa-target">CPA goal</label>
+            <div class="field-row" style="gap:.35rem;">
+              <span class="field__prefix">$</span>
+              <input type="number" id="offer-cpa-target" min="0" step="0.01" placeholder="85" style="flex:1;" />
+              <select id="offer-cpa-currency" style="max-width:80px;">
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
                 <option value="GBP">GBP</option>
               </select>
             </div>
-            <div class="field">
-              <label for="offer-cpa-type">Conversion type</label>
-              <input type="text" id="offer-cpa-type" placeholder="e.g. lead" />
-            </div>
           </div>
+        </div>
+        <div class="field">
+          <label for="offer-cpa-type">Conversion type</label>
+          <input type="text" id="offer-cpa-type" placeholder="e.g. lead, purchase" />
         </div>
       </section>
 
-      <!-- CTA URLs -->
-      <section class="offer-detail-pane" data-tab-panel="cta-urls" hidden>
-        <p class="settings-section__hint muted">Paste the base (max) URL. Nexus appends tracking params automatically. Up to 10 CTA URLs per offer.</p>
-        <div id="offer-cta-url-list" class="offer-cta-url-list"></div>
-        <button type="button" class="kv-add" id="offer-cta-url-add">+ Add CTA URL</button>
+      <!-- CTA URL (single) -->
+      <section class="offer-detail-pane" data-tab-panel="cta-url" hidden>
+        <p class="settings-section__hint muted">Paste the base (max) URL. Nexus appends tracking params automatically. All landers on this offer inherit this URL.</p>
+        <div class="field">
+          <label for="offer-cta-url">CTA URL</label>
+          <input type="url" id="offer-cta-url" placeholder="https://trk.pmsrv.co/v2/trk?adid=…&akey=…" class="input" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;" />
+        </div>
 
         <div class="settings-section" style="margin-top:1.2rem;">
           <p class="settings-section__title">Auto-appended tracking params</p>
-          <div class="offer-params-preview" id="offer-params-preview">
-            <table class="table table--compact">
-              <thead><tr><th>Param</th><th>Value</th></tr></thead>
-              <tbody>
-                <tr><td class="mono">cp1</td><td class="mono">{{campaign_id}}</td></tr>
-                <tr><td class="mono">cp2</td><td class="mono">{{adset_id}}</td></tr>
-                <tr><td class="mono">cp3</td><td class="mono">{{ad_id}}</td></tr>
-                <tr><td class="mono">cp4</td><td class="mono">{{variant_name}}</td></tr>
-                <tr><td class="mono">tpid</td><td class="mono"><em>auto — see tps</em></td></tr>
-                <tr><td class="mono">tps</td><td class="mono"><em>fb | google | taboola | nexus</em></td></tr>
-                <tr><td class="mono">ppid</td><td class="mono">8PRN625DH</td></tr>
-                <tr><td class="mono">pid</td><td class="mono">8PRN625DH</td></tr>
-                <tr><td class="mono">purl</td><td class="mono">https://{{route}}</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <table class="table table--compact">
+            <thead><tr><th>Param</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">cp1</td><td class="mono">{{campaign_id}}</td></tr>
+              <tr><td class="mono">cp2</td><td class="mono">{{adset_id}}</td></tr>
+              <tr><td class="mono">cp3</td><td class="mono">{{ad_id}}</td></tr>
+              <tr><td class="mono">cp4</td><td class="mono">{{variant_name}}</td></tr>
+              <tr><td class="mono">tpid</td><td class="mono"><em>auto — see tps</em></td></tr>
+              <tr><td class="mono">tps</td><td class="mono"><em>fb | google | taboola | nexus</em></td></tr>
+              <tr><td class="mono">ppid</td><td class="mono">8PRN625DH</td></tr>
+              <tr><td class="mono">pid</td><td class="mono">8PRN625DH</td></tr>
+              <tr><td class="mono">purl</td><td class="mono">https://{{route}}</td></tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="settings-section" style="margin-top:1rem;">
           <p class="settings-section__title">Preview — enriched URL</p>
-          <p class="settings-section__hint muted">Select a traffic source to preview the full URL with macros.</p>
           <div class="field-row" style="margin-bottom:.5rem;">
             <div class="field">
               <label for="offer-cta-tps-preview">Traffic source (tps)</label>
@@ -180,9 +175,7 @@
               </select>
             </div>
           </div>
-          <div class="offer-enriched-preview" id="offer-enriched-preview">
-            <input type="text" readonly id="offer-enriched-url" class="input" style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;" />
-          </div>
+          <input type="text" readonly id="offer-enriched-url" class="input" style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;" />
         </div>
       </section>
 
@@ -203,10 +196,9 @@
   <script>
     var ICON = {
       settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+      clone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
       chev: '<span class="chev">▸</span>'
     };
-
-    var VERTICALS = ["Finance", "Home & Garden", "Travel", "Autos", "Health - wellness", "Health - Pharma", "Shopping deals", "Others"];
 
     var TEAM_WORKSPACES = [
       { id: "acme-growth", name: "ACME Growth" },
@@ -215,12 +207,12 @@
     ];
 
     var offers = [
-      { id: "hb-wis",  advertiserName: "Homebuddy",        name: "Walk-in showers",  vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Main tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" }] },
-      { id: "hb-wit",  advertiserName: "Homebuddy",        name: "Walk-in Tubs",     vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Main tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" }] },
-      { id: "hb-roof", advertiserName: "Homebuddy",        name: "Roofing",          vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Google tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" }, { label: "Meta tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof02&akey=e5f6g7h8" }] },
-      { id: "bv-vin",  advertiserName: "Beenverified",     name: "VIN Search",       vertical: "Autos",         status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "VIN tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" }] },
-      { id: "bv-obit", advertiserName: "Beenverified",     name: "Obituary search",  vertical: "Others",        status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD", conversionType: "lead" }, ctaUrls: [] },
-      { id: "sf-auto", advertiserName: "Smart Financials", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Auto ins tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }] }
+      { id: "hb-wis",  advertiserName: "Homebuddy",        name: "Walk-in showers",  vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD", conversionType: "lead" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
+      { id: "hb-wit",  advertiserName: "Homebuddy",        name: "Walk-in Tubs",     vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD", conversionType: "lead" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
+      { id: "hb-roof", advertiserName: "Homebuddy",        name: "Roofing",          vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD", conversionType: "lead" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
+      { id: "bv-vin",  advertiserName: "Beenverified",     name: "VIN Search",       vertical: "Autos",         status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD", conversionType: "lead" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
+      { id: "bv-obit", advertiserName: "Beenverified",     name: "Obituary search",  vertical: "Others",        status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD", conversionType: "lead" }, ctaUrl: "" },
+      { id: "sf-auto", advertiserName: "Smart Financials", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD", conversionType: "lead" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
     ];
 
     var expandedAdvertisers = {};
@@ -284,7 +276,7 @@
       var groups = groupByAdvertiser(rows);
       tbody.innerHTML = "";
       if (!groups.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="muted" style="padding:1.5rem;text-align:center;">No offers match your filters.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="muted" style="padding:1.5rem;text-align:center;">No offers match your filters.</td></tr>';
         return;
       }
       groups.forEach(function (g) {
@@ -296,7 +288,7 @@
           '<td class="lander-row__toggle">' +
             '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '" aria-label="Toggle ' + escapeHtml(g.advertiserName) + ' offers">' + ICON.chev + '</button>' +
           '</td>' +
-          '<td colspan="7"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
+          '<td colspan="6"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
             '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' offer' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
         tbody.appendChild(tr);
         g.offers.forEach(function (o) {
@@ -312,9 +304,9 @@
             '<td>' + statusBadge(o.status) + '</td>' +
             '<td class="right num">' + (o.workspaceIds ? o.workspaceIds.length : 0) + '</td>' +
             '<td class="right num">' + fmtCpa(o.cpaGoal) + '</td>' +
-            '<td class="right num">' + (o.ctaUrls ? o.ctaUrls.length : 0) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-offer-settings" data-offer-id="' + escapeHtml(o.id) + '" title="Offer settings">' + ICON.settings + '</button>' +
+              '<button type="button" class="icon-btn js-offer-clone" data-offer-id="' + escapeHtml(o.id) + '" title="Clone offer">' + ICON.clone + '</button>' +
             '</div></td>';
           tbody.appendChild(orow);
         });
@@ -327,21 +319,14 @@
 
     // ---- CTA URL enrichment ----
     var STATIC_PARAMS = {
-      cp1: "{{campaign_id}}",
-      cp2: "{{adset_id}}",
-      cp3: "{{ad_id}}",
-      cp4: "{{variant_name}}",
-      ppid: "8PRN625DH",
-      pid: "8PRN625DH",
-      purl: "https://{{route}}"
+      cp1: "{{campaign_id}}", cp2: "{{adset_id}}", cp3: "{{ad_id}}", cp4: "{{variant_name}}",
+      ppid: "8PRN625DH", pid: "8PRN625DH", purl: "https://{{route}}"
     };
-
     function tpidForTps(tps) {
       if (tps === "fb") return "{{fbclid}}";
       if (tps === "google" || tps === "taboola") return "{{clid}}";
       return "{{clid}}";
     }
-
     function buildEnrichedUrl(baseUrl, tps) {
       if (!baseUrl) return "";
       var sep = baseUrl.indexOf("?") !== -1 ? "&" : "?";
@@ -355,52 +340,17 @@
       params.push("ppid=" + STATIC_PARAMS.ppid);
       params.push("pid=" + STATIC_PARAMS.pid);
       params.push("purl=" + encodeURIComponent(STATIC_PARAMS.purl));
-      return baseUrl + sep + params.join("&")
-        .replace(/%7B%7B/g, "{{").replace(/%7D%7D/g, "}}");
-    }
-
-    function renderCtaUrlList(offer) {
-      var container = document.getElementById("offer-cta-url-list");
-      if (!container) return;
-      var urls = offer.ctaUrls || [];
-      container.innerHTML = urls.map(function (u, i) {
-        return '<div class="offer-cta-url-row" data-cta-idx="' + i + '">' +
-          '<div class="field" style="flex:1;margin:0;">' +
-            '<label>URL ' + (i + 1) + (u.label ? ' — ' + escapeHtml(u.label) : '') + '</label>' +
-            '<div class="field-row" style="gap:.35rem;">' +
-              '<input type="text" class="input offer-cta-label-input" value="' + escapeHtml(u.label || "") + '" placeholder="Label" style="max-width:140px;" />' +
-              '<input type="url" class="input offer-cta-url-input" value="' + escapeHtml(u.baseUrl || "") + '" placeholder="https://trk.pmsrv.co/v2/trk?adid=…" style="flex:1;" />' +
-              '<button type="button" class="icon-btn offer-cta-url-remove" aria-label="Remove" title="Remove">✕</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      }).join("");
-    }
-
-    function readCtaUrlsFromDom() {
-      var rows = document.querySelectorAll(".offer-cta-url-row");
-      var urls = [];
-      rows.forEach(function (row) {
-        var label = row.querySelector(".offer-cta-label-input");
-        var url = row.querySelector(".offer-cta-url-input");
-        if (url && url.value.trim()) {
-          urls.push({ label: label ? label.value.trim() : "", baseUrl: url.value.trim() });
-        }
-      });
-      return urls;
+      return baseUrl + sep + params.join("&").replace(/%7B%7B/g, "{{").replace(/%7D%7D/g, "}}");
     }
 
     function refreshEnrichedPreview() {
-      var o = offerById(activeOfferId);
-      var urls = readCtaUrlsFromDom();
+      var urlInput = document.getElementById("offer-cta-url");
       var tps = document.getElementById("offer-cta-tps-preview").value || "fb";
       var previewInput = document.getElementById("offer-enriched-url");
       if (!previewInput) return;
-      if (!urls.length) {
-        previewInput.value = "(add a CTA URL above to see preview)";
-        return;
-      }
-      previewInput.value = buildEnrichedUrl(urls[0].baseUrl, tps);
+      var base = urlInput ? urlInput.value.trim() : "";
+      if (!base) { previewInput.value = "(paste a CTA URL above to see preview)"; return; }
+      previewInput.value = buildEnrichedUrl(base, tps);
     }
 
     function renderOfferWorkspaces(offer) {
@@ -421,19 +371,18 @@
       var o = offerById(id);
       if (!o || !detailDlg) return;
       activeOfferId = id;
-      document.getElementById("offer-detail-title").textContent = o.name;
-      document.getElementById("offer-detail-sub").textContent = o.advertiserName + " · " + o.vertical;
+      document.getElementById("offer-detail-title").textContent = o.name || "New offer";
+      document.getElementById("offer-detail-sub").textContent = (o.advertiserName || "New advertiser") + (o.vertical ? " · " + o.vertical : "");
       document.getElementById("offer-name").value = o.name;
       document.getElementById("offer-advertiser").value = o.advertiserName;
       document.getElementById("offer-vertical").value = o.vertical || "";
       document.getElementById("offer-status").value = o.status || "active";
-      document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa != null ? o.cpaGoal.targetCpa : "";
+      document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa ? o.cpaGoal.targetCpa : "";
       document.getElementById("offer-cpa-currency").value = (o.cpaGoal && o.cpaGoal.currency) || "USD";
       document.getElementById("offer-cpa-type").value = (o.cpaGoal && o.cpaGoal.conversionType) || "";
-      renderCtaUrlList(o);
+      document.getElementById("offer-cta-url").value = o.ctaUrl || "";
       renderOfferWorkspaces(o);
       refreshEnrichedPreview();
-
       var firstTab = detailDlg.querySelector('.tab[data-tab="general"]');
       if (firstTab) firstTab.click();
       detailDlg.showModal();
@@ -451,7 +400,7 @@
         currency: document.getElementById("offer-cpa-currency").value,
         conversionType: document.getElementById("offer-cpa-type").value.trim()
       };
-      o.ctaUrls = readCtaUrlsFromDom();
+      o.ctaUrl = document.getElementById("offer-cta-url").value.trim();
       o.workspaceIds = [];
       document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
         o.workspaceIds.push(cb.value);
@@ -460,12 +409,35 @@
       render();
     }
 
+    function cloneOffer(id) {
+      var src = offerById(id);
+      if (!src) return;
+      var newId = "offer-" + Date.now();
+      var copy = {
+        id: newId,
+        advertiserName: src.advertiserName,
+        name: src.name + " (copy)",
+        vertical: src.vertical,
+        status: src.status,
+        workspaceIds: src.workspaceIds.slice(),
+        cpaGoal: { targetCpa: src.cpaGoal.targetCpa, currency: src.cpaGoal.currency, conversionType: src.cpaGoal.conversionType },
+        ctaUrl: src.ctaUrl
+      };
+      offers.push(copy);
+      renderAdvertiserFilter();
+      render();
+      openOfferDetail(newId);
+    }
+
     document.getElementById("offers-search").addEventListener("input", render);
     document.getElementById("offers-status-filter").addEventListener("change", render);
     document.getElementById("offers-advertiser-filter").addEventListener("change", render);
 
     var ctaTpsPreview = document.getElementById("offer-cta-tps-preview");
     if (ctaTpsPreview) ctaTpsPreview.addEventListener("change", refreshEnrichedPreview);
+
+    var ctaUrlInput = document.getElementById("offer-cta-url");
+    if (ctaUrlInput) ctaUrlInput.addEventListener("input", refreshEnrichedPreview);
 
     tbody.addEventListener("click", function (e) {
       var tbtn = e.target.closest("[data-advertiser-toggle]");
@@ -484,33 +456,9 @@
         return;
       }
       var sbtn = e.target.closest(".js-offer-settings");
-      if (sbtn) {
-        openOfferDetail(sbtn.getAttribute("data-offer-id"));
-      }
-    });
-
-    document.getElementById("offer-cta-url-add").addEventListener("click", function () {
-      var o = offerById(activeOfferId);
-      if (!o) return;
-      var current = readCtaUrlsFromDom();
-      if (current.length >= 10) { alert("Maximum 10 CTA URLs per offer."); return; }
-      current.push({ label: "", baseUrl: "" });
-      o.ctaUrls = current;
-      renderCtaUrlList(o);
-      var last = document.querySelector(".offer-cta-url-row:last-child .offer-cta-url-input");
-      if (last) last.focus();
-    });
-
-    document.getElementById("offer-cta-url-list").addEventListener("click", function (e) {
-      var rm = e.target.closest(".offer-cta-url-remove");
-      if (!rm) return;
-      var row = rm.closest(".offer-cta-url-row");
-      if (row) row.remove();
-      refreshEnrichedPreview();
-    });
-
-    document.getElementById("offer-cta-url-list").addEventListener("input", function (e) {
-      if (e.target.closest(".offer-cta-url-input")) refreshEnrichedPreview();
+      if (sbtn) { openOfferDetail(sbtn.getAttribute("data-offer-id")); return; }
+      var cbtn = e.target.closest(".js-offer-clone");
+      if (cbtn) { cloneOffer(cbtn.getAttribute("data-offer-id")); return; }
     });
 
     if (detailDlg) {
@@ -518,17 +466,12 @@
     }
 
     document.getElementById("offer-add-btn").addEventListener("click", function () {
-      var name = (window.prompt("Offer name") || "").trim();
-      if (!name) return;
-      var adv = (window.prompt("Advertiser name") || "").trim() || "New advertiser";
       var id = "offer-" + Date.now();
       offers.push({
-        id: id, advertiserName: adv, name: name, vertical: "", status: "active",
+        id: id, advertiserName: "", name: "", vertical: "", status: "active",
         workspaceIds: [], cpaGoal: { targetCpa: 0, currency: "USD", conversionType: "lead" },
-        ctaUrls: []
+        ctaUrl: ""
       });
-      renderAdvertiserFilter();
-      render();
       openOfferDetail(id);
     });
 

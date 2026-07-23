@@ -6354,6 +6354,13 @@ details.pop.pop--more[open] > summary { background: var(--bg-hover); }
 .table--compact { font-size: 12.5px; }
 .table--compact td, .table--compact th { padding: 5px 10px; }
 .offer-enriched-preview { margin-top: .25rem; }
+.field__prefix {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 6px 0 0 2px;
+  flex-shrink: 0;
+}
 
 /* ---- Lander settings: re-publish flow ---- */
 .settings-draft-warning {
