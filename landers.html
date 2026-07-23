@@ -144,79 +144,83 @@
     </main>
   </div>
 
-  <!-- Lander settings (publish-aware) -->
-  <dialog class="modal modal--settings" id="dialog-lander-settings">
-    <form method="dialog" class="modal__inner">
+  <!-- Lander settings — 2-step side drawer -->
+  <dialog class="modal modal--publish-flow" id="dialog-lander-settings">
+    <div class="modal__inner publish-flow">
       <div class="modal__header">
         <div>
           <h2 class="modal__title" id="lander-settings-title">Lander settings</h2>
-          <p class="modal__hint">Lander-level record — changes here affect the published lander.</p>
+          <p class="modal__hint" id="lander-settings-hint">Confirm settings, then publish.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
 
-      <div class="settings-section">
-        <p class="settings-section__title">Route</p>
-        <div class="field-row">
-          <div class="field">
-            <label>Domain</label>
-            <select data-settings="domain">
-              <option>offers.acme.com</option>
-              <option>refer.acme.com</option>
-              <option>try.acme.com</option>
-              <option>hub.acme.com</option>
-            </select>
+      <!-- Steps indicator -->
+      <ol class="publish-steps" id="settings-steps">
+        <li class="publish-step is-active" data-step="1">
+          <span class="publish-step__num">1</span>
+          <span class="publish-step__label">Settings</span>
+        </li>
+        <li class="publish-step" data-step="2">
+          <span class="publish-step__num">2</span>
+          <span class="publish-step__label">Review</span>
+        </li>
+      </ol>
+
+      <!-- Step 1: Settings -->
+      <div class="publish-pane" id="settings-pane-1">
+        <div class="settings-section">
+          <p class="settings-section__title">Route</p>
+          <div class="field-row">
+            <div class="field">
+              <label>Domain</label>
+              <select data-settings="domain">
+                <option>offers.acme.com</option>
+                <option>refer.acme.com</option>
+                <option>try.acme.com</option>
+                <option>hub.acme.com</option>
+              </select>
+            </div>
+            <div class="field"><label>Path</label><input type="text" data-settings="path" value="/summer-sale-hero" placeholder="/your-path" /></div>
           </div>
-          <div class="field"><label>Path</label><input type="text" data-settings="path" value="/summer-sale-hero" placeholder="/your-path" /></div>
+        </div>
+
+        <div class="settings-section">
+          <p class="settings-section__title">Integrations</p>
+          <p class="settings-section__hint muted">Inherited from workspace defaults — override per lander if needed.</p>
+          <ul class="publish-pixel-list" id="settings-integrations-list" aria-label="Tracking integrations"></ul>
+          <p class="publish-tracking__foot muted"><a href="settings.html#integrations">Manage workspace integrations</a></p>
+        </div>
+
+        <div class="settings-section">
+          <p class="settings-section__title">Macro-enriched URLs</p>
+          <p class="settings-section__hint muted">Auto-generated per buy source from domain + path. Paste into your ad platform — macros expand on click.</p>
+          <div class="publish-success__platforms" id="settings-macro-urls" aria-live="polite"></div>
         </div>
       </div>
 
-      <div class="settings-section">
-        <p class="settings-section__title">Integrations</p>
-        <p class="settings-section__hint muted">Inherited from workspace defaults — override per lander if needed.</p>
-        <ul class="publish-pixel-list" id="settings-integrations-list" aria-label="Tracking integrations"></ul>
-        <p class="publish-tracking__foot muted"><a href="settings.html#integrations">Manage workspace integrations</a></p>
-      </div>
-
-      <div class="settings-section">
-        <p class="settings-section__title">Macro-enriched URLs</p>
-        <p class="settings-section__hint muted">Auto-generated per buy source from domain + path. Paste into your ad platform — macros expand on click.</p>
-        <div class="publish-success__platforms" id="settings-macro-urls" aria-live="polite"></div>
-      </div>
-
-      <!-- Variant draft status (shown when re-publish is relevant) -->
-      <div class="settings-variant-status" id="settings-variant-status" hidden>
-        <p class="settings-section__title" style="margin-bottom:.5rem;">WHAT WILL PUBLISH</p>
-        <ul id="settings-variant-status-list" class="settings-variant-status-list"></ul>
-      </div>
-
-      <div class="modal__actions">
-        <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="button" class="btn btn--black" id="settings-republish-btn">Re-publish</button>
-      </div>
-    </form>
-  </dialog>
-
-  <!-- Re-publish confirmation dialog -->
-  <dialog class="modal modal--republish-confirm" id="dialog-republish-confirm">
-    <div class="modal__inner">
-      <div class="modal__header">
-        <div>
-          <h2 class="modal__title">Re-publish lander?</h2>
-          <p class="modal__hint">Your updated settings will go live once you confirm.</p>
+      <!-- Step 2: Review -->
+      <div class="publish-pane" id="settings-pane-2" hidden>
+        <!-- Variant draft status -->
+        <div class="settings-variant-status" id="settings-variant-status">
+          <p class="settings-section__title" style="margin-bottom:.5rem;">WHAT WILL PUBLISH</p>
+          <ul id="settings-variant-status-list" class="settings-variant-status-list"></ul>
         </div>
-        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
-      </div>
-      <div class="republish-info-tile">
-        <div class="republish-info-tile__icon">✓</div>
-        <div class="republish-info-tile__body">
-          <strong>Your new route will go live with the latest HTML &amp; settings.</strong>
-          <p>The previous route stays active separately — nothing breaks. Auto-redirect from old → new is coming soon.</p>
+
+        <div class="republish-info-tile" style="margin-top:1rem;">
+          <div class="republish-info-tile__icon">✓</div>
+          <div class="republish-info-tile__body">
+            <strong>Your new route will go live with the latest HTML &amp; settings.</strong>
+            <p>The previous route stays active separately — nothing breaks. Auto-redirect from old → new is coming soon.</p>
+          </div>
         </div>
       </div>
-      <div class="modal__actions">
-        <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="button" class="btn btn--black" id="republish-confirm-yes">Yes, re-publish</button>
+
+      <!-- Footer actions -->
+      <div class="modal__actions" id="settings-actions">
+        <button type="button" class="btn" id="settings-back-btn" hidden>← Back</button>
+        <span style="flex:1;"></span>
+        <button type="button" class="btn btn--black" id="settings-continue-btn">Continue →</button>
       </div>
     </div>
   </dialog>
@@ -1080,15 +1084,19 @@
         done();
       }
     }
-    var settingsRepublishBtn = document.getElementById("settings-republish-btn");
     var settingsVariantStatus = document.getElementById("settings-variant-status");
     var settingsVariantStatusList = document.getElementById("settings-variant-status-list");
-    var republishConfirmDlg = document.getElementById("dialog-republish-confirm");
-    var republishConfirmYes = document.getElementById("republish-confirm-yes");
+    var settingsContinueBtn = document.getElementById("settings-continue-btn");
+    var settingsBackBtn = document.getElementById("settings-back-btn");
+    var settingsPane1 = document.getElementById("settings-pane-1");
+    var settingsPane2 = document.getElementById("settings-pane-2");
+    var settingsSteps = document.getElementById("settings-steps");
+    var settingsHint = document.getElementById("lander-settings-hint");
     var settingsActiveLanderId = null;
     var settingsInitialSnapshot = {};
     var settingsDirty = false;
     var settingsHasUnsavedDrafts = true;
+    var settingsCurrentStep = 1;
 
     function settingsTakeSnapshot() {
       var domainSel = settingsDlg.querySelector('[data-settings="domain"]');
@@ -1108,22 +1116,43 @@
         current.integrations !== settingsInitialSnapshot.integrations;
       settingsUpdateRepublishUI();
     }
-    function settingsUpdateRepublishUI() {
+    function settingsGoToStep(step) {
+      settingsCurrentStep = step;
       var l = landers.find(function (x) { return x.id === settingsActiveLanderId; });
       var isPublished = l && l.status === "published";
-      if (settingsRepublishBtn) {
-        settingsRepublishBtn.textContent = isPublished ? "Re-publish" : "Publish";
+
+      if (settingsPane1) settingsPane1.hidden = step !== 1;
+      if (settingsPane2) settingsPane2.hidden = step !== 2;
+      if (settingsBackBtn) settingsBackBtn.hidden = step === 1;
+
+      if (settingsSteps) {
+        var s1 = settingsSteps.querySelector('[data-step="1"]');
+        var s2 = settingsSteps.querySelector('[data-step="2"]');
+        if (s1) { s1.className = step === 1 ? "publish-step is-active" : "publish-step is-complete"; }
+        if (s2) { s2.className = step === 2 ? "publish-step is-active" : "publish-step"; }
       }
-      if (!settingsDirty) {
-        if (settingsVariantStatus) settingsVariantStatus.hidden = true;
+
+      if (step === 1) {
+        if (settingsContinueBtn) { settingsContinueBtn.textContent = "Continue →"; settingsContinueBtn.disabled = false; settingsContinueBtn.classList.remove("btn--disabled"); }
+        if (settingsHint) settingsHint.textContent = "Confirm settings, then publish.";
       } else {
-        if (settingsVariantStatus && isPublished) { settingsVariantStatus.hidden = false; settingsRenderVariantStatus(l); }
+        settingsRenderVariantStatus(l);
+        var label = isPublished ? "Yes, re-publish" : "Publish";
+        if (settingsContinueBtn) {
+          settingsContinueBtn.textContent = label;
+          if (settingsHasUnsavedDrafts && isPublished) {
+            settingsContinueBtn.disabled = true;
+            settingsContinueBtn.classList.add("btn--disabled");
+          } else {
+            settingsContinueBtn.disabled = false;
+            settingsContinueBtn.classList.remove("btn--disabled");
+          }
+        }
+        if (settingsHint) settingsHint.textContent = "Review variants and confirm.";
       }
-      if (settingsHasUnsavedDrafts && settingsDirty && isPublished) {
-        if (settingsRepublishBtn) { settingsRepublishBtn.disabled = true; settingsRepublishBtn.classList.add("btn--disabled"); }
-      } else {
-        if (settingsRepublishBtn) { settingsRepublishBtn.disabled = false; settingsRepublishBtn.classList.remove("btn--disabled"); }
-      }
+    }
+    function settingsUpdateRepublishUI() {
+      // no-op in drawer mode — step 2 handles it
     }
     function settingsRenderVariantStatus(l) {
       if (!settingsVariantStatusList || !l) return;
@@ -1183,7 +1212,7 @@
       settingsHasUnsavedDrafts = l && l.variants.length > 1;
       settingsDirty = false;
       settingsInitialSnapshot = settingsTakeSnapshot();
-      settingsUpdateRepublishUI();
+      settingsGoToStep(1);
       settingsDlg.showModal();
     }
 
@@ -1208,9 +1237,7 @@
       settingsDlg.addEventListener("change", function (e) {
         if (e.target.closest("[data-int-source]")) settingsCheckDirty();
       });
-      settingsDlg.querySelector("form").addEventListener("submit", function (e) {
-        e.preventDefault();
-      });
+      // no form submit — handled by Continue/Back buttons
     }
 
     if (settingsVariantStatusList) {
@@ -1218,24 +1245,27 @@
         var btn = e.target.closest(".js-save-variant-draft");
         if (!btn) return;
         settingsHasUnsavedDrafts = false;
-        settingsUpdateRepublishUI();
+        settingsGoToStep(2);
         landerToast("Variant draft saved");
       });
     }
 
-    if (settingsRepublishBtn) {
-      settingsRepublishBtn.addEventListener("click", function () {
-        if (settingsRepublishBtn.disabled) return;
-        settingsDlg.close();
-        if (republishConfirmDlg) republishConfirmDlg.showModal();
+    if (settingsContinueBtn) {
+      settingsContinueBtn.addEventListener("click", function () {
+        if (settingsCurrentStep === 1) {
+          settingsGoToStep(2);
+        } else {
+          if (settingsContinueBtn.disabled) return;
+          settingsSave();
+          settingsDlg.close();
+          landerToast("Lander re-published successfully");
+        }
       });
     }
 
-    if (republishConfirmYes && republishConfirmDlg) {
-      republishConfirmYes.addEventListener("click", function () {
-        republishConfirmDlg.close();
-        settingsSave();
-        landerToast("Lander re-published successfully");
+    if (settingsBackBtn) {
+      settingsBackBtn.addEventListener("click", function () {
+        settingsGoToStep(1);
       });
     }
     if (settingsMacroUrlsEl) {
