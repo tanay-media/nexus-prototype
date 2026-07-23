@@ -26,14 +26,21 @@
 
     <main class="main">
       <div class="page-header">
-        <h1>Offers</h1>
+        <h1 id="page-main-title">Offers</h1>
         <div class="page-header__right">
           <button type="button" class="btn btn--black" id="offer-add-btn">+ New offer</button>
+          <button type="button" class="btn btn--black" id="adv-add-btn" style="display:none;">+ New advertiser</button>
         </div>
       </div>
 
-      <div class="page-body">
-        <p class="offers-intro muted">Team-scoped offers — CTA URL and CPA goals inherit to all landers on this offer.</p>
+      <div class="tabs page-level-tabs" role="tablist" data-tabs="page-level">
+        <button type="button" class="tab is-active" data-page-tab="offers" role="tab" aria-selected="true">Offers</button>
+        <button type="button" class="tab" data-page-tab="advertisers" role="tab" aria-selected="false">Advertisers</button>
+      </div>
+
+      <!-- ===== OFFERS PANEL ===== -->
+      <div class="page-body" id="panel-offers">
+        <p class="offers-intro muted">Offers belong to advertisers and are mapped to teams & workspaces.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
@@ -69,7 +76,61 @@
           </div>
         </div>
       </div>
+
+      <!-- ===== ADVERTISERS PANEL ===== -->
+      <div class="page-body" id="panel-advertisers" style="display:none;">
+        <p class="offers-intro muted">Standalone advertiser entities — each advertiser owns one or more offers.</p>
+
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input class="input" type="search" id="adv-search" placeholder="Search advertisers" />
+          </div>
+          <select class="select" id="adv-status-filter" aria-label="Status filter">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <div class="table-scroll" role="region" aria-label="Advertisers">
+            <table class="table" id="adv-table">
+              <thead>
+                <tr>
+                  <th>Advertiser</th>
+                  <th>Status</th>
+                  <th class="right">Offers</th>
+                  <th class="right" style="min-width:100px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adv-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </main>
+
+  <!-- Advertiser detail dialog -->
+  <dialog class="modal modal--settings" id="dialog-adv-detail">
+    <form method="dialog" class="modal__inner" id="adv-detail-form">
+      <div class="modal__header">
+        <div><h2 id="adv-detail-title">Advertiser</h2></div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
+      </div>
+      <div class="field"><label for="adv-name">Advertiser name</label><input type="text" id="adv-name" required /></div>
+      <div class="field"><label for="adv-status">Status</label>
+        <select id="adv-status">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="submit" class="btn btn--black">Save advertiser</button>
+      </div>
+    </form>
+  </dialog>
   </div>
 
   <!-- Offer detail -->
@@ -648,6 +709,109 @@
     renderAdvertiserFilter();
     render();
     if (urlOffer) openOfferDetail(urlOffer);
+
+    // ---- Page-level tabs (Offers / Advertisers) ----
+    var pageTabs = document.querySelectorAll("[data-page-tab]");
+    pageTabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        var target = tab.getAttribute("data-page-tab");
+        pageTabs.forEach(function (t) { t.classList.remove("is-active"); t.setAttribute("aria-selected", "false"); });
+        tab.classList.add("is-active");
+        tab.setAttribute("aria-selected", "true");
+        document.getElementById("panel-offers").style.display = target === "offers" ? "" : "none";
+        document.getElementById("panel-advertisers").style.display = target === "advertisers" ? "" : "none";
+        document.getElementById("offer-add-btn").style.display = target === "offers" ? "" : "none";
+        document.getElementById("adv-add-btn").style.display = target === "advertisers" ? "" : "none";
+        document.getElementById("page-main-title").textContent = target === "offers" ? "Offers" : "Advertisers";
+        if (target === "advertisers") renderAdvTable();
+      });
+    });
+
+    // ---- Advertisers CRUD ----
+    var advBody = document.getElementById("adv-body");
+    var advDlg = document.getElementById("dialog-adv-detail");
+    var activeAdvId = null;
+
+    function offerCountForAdv(advId) {
+      return offers.filter(function (o) { return o.advertiserId === advId; }).length;
+    }
+
+    function filteredAdvertisers() {
+      var q = (document.getElementById("adv-search").value || "").trim().toLowerCase();
+      var status = document.getElementById("adv-status-filter").value;
+      return advertisers.filter(function (a) {
+        if (status && a.status !== status) return false;
+        if (q && a.name.toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+    }
+
+    function renderAdvTable() {
+      var rows = filteredAdvertisers();
+      rows.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      advBody.innerHTML = "";
+      if (!rows.length) {
+        advBody.innerHTML = '<tr><td colspan="4" class="muted" style="padding:1.5rem;text-align:center;">No advertisers found.</td></tr>';
+        return;
+      }
+      rows.forEach(function (a) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          '<td><strong>' + escapeHtml(a.name) + '</strong></td>' +
+          '<td>' + (a.status === "inactive" ? '<span class="badge badge--archived">Inactive</span>' : '<span class="badge badge--active">Active</span>') + '</td>' +
+          '<td class="right num">' + offerCountForAdv(a.id) + '</td>' +
+          '<td class="right"><div class="actions">' +
+            '<button type="button" class="icon-btn js-adv-edit" data-adv-id="' + escapeHtml(a.id) + '" title="Edit">' + ICON.settings + '</button>' +
+          '</div></td>';
+        advBody.appendChild(tr);
+      });
+    }
+
+    function openAdvDetail(id) {
+      var a = advById(id);
+      if (!a || !advDlg) return;
+      activeAdvId = id;
+      document.getElementById("adv-detail-title").textContent = a.name || "New advertiser";
+      document.getElementById("adv-name").value = a.name;
+      document.getElementById("adv-status").value = a.status || "active";
+      advDlg.showModal();
+    }
+
+    function saveAdvDetail() {
+      var a = advById(activeAdvId);
+      if (!a) return;
+      a.name = document.getElementById("adv-name").value.trim() || a.name;
+      a.status = document.getElementById("adv-status").value;
+      renderAdvTable();
+      renderAdvertiserFilter();
+      render();
+    }
+
+    if (advDlg) {
+      advDlg.querySelector("form").addEventListener("submit", saveAdvDetail);
+    }
+
+    document.getElementById("adv-add-btn").addEventListener("click", function () {
+      var id = "adv-" + Date.now();
+      advertisers.push({ id: id, name: "", status: "active" });
+      openAdvDetail(id);
+    });
+
+    advBody.addEventListener("click", function (e) {
+      var btn = e.target.closest(".js-adv-edit");
+      if (btn) openAdvDetail(btn.getAttribute("data-adv-id"));
+    });
+
+    document.getElementById("adv-search").addEventListener("input", renderAdvTable);
+    document.getElementById("adv-status-filter").addEventListener("change", renderAdvTable);
+
+    // close dialogs
+    document.querySelectorAll("[data-close-dialog]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var dlg = btn.closest("dialog");
+        if (dlg) dlg.close();
+      });
+    });
   </script>
 </body>
 </html>
