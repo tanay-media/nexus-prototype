@@ -93,7 +93,14 @@
       <section class="offer-detail-pane" data-tab-panel="general">
         <div class="field"><label for="offer-name">Offer name</label><input type="text" id="offer-name" /></div>
         <div class="field-row">
-          <div class="field"><label for="offer-advertiser">Advertiser</label><input type="text" id="offer-advertiser" /></div>
+          <div class="field">
+            <label for="offer-advertiser-select">Advertiser</label>
+            <select id="offer-advertiser-select">
+              <option value="">— Select —</option>
+              <option value="__new__">+ New advertiser</option>
+            </select>
+            <input type="text" id="offer-advertiser-new" placeholder="New advertiser name" hidden />
+          </div>
           <div class="field">
             <label for="offer-vertical">Vertical</label>
             <select id="offer-vertical">
@@ -367,6 +374,37 @@
       }).join("");
     }
 
+    function renderAdvertiserDropdown(selectedName) {
+      var sel = document.getElementById("offer-advertiser-select");
+      var newInput = document.getElementById("offer-advertiser-new");
+      if (!sel) return;
+      var names = [];
+      offers.forEach(function (o) {
+        if (o.advertiserName && names.indexOf(o.advertiserName) === -1) names.push(o.advertiserName);
+      });
+      names.sort();
+      sel.innerHTML = '<option value="">— Select —</option>' +
+        names.map(function (n) {
+          return '<option value="' + escapeHtml(n) + '"' + (selectedName === n ? ' selected' : '') + '>' + escapeHtml(n) + '</option>';
+        }).join("") +
+        '<option value="__new__">+ New advertiser</option>';
+      if (selectedName && names.indexOf(selectedName) === -1 && selectedName !== "") {
+        var opt = document.createElement("option");
+        opt.value = selectedName;
+        opt.textContent = selectedName;
+        opt.selected = true;
+        sel.insertBefore(opt, sel.lastElementChild);
+      }
+      if (newInput) newInput.hidden = true;
+    }
+
+    function getAdvertiserValue() {
+      var sel = document.getElementById("offer-advertiser-select");
+      var newInput = document.getElementById("offer-advertiser-new");
+      if (sel && sel.value === "__new__" && newInput) return newInput.value.trim();
+      return sel ? sel.value : "";
+    }
+
     function openOfferDetail(id) {
       var o = offerById(id);
       if (!o || !detailDlg) return;
@@ -374,7 +412,7 @@
       document.getElementById("offer-detail-title").textContent = o.name || "New offer";
       document.getElementById("offer-detail-sub").textContent = (o.advertiserName || "New advertiser") + (o.vertical ? " · " + o.vertical : "");
       document.getElementById("offer-name").value = o.name;
-      document.getElementById("offer-advertiser").value = o.advertiserName;
+      renderAdvertiserDropdown(o.advertiserName);
       document.getElementById("offer-vertical").value = o.vertical || "";
       document.getElementById("offer-status").value = o.status || "active";
       document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa ? o.cpaGoal.targetCpa : "";
@@ -392,7 +430,7 @@
       var o = offerById(activeOfferId);
       if (!o) return;
       o.name = document.getElementById("offer-name").value.trim() || o.name;
-      o.advertiserName = document.getElementById("offer-advertiser").value.trim() || o.advertiserName;
+      o.advertiserName = getAdvertiserValue() || o.advertiserName;
       o.vertical = document.getElementById("offer-vertical").value;
       o.status = document.getElementById("offer-status").value;
       o.cpaGoal = {
@@ -432,6 +470,17 @@
     document.getElementById("offers-search").addEventListener("input", render);
     document.getElementById("offers-status-filter").addEventListener("change", render);
     document.getElementById("offers-advertiser-filter").addEventListener("change", render);
+
+    var advSelect = document.getElementById("offer-advertiser-select");
+    var advNewInput = document.getElementById("offer-advertiser-new");
+    if (advSelect) {
+      advSelect.addEventListener("change", function () {
+        if (advNewInput) {
+          advNewInput.hidden = advSelect.value !== "__new__";
+          if (!advNewInput.hidden) setTimeout(function () { advNewInput.focus(); }, 30);
+        }
+      });
+    }
 
     var ctaTpsPreview = document.getElementById("offer-cta-tps-preview");
     if (ctaTpsPreview) ctaTpsPreview.addEventListener("change", refreshEnrichedPreview);
