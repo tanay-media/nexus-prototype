@@ -126,20 +126,16 @@
           </div>
           <div class="field">
             <label for="offer-cpa-target">CPA goal</label>
-            <div class="field-row" style="gap:.35rem;">
-              <span class="field__prefix">$</span>
-              <input type="number" id="offer-cpa-target" min="0" step="0.01" placeholder="85" style="flex:1;" />
-              <select id="offer-cpa-currency" style="max-width:80px;">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
-            </div>
+            <input type="number" id="offer-cpa-target" min="0" step="0.01" placeholder="e.g. 85" />
           </div>
-        </div>
-        <div class="field">
-          <label for="offer-cpa-type">Conversion type</label>
-          <input type="text" id="offer-cpa-type" placeholder="e.g. lead, purchase" />
+          <div class="field" style="max-width:90px;">
+            <label for="offer-cpa-currency">Currency</label>
+            <select id="offer-cpa-currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
         </div>
       </section>
 
@@ -472,7 +468,6 @@
       document.getElementById("offer-status").value = o.status || "active";
       document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa ? o.cpaGoal.targetCpa : "";
       document.getElementById("offer-cpa-currency").value = (o.cpaGoal && o.cpaGoal.currency) || "USD";
-      document.getElementById("offer-cpa-type").value = (o.cpaGoal && o.cpaGoal.conversionType) || "";
       document.getElementById("offer-cta-url").value = o.ctaUrl || "";
       if (o.params) offerParams = o.params.map(function (p) { return { key: p.key, value: p.value }; });
       else offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
@@ -493,8 +488,7 @@
       o.status = document.getElementById("offer-status").value;
       o.cpaGoal = {
         targetCpa: parseFloat(document.getElementById("offer-cpa-target").value) || 0,
-        currency: document.getElementById("offer-cpa-currency").value,
-        conversionType: document.getElementById("offer-cpa-type").value.trim()
+        currency: document.getElementById("offer-cpa-currency").value
       };
       o.ctaUrl = document.getElementById("offer-cta-url").value.trim();
       readParamsFromDom();
