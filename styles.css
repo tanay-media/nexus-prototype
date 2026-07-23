@@ -6354,6 +6354,37 @@ details.pop.pop--more[open] > summary { background: var(--bg-hover); }
 .table--compact { font-size: 12.5px; }
 .table--compact td, .table--compact th { padding: 5px 10px; }
 .offer-enriched-preview { margin-top: .25rem; }
+
+.offer-url-textarea {
+  width: 100%;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  word-break: break-all;
+}
+.offer-url-textarea--readonly {
+  background: var(--bg-subtle, #fafaf8);
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.offer-params-editable { display: flex; flex-direction: column; gap: 6px; }
+.offer-param-row {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--bg-subtle, #fafaf8);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.offer-param-key { font-size: 12.5px; font-weight: 600; }
+.offer-param-val, .offer-param-macro, .offer-param-custom { font-size: 12.5px; }
+.offer-param-val-wrap { display: flex; gap: 6px; }
+.offer-param-val-wrap .offer-param-macro { max-width: 180px; }
+.offer-param-val-wrap .offer-param-custom { flex: 1; }
 .field__prefix {
   font-size: 14px;
   font-weight: 600;

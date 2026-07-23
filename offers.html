@@ -147,32 +147,20 @@
       <section class="offer-detail-pane" data-tab-panel="cta-url" hidden>
         <p class="settings-section__hint muted">Paste the base (max) URL. Nexus appends tracking params automatically. All landers on this offer inherit this URL.</p>
         <div class="field">
-          <label for="offer-cta-url">CTA URL</label>
-          <input type="url" id="offer-cta-url" placeholder="https://trk.pmsrv.co/v2/trk?adid=…&akey=…" class="input" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;" />
+          <label for="offer-cta-url">Base URL</label>
+          <textarea id="offer-cta-url" rows="2" placeholder="https://trk.pmsrv.co/v2/trk?adid=…&akey=…" class="input offer-url-textarea"></textarea>
         </div>
 
         <div class="settings-section" style="margin-top:1.2rem;">
-          <p class="settings-section__title">Auto-appended tracking params</p>
-          <table class="table table--compact">
-            <thead><tr><th>Param</th><th>Value</th></tr></thead>
-            <tbody>
-              <tr><td class="mono">cp1</td><td class="mono">{{campaign_id}}</td></tr>
-              <tr><td class="mono">cp2</td><td class="mono">{{adset_id}}</td></tr>
-              <tr><td class="mono">cp3</td><td class="mono">{{ad_id}}</td></tr>
-              <tr><td class="mono">cp4</td><td class="mono">{{variant_name}}</td></tr>
-              <tr><td class="mono">tpid</td><td class="mono"><em>auto — see tps</em></td></tr>
-              <tr><td class="mono">tps</td><td class="mono"><em>fb | google | taboola | nexus</em></td></tr>
-              <tr><td class="mono">ppid</td><td class="mono">8PRN625DH</td></tr>
-              <tr><td class="mono">pid</td><td class="mono">8PRN625DH</td></tr>
-              <tr><td class="mono">purl</td><td class="mono">https://{{route}}</td></tr>
-            </tbody>
-          </table>
+          <p class="settings-section__title">Tracking params</p>
+          <p class="settings-section__hint muted">Appended to the base URL. Change any value to a macro or static string.</p>
+          <div class="offer-params-editable" id="offer-params-editable"></div>
         </div>
 
-        <div class="settings-section" style="margin-top:1rem;">
-          <p class="settings-section__title">Preview — enriched URL</p>
-          <div class="field-row" style="margin-bottom:.5rem;">
-            <div class="field">
+        <div class="settings-section" style="margin-top:1.2rem;">
+          <p class="settings-section__title">Final enriched URL</p>
+          <div class="field-row" style="margin-bottom:.5rem;align-items:flex-end;">
+            <div class="field" style="max-width:160px;">
               <label for="offer-cta-tps-preview">Traffic source (tps)</label>
               <select id="offer-cta-tps-preview">
                 <option value="fb">fb</option>
@@ -182,7 +170,7 @@
               </select>
             </div>
           </div>
-          <input type="text" readonly id="offer-enriched-url" class="input" style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;" />
+          <textarea id="offer-enriched-url" rows="3" readonly class="input offer-url-textarea offer-url-textarea--readonly"></textarea>
         </div>
       </section>
 
@@ -325,39 +313,106 @@
     }
 
     // ---- CTA URL enrichment ----
-    var STATIC_PARAMS = {
-      cp1: "{{campaign_id}}", cp2: "{{adset_id}}", cp3: "{{ad_id}}", cp4: "{{variant_name}}",
-      ppid: "8PRN625DH", pid: "8PRN625DH", purl: "https://{{route}}"
-    };
+    var AVAILABLE_MACROS = [
+      "{{campaign_id}}", "{{adset_id}}", "{{ad_id}}", "{{variant_name}}",
+      "{{clid}}", "{{fbclid}}", "{{route}}", "{{lander_name}}", "{{offer_name}}"
+    ];
+
+    var DEFAULT_PARAMS = [
+      { key: "cp1",  value: "{{campaign_id}}" },
+      { key: "cp2",  value: "{{adset_id}}" },
+      { key: "cp3",  value: "{{ad_id}}" },
+      { key: "cp4",  value: "{{variant_name}}" },
+      { key: "tpid", value: "auto" },
+      { key: "tps",  value: "fb" },
+      { key: "ppid", value: "8PRN625DH" },
+      { key: "pid",  value: "8PRN625DH" },
+      { key: "purl", value: "https://{{route}}" }
+    ];
+
+    var offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
+
     function tpidForTps(tps) {
       if (tps === "fb") return "{{fbclid}}";
       if (tps === "google" || tps === "taboola") return "{{clid}}";
       return "{{clid}}";
     }
-    function buildEnrichedUrl(baseUrl, tps) {
+
+    function macroOptions(selected) {
+      var opts = '<option value="">— custom —</option>';
+      AVAILABLE_MACROS.forEach(function (m) {
+        opts += '<option value="' + escapeHtml(m) + '"' + (selected === m ? ' selected' : '') + '>' + escapeHtml(m) + '</option>';
+      });
+      return opts;
+    }
+
+    function renderEditableParams() {
+      var container = document.getElementById("offer-params-editable");
+      if (!container) return;
+      container.innerHTML = offerParams.map(function (p, i) {
+        var isMacro = p.value.indexOf("{{") !== -1;
+        var isAuto = p.key === "tpid" && p.value === "auto";
+        var isTps = p.key === "tps";
+        var valHtml;
+        if (isTps) {
+          valHtml = '<select class="input offer-param-val" data-param-idx="' + i + '">' +
+            '<option value="fb"' + (p.value === "fb" ? " selected" : "") + '>fb</option>' +
+            '<option value="google"' + (p.value === "google" ? " selected" : "") + '>google</option>' +
+            '<option value="taboola"' + (p.value === "taboola" ? " selected" : "") + '>taboola</option>' +
+            '<option value="nexus"' + (p.value === "nexus" ? " selected" : "") + '>nexus</option>' +
+          '</select>';
+        } else if (isAuto) {
+          valHtml = '<select class="input offer-param-val" data-param-idx="' + i + '">' +
+            '<option value="auto" selected>auto (based on tps)</option>' +
+            '<option value="{{clid}}">{{clid}}</option>' +
+            '<option value="{{fbclid}}">{{fbclid}}</option>' +
+          '</select>';
+        } else {
+          valHtml = '<div class="offer-param-val-wrap">' +
+            '<select class="input offer-param-macro" data-param-idx="' + i + '">' + macroOptions(isMacro ? p.value : "") + '</select>' +
+            '<input type="text" class="input offer-param-custom" data-param-idx="' + i + '" value="' + escapeHtml(isMacro ? "" : p.value) + '" placeholder="static value"' + (isMacro ? ' hidden' : '') + ' />' +
+          '</div>';
+        }
+        return '<div class="offer-param-row">' +
+          '<span class="offer-param-key mono">' + escapeHtml(p.key) + '</span>' +
+          valHtml +
+        '</div>';
+      }).join("");
+    }
+
+    function readParamsFromDom() {
+      offerParams.forEach(function (p, i) {
+        var sel = document.querySelector('.offer-param-val[data-param-idx="' + i + '"]');
+        if (sel) { p.value = sel.value; return; }
+        var macro = document.querySelector('.offer-param-macro[data-param-idx="' + i + '"]');
+        var custom = document.querySelector('.offer-param-custom[data-param-idx="' + i + '"]');
+        if (macro && macro.value) { p.value = macro.value; }
+        else if (custom) { p.value = custom.value.trim() || ""; }
+      });
+    }
+
+    function buildEnrichedUrl(baseUrl, tpsOverride) {
       if (!baseUrl) return "";
+      readParamsFromDom();
       var sep = baseUrl.indexOf("?") !== -1 ? "&" : "?";
-      var params = [];
-      params.push("cp1=" + encodeURIComponent(STATIC_PARAMS.cp1));
-      params.push("cp2=" + encodeURIComponent(STATIC_PARAMS.cp2));
-      params.push("cp3=" + encodeURIComponent(STATIC_PARAMS.cp3));
-      params.push("cp4=" + encodeURIComponent(STATIC_PARAMS.cp4));
-      params.push("tpid=" + encodeURIComponent(tpidForTps(tps)));
-      params.push("tps=" + encodeURIComponent(tps));
-      params.push("ppid=" + STATIC_PARAMS.ppid);
-      params.push("pid=" + STATIC_PARAMS.pid);
-      params.push("purl=" + encodeURIComponent(STATIC_PARAMS.purl));
-      return baseUrl + sep + params.join("&").replace(/%7B%7B/g, "{{").replace(/%7D%7D/g, "}}");
+      var parts = [];
+      offerParams.forEach(function (p) {
+        var val = p.value;
+        if (p.key === "tps" && tpsOverride) val = tpsOverride;
+        if (p.key === "tpid" && val === "auto") val = tpidForTps(tpsOverride || "fb");
+        parts.push(p.key + "=" + val);
+      });
+      return baseUrl + sep + parts.join("&");
     }
 
     function refreshEnrichedPreview() {
       var urlInput = document.getElementById("offer-cta-url");
       var tps = document.getElementById("offer-cta-tps-preview").value || "fb";
-      var previewInput = document.getElementById("offer-enriched-url");
-      if (!previewInput) return;
+      var previewEl = document.getElementById("offer-enriched-url");
+      if (!previewEl) return;
       var base = urlInput ? urlInput.value.trim() : "";
-      if (!base) { previewInput.value = "(paste a CTA URL above to see preview)"; return; }
-      previewInput.value = buildEnrichedUrl(base, tps);
+      if (!base) { previewEl.value = "(paste a CTA URL above to see preview)"; return; }
+      previewEl.value = buildEnrichedUrl(base, tps);
     }
 
     function renderOfferWorkspaces(offer) {
@@ -419,6 +474,9 @@
       document.getElementById("offer-cpa-currency").value = (o.cpaGoal && o.cpaGoal.currency) || "USD";
       document.getElementById("offer-cpa-type").value = (o.cpaGoal && o.cpaGoal.conversionType) || "";
       document.getElementById("offer-cta-url").value = o.ctaUrl || "";
+      if (o.params) offerParams = o.params.map(function (p) { return { key: p.key, value: p.value }; });
+      else offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
+      renderEditableParams();
       renderOfferWorkspaces(o);
       refreshEnrichedPreview();
       var firstTab = detailDlg.querySelector('.tab[data-tab="general"]');
@@ -439,6 +497,8 @@
         conversionType: document.getElementById("offer-cpa-type").value.trim()
       };
       o.ctaUrl = document.getElementById("offer-cta-url").value.trim();
+      readParamsFromDom();
+      o.params = offerParams.map(function (p) { return { key: p.key, value: p.value }; });
       o.workspaceIds = [];
       document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
         o.workspaceIds.push(cb.value);
@@ -487,6 +547,22 @@
 
     var ctaUrlInput = document.getElementById("offer-cta-url");
     if (ctaUrlInput) ctaUrlInput.addEventListener("input", refreshEnrichedPreview);
+
+    var paramsContainer = document.getElementById("offer-params-editable");
+    if (paramsContainer) {
+      paramsContainer.addEventListener("change", function (e) {
+        var macro = e.target.closest(".offer-param-macro");
+        if (macro) {
+          var idx = macro.getAttribute("data-param-idx");
+          var custom = paramsContainer.querySelector('.offer-param-custom[data-param-idx="' + idx + '"]');
+          if (custom) custom.hidden = !!macro.value;
+        }
+        refreshEnrichedPreview();
+      });
+      paramsContainer.addEventListener("input", function (e) {
+        if (e.target.closest(".offer-param-custom")) refreshEnrichedPreview();
+      });
+    }
 
     tbody.addEventListener("click", function (e) {
       var tbtn = e.target.closest("[data-advertiser-toggle]");
