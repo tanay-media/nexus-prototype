@@ -192,13 +192,22 @@
       { id: "fin-main", name: "FinanceEdge Main" }
     ];
 
+    var advertisers = [
+      { id: "adv-hb", name: "Homebuddy",        status: "active" },
+      { id: "adv-bv", name: "Beenverified",     status: "active" },
+      { id: "adv-sf", name: "Smart Financials", status: "active" }
+    ];
+
+    function advById(id) { return advertisers.find(function (a) { return a.id === id; }); }
+    function advName(id) { var a = advById(id); return a ? a.name : ""; }
+
     var offers = [
-      { id: "hb-wis",  advertiserName: "Homebuddy",        name: "Walk-in showers",  vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
-      { id: "hb-wit",  advertiserName: "Homebuddy",        name: "Walk-in Tubs",     vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
-      { id: "hb-roof", advertiserName: "Homebuddy",        name: "Roofing",          vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
-      { id: "bv-vin",  advertiserName: "Beenverified",     name: "VIN Search",       vertical: "Autos",         status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
-      { id: "bv-obit", advertiserName: "Beenverified",     name: "Obituary search",  vertical: "Others",        status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD" }, ctaUrl: "" },
-      { id: "sf-auto", advertiserName: "Smart Financials", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
+      { id: "hb-wis",  advertiserId: "adv-hb", name: "Walk-in showers",  vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
+      { id: "hb-wit",  advertiserId: "adv-hb", name: "Walk-in Tubs",     vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
+      { id: "hb-roof", advertiserId: "adv-hb", name: "Roofing",          vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
+      { id: "bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       vertical: "Autos",         status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
+      { id: "bv-obit", advertiserId: "adv-bv", name: "Obituary search",  vertical: "Others",        status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD" }, ctaUrl: "" },
+      { id: "sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
     ];
 
     var expandedAdvertisers = {};
@@ -228,7 +237,7 @@
     function groupByAdvertiser(rows) {
       var map = {};
       rows.forEach(function (o) {
-        var name = o.advertiserName || "Unknown";
+        var name = advName(o.advertiserId) || "Unknown";
         if (!map[name]) map[name] = [];
         map[name].push(o);
       });
@@ -243,8 +252,9 @@
       var adv = document.getElementById("offers-advertiser-filter").value;
       return offers.filter(function (o) {
         if (status && o.status !== status) return false;
-        if (adv && o.advertiserName !== adv) return false;
-        if (q && o.name.toLowerCase().indexOf(q) === -1 && o.advertiserName.toLowerCase().indexOf(q) === -1) return false;
+        if (adv && o.advertiserId !== adv) return false;
+        var an = advName(o.advertiserId);
+        if (q && o.name.toLowerCase().indexOf(q) === -1 && an.toLowerCase().indexOf(q) === -1) return false;
         return true;
       });
     }
@@ -252,14 +262,10 @@
     function renderAdvertiserFilter() {
       var sel = document.getElementById("offers-advertiser-filter");
       var current = sel.value;
-      var names = [];
-      offers.forEach(function (o) {
-        if (o.advertiserName && names.indexOf(o.advertiserName) === -1) names.push(o.advertiserName);
-      });
-      names.sort();
+      var sorted = advertisers.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
       sel.innerHTML = '<option value="">All advertisers</option>' +
-        names.map(function (n) {
-          return '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>';
+        sorted.map(function (a) {
+          return '<option value="' + escapeHtml(a.id) + '">' + escapeHtml(a.name) + '</option>';
         }).join("");
       if (current) sel.value = current;
     }
@@ -443,34 +449,29 @@
       }).join("");
     }
 
-    function renderAdvertiserDropdown(selectedName) {
+    function renderAdvertiserDropdown(selectedId) {
       var sel = document.getElementById("offer-advertiser-select");
       var newInput = document.getElementById("offer-advertiser-new");
       if (!sel) return;
-      var names = [];
-      offers.forEach(function (o) {
-        if (o.advertiserName && names.indexOf(o.advertiserName) === -1) names.push(o.advertiserName);
-      });
-      names.sort();
+      var sorted = advertisers.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
       sel.innerHTML = '<option value="">— Select —</option>' +
-        names.map(function (n) {
-          return '<option value="' + escapeHtml(n) + '"' + (n === selectedName ? ' selected' : '') + '>' + escapeHtml(n) + '</option>';
+        sorted.map(function (a) {
+          return '<option value="' + escapeHtml(a.id) + '"' + (a.id === selectedId ? ' selected' : '') + '>' + escapeHtml(a.name) + '</option>';
         }).join("") +
         '<option value="__new__">+ New advertiser</option>';
-      if (selectedName && names.indexOf(selectedName) === -1 && selectedName !== "") {
-        var opt = document.createElement("option");
-        opt.value = selectedName;
-        opt.textContent = selectedName;
-        opt.selected = true;
-        sel.insertBefore(opt, sel.lastElementChild);
-      }
       if (newInput) { newInput.style.display = "none"; newInput.value = ""; }
     }
 
     function getAdvertiserValue() {
       var sel = document.getElementById("offer-advertiser-select");
       var newInput = document.getElementById("offer-advertiser-new");
-      if (sel && sel.value === "__new__" && newInput) return newInput.value.trim();
+      if (sel && sel.value === "__new__" && newInput) {
+        var name = newInput.value.trim();
+        if (!name) return "";
+        var newId = "adv-" + Date.now();
+        advertisers.push({ id: newId, name: name, status: "active" });
+        return newId;
+      }
       return sel ? sel.value : "";
     }
 
@@ -479,9 +480,9 @@
       if (!o || !detailDlg) return;
       activeOfferId = id;
       document.getElementById("offer-detail-title").textContent = o.name || "New offer";
-      document.getElementById("offer-detail-sub").textContent = (o.advertiserName || "New advertiser") + (o.vertical ? " · " + o.vertical : "");
+      document.getElementById("offer-detail-sub").textContent = (advName(o.advertiserId) || "New advertiser") + (o.vertical ? " · " + o.vertical : "");
       document.getElementById("offer-name").value = o.name;
-      renderAdvertiserDropdown(o.advertiserName);
+      renderAdvertiserDropdown(o.advertiserId);
       document.getElementById("offer-vertical").value = o.vertical || "";
       document.getElementById("offer-status").value = o.status || "active";
       document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa ? o.cpaGoal.targetCpa : "";
@@ -501,7 +502,7 @@
       var o = offerById(activeOfferId);
       if (!o) return;
       o.name = document.getElementById("offer-name").value.trim() || o.name;
-      o.advertiserName = getAdvertiserValue() || o.advertiserName;
+      o.advertiserId = getAdvertiserValue() || o.advertiserId;
       o.vertical = document.getElementById("offer-vertical").value || o.vertical;
       o.status = document.getElementById("offer-status").value;
       o.cpaGoal = {
@@ -525,7 +526,7 @@
       var newId = "offer-" + Date.now();
       var copy = {
         id: newId,
-        advertiserName: src.advertiserName,
+        advertiserId: src.advertiserId,
         name: src.name + " (copy)",
         vertical: src.vertical,
         status: src.status,
@@ -636,7 +637,7 @@
     document.getElementById("offer-add-btn").addEventListener("click", function () {
       var id = "offer-" + Date.now();
       offers.push({
-        id: id, advertiserName: "", name: "", vertical: "", status: "active",
+        id: id, advertiserId: "", name: "", vertical: "", status: "active",
         workspaceIds: [], cpaGoal: { targetCpa: 0, currency: "USD" },
         ctaUrl: ""
       });
