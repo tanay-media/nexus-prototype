@@ -192,8 +192,7 @@
 
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="submit" class="btn btn--black">Save settings</button>
-        <button type="button" class="btn btn--black" id="settings-republish-btn" hidden>Re-publish</button>
+        <button type="button" class="btn btn--black" id="settings-republish-btn">Re-publish</button>
       </div>
     </form>
   </dialog>
@@ -1114,15 +1113,15 @@
     function settingsUpdateRepublishUI() {
       var l = landers.find(function (x) { return x.id === settingsActiveLanderId; });
       var isPublished = l && l.status === "published";
-      if (!isPublished || !settingsDirty) {
-        if (settingsRepublishBtn) settingsRepublishBtn.hidden = true;
-        if (settingsVariantStatus) settingsVariantStatus.hidden = true;
-        return;
+      if (settingsRepublishBtn) {
+        settingsRepublishBtn.textContent = isPublished ? "Re-publish" : "Publish";
       }
-      if (settingsRepublishBtn) settingsRepublishBtn.hidden = false;
-      if (settingsVariantStatus) settingsVariantStatus.hidden = false;
-      settingsRenderVariantStatus(l);
-      if (settingsHasUnsavedDrafts) {
+      if (!settingsDirty) {
+        if (settingsVariantStatus) settingsVariantStatus.hidden = true;
+      } else {
+        if (settingsVariantStatus && isPublished) { settingsVariantStatus.hidden = false; settingsRenderVariantStatus(l); }
+      }
+      if (settingsHasUnsavedDrafts && settingsDirty && isPublished) {
         if (settingsRepublishBtn) { settingsRepublishBtn.disabled = true; settingsRepublishBtn.classList.add("btn--disabled"); }
       } else {
         if (settingsRepublishBtn) { settingsRepublishBtn.disabled = false; settingsRepublishBtn.classList.remove("btn--disabled"); }
@@ -1211,12 +1210,9 @@
       settingsDlg.addEventListener("change", function (e) {
         if (e.target.closest("[data-int-source]")) settingsCheckDirty();
       });
-      var settingsForm = settingsDlg.querySelector("form");
-      if (settingsForm) {
-        settingsForm.addEventListener("submit", function () {
-          settingsSave();
-        });
-      }
+      settingsDlg.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+      });
     }
 
     if (settingsVariantStatusList) {
