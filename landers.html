@@ -184,16 +184,6 @@
         <div class="publish-success__platforms" id="settings-macro-urls" aria-live="polite"></div>
       </div>
 
-      <!-- Unsaved-draft warning tile (hidden by default) -->
-      <div class="settings-draft-warning" id="settings-draft-warning" hidden>
-        <div class="settings-draft-warning__icon">⚠</div>
-        <div class="settings-draft-warning__body">
-          <strong>Preview newer than last saved version</strong>
-          <p>Re-publishing uses the latest <strong>saved</strong> Base version. Save current HTML first to ship the latest changes.</p>
-          <button type="button" class="btn btn--outline-warn" id="settings-save-drafts-btn">Save latest drafts</button>
-        </div>
-      </div>
-
       <!-- Variant draft status (shown when re-publish is relevant) -->
       <div class="settings-variant-status" id="settings-variant-status" hidden>
         <p class="settings-section__title" style="margin-bottom:.5rem;">WHAT WILL PUBLISH</p>
@@ -1094,8 +1084,6 @@
       }
     }
     var settingsRepublishBtn = document.getElementById("settings-republish-btn");
-    var settingsDraftWarning = document.getElementById("settings-draft-warning");
-    var settingsSaveDraftsBtn = document.getElementById("settings-save-drafts-btn");
     var settingsVariantStatus = document.getElementById("settings-variant-status");
     var settingsVariantStatusList = document.getElementById("settings-variant-status-list");
     var republishConfirmDlg = document.getElementById("dialog-republish-confirm");
@@ -1128,7 +1116,6 @@
       var isPublished = l && l.status === "published";
       if (!isPublished || !settingsDirty) {
         if (settingsRepublishBtn) settingsRepublishBtn.hidden = true;
-        if (settingsDraftWarning) settingsDraftWarning.hidden = true;
         if (settingsVariantStatus) settingsVariantStatus.hidden = true;
         return;
       }
@@ -1136,10 +1123,8 @@
       if (settingsVariantStatus) settingsVariantStatus.hidden = false;
       settingsRenderVariantStatus(l);
       if (settingsHasUnsavedDrafts) {
-        if (settingsDraftWarning) settingsDraftWarning.hidden = false;
         if (settingsRepublishBtn) { settingsRepublishBtn.disabled = true; settingsRepublishBtn.classList.add("btn--disabled"); }
       } else {
-        if (settingsDraftWarning) settingsDraftWarning.hidden = true;
         if (settingsRepublishBtn) { settingsRepublishBtn.disabled = false; settingsRepublishBtn.classList.remove("btn--disabled"); }
       }
     }
@@ -1149,13 +1134,24 @@
         var hasDraft = i === 1 && settingsHasUnsavedDrafts;
         var icon = hasDraft ? '⚠' : '✓';
         var cls = hasDraft ? 'settings-vs-row--warn' : 'settings-vs-row--ok';
-        var label = hasDraft
-          ? 'v1 · saved just now · newer draft pending'
-          : 'v' + (i + 1 + (i >= 1 && !settingsHasUnsavedDrafts ? 0 : 0)) + ' · saved just now';
+        var versionLabel = hasDraft
+          ? 'v1 · saved just now · <strong>newer draft pending</strong>'
+          : 'v' + (i + 1) + ' · saved just now';
+        var warning = '';
+        if (hasDraft) {
+          warning =
+            '<div class="settings-vs-warn-detail">' +
+              '<p>Re-publishing uses the latest <strong>saved</strong> version. Save current HTML first to ship the latest changes.</p>' +
+              '<button type="button" class="btn btn--outline-warn js-save-variant-draft" data-variant-idx="' + i + '">Save latest draft</button>' +
+            '</div>';
+        }
         return '<li class="settings-vs-row ' + cls + '">' +
-          '<span class="settings-vs-icon">' + icon + '</span>' +
-          '<strong>' + escapeHtml(v.name) + '</strong>' +
-          '<span class="muted" style="margin-left:.5rem;">' + label + '</span>' +
+          '<div class="settings-vs-row__top">' +
+            '<span class="settings-vs-icon">' + icon + '</span>' +
+            '<strong>' + escapeHtml(v.name) + '</strong>' +
+            '<span class="muted" style="margin-left:.5rem;">' + versionLabel + '</span>' +
+          '</div>' +
+          warning +
         '</li>';
       }).join("");
     }
@@ -1223,11 +1219,13 @@
       }
     }
 
-    if (settingsSaveDraftsBtn) {
-      settingsSaveDraftsBtn.addEventListener("click", function () {
+    if (settingsVariantStatusList) {
+      settingsVariantStatusList.addEventListener("click", function (e) {
+        var btn = e.target.closest(".js-save-variant-draft");
+        if (!btn) return;
         settingsHasUnsavedDrafts = false;
         settingsUpdateRepublishUI();
-        landerToast("All variant drafts saved");
+        landerToast("Variant draft saved");
       });
     }
 
