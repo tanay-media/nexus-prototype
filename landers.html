@@ -214,21 +214,16 @@
       <div class="modal__header">
         <div>
           <h2 class="modal__title">Re-publish lander?</h2>
-          <p class="modal__hint">This will impact your currently published lander too. Changes to domain, path, or integrations will go live immediately.</p>
+          <p class="modal__hint">Your updated settings will go live once you confirm.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
       <div style="padding:0 24px 12px;">
-        <p class="muted" style="margin:0 0 10px;">Are you sure you want to re-publish?</p>
-        <div class="settings-draft-warning" style="margin:0;">
-          <div class="settings-draft-warning__icon">ℹ</div>
-          <div class="settings-draft-warning__body">
-            <strong>What happens when you change the route?</strong>
-            <ul style="margin:4px 0 0;padding-left:18px;font-size:12.5px;color:var(--text-muted);line-height:1.7;">
-              <li><strong>Old route</strong> → stays live with the old HTML &amp; settings (unchanged)</li>
-              <li><strong>New route</strong> → goes live with your latest HTML &amp; settings</li>
-            </ul>
-            <p style="margin:8px 0 0;font-size:12px;color:var(--text-muted);">Automatic redirection from the old route to the new one will be available soon.</p>
+        <div class="republish-info-tile">
+          <div class="republish-info-tile__icon">✓</div>
+          <div class="republish-info-tile__body">
+            <strong>Your new route will go live with the latest HTML &amp; settings.</strong>
+            <p>The previous route stays active separately — nothing breaks. Auto-redirect from old → new is coming soon.</p>
           </div>
         </div>
       </div>
