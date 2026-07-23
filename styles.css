@@ -6414,6 +6414,9 @@ details.pop.pop--more[open] > summary { background: var(--bg-hover); }
 .settings-vs-warn-detail p { margin: 0 0 8px; }
 .settings-vs-row--warn { flex-direction: column; align-items: flex-start; }
 
+/* Re-publish confirmation dialog */
+.modal--republish-confirm { max-width: 440px; }
+
 /* Re-publish confirmation — reassuring info tile */
 .republish-info-tile {
   display: flex;
