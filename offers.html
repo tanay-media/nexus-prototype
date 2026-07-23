@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Offers · nexus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="top-strip"></div>
+  <div class="shell">
+    <aside class="sidebar">
+      <a href="index.html" class="brand-tile" title="Home" aria-label="nexus"><img src="img/nexus-logo.svg" alt="nexus" class="brand-tile__img" width="24" height="24" decoding="async" /></a>
+      <nav class="nav">
+        <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+        <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
+        <a href="widgets.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
+        <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
+        <a href="offers.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</a>
+        <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
+        <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
+        <a href="settings.html" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</a>
+      </nav>
+      <div class="avatar">K</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1>Offers</h1>
+        <div class="page-header__right">
+          <button type="button" class="btn btn--black" id="offer-add-btn">+ New offer</button>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <p class="offers-intro muted">Team-scoped offers — tracking integrations and CPA goals inherit to all landers on this offer.</p>
+
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input class="input" type="search" id="offers-search" placeholder="Search by offer or advertiser" />
+          </div>
+          <select class="select" id="offers-status-filter" aria-label="Status filter">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <select class="select" id="offers-advertiser-filter" aria-label="Advertiser filter">
+            <option value="">All advertisers</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <div class="table-scroll" role="region" aria-label="Offers">
+            <table class="table" id="offers-table">
+              <thead>
+                <tr>
+                  <th style="width:34px"></th>
+                  <th>Offer</th>
+                  <th>Advertiser</th>
+                  <th>Vertical</th>
+                  <th>Status</th>
+                  <th class="right">Workspaces</th>
+                  <th class="right">CPA goal</th>
+                  <th class="right" style="min-width:80px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="offers-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Offer detail -->
+  <dialog class="modal modal--settings modal--offer-detail" id="dialog-offer-detail">
+    <form method="dialog" class="modal__inner">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title" id="offer-detail-title">Offer</h2>
+          <p class="modal__hint" id="offer-detail-sub">Team-scoped · integrations inherit to landers</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+
+      <div class="tabs offer-detail-tabs" role="tablist" data-tabs="offer-detail">
+        <button type="button" class="tab is-active" data-tab="general" role="tab" aria-selected="true">General</button>
+        <button type="button" class="tab" data-tab="integrations" role="tab" aria-selected="false">Integrations</button>
+        <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
+        <button type="button" class="tab" data-tab="cpa" role="tab" aria-selected="false">CPA goal</button>
+      </div>
+
+      <section class="offer-detail-pane" data-tab-panel="general">
+        <div class="field"><label for="offer-name">Offer name</label><input type="text" id="offer-name" /></div>
+        <div class="field-row">
+          <div class="field"><label for="offer-advertiser">Advertiser</label><input type="text" id="offer-advertiser" /></div>
+          <div class="field"><label for="offer-vertical">Vertical</label><input type="text" id="offer-vertical" placeholder="e.g. Home Services" /></div>
+        </div>
+        <div class="field">
+          <label for="offer-status">Status</label>
+          <select id="offer-status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="offer-description">Description</label>
+          <textarea id="offer-description" rows="2" placeholder="Internal notes…"></textarea>
+        </div>
+      </section>
+
+      <section class="offer-detail-pane" data-tab-panel="integrations" hidden>
+        <p class="settings-section__hint muted">Offer-level tracking — all landers on this offer inherit these integrations.</p>
+        <ul class="publish-pixel-list" id="offer-integrations-list" aria-label="Offer integrations"></ul>
+      </section>
+
+      <section class="offer-detail-pane" data-tab-panel="workspaces" hidden>
+        <p class="settings-section__hint muted">Map this offer to team workspaces. Landers must pick an offer mapped to their workspace.</p>
+        <ul class="offer-ws-list" id="offer-workspaces-list"></ul>
+      </section>
+
+      <section class="offer-detail-pane" data-tab-panel="cpa" hidden>
+        <div class="field-row">
+          <div class="field">
+            <label for="offer-cpa-target">Target CPA</label>
+            <input type="number" id="offer-cpa-target" min="0" step="0.01" />
+          </div>
+          <div class="field">
+            <label for="offer-cpa-currency">Currency</label>
+            <select id="offer-cpa-currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="offer-cpa-type">Conversion type</label>
+          <input type="text" id="offer-cpa-type" placeholder="e.g. lead, purchase" />
+        </div>
+      </section>
+
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="submit" class="btn btn--black">Save offer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="integrations-catalog.js"></script>
+  <script src="app.js"></script>
+  <script>
+    var ICON = {
+      settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+      chev: '<span class="chev">▸</span>'
+    };
+
+    var TEAM_WORKSPACES = [
+      { id: "acme-growth", name: "ACME Growth" },
+      { id: "acme-brand", name: "ACME Brand" },
+      { id: "fin-main", name: "FinanceEdge Main" }
+    ];
+
+    var OFFER_INT_SOURCES = [
+      { source: "facebook", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Meta", title: "Meta CAPI", sub: "Server-side conversions to Meta." },
+      { source: "google", iconClass: "publish-pixel-row__icon--ga", iconLabel: "G", title: "Google Ads", sub: "Offline conversion upload on postback." },
+      { source: "gtm", iconClass: "publish-pixel-row__icon--gtm", iconLabel: "GTM", title: "Google Tag Manager", sub: "Container baked into serving HTML." },
+      { source: "meta_pixel", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Px", title: "Meta Pixel", sub: "Browser pixel (fbq) on the lander." }
+    ];
+
+    var offers = [
+      { id: "hb-wis",  advertiserName: "Homebuddy",        name: "Walk-in showers",  vertical: "Home Services", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD", conversionType: "lead" }, description: "Primary walk-in shower CPA offer.", integrations: {} },
+      { id: "hb-wit",  advertiserName: "Homebuddy",        name: "Walk-in Tubs",     vertical: "Home Services", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD", conversionType: "lead" }, description: "", integrations: {} },
+      { id: "hb-roof", advertiserName: "Homebuddy",        name: "Roofing",          vertical: "Home Services", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD", conversionType: "lead" }, description: "Roofing replacement leads.", integrations: {} },
+      { id: "bv-vin",  advertiserName: "Beenverified",     name: "VIN Search",       vertical: "People Search", status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD", conversionType: "lead" }, description: "", integrations: {} },
+      { id: "bv-obit", advertiserName: "Beenverified",     name: "Obituary search",  vertical: "People Search", status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD", conversionType: "lead" }, description: "Paused — low volume.", integrations: {} },
+      { id: "sf-auto", advertiserName: "Smart Financials", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD", conversionType: "lead" }, description: "", integrations: {} }
+    ];
+
+    var expandedAdvertisers = {};
+    var activeOfferId = null;
+    var tbody = document.getElementById("offers-body");
+    var detailDlg = document.getElementById("dialog-offer-detail");
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    }
+    function fmtCpa(goal) {
+      if (!goal || goal.targetCpa == null) return "—";
+      return "$" + Number(goal.targetCpa).toFixed(goal.targetCpa % 1 ? 2 : 0);
+    }
+    function statusBadge(status) {
+      return status === "inactive"
+        ? '<span class="badge badge--archived">Inactive</span>'
+        : '<span class="badge badge--active">Active</span>';
+    }
+    function groupByAdvertiser(rows) {
+      var map = {};
+      rows.forEach(function (o) {
+        if (!map[o.advertiserName]) map[o.advertiserName] = [];
+        map[o.advertiserName].push(o);
+      });
+      return Object.keys(map).sort().map(function (name) {
+        return { advertiserName: name, offers: map[name] };
+      });
+    }
+    function filteredOffers() {
+      var q = (document.getElementById("offers-search").value || "").trim().toLowerCase();
+      var status = document.getElementById("offers-status-filter").value;
+      var adv = document.getElementById("offers-advertiser-filter").value;
+      return offers.filter(function (o) {
+        if (status && o.status !== status) return false;
+        if (adv && o.advertiserName !== adv) return false;
+        if (q && o.name.toLowerCase().indexOf(q) === -1 && o.advertiserName.toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+    }
+    function renderAdvertiserFilter() {
+      var sel = document.getElementById("offers-advertiser-filter");
+      var current = sel.value;
+      var names = [];
+      offers.forEach(function (o) {
+        if (names.indexOf(o.advertiserName) === -1) names.push(o.advertiserName);
+      });
+      names.sort();
+      sel.innerHTML = '<option value="">All advertisers</option>' +
+        names.map(function (n) {
+          return '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>';
+        }).join("");
+      if (current) sel.value = current;
+    }
+    function render() {
+      var rows = filteredOffers();
+      var groups = groupByAdvertiser(rows);
+      tbody.innerHTML = "";
+      if (!groups.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="muted" style="padding:1.5rem;text-align:center;">No offers match your filters.</td></tr>';
+        return;
+      }
+      groups.forEach(function (g) {
+        var advKey = g.advertiserName.replace(/\s+/g, "-").toLowerCase();
+        var expanded = expandedAdvertisers[advKey] !== false;
+        var tr = document.createElement("tr");
+        tr.className = "offer-advertiser-row";
+        tr.innerHTML =
+          '<td class="lander-row__toggle">' +
+            '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '" aria-label="Toggle ' + escapeHtml(g.advertiserName) + ' offers">' + ICON.chev + '</button>' +
+          '</td>' +
+          '<td colspan="7"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
+            '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' offer' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
+        tbody.appendChild(tr);
+        g.offers.forEach(function (o) {
+          var orow = document.createElement("tr");
+          orow.className = "offer-row variant-row";
+          if (!expanded) orow.hidden = true;
+          orow.setAttribute("data-offer-id", o.id);
+          orow.innerHTML =
+            '<td></td>' +
+            '<td><strong>' + escapeHtml(o.name) + '</strong></td>' +
+            '<td class="muted">' + escapeHtml(o.advertiserName) + '</td>' +
+            '<td class="muted">' + escapeHtml(o.vertical) + '</td>' +
+            '<td>' + statusBadge(o.status) + '</td>' +
+            '<td class="right num">' + (o.workspaceIds ? o.workspaceIds.length : 0) + '</td>' +
+            '<td class="right num">' + fmtCpa(o.cpaGoal) + '</td>' +
+            '<td class="right"><div class="actions">' +
+              '<button type="button" class="icon-btn js-offer-settings" data-offer-id="' + escapeHtml(o.id) + '" title="Offer settings">' + ICON.settings + '</button>' +
+            '</div></td>';
+          tbody.appendChild(orow);
+        });
+      });
+    }
+    function offerById(id) {
+      return offers.find(function (o) { return o.id === id; });
+    }
+    function renderOfferIntegrations(offer) {
+      var list = document.getElementById("offer-integrations-list");
+      if (!list || !window.nexusIntegrations) return;
+      var ni = window.nexusIntegrations;
+      var picks = offer.integrations || {};
+      list.innerHTML = OFFER_INT_SOURCES.map(function (cfg) {
+        var rows = ni.rowsForSource(cfg.source);
+        var defId = ni.defaultIdForSource(cfg.source);
+        var defRow = defId ? ni.rowById(defId) : null;
+        var inheritLabel = defRow ? ("Workspace default · " + defRow.name) : "None configured";
+        var selected = picks[cfg.source] || "";
+        var opts = '<option value="">' + escapeHtml(inheritLabel) + '</option>';
+        rows.forEach(function (r) {
+          opts += '<option value="' + escapeHtml(r.id) + '"' + (selected === r.id ? " selected" : "") + '>' + escapeHtml(r.name) + '</option>';
+        });
+        return '<li class="publish-pixel-row">' +
+          '<span class="publish-pixel-row__icon ' + cfg.iconClass + '" aria-hidden="true">' + escapeHtml(cfg.iconLabel) + '</span>' +
+          '<div class="publish-pixel-row__text"><strong>' + escapeHtml(cfg.title) + '</strong><small>' + escapeHtml(cfg.sub) + '</small></div>' +
+          '<select class="input publish-pixel-row__select" data-offer-int="' + cfg.source + '">' + opts + '</select>' +
+        '</li>';
+      }).join("");
+    }
+    function renderOfferWorkspaces(offer) {
+      var list = document.getElementById("offer-workspaces-list");
+      if (!list) return;
+      var picked = offer.workspaceIds || [];
+      list.innerHTML = TEAM_WORKSPACES.map(function (ws) {
+        var checked = picked.indexOf(ws.id) !== -1 ? " checked" : "";
+        return '<li class="offer-ws-row">' +
+          '<label class="offer-ws-pick">' +
+            '<input type="checkbox" value="' + escapeHtml(ws.id) + '"' + checked + ' />' +
+            '<span>' + escapeHtml(ws.name) + '</span>' +
+          '</label></li>';
+      }).join("");
+    }
+    function openOfferDetail(id) {
+      var o = offerById(id);
+      if (!o || !detailDlg) return;
+      activeOfferId = id;
+      document.getElementById("offer-detail-title").textContent = o.name;
+      document.getElementById("offer-detail-sub").textContent = o.advertiserName + " · " + o.vertical;
+      document.getElementById("offer-name").value = o.name;
+      document.getElementById("offer-advertiser").value = o.advertiserName;
+      document.getElementById("offer-vertical").value = o.vertical || "";
+      document.getElementById("offer-status").value = o.status || "active";
+      document.getElementById("offer-description").value = o.description || "";
+      document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa != null ? o.cpaGoal.targetCpa : "";
+      document.getElementById("offer-cpa-currency").value = (o.cpaGoal && o.cpaGoal.currency) || "USD";
+      document.getElementById("offer-cpa-type").value = (o.cpaGoal && o.cpaGoal.conversionType) || "";
+      renderOfferIntegrations(o);
+      renderOfferWorkspaces(o);
+      var firstTab = detailDlg.querySelector('.tab[data-tab="general"]');
+      if (firstTab) firstTab.click();
+      detailDlg.showModal();
+    }
+    function saveOfferDetail() {
+      var o = offerById(activeOfferId);
+      if (!o) return;
+      o.name = document.getElementById("offer-name").value.trim() || o.name;
+      o.advertiserName = document.getElementById("offer-advertiser").value.trim() || o.advertiserName;
+      o.vertical = document.getElementById("offer-vertical").value.trim();
+      o.status = document.getElementById("offer-status").value;
+      o.description = document.getElementById("offer-description").value.trim();
+      o.cpaGoal = {
+        targetCpa: parseFloat(document.getElementById("offer-cpa-target").value) || 0,
+        currency: document.getElementById("offer-cpa-currency").value,
+        conversionType: document.getElementById("offer-cpa-type").value.trim()
+      };
+      o.integrations = {};
+      document.querySelectorAll("[data-offer-int]").forEach(function (sel) {
+        var src = sel.getAttribute("data-offer-int");
+        o.integrations[src] = sel.value || null;
+      });
+      o.workspaceIds = [];
+      document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
+        o.workspaceIds.push(cb.value);
+      });
+      renderAdvertiserFilter();
+      render();
+    }
+
+    document.getElementById("offers-search").addEventListener("input", render);
+    document.getElementById("offers-status-filter").addEventListener("change", render);
+    document.getElementById("offers-advertiser-filter").addEventListener("change", render);
+
+    tbody.addEventListener("click", function (e) {
+      var tbtn = e.target.closest("[data-advertiser-toggle]");
+      if (tbtn) {
+        var key = tbtn.getAttribute("data-advertiser-toggle");
+        var nowExpanded = tbtn.getAttribute("aria-expanded") !== "true";
+        expandedAdvertisers[key] = nowExpanded;
+        tbtn.setAttribute("aria-expanded", nowExpanded ? "true" : "false");
+        tbtn.classList.toggle("is-expanded", nowExpanded);
+        var row = tbtn.closest("tr");
+        var next = row && row.nextElementSibling;
+        while (next && next.classList.contains("offer-row")) {
+          next.hidden = !nowExpanded;
+          next = next.nextElementSibling;
+        }
+        return;
+      }
+      var sbtn = e.target.closest(".js-offer-settings");
+      if (sbtn) {
+        openOfferDetail(sbtn.getAttribute("data-offer-id"));
+      }
+    });
+
+    if (detailDlg) {
+      detailDlg.querySelector("form").addEventListener("submit", saveOfferDetail);
+    }
+
+    document.getElementById("offer-add-btn").addEventListener("click", function () {
+      var name = (window.prompt("Offer name") || "").trim();
+      if (!name) return;
+      var adv = (window.prompt("Advertiser name") || "").trim() || "New advertiser";
+      var id = "offer-" + Date.now();
+      offers.push({
+        id: id, advertiserName: adv, name: name, vertical: "", status: "active",
+        workspaceIds: [], cpaGoal: { targetCpa: 0, currency: "USD", conversionType: "lead" },
+        description: "", integrations: {}
+      });
+      renderAdvertiserFilter();
+      render();
+      openOfferDetail(id);
+    });
+
+    var urlOffer = new URLSearchParams(window.location.search).get("offer");
+    renderAdvertiserFilter();
+    render();
+    if (urlOffer) openOfferDetail(urlOffer);
+  </script>
+</body>
+</html>

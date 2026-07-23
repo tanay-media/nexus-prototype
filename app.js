@@ -25,6 +25,14 @@
       { name: "refer.acme.com",  routes: ["/referral-q2"] },
       { name: "try.acme.com",    routes: ["/partner-announce", "/walk-in-tubs", "/partner-pulse"] },
       { name: "hub.acme.com",    routes: [] }
+    ],
+    offers: [
+      { id: "hb-wis",  name: "Walk-in showers",  advertiserName: "Homebuddy",        vertical: "Home Services" },
+      { id: "hb-wit",  name: "Walk-in Tubs",     advertiserName: "Homebuddy",        vertical: "Home Services" },
+      { id: "hb-roof", name: "Roofing",          advertiserName: "Homebuddy",        vertical: "Home Services" },
+      { id: "bv-vin",  name: "VIN Search",       advertiserName: "Beenverified",     vertical: "People Search" },
+      { id: "bv-obit", name: "Obituary search",  advertiserName: "Beenverified",     vertical: "People Search" },
+      { id: "sf-auto", name: "Auto Insurance",   advertiserName: "Smart Financials", vertical: "Finance" }
     ]
   };
   window.NEXUS_DATA = NEXUS_DATA;
@@ -124,11 +132,11 @@
       var a = document.querySelector(".sidebar .nav a.is-active");
       if (a) return (a.textContent || "").replace(/\s+/g, " ").trim();
       var file = pathFile.replace(".html", "");
-      var map  = { "index": "Home", "landers": "Landers", "reports": "Reports", "domains": "Domains", "logs": "Logs", "editor": "Editor" };
+      var map  = { "index": "Home", "landers": "Landers", "reports": "Reports", "offers": "Offers", "domains": "Domains", "logs": "Logs", "editor": "Editor" };
       return map[file] || (file.charAt(0).toUpperCase() + file.slice(1));
     })();
 
-    var useNexusWordmark = pathFile === "domains.html";
+    var useNexusWordmark = pathFile === "domains.html" || pathFile === "offers.html";
     var brandAnchor =
       '<a href="index.html" class="top-brand' + (useNexusWordmark ? " top-brand--nexus" : "") + '" title="Home" aria-label="nexus">' +
         (useNexusWordmark
@@ -555,6 +563,21 @@
           });
         }
       });
+    });
+    var openOfferShown = 0;
+    var openOfferMax   = !q ? 6 : 50;
+    (NEXUS_DATA.offers || []).forEach(function (o) {
+      var hitName = q && (includes(o.name, q) || includes(o.advertiserName, q));
+      if ((!q || hitName) && openOfferShown < openOfferMax) {
+        openOfferShown++;
+        openRows.push({
+          icon: "🏷",
+          title: "Open offer " + (q && includes(o.name, q) ? wrapMatch(o.name, q) : "<strong>" + escapeHtml(o.name) + "</strong>"),
+          desc:  escapeHtml(o.advertiserName) + " · " + escapeHtml(o.vertical) + " · Offers Wall · " + EX_TUB,
+          hint:  "Open",
+          action: function () { window.location.href = "offers.html?offer=" + encodeURIComponent(o.id); }
+        });
+      }
     });
     NEXUS_DATA.domains.forEach(function (d) {
       if (!d.routes.length) return;

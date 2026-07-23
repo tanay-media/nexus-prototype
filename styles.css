@@ -2962,6 +2962,44 @@ button.dsk-row-name:focus-visible strong {
 
 /* ---------- Settings dialog (bigger, sectioned) ---------- */
 
+/* ---------- Offers Wall (team-scoped list) ---------- */
+.offers-intro {
+  margin: -0.25rem 0 0.85rem;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.offer-advertiser-row td {
+  background: #fafaf8;
+  border-bottom: 1px solid var(--border);
+}
+.offer-advertiser-row strong { font-size: 14px; }
+.offer-row td:first-child + td { padding-left: 0.35rem; }
+.modal--offer-detail { max-width: 640px; }
+.modal--offer-detail .modal__inner { max-height: min(88vh, 780px); overflow-y: auto; }
+.offer-detail-tabs { margin-bottom: 0.85rem; }
+.offer-detail-pane { margin-bottom: 0.5rem; }
+.offer-ws-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.offer-ws-row { margin: 0; }
+.offer-ws-pick {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+.offer-ws-pick input { margin: 0; }
+
 .modal--settings { max-width: 680px; }
 .modal--settings .modal__inner {
   max-height: min(88vh, 820px);
