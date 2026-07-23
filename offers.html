@@ -145,17 +145,7 @@
 
         <div class="settings-section" style="margin-top:1.2rem;">
           <p class="settings-section__title">Final enriched URL</p>
-          <div class="field-row" style="margin-bottom:.5rem;align-items:flex-end;">
-            <div class="field" style="max-width:160px;">
-              <label for="offer-cta-tps-preview">Traffic source (tps)</label>
-              <select id="offer-cta-tps-preview">
-                <option value="fb">fb</option>
-                <option value="google">google</option>
-                <option value="taboola">taboola</option>
-                <option value="nexus">nexus</option>
-              </select>
-            </div>
-          </div>
+          <p class="settings-section__hint muted">Auto-generated from base URL + params above. <code>tpid</code> resolves based on <code>tps</code> value.</p>
           <textarea id="offer-enriched-url" rows="3" readonly class="input offer-url-textarea offer-url-textarea--readonly"></textarea>
         </div>
       </section>
@@ -332,73 +322,89 @@
       return opts;
     }
 
+    function paramValueHtml(p, i) {
+      var isMacro = p.value.indexOf("{{") !== -1;
+      var isTps = p.key === "tps";
+      var isAuto = p.key === "tpid" && p.value === "auto";
+
+      if (isTps) {
+        return '<select class="input offer-pv-select" data-idx="' + i + '">' +
+          '<option value="fb"' + (p.value === "fb" ? " selected" : "") + '>fb</option>' +
+          '<option value="google"' + (p.value === "google" ? " selected" : "") + '>google</option>' +
+          '<option value="taboola"' + (p.value === "taboola" ? " selected" : "") + '>taboola</option>' +
+          '<option value="nexus"' + (p.value === "nexus" ? " selected" : "") + '>nexus</option>' +
+        '</select>';
+      }
+      if (isAuto) {
+        return '<select class="input offer-pv-select" data-idx="' + i + '">' +
+          '<option value="auto" selected>auto (based on tps)</option>' +
+          '<option value="{{clid}}">{{clid}}</option>' +
+          '<option value="{{fbclid}}">{{fbclid}}</option>' +
+        '</select>';
+      }
+      if (isMacro) {
+        return '<select class="input offer-pv-select" data-idx="' + i + '">' +
+          macroOptions(p.value) +
+        '</select>';
+      }
+      return '<input type="text" class="input offer-pv-input" data-idx="' + i + '" value="' + escapeHtml(p.value) + '" placeholder="static value" />';
+    }
+
     function renderEditableParams() {
       var container = document.getElementById("offer-params-editable");
       if (!container) return;
       container.innerHTML = offerParams.map(function (p, i) {
-        var isMacro = p.value.indexOf("{{") !== -1;
-        var isAuto = p.key === "tpid" && p.value === "auto";
-        var isTps = p.key === "tps";
-        var valHtml;
-        if (isTps) {
-          valHtml = '<select class="input offer-param-val" data-param-idx="' + i + '">' +
-            '<option value="fb"' + (p.value === "fb" ? " selected" : "") + '>fb</option>' +
-            '<option value="google"' + (p.value === "google" ? " selected" : "") + '>google</option>' +
-            '<option value="taboola"' + (p.value === "taboola" ? " selected" : "") + '>taboola</option>' +
-            '<option value="nexus"' + (p.value === "nexus" ? " selected" : "") + '>nexus</option>' +
-          '</select>';
-        } else if (isAuto) {
-          valHtml = '<select class="input offer-param-val" data-param-idx="' + i + '">' +
-            '<option value="auto" selected>auto (based on tps)</option>' +
-            '<option value="{{clid}}">{{clid}}</option>' +
-            '<option value="{{fbclid}}">{{fbclid}}</option>' +
-          '</select>';
-        } else {
-          valHtml = '<div class="offer-param-val-wrap">' +
-            '<select class="input offer-param-macro" data-param-idx="' + i + '">' + macroOptions(isMacro ? p.value : "") + '</select>' +
-            '<input type="text" class="input offer-param-custom" data-param-idx="' + i + '" value="' + escapeHtml(isMacro ? "" : p.value) + '" placeholder="static value"' + (isMacro ? ' hidden' : '') + ' />' +
-          '</div>';
-        }
-        return '<div class="offer-param-row">' +
-          '<span class="offer-param-key mono">' + escapeHtml(p.key) + '</span>' +
-          valHtml +
+        var modeIsMacro = p.value.indexOf("{{") !== -1 || p.key === "tps" || (p.key === "tpid" && p.value === "auto");
+        var toggleLabel = modeIsMacro ? "static" : "macro";
+        return '<div class="offer-param-row" data-row-idx="' + i + '">' +
+          '<input type="text" class="input offer-pk-input mono" data-idx="' + i + '" value="' + escapeHtml(p.key) + '" />' +
+          '<div class="offer-pv-cell">' + paramValueHtml(p, i) + '</div>' +
+          '<button type="button" class="btn-link offer-pv-toggle" data-idx="' + i + '" title="Switch to ' + toggleLabel + '">' + toggleLabel + '</button>' +
+          '<button type="button" class="btn-icon offer-pr-remove" data-idx="' + i + '" title="Remove">&times;</button>' +
         '</div>';
-      }).join("");
+      }).join("") +
+      '<button type="button" class="btn btn--sm offer-param-add" id="offer-param-add">+ Add param</button>';
     }
 
     function readParamsFromDom() {
       offerParams.forEach(function (p, i) {
-        var sel = document.querySelector('.offer-param-val[data-param-idx="' + i + '"]');
+        var keyInput = document.querySelector('.offer-pk-input[data-idx="' + i + '"]');
+        if (keyInput) p.key = keyInput.value.trim() || p.key;
+        var sel = document.querySelector('.offer-pv-select[data-idx="' + i + '"]');
         if (sel) { p.value = sel.value; return; }
-        var macro = document.querySelector('.offer-param-macro[data-param-idx="' + i + '"]');
-        var custom = document.querySelector('.offer-param-custom[data-param-idx="' + i + '"]');
-        if (macro && macro.value) { p.value = macro.value; }
-        else if (custom) { p.value = custom.value.trim() || ""; }
+        var inp = document.querySelector('.offer-pv-input[data-idx="' + i + '"]');
+        if (inp) { p.value = inp.value.trim() || ""; }
       });
     }
 
-    function buildEnrichedUrl(baseUrl, tpsOverride) {
+    function getCurrentTps() {
+      for (var i = 0; i < offerParams.length; i++) {
+        if (offerParams[i].key === "tps") return offerParams[i].value || "fb";
+      }
+      return "fb";
+    }
+
+    function buildEnrichedUrl(baseUrl) {
       if (!baseUrl) return "";
       readParamsFromDom();
+      var tps = getCurrentTps();
       var sep = baseUrl.indexOf("?") !== -1 ? "&" : "?";
       var parts = [];
       offerParams.forEach(function (p) {
         var val = p.value;
-        if (p.key === "tps" && tpsOverride) val = tpsOverride;
-        if (p.key === "tpid" && val === "auto") val = tpidForTps(tpsOverride || "fb");
-        parts.push(p.key + "=" + val);
+        if (p.key === "tpid" && val === "auto") val = tpidForTps(tps);
+        parts.push(encodeURIComponent(p.key) + "=" + val);
       });
       return baseUrl + sep + parts.join("&");
     }
 
     function refreshEnrichedPreview() {
       var urlInput = document.getElementById("offer-cta-url");
-      var tps = document.getElementById("offer-cta-tps-preview").value || "fb";
       var previewEl = document.getElementById("offer-enriched-url");
       if (!previewEl) return;
       var base = urlInput ? urlInput.value.trim() : "";
       if (!base) { previewEl.value = "(paste a CTA URL above to see preview)"; return; }
-      previewEl.value = buildEnrichedUrl(base, tps);
+      previewEl.value = buildEnrichedUrl(base);
     }
 
     function renderOfferWorkspaces(offer) {
@@ -552,25 +558,56 @@
 
     /* Advertiser & Vertical pickers are initialized in openOfferDetail via buildRadioPicker */
 
-    var ctaTpsPreview = document.getElementById("offer-cta-tps-preview");
-    if (ctaTpsPreview) ctaTpsPreview.addEventListener("change", refreshEnrichedPreview);
-
     var ctaUrlInput = document.getElementById("offer-cta-url");
     if (ctaUrlInput) ctaUrlInput.addEventListener("input", refreshEnrichedPreview);
 
     var paramsContainer = document.getElementById("offer-params-editable");
     if (paramsContainer) {
       paramsContainer.addEventListener("change", function (e) {
-        var macro = e.target.closest(".offer-param-macro");
-        if (macro) {
-          var idx = macro.getAttribute("data-param-idx");
-          var custom = paramsContainer.querySelector('.offer-param-custom[data-param-idx="' + idx + '"]');
-          if (custom) custom.hidden = !!macro.value;
-        }
+        readParamsFromDom();
         refreshEnrichedPreview();
       });
       paramsContainer.addEventListener("input", function (e) {
-        if (e.target.closest(".offer-param-custom")) refreshEnrichedPreview();
+        if (e.target.closest(".offer-pv-input") || e.target.closest(".offer-pk-input")) {
+          readParamsFromDom();
+          refreshEnrichedPreview();
+        }
+      });
+      paramsContainer.addEventListener("click", function (e) {
+        var toggleBtn = e.target.closest(".offer-pv-toggle");
+        if (toggleBtn) {
+          var idx = parseInt(toggleBtn.getAttribute("data-idx"));
+          readParamsFromDom();
+          var p = offerParams[idx];
+          if (!p) return;
+          var isMacro = p.value.indexOf("{{") !== -1 || p.key === "tps" || (p.key === "tpid" && p.value === "auto");
+          if (isMacro) {
+            p.value = "";
+          } else {
+            p.value = AVAILABLE_MACROS[0];
+          }
+          renderEditableParams();
+          refreshEnrichedPreview();
+          return;
+        }
+        var removeBtn = e.target.closest(".offer-pr-remove");
+        if (removeBtn) {
+          var rIdx = parseInt(removeBtn.getAttribute("data-idx"));
+          readParamsFromDom();
+          offerParams.splice(rIdx, 1);
+          renderEditableParams();
+          refreshEnrichedPreview();
+          return;
+        }
+        var addBtn = e.target.closest("#offer-param-add");
+        if (addBtn) {
+          readParamsFromDom();
+          offerParams.push({ key: "", value: "" });
+          renderEditableParams();
+          var lastKey = paramsContainer.querySelector('.offer-pk-input[data-idx="' + (offerParams.length - 1) + '"]');
+          if (lastKey) lastKey.focus();
+          return;
+        }
       });
     }
 
