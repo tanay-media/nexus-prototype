@@ -33,7 +33,7 @@
       </div>
 
       <div class="page-body">
-        <p class="offers-intro muted">Team-scoped offers — tracking integrations and CPA goals inherit to all landers on this offer.</p>
+        <p class="offers-intro muted">Team-scoped offers — CTA URLs and CPA goals inherit to all landers on this offer.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
@@ -57,11 +57,11 @@
                 <tr>
                   <th style="width:34px"></th>
                   <th>Offer</th>
-                  <th>Advertiser</th>
                   <th>Vertical</th>
                   <th>Status</th>
                   <th class="right">Workspaces</th>
                   <th class="right">CPA goal</th>
+                  <th class="right">CTA URLs</th>
                   <th class="right" style="min-width:80px;">Actions</th>
                 </tr>
               </thead>
@@ -79,23 +79,36 @@
       <div class="modal__header">
         <div>
           <h2 class="modal__title" id="offer-detail-title">Offer</h2>
-          <p class="modal__hint" id="offer-detail-sub">Team-scoped · integrations inherit to landers</p>
+          <p class="modal__hint" id="offer-detail-sub">Team-scoped · CTA URLs + CPA inherit to landers</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
 
       <div class="tabs offer-detail-tabs" role="tablist" data-tabs="offer-detail">
         <button type="button" class="tab is-active" data-tab="general" role="tab" aria-selected="true">General</button>
-        <button type="button" class="tab" data-tab="integrations" role="tab" aria-selected="false">Integrations</button>
+        <button type="button" class="tab" data-tab="cta-urls" role="tab" aria-selected="false">CTA URLs</button>
         <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
-        <button type="button" class="tab" data-tab="cpa" role="tab" aria-selected="false">CPA goal</button>
       </div>
 
+      <!-- General -->
       <section class="offer-detail-pane" data-tab-panel="general">
         <div class="field"><label for="offer-name">Offer name</label><input type="text" id="offer-name" /></div>
         <div class="field-row">
           <div class="field"><label for="offer-advertiser">Advertiser</label><input type="text" id="offer-advertiser" /></div>
-          <div class="field"><label for="offer-vertical">Vertical</label><input type="text" id="offer-vertical" placeholder="e.g. Home Services" /></div>
+          <div class="field">
+            <label for="offer-vertical">Vertical</label>
+            <select id="offer-vertical">
+              <option value="">— Select —</option>
+              <option value="Finance">Finance</option>
+              <option value="Home & Garden">Home &amp; Garden</option>
+              <option value="Travel">Travel</option>
+              <option value="Autos">Autos</option>
+              <option value="Health - wellness">Health - wellness</option>
+              <option value="Health - Pharma">Health - Pharma</option>
+              <option value="Shopping deals">Shopping deals</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
         </div>
         <div class="field">
           <label for="offer-status">Status</label>
@@ -104,41 +117,79 @@
             <option value="inactive">Inactive</option>
           </select>
         </div>
-        <div class="field">
-          <label for="offer-description">Description</label>
-          <textarea id="offer-description" rows="2" placeholder="Internal notes…"></textarea>
+        <div class="settings-section" style="margin-top:1rem;">
+          <p class="settings-section__title">CPA goal</p>
+          <div class="field-row">
+            <div class="field">
+              <label for="offer-cpa-target">Target CPA</label>
+              <input type="number" id="offer-cpa-target" min="0" step="0.01" placeholder="e.g. 85" />
+            </div>
+            <div class="field">
+              <label for="offer-cpa-currency">Currency</label>
+              <select id="offer-cpa-currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="offer-cpa-type">Conversion type</label>
+              <input type="text" id="offer-cpa-type" placeholder="e.g. lead" />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="offer-detail-pane" data-tab-panel="integrations" hidden>
-        <p class="settings-section__hint muted">Offer-level tracking — all landers on this offer inherit these integrations.</p>
-        <ul class="publish-pixel-list" id="offer-integrations-list" aria-label="Offer integrations"></ul>
+      <!-- CTA URLs -->
+      <section class="offer-detail-pane" data-tab-panel="cta-urls" hidden>
+        <p class="settings-section__hint muted">Paste the base (max) URL. Nexus appends tracking params automatically. Up to 10 CTA URLs per offer.</p>
+        <div id="offer-cta-url-list" class="offer-cta-url-list"></div>
+        <button type="button" class="kv-add" id="offer-cta-url-add">+ Add CTA URL</button>
+
+        <div class="settings-section" style="margin-top:1.2rem;">
+          <p class="settings-section__title">Auto-appended tracking params</p>
+          <div class="offer-params-preview" id="offer-params-preview">
+            <table class="table table--compact">
+              <thead><tr><th>Param</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">cp1</td><td class="mono">{{campaign_id}}</td></tr>
+                <tr><td class="mono">cp2</td><td class="mono">{{adset_id}}</td></tr>
+                <tr><td class="mono">cp3</td><td class="mono">{{ad_id}}</td></tr>
+                <tr><td class="mono">cp4</td><td class="mono">{{variant_name}}</td></tr>
+                <tr><td class="mono">tpid</td><td class="mono"><em>auto — see tps</em></td></tr>
+                <tr><td class="mono">tps</td><td class="mono"><em>fb | google | taboola | nexus</em></td></tr>
+                <tr><td class="mono">ppid</td><td class="mono">8PRN625DH</td></tr>
+                <tr><td class="mono">pid</td><td class="mono">8PRN625DH</td></tr>
+                <tr><td class="mono">purl</td><td class="mono">https://{{route}}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="settings-section" style="margin-top:1rem;">
+          <p class="settings-section__title">Preview — enriched URL</p>
+          <p class="settings-section__hint muted">Select a traffic source to preview the full URL with macros.</p>
+          <div class="field-row" style="margin-bottom:.5rem;">
+            <div class="field">
+              <label for="offer-cta-tps-preview">Traffic source (tps)</label>
+              <select id="offer-cta-tps-preview">
+                <option value="fb">fb</option>
+                <option value="google">google</option>
+                <option value="taboola">taboola</option>
+                <option value="nexus">nexus</option>
+              </select>
+            </div>
+          </div>
+          <div class="offer-enriched-preview" id="offer-enriched-preview">
+            <input type="text" readonly id="offer-enriched-url" class="input" style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;" />
+          </div>
+        </div>
       </section>
 
+      <!-- Workspaces -->
       <section class="offer-detail-pane" data-tab-panel="workspaces" hidden>
         <p class="settings-section__hint muted">Map this offer to team workspaces. Landers must pick an offer mapped to their workspace.</p>
         <ul class="offer-ws-list" id="offer-workspaces-list"></ul>
-      </section>
-
-      <section class="offer-detail-pane" data-tab-panel="cpa" hidden>
-        <div class="field-row">
-          <div class="field">
-            <label for="offer-cpa-target">Target CPA</label>
-            <input type="number" id="offer-cpa-target" min="0" step="0.01" />
-          </div>
-          <div class="field">
-            <label for="offer-cpa-currency">Currency</label>
-            <select id="offer-cpa-currency">
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label for="offer-cpa-type">Conversion type</label>
-          <input type="text" id="offer-cpa-type" placeholder="e.g. lead, purchase" />
-        </div>
       </section>
 
       <div class="modal__actions">
@@ -148,7 +199,6 @@
     </form>
   </dialog>
 
-  <script src="integrations-catalog.js"></script>
   <script src="app.js"></script>
   <script>
     var ICON = {
@@ -156,26 +206,21 @@
       chev: '<span class="chev">▸</span>'
     };
 
+    var VERTICALS = ["Finance", "Home & Garden", "Travel", "Autos", "Health - wellness", "Health - Pharma", "Shopping deals", "Others"];
+
     var TEAM_WORKSPACES = [
       { id: "acme-growth", name: "ACME Growth" },
       { id: "acme-brand", name: "ACME Brand" },
       { id: "fin-main", name: "FinanceEdge Main" }
     ];
 
-    var OFFER_INT_SOURCES = [
-      { source: "facebook", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Meta", title: "Meta CAPI", sub: "Server-side conversions to Meta." },
-      { source: "google", iconClass: "publish-pixel-row__icon--ga", iconLabel: "G", title: "Google Ads", sub: "Offline conversion upload on postback." },
-      { source: "gtm", iconClass: "publish-pixel-row__icon--gtm", iconLabel: "GTM", title: "Google Tag Manager", sub: "Container baked into serving HTML." },
-      { source: "meta_pixel", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Px", title: "Meta Pixel", sub: "Browser pixel (fbq) on the lander." }
-    ];
-
     var offers = [
-      { id: "hb-wis",  advertiserName: "Homebuddy",        name: "Walk-in showers",  vertical: "Home Services", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD", conversionType: "lead" }, description: "Primary walk-in shower CPA offer.", integrations: {} },
-      { id: "hb-wit",  advertiserName: "Homebuddy",        name: "Walk-in Tubs",     vertical: "Home Services", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD", conversionType: "lead" }, description: "", integrations: {} },
-      { id: "hb-roof", advertiserName: "Homebuddy",        name: "Roofing",          vertical: "Home Services", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD", conversionType: "lead" }, description: "Roofing replacement leads.", integrations: {} },
-      { id: "bv-vin",  advertiserName: "Beenverified",     name: "VIN Search",       vertical: "People Search", status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD", conversionType: "lead" }, description: "", integrations: {} },
-      { id: "bv-obit", advertiserName: "Beenverified",     name: "Obituary search",  vertical: "People Search", status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD", conversionType: "lead" }, description: "Paused — low volume.", integrations: {} },
-      { id: "sf-auto", advertiserName: "Smart Financials", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD", conversionType: "lead" }, description: "", integrations: {} }
+      { id: "hb-wis",  advertiserName: "Homebuddy",        name: "Walk-in showers",  vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Main tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" }] },
+      { id: "hb-wit",  advertiserName: "Homebuddy",        name: "Walk-in Tubs",     vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Main tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" }] },
+      { id: "hb-roof", advertiserName: "Homebuddy",        name: "Roofing",          vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Google tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" }, { label: "Meta tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof02&akey=e5f6g7h8" }] },
+      { id: "bv-vin",  advertiserName: "Beenverified",     name: "VIN Search",       vertical: "Autos",         status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "VIN tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" }] },
+      { id: "bv-obit", advertiserName: "Beenverified",     name: "Obituary search",  vertical: "Others",        status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD", conversionType: "lead" }, ctaUrls: [] },
+      { id: "sf-auto", advertiserName: "Smart Financials", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD", conversionType: "lead" }, ctaUrls: [{ label: "Auto ins tracker", baseUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }] }
     ];
 
     var expandedAdvertisers = {};
@@ -187,7 +232,7 @@
       return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
     }
     function fmtCpa(goal) {
-      if (!goal || goal.targetCpa == null) return "—";
+      if (!goal || goal.targetCpa == null || goal.targetCpa === 0) return "—";
       return "$" + Number(goal.targetCpa).toFixed(goal.targetCpa % 1 ? 2 : 0);
     }
     function statusBadge(status) {
@@ -195,6 +240,7 @@
         ? '<span class="badge badge--archived">Inactive</span>'
         : '<span class="badge badge--active">Active</span>';
     }
+
     function groupByAdvertiser(rows) {
       var map = {};
       rows.forEach(function (o) {
@@ -205,6 +251,7 @@
         return { advertiserName: name, offers: map[name] };
       });
     }
+
     function filteredOffers() {
       var q = (document.getElementById("offers-search").value || "").trim().toLowerCase();
       var status = document.getElementById("offers-status-filter").value;
@@ -216,6 +263,7 @@
         return true;
       });
     }
+
     function renderAdvertiserFilter() {
       var sel = document.getElementById("offers-advertiser-filter");
       var current = sel.value;
@@ -230,6 +278,7 @@
         }).join("");
       if (current) sel.value = current;
     }
+
     function render() {
       var rows = filteredOffers();
       var groups = groupByAdvertiser(rows);
@@ -255,14 +304,15 @@
           orow.className = "offer-row variant-row";
           if (!expanded) orow.hidden = true;
           orow.setAttribute("data-offer-id", o.id);
+          orow.setAttribute("data-advertiser-key", advKey);
           orow.innerHTML =
             '<td></td>' +
             '<td><strong>' + escapeHtml(o.name) + '</strong></td>' +
-            '<td class="muted">' + escapeHtml(o.advertiserName) + '</td>' +
             '<td class="muted">' + escapeHtml(o.vertical) + '</td>' +
             '<td>' + statusBadge(o.status) + '</td>' +
             '<td class="right num">' + (o.workspaceIds ? o.workspaceIds.length : 0) + '</td>' +
             '<td class="right num">' + fmtCpa(o.cpaGoal) + '</td>' +
+            '<td class="right num">' + (o.ctaUrls ? o.ctaUrls.length : 0) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-offer-settings" data-offer-id="' + escapeHtml(o.id) + '" title="Offer settings">' + ICON.settings + '</button>' +
             '</div></td>';
@@ -270,31 +320,89 @@
         });
       });
     }
+
     function offerById(id) {
       return offers.find(function (o) { return o.id === id; });
     }
-    function renderOfferIntegrations(offer) {
-      var list = document.getElementById("offer-integrations-list");
-      if (!list || !window.nexusIntegrations) return;
-      var ni = window.nexusIntegrations;
-      var picks = offer.integrations || {};
-      list.innerHTML = OFFER_INT_SOURCES.map(function (cfg) {
-        var rows = ni.rowsForSource(cfg.source);
-        var defId = ni.defaultIdForSource(cfg.source);
-        var defRow = defId ? ni.rowById(defId) : null;
-        var inheritLabel = defRow ? ("Workspace default · " + defRow.name) : "None configured";
-        var selected = picks[cfg.source] || "";
-        var opts = '<option value="">' + escapeHtml(inheritLabel) + '</option>';
-        rows.forEach(function (r) {
-          opts += '<option value="' + escapeHtml(r.id) + '"' + (selected === r.id ? " selected" : "") + '>' + escapeHtml(r.name) + '</option>';
-        });
-        return '<li class="publish-pixel-row">' +
-          '<span class="publish-pixel-row__icon ' + cfg.iconClass + '" aria-hidden="true">' + escapeHtml(cfg.iconLabel) + '</span>' +
-          '<div class="publish-pixel-row__text"><strong>' + escapeHtml(cfg.title) + '</strong><small>' + escapeHtml(cfg.sub) + '</small></div>' +
-          '<select class="input publish-pixel-row__select" data-offer-int="' + cfg.source + '">' + opts + '</select>' +
-        '</li>';
+
+    // ---- CTA URL enrichment ----
+    var STATIC_PARAMS = {
+      cp1: "{{campaign_id}}",
+      cp2: "{{adset_id}}",
+      cp3: "{{ad_id}}",
+      cp4: "{{variant_name}}",
+      ppid: "8PRN625DH",
+      pid: "8PRN625DH",
+      purl: "https://{{route}}"
+    };
+
+    function tpidForTps(tps) {
+      if (tps === "fb") return "{{fbclid}}";
+      if (tps === "google" || tps === "taboola") return "{{clid}}";
+      return "{{clid}}";
+    }
+
+    function buildEnrichedUrl(baseUrl, tps) {
+      if (!baseUrl) return "";
+      var sep = baseUrl.indexOf("?") !== -1 ? "&" : "?";
+      var params = [];
+      params.push("cp1=" + encodeURIComponent(STATIC_PARAMS.cp1));
+      params.push("cp2=" + encodeURIComponent(STATIC_PARAMS.cp2));
+      params.push("cp3=" + encodeURIComponent(STATIC_PARAMS.cp3));
+      params.push("cp4=" + encodeURIComponent(STATIC_PARAMS.cp4));
+      params.push("tpid=" + encodeURIComponent(tpidForTps(tps)));
+      params.push("tps=" + encodeURIComponent(tps));
+      params.push("ppid=" + STATIC_PARAMS.ppid);
+      params.push("pid=" + STATIC_PARAMS.pid);
+      params.push("purl=" + encodeURIComponent(STATIC_PARAMS.purl));
+      return baseUrl + sep + params.join("&")
+        .replace(/%7B%7B/g, "{{").replace(/%7D%7D/g, "}}");
+    }
+
+    function renderCtaUrlList(offer) {
+      var container = document.getElementById("offer-cta-url-list");
+      if (!container) return;
+      var urls = offer.ctaUrls || [];
+      container.innerHTML = urls.map(function (u, i) {
+        return '<div class="offer-cta-url-row" data-cta-idx="' + i + '">' +
+          '<div class="field" style="flex:1;margin:0;">' +
+            '<label>URL ' + (i + 1) + (u.label ? ' — ' + escapeHtml(u.label) : '') + '</label>' +
+            '<div class="field-row" style="gap:.35rem;">' +
+              '<input type="text" class="input offer-cta-label-input" value="' + escapeHtml(u.label || "") + '" placeholder="Label" style="max-width:140px;" />' +
+              '<input type="url" class="input offer-cta-url-input" value="' + escapeHtml(u.baseUrl || "") + '" placeholder="https://trk.pmsrv.co/v2/trk?adid=…" style="flex:1;" />' +
+              '<button type="button" class="icon-btn offer-cta-url-remove" aria-label="Remove" title="Remove">✕</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
       }).join("");
     }
+
+    function readCtaUrlsFromDom() {
+      var rows = document.querySelectorAll(".offer-cta-url-row");
+      var urls = [];
+      rows.forEach(function (row) {
+        var label = row.querySelector(".offer-cta-label-input");
+        var url = row.querySelector(".offer-cta-url-input");
+        if (url && url.value.trim()) {
+          urls.push({ label: label ? label.value.trim() : "", baseUrl: url.value.trim() });
+        }
+      });
+      return urls;
+    }
+
+    function refreshEnrichedPreview() {
+      var o = offerById(activeOfferId);
+      var urls = readCtaUrlsFromDom();
+      var tps = document.getElementById("offer-cta-tps-preview").value || "fb";
+      var previewInput = document.getElementById("offer-enriched-url");
+      if (!previewInput) return;
+      if (!urls.length) {
+        previewInput.value = "(add a CTA URL above to see preview)";
+        return;
+      }
+      previewInput.value = buildEnrichedUrl(urls[0].baseUrl, tps);
+    }
+
     function renderOfferWorkspaces(offer) {
       var list = document.getElementById("offer-workspaces-list");
       if (!list) return;
@@ -308,6 +416,7 @@
           '</label></li>';
       }).join("");
     }
+
     function openOfferDetail(id) {
       var o = offerById(id);
       if (!o || !detailDlg) return;
@@ -318,34 +427,31 @@
       document.getElementById("offer-advertiser").value = o.advertiserName;
       document.getElementById("offer-vertical").value = o.vertical || "";
       document.getElementById("offer-status").value = o.status || "active";
-      document.getElementById("offer-description").value = o.description || "";
       document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa != null ? o.cpaGoal.targetCpa : "";
       document.getElementById("offer-cpa-currency").value = (o.cpaGoal && o.cpaGoal.currency) || "USD";
       document.getElementById("offer-cpa-type").value = (o.cpaGoal && o.cpaGoal.conversionType) || "";
-      renderOfferIntegrations(o);
+      renderCtaUrlList(o);
       renderOfferWorkspaces(o);
+      refreshEnrichedPreview();
+
       var firstTab = detailDlg.querySelector('.tab[data-tab="general"]');
       if (firstTab) firstTab.click();
       detailDlg.showModal();
     }
+
     function saveOfferDetail() {
       var o = offerById(activeOfferId);
       if (!o) return;
       o.name = document.getElementById("offer-name").value.trim() || o.name;
       o.advertiserName = document.getElementById("offer-advertiser").value.trim() || o.advertiserName;
-      o.vertical = document.getElementById("offer-vertical").value.trim();
+      o.vertical = document.getElementById("offer-vertical").value;
       o.status = document.getElementById("offer-status").value;
-      o.description = document.getElementById("offer-description").value.trim();
       o.cpaGoal = {
         targetCpa: parseFloat(document.getElementById("offer-cpa-target").value) || 0,
         currency: document.getElementById("offer-cpa-currency").value,
         conversionType: document.getElementById("offer-cpa-type").value.trim()
       };
-      o.integrations = {};
-      document.querySelectorAll("[data-offer-int]").forEach(function (sel) {
-        var src = sel.getAttribute("data-offer-int");
-        o.integrations[src] = sel.value || null;
-      });
+      o.ctaUrls = readCtaUrlsFromDom();
       o.workspaceIds = [];
       document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
         o.workspaceIds.push(cb.value);
@@ -357,6 +463,9 @@
     document.getElementById("offers-search").addEventListener("input", render);
     document.getElementById("offers-status-filter").addEventListener("change", render);
     document.getElementById("offers-advertiser-filter").addEventListener("change", render);
+
+    var ctaTpsPreview = document.getElementById("offer-cta-tps-preview");
+    if (ctaTpsPreview) ctaTpsPreview.addEventListener("change", refreshEnrichedPreview);
 
     tbody.addEventListener("click", function (e) {
       var tbtn = e.target.closest("[data-advertiser-toggle]");
@@ -380,6 +489,30 @@
       }
     });
 
+    document.getElementById("offer-cta-url-add").addEventListener("click", function () {
+      var o = offerById(activeOfferId);
+      if (!o) return;
+      var current = readCtaUrlsFromDom();
+      if (current.length >= 10) { alert("Maximum 10 CTA URLs per offer."); return; }
+      current.push({ label: "", baseUrl: "" });
+      o.ctaUrls = current;
+      renderCtaUrlList(o);
+      var last = document.querySelector(".offer-cta-url-row:last-child .offer-cta-url-input");
+      if (last) last.focus();
+    });
+
+    document.getElementById("offer-cta-url-list").addEventListener("click", function (e) {
+      var rm = e.target.closest(".offer-cta-url-remove");
+      if (!rm) return;
+      var row = rm.closest(".offer-cta-url-row");
+      if (row) row.remove();
+      refreshEnrichedPreview();
+    });
+
+    document.getElementById("offer-cta-url-list").addEventListener("input", function (e) {
+      if (e.target.closest(".offer-cta-url-input")) refreshEnrichedPreview();
+    });
+
     if (detailDlg) {
       detailDlg.querySelector("form").addEventListener("submit", saveOfferDetail);
     }
@@ -392,7 +525,7 @@
       offers.push({
         id: id, advertiserName: adv, name: name, vertical: "", status: "active",
         workspaceIds: [], cpaGoal: { targetCpa: 0, currency: "USD", conversionType: "lead" },
-        description: "", integrations: {}
+        ctaUrls: []
       });
       renderAdvertiserFilter();
       render();
