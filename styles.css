@@ -918,6 +918,25 @@ tr.row-new td { background: #eaf2fc !important; animation: newRow 1.4s ease-out;
   background: #e4edf9;
   border-color: #b8cce8;
 }
+
+.variant-chip {
+  display: inline-block;
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #f3f3f3;
+  color: #555;
+  text-decoration: none;
+  border: 1px solid #e5e5e5;
+  transition: background .12s, border-color .12s;
+  white-space: nowrap;
+}
+.variant-chip:hover {
+  background: #e8e8e8;
+  border-color: #ccc;
+  color: #222;
+}
 .badge--tab-type {
   font-size: 9px;
   padding: 1px 7px;
