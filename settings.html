@@ -81,10 +81,9 @@
             <div>
               <h2 class="settings-intro__title">Integrations</h2>
               <p class="settings-intro__sub">
-                Connect ad platforms and tag managers for this workspace. <strong>Meta</strong> and
-                <strong>Google</strong> receive server-side conversions (buy-source firing);
-                <strong>Google Tag Manager</strong> handles client-side behavioral events on your landers.
-                You can connect several accounts per provider and mark <strong>one default per provider</strong>.
+                Connect buy sources for your workspace. Nexus fires <strong>visit</strong>, <strong>impression</strong>, and <strong>click</strong>
+                to Meta, Google Ads, and Taboola automatically (browser tag + server API — you only pick the tracking ID and event names).
+                <strong>Advertiser-level events</strong> fire when MAX sends a conversion postback.
               </p>
             </div>
           </div>
@@ -315,6 +314,13 @@
                 <div class="cd-prov__meta">Offline conversion upload</div>
               </div>
             </button>
+            <button type="button" class="cd-prov" data-source="taboola" aria-pressed="false">
+              <span class="cd-prov__logo cd-prov__logo--tb" style="background:#1652DA;color:#fff;font-weight:700;font-size:12px">Tb</span>
+              <div>
+                <div class="cd-prov__name">Taboola</div>
+                <div class="cd-prov__meta">S2S · visit / click events</div>
+              </div>
+            </button>
             <button type="button" class="cd-prov" data-source="gtm" aria-pressed="false">
               <span class="cd-prov__logo cd-prov__logo--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>
               <div>
@@ -380,13 +386,18 @@
 
         <!-- Google fields -->
         <div data-source-fields="google" hidden>
+          <div class="dskp__field">
+            <div class="dskp__label">Google Tag ID (AW-…) <span class="dskp__opt"><a href="https://support.google.com/google-ads/answer/6331314" target="_blank" rel="noopener">Find it</a></span></div>
+            <input class="dskp__input" type="text" id="cd-g-tag" placeholder="AW-123456789" />
+            <div class="dskp__hint">Baked into lander HTML for visit, impression, and click. Server upload uses OAuth below.</div>
+          </div>
           <div class="dskp__row dskp__row--2">
             <div class="dskp__field">
               <div class="dskp__label">Customer ID</div>
               <input class="dskp__input" type="text" id="cd-g-customer" placeholder="123-456-7890" />
             </div>
             <div class="dskp__field">
-              <div class="dskp__label">Conversion action ID</div>
+              <div class="dskp__label">Default conversion action ID</div>
               <input class="dskp__input" type="text" id="cd-g-action" placeholder="customers/123/conversionActions/4567" />
             </div>
           </div>
@@ -415,6 +426,14 @@
           </div>
         </div>
 
+        <!-- Taboola fields -->
+        <div data-source-fields="taboola" hidden>
+          <div class="dskp__field">
+            <div class="dskp__label">Account ID</div>
+            <input class="dskp__input" type="text" id="cd-tb-account" placeholder="1234567" />
+          </div>
+        </div>
+
         <!-- Meta Pixel fields -->
         <div data-source-fields="meta_pixel" hidden>
           <div class="dskp__field">
@@ -423,9 +442,22 @@
           </div>
         </div>
 
-        <!-- Event map (shared) -->
-        <div class="dskp__field" data-em-section>
-          <div class="dskp__label">Event map</div>
+        <!-- Lander-level events (buy sources only) -->
+        <div class="dskp__field" data-lander-events-section>
+          <div class="dskp__label">Lander-level events</div>
+          <p class="dskp__hint cd-lander-events__intro">Nexus fires these on your lander (browser tag + server API). Turn off an event to disable both paths.</p>
+          <div class="cd-lander-events-head">
+            <div class="cd-lander-events-head__event">Event</div>
+            <div class="cd-lander-events-head__dest" data-lander-event-dest-label>Platform event</div>
+            <div class="cd-lander-events-head__on">Enabled</div>
+          </div>
+          <div class="cd-lander-events" id="cd-lander-events"></div>
+        </div>
+
+        <!-- Advertiser-level events (postback) -->
+        <div class="dskp__field" data-adv-events-section>
+          <div class="dskp__label">Advertiser-level events</div>
+          <p class="dskp__hint">When MAX / advertiser sends a conversion postback (<code>conversion_type</code>).</p>
           <div class="cd-eventmap-head">
             <div>
               <div class="cd-eventmap-head__name">Advertiser event</div>

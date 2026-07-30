@@ -3913,6 +3913,38 @@ body.editor-open .shell { padding-top: 0; grid-template-columns: 1fr; }
 .publish-pixel-row__icon--ga { background: #1a73e8; }
 .publish-pixel-row__icon--meta { background: #1877f2; }
 .publish-pixel-row__icon--gtm { background: #2c2c2c; }
+.publish-pixel-row__icon--tb { background: #1652DA; }
+.publish-section--nested {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.publish-lander-events { display: flex; flex-direction: column; gap: 0.75rem; }
+.publish-lander-events__group {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  background: #fafafa;
+}
+.publish-lander-events__title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+.publish-lander-events__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+.publish-lander-events__label strong { display: block; }
+.publish-lander-events__label small { color: var(--text-muted); font-size: 11px; }
 .publish-pixel-row__text strong {
   display: block;
   font-size: 13px;

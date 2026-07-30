@@ -7,9 +7,37 @@
 (function () {
   var STORAGE_KEY = "nexus.cd.v2";
 
+  var DEFAULT_LANDER_EVENTS = {
+    facebook: {
+      visit:      { enabled: true,  eventName: "PageView" },
+      impression: { enabled: false, eventName: "ViewContent" },
+      click:      { enabled: true,  eventName: "InitiateCheckout" }
+    },
+    google: {
+      visit:      { enabled: true,  eventName: "page_view" },
+      impression: { enabled: false, eventName: "view_content" },
+      click:      { enabled: true,  eventName: "cta_click" }
+    },
+    taboola: {
+      visit:      { enabled: true,  eventName: "page_view" },
+      impression: { enabled: false, eventName: "view_content" },
+      click:      { enabled: true,  eventName: "cta_click" }
+    }
+  };
+  var LANDER_EVENT_KEYS = [
+    { key: "visit", label: "Visit", hint: "Page load" },
+    { key: "impression", label: "Impression", hint: "Page rendered" },
+    { key: "click", label: "Click", hint: "CTA tap" }
+  ];
+
+  function defaultLanderEventMap(src) {
+    var d = DEFAULT_LANDER_EVENTS[src];
+    return d ? JSON.parse(JSON.stringify(d)) : null;
+  }
+
   // ----- Defaults / seed data -----
   var seed = {
-    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
+    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", taboola: "cd_taboola_main", gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
     rows: [
       {
         id: "cd_meta_prod",
@@ -21,10 +49,10 @@
           fb_token_ref: "secret://vault/meta/acme-prod",
           fb_test_code: ""
         },
+        landerEventMap: defaultLanderEventMap("facebook"),
         eventMap: [
           { from: "lead", to: "Lead" },
-          { from: "purchase", to: "Purchase" },
-          { from: "view_content", to: "ViewContent" }
+          { from: "purchase", to: "Purchase" }
         ],
         createdAt: "2026-03-12"
       },
@@ -42,6 +70,7 @@
           { from: "lead", to: "Lead" },
           { from: "purchase", to: "Purchase" }
         ],
+        landerEventMap: defaultLanderEventMap("facebook"),
         createdAt: "2026-04-22"
       },
       {
@@ -49,15 +78,26 @@
         name: "Google Ads — main",
         source: "google",
         fields: {
+          g_tag_id: "AW-123456789",
           g_customer_id: "284-619-7723",
           g_action_id: "customers/2846197723/conversionActions/8841502",
           g_token_ref: "secret://vault/google/acme-main"
         },
+        landerEventMap: defaultLanderEventMap("google"),
         eventMap: [
-          { from: "lead", to: "lead_offline" },
+          { from: "lead", to: "Submit lead form", value: { mode: "static", amount: 40, currency: "USD" } },
           { from: "purchase", to: "purchase_offline" }
         ],
         createdAt: "2026-04-04"
+      },
+      {
+        id: "cd_taboola_main",
+        name: "Taboola — default",
+        source: "taboola",
+        fields: { tb_account_id: "1234567", tb_token_ref: "secret://vault/taboola/acme" },
+        landerEventMap: defaultLanderEventMap("taboola"),
+        eventMap: [{ from: "lead", to: "lead" }],
+        createdAt: "2026-04-10"
       },
       {
         id: "cd_gtm_main",
@@ -107,6 +147,18 @@
           if (!parsed.defaults.meta_pixel && seed.defaults.meta_pixel) {
             parsed.defaults.meta_pixel = seed.defaults.meta_pixel;
           }
+          parsed.rows.forEach(function (r) {
+            if (!r.landerEventMap && defaultLanderEventMap(r.source)) {
+              r.landerEventMap = defaultLanderEventMap(r.source);
+            }
+          });
+          if (!parsed.rows.some(function (r) { return r.id === "cd_taboola_main"; })) {
+            var tb = seed.rows.find(function (r) { return r.id === "cd_taboola_main"; });
+            if (tb) parsed.rows.push(JSON.parse(JSON.stringify(tb)));
+          }
+          if (!parsed.defaults.taboola && seed.defaults.taboola) {
+            parsed.defaults.taboola = seed.defaults.taboola;
+          }
           if (!parsed.rows.some(function (r) { return r.id === "cd_meta_pixel_main"; })) {
             var mp = seed.rows.find(function (r) { return r.id === "cd_meta_pixel_main"; });
             if (mp) parsed.rows.push(JSON.parse(JSON.stringify(mp)));
@@ -152,12 +204,14 @@
   var SOURCE_LABEL = {
     facebook: { name: "Meta", short: "Meta" },
     google:   { name: "Google Ads", short: "Google" },
+    taboola:  { name: "Taboola", short: "Taboola" },
     gtm:      { name: "Google Tag Manager", short: "GTM" },
     meta_pixel: { name: "Meta Pixel", short: "Pixel" }
   };
   var SOURCE_THUMB = {
     facebook: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>',
     google: '<span class="cd-thumb cd-thumb--google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg></span>',
+    taboola: '<span class="cd-thumb cd-thumb--taboola" style="background:#1652DA;color:#fff;font-weight:700;font-size:12px">Tb</span>',
     gtm: '<span class="cd-thumb cd-thumb--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>',
     meta_pixel: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>'
   };
@@ -171,8 +225,14 @@
     }
     if (row.source === "google") {
       return '<div class="cd-ids">' +
-        '<code>' + escapeHtml(row.fields.g_customer_id || "—") + '</code>' +
-        '<small>conv. action · ' + escapeHtml((row.fields.g_action_id || "").split("/").pop() || "—") + '</small>' +
+        '<code>' + escapeHtml(row.fields.g_tag_id || row.fields.g_customer_id || "—") + '</code>' +
+        '<small>' + escapeHtml(row.fields.g_customer_id || "") + '</small>' +
+      '</div>';
+    }
+    if (row.source === "taboola") {
+      return '<div class="cd-ids">' +
+        '<code>acct ' + escapeHtml(row.fields.tb_account_id || "—") + '</code>' +
+        '<small>S2S · Taboola</small>' +
       '</div>';
     }
     if (row.source === "gtm") {
@@ -195,6 +255,7 @@
     cd_meta_prod: ["Summer Sale", "Black Friday", "Founder Letter"],
     cd_meta_promo: ["Holiday Teaser"],
     cd_google_main: ["Referral Q2", "Partner Announce"],
+    cd_taboola_main: ["Walk-in Tubs"],
     cd_gtm_main: ["Summer Sale", "Walk-in Tubs", "Fall Preview"],
     cd_gtm_staging: [],
     cd_meta_pixel_main: ["Summer Sale", "Black Friday"]
@@ -215,15 +276,25 @@
   }
 
   function eventsCell(row) {
-    if (!row.eventMap || !row.eventMap.length) return '<span class="muted" style="font-size:11px">—</span>';
-    var destLabel = ({ facebook: "Meta", google: "Google", gtm: "GTM", meta_pixel: "Meta Pixel" })[row.source] || "dest";
-    return '<div class="cd-events" title="Advertiser event → ' + destLabel + ' event">' +
-      row.eventMap.map(function (m) {
-        return '<code><span class="cd-events__from">' + escapeHtml(m.from) + '</span>' +
-               '<span class="cd-events__arrow">→</span>' +
-               '<span class="cd-events__to">' + escapeHtml(m.to) + '</span></code>';
-      }).join("") +
-    '</div>';
+    var chips = [];
+    if (row.landerEventMap) {
+      LANDER_EVENT_KEYS.forEach(function (ev) {
+        var m = row.landerEventMap[ev.key];
+        if (m && m.enabled) chips.push(ev.key);
+      });
+    }
+    var adv = (row.eventMap || []).map(function (m) {
+      return '<code><span class="cd-events__from">' + escapeHtml(m.from) + '</span>' +
+             '<span class="cd-events__arrow">→</span>' +
+             '<span class="cd-events__to">' + escapeHtml(m.to) + '</span></code>';
+    }).join("");
+    if (!chips.length && !adv) return '<span class="muted" style="font-size:11px">—</span>';
+    var landerHtml = chips.length
+      ? '<span class="cd-events-lander" title="Lander-level events enabled">' + chips.map(function (c) {
+          return '<code class="cd-events-lander__tag">' + escapeHtml(c) + '</code>';
+        }).join("") + '</span>'
+      : "";
+    return '<div class="cd-events">' + landerHtml + adv + '</div>';
   }
 
   function defaultCell(row) {
@@ -247,7 +318,7 @@
     if (tableScroll) tableScroll.hidden = false;
     if (emptyEl) emptyEl.hidden = true;
 
-    var GROUP_ORDER = ["facebook", "google", "gtm"];
+    var GROUP_ORDER = ["facebook", "google", "taboola", "gtm"];
     function rowHtml(r) {
       return '<tr class="cd-acct-row" data-group="' + r.source + '"' + (collapsed[r.source] ? ' hidden' : '') + '>' +
         '<td>' +
@@ -301,11 +372,15 @@
     btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-source") === src)); });
     formDlg.setAttribute("data-source", src);
     var isClientPixel = src === "gtm" || src === "meta_pixel";
-    var emSec = document.querySelector("[data-em-section]");
+    var isBuySource = src === "facebook" || src === "google" || src === "taboola";
+    var landerSec = document.querySelector("[data-lander-events-section]");
+    var advSec = document.querySelector("[data-adv-events-section]");
+    var emSec = document.querySelector("[data-adv-events-section]");
     var defSec = document.querySelector("[data-default-section]");
-    if (emSec) emSec.hidden = isClientPixel;
+    if (landerSec) landerSec.hidden = !isBuySource;
+    if (advSec) advSec.hidden = isClientPixel;
     if (defSec) defSec.hidden = isClientPixel;
-    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src] || "Integration";
+    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", taboola: "Taboola", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src] || "Integration";
     var eyebrow = document.getElementById("cd-eyebrow");
     if (eyebrow) eyebrow.textContent = provName;
 
@@ -316,6 +391,7 @@
       iconEl.innerHTML = ({
         facebook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>',
         google:   '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg>',
+        taboola: '<svg viewBox="0 0 24 24" width="22" height="22"><text x="5" y="17" fill="#1652DA" font-size="14" font-weight="700">Tb</text></svg>',
         gtm:      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg>',
         meta_pixel: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>'
       })[src] || '';
@@ -323,8 +399,9 @@
 
     // Update event-map header to reflect chosen destination
     var labelMap = {
-      facebook: { name: "Meta event name", sub: 'sent in CAPI · <code>event_name</code>' },
-      google:   { name: "Google action name", sub: 'used in offline upload · <code>conversion_action</code>' },
+      facebook: { name: "Meta event name", sub: 'platform · <code>event_name</code>' },
+      google:   { name: "Google conversion", sub: 'platform · <code>conversion_action</code>' },
+      taboola:  { name: "Taboola event name", sub: 'Realize · <code>name</code> (exact match)' },
       gtm:      { name: "dataLayer event", sub: 'pushed client-side · <code>event</code>' }
     };
     var l = labelMap[src] || labelMap.facebook;
@@ -339,10 +416,16 @@
     var subEl = document.querySelector("[data-source-event-sub]");
     if (nameEl) nameEl.textContent = l.name;
     if (subEl) subEl.innerHTML = l.sub;
+    var landerDestLbl = document.querySelector("[data-lander-event-dest-label]");
+    if (landerDestLbl) landerDestLbl.textContent = l.name;
 
     // Re-render existing rows so destination dropdowns reflect the new buy source
     if (eventMapEl && eventMapEl.children.length) {
       rerenderEventMapPreservingValues();
+    }
+    if (landerEventsEl) {
+      var cur = collectLanderEventMap();
+      renderLanderEventMap(cur && Object.keys(cur).length ? cur : null);
     }
   }
 
@@ -350,7 +433,58 @@
     b.addEventListener("click", function () { setSourceInDialog(b.getAttribute("data-source")); });
   });
 
-  // ----- Event map editor -----
+  // ----- Lander-level events editor -----
+  var landerEventsEl = document.getElementById("cd-lander-events");
+
+  var LANDER_DEST_OPTIONS = {
+    facebook: ["PageView", "ViewContent", "InitiateCheckout", "Lead", "Contact", "AddToCart"],
+    google: ["page_view", "view_content", "cta_click", "lead_offline", "purchase_offline"],
+    taboola: ["page_view", "view_content", "cta_click", "lead", "purchase"]
+  };
+
+  function renderLanderEventRow(evKey, evLabel, evHint, data) {
+    var src = currentSource();
+    var opts = LANDER_DEST_OPTIONS[src] || [];
+    var destOptions = opts.map(function (v) {
+      return '<option value="' + escapeHtml(v) + '"' + (v === data.eventName ? " selected" : "") + '>' + escapeHtml(v) + '</option>';
+    }).join("");
+    if (data.eventName && opts.indexOf(data.eventName) === -1) {
+      destOptions = '<option value="' + escapeHtml(data.eventName) + '" selected>' + escapeHtml(data.eventName) + '</option>' + destOptions;
+    }
+    return '<div class="cd-lander-row" data-lander-key="' + escapeHtml(evKey) + '">' +
+      '<div class="cd-lander-row__event"><strong>' + escapeHtml(evLabel) + '</strong><small>' + escapeHtml(evHint) + '</small></div>' +
+      '<select class="cd-em-select cd-lander-row__dest" data-lander="eventName">' + destOptions + '</select>' +
+      '<label class="cd-lander-toggle"><input type="checkbox" data-lander="enabled"' + (data.enabled ? " checked" : "") + ' /><span class="cd-lander-toggle__ui"></span></label>' +
+    '</div>';
+  }
+
+  function renderLanderEventMap(map) {
+    if (!landerEventsEl) return;
+    var src = currentSource();
+    var defaults = defaultLanderEventMap(src) || {};
+    var m = map || defaults;
+    landerEventsEl.innerHTML = LANDER_EVENT_KEYS.map(function (ev) {
+      var d = m[ev.key] || defaults[ev.key] || { enabled: false, eventName: "" };
+      return renderLanderEventRow(ev.key, ev.label, ev.hint, d);
+    }).join("");
+  }
+
+  function collectLanderEventMap() {
+    if (!landerEventsEl) return null;
+    var out = {};
+    landerEventsEl.querySelectorAll(".cd-lander-row").forEach(function (row) {
+      var key = row.getAttribute("data-lander-key");
+      var en = row.querySelector('[data-lander="enabled"]');
+      var nm = row.querySelector('[data-lander="eventName"]');
+      out[key] = {
+        enabled: !!(en && en.checked),
+        eventName: nm ? nm.value : ""
+      };
+    });
+    return out;
+  }
+
+  // ----- Event map editor (advertiser-level) -----
   var eventMapEl = document.getElementById("cd-eventmap");
   var eventMapAdd = document.getElementById("cd-eventmap-add");
 
@@ -374,10 +508,16 @@
       { v: "SubmitApplication" }
     ],
     google: [
+      { v: "Submit lead form", value: true },
       { v: "lead_offline" },
       { v: "purchase_offline", value: true },
       { v: "signup_offline" },
       { v: "trial_start_offline", value: true }
+    ],
+    taboola: [
+      { v: "lead" },
+      { v: "purchase", value: true },
+      { v: "signup" }
     ],
     gtm: [
       { v: "page_view" },
@@ -577,13 +717,18 @@
     document.getElementById("cd-fb-action-source").value = r && r.source === "facebook" ? (r.fields.fb_action_source || "website") : "website";
     document.getElementById("cd-fb-token").value = r && r.source === "facebook" ? "" : "";
     document.getElementById("cd-fb-token").placeholder = r && r.source === "facebook" && r.fields.fb_token_ref ? "Leave blank to keep existing token (vault ref)" : "EAAB••••••••••••••••";
+    document.getElementById("cd-g-tag").value = r && r.source === "google" ? (r.fields.g_tag_id || "") : "";
     document.getElementById("cd-g-customer").value = r && r.source === "google" ? (r.fields.g_customer_id || "") : "";
     document.getElementById("cd-g-action").value = r && r.source === "google" ? (r.fields.g_action_id || "") : "";
     document.getElementById("cd-g-token").value = "";
     document.getElementById("cd-g-token").placeholder = r && r.source === "google" && r.fields.g_token_ref ? "Leave blank to keep existing token (vault ref)" : "1//••••••••••••••••";
+    if (document.getElementById("cd-tb-account")) {
+      document.getElementById("cd-tb-account").value = r && r.source === "taboola" ? (r.fields.tb_account_id || "") : "";
+    }
     document.getElementById("cd-gtm-container").value = r && r.source === "gtm" ? (r.fields.gtm_container || "") : "";
     if (document.getElementById("cd-gtm-env")) document.getElementById("cd-gtm-env").value = r && r.source === "gtm" ? (r.fields.gtm_env || "live") : "live";
     if (document.getElementById("cd-meta-pixel-id")) document.getElementById("cd-meta-pixel-id").value = r && r.source === "meta_pixel" ? (r.fields.pixel_id || "") : "";
+    renderLanderEventMap(r ? r.landerEventMap : null);
     renderEventMap(r ? r.eventMap : [
       { from: "lead", to: "Lead" },
       { from: "purchase", to: "Purchase" }
@@ -625,10 +770,14 @@
       var newTok = document.getElementById("cd-fb-token").value.trim();
       if (newTok) fields.fb_token_ref = "secret://vault/meta/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     } else if (src === "google") {
+      fields.g_tag_id = document.getElementById("cd-g-tag").value.trim();
       fields.g_customer_id = document.getElementById("cd-g-customer").value.trim();
       fields.g_action_id = document.getElementById("cd-g-action").value.trim();
       var newTokG = document.getElementById("cd-g-token").value.trim();
       if (newTokG) fields.g_token_ref = "secret://vault/google/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    } else if (src === "taboola") {
+      fields.tb_account_id = document.getElementById("cd-tb-account").value.trim();
+      fields.tb_token_ref = "secret://vault/taboola/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     } else if (src === "gtm") {
       fields.gtm_container = document.getElementById("cd-gtm-container").value.trim();
       fields.gtm_env = document.getElementById("cd-gtm-env").value;
@@ -643,11 +792,12 @@
         r.name = nm;
         // Preserve existing secret refs when token field left blank
         var prevFields = r.fields || {};
-        ["fb_token_ref", "g_token_ref"].forEach(function (k) {
+        ["fb_token_ref", "g_token_ref", "tb_token_ref"].forEach(function (k) {
           if (prevFields[k] && fields[k] == null) fields[k] = prevFields[k];
         });
         r.source = src;
         r.fields = fields;
+        r.landerEventMap = collectLanderEventMap();
         r.eventMap = collectEventMap();
       }
     } else {
@@ -657,6 +807,7 @@
         name: nm,
         source: src,
         fields: fields,
+        landerEventMap: collectLanderEventMap(),
         eventMap: collectEventMap(),
         createdAt: new Date().toISOString().slice(0, 10)
       });
@@ -887,7 +1038,7 @@
       logo: '<span class="cd-thumb cd-thumb--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>' },
     { id: "meta_pixel", name: "Meta Pixel", cat: "tag", desc: "Browser pixel for PageView and on-site events (fbq).", connectable: true,
       logo: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>' },
-    { id: "taboola", name: "Taboola", cat: "ads", desc: "S2S conversions for Taboola campaigns.", connectable: false,
+    { id: "taboola", name: "Taboola", cat: "ads", desc: "Visit, impression, and click to Taboola (S2S + tag).", connectable: true,
       logo: '<span class="cd-thumb cd-thumb--taboola" style="background:#1652DA">Tb</span>' },
     { id: "ga4", name: "Google Analytics 4", cat: "tag", desc: "Measurement Protocol events.", connectable: false,
       logo: '<span class="cd-thumb" style="background:#E8710A;color:#fff;font-weight:700">GA</span>' }

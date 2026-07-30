@@ -414,6 +414,17 @@
             </div>
 
           <ul class="publish-pixel-list" id="publish-tracking-list" aria-label="Tracking integrations"></ul>
+
+          <div class="publish-section publish-section--nested" id="publish-lander-events-wrap" hidden>
+            <div class="publish-section__head">
+              <div>
+                <h4>Lander-level events</h4>
+                <p class="muted">Override workspace defaults for this lander. Off disables browser tag and server fire.</p>
+              </div>
+            </div>
+            <div class="publish-lander-events" id="publish-lander-events"></div>
+          </div>
+
           <p class="publish-tracking__foot muted"><a href="settings.html#integrations">Manage workspace integrations</a></p>
           </div>
         </div>
@@ -1293,13 +1304,18 @@
     // Publish tracking — UI source keys; map to Base provider via nexusIntegrations.UI_FIELD_MAP
     // (facebook→meta_capi, google→google_ads, gtm, meta_pixel). Lander picks → selectedIntegrationIds.
     var LANDER_INT_KEY = "nexus.lander.integrations.v1";
+    var LANDER_EVENTS_KEY = "nexus.lander.events.v1";
     var PUBLISH_TRACK_SOURCES = [
-      { source: "facebook", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Meta", title: "Meta CAPI", sub: "Server-side conversions to Meta (convDestinations)." },
-      { source: "google", iconClass: "publish-pixel-row__icon--ga", iconLabel: "G", title: "Google Ads", sub: "Offline conversion upload on postback." },
-      { source: "gtm", iconClass: "publish-pixel-row__icon--gtm", iconLabel: "GTM", title: "Tag Manager", sub: "Container ID baked into serving HTML." },
-      { source: "meta_pixel", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Px", title: "Meta Pixel", sub: "Browser pixel (fbq) on the lander." }
+      { source: "facebook", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Meta", title: "Meta CAPI", sub: "Visit, impression, click + advertiser conversions.", buySource: true },
+      { source: "google", iconClass: "publish-pixel-row__icon--ga", iconLabel: "G", title: "Google Ads", sub: "Tag ID + server upload on visit, click, and postback.", buySource: true },
+      { source: "taboola", iconClass: "publish-pixel-row__icon--tb", iconLabel: "Tb", title: "Taboola", sub: "S2S visit, impression, click + postback conversions.", buySource: true },
+      { source: "gtm", iconClass: "publish-pixel-row__icon--gtm", iconLabel: "GTM", title: "Tag Manager", sub: "Optional — Nexus fires lander events without GTM.", buySource: false },
+      { source: "meta_pixel", iconClass: "publish-pixel-row__icon--meta", iconLabel: "Px", title: "Meta Pixel", sub: "Optional legacy browser pixel.", buySource: false }
     ];
     var publishTrackingList = document.getElementById("publish-tracking-list");
+    var publishLanderEventsWrap = document.getElementById("publish-lander-events-wrap");
+    var publishLanderEventsEl = document.getElementById("publish-lander-events");
+    var LANDER_EVENT_LABELS = { visit: "Visit", impression: "Impression", click: "Click" };
 
     function loadAllLanderIntegrations() {
       try { return JSON.parse(localStorage.getItem(LANDER_INT_KEY)) || {}; } catch (e) { return {}; }
@@ -1311,6 +1327,67 @@
       var all = loadAllLanderIntegrations();
       all[landerName] = picks;
       try { localStorage.setItem(LANDER_INT_KEY, JSON.stringify(all)); } catch (e) {}
+    }
+    function loadAllLanderEventOverrides() {
+      try { return JSON.parse(localStorage.getItem(LANDER_EVENTS_KEY)) || {}; } catch (e) { return {}; }
+    }
+    function getLanderEventOverrides(landerName) {
+      return loadAllLanderEventOverrides()[landerName] || {};
+    }
+    function saveLanderEventOverrides(landerName, overrides) {
+      var all = loadAllLanderEventOverrides();
+      all[landerName] = overrides;
+      try { localStorage.setItem(LANDER_EVENTS_KEY, JSON.stringify(all)); } catch (e) {}
+    }
+    function resolvedLanderEventMap(source) {
+      var id = publishResolvedIntegrationId(source);
+      var row = id && window.nexusIntegrations ? window.nexusIntegrations.rowById(id) : null;
+      if (!row || !row.landerEventMap) return window.nexusIntegrations ? window.nexusIntegrations.defaultLanderEventMap(source) : null;
+      return row.landerEventMap;
+    }
+    function publishRenderLanderEvents() {
+      if (!publishLanderEventsEl || !publishLanderEventsWrap || !window.nexusIntegrations) return;
+      var activeSources = PUBLISH_TRACK_SOURCES.filter(function (c) {
+        return c.buySource && publishResolvedIntegrationId(c.source);
+      });
+      if (!activeSources.length) {
+        publishLanderEventsWrap.hidden = true;
+        publishLanderEventsEl.innerHTML = "";
+        return;
+      }
+      publishLanderEventsWrap.hidden = false;
+      var overrides = getLanderEventOverrides(publishCurrentLanderName());
+      var html = "";
+      activeSources.forEach(function (cfg) {
+        var base = resolvedLanderEventMap(cfg.source) || {};
+        var srcOv = overrides[cfg.source] || {};
+        html += '<div class="publish-lander-events__group"><div class="publish-lander-events__title">' + publishEscape(cfg.title) + '</div>';
+        ["visit", "impression", "click"].forEach(function (key) {
+          var def = base[key] || { enabled: false, eventName: "" };
+          var en = srcOv[key] != null ? !!srcOv[key].enabled : !!def.enabled;
+          html += '<label class="publish-lander-events__row">' +
+            '<span class="publish-lander-events__label"><strong>' + publishEscape(LANDER_EVENT_LABELS[key]) + '</strong>' +
+            '<small>' + publishEscape(def.eventName || "") + '</small></span>' +
+            '<input type="checkbox" data-lander-event-source="' + publishEscape(cfg.source) + '" data-lander-event-key="' + key + '"' + (en ? " checked" : "") + ' />' +
+          '</label>';
+        });
+        html += '</div>';
+      });
+      publishLanderEventsEl.innerHTML = html;
+    }
+    function publishReadLanderEventOverrides() {
+      var out = {};
+      if (!publishLanderEventsEl) return out;
+      publishLanderEventsEl.querySelectorAll("input[data-lander-event-source]").forEach(function (inp) {
+        var src = inp.getAttribute("data-lander-event-source");
+        var key = inp.getAttribute("data-lander-event-key");
+        if (!out[src]) out[src] = {};
+        out[src][key] = { enabled: inp.checked };
+      });
+      return out;
+    }
+    function publishSaveLanderEventOverrides() {
+      saveLanderEventOverrides(publishCurrentLanderName(), publishReadLanderEventOverrides());
     }
     function publishCurrentLanderName() {
       return (document.getElementById("editor-lander-title").textContent || "").trim() || "default";
@@ -1348,6 +1425,7 @@
           '<select class="input publish-pixel-row__select" id="publish-int-' + cfg.source + '" data-int-source="' + cfg.source + '">' + opts + '</select>' +
         '</li>';
       }).join("");
+      publishRenderLanderEvents();
     }
     function publishReadTrackingPicks() {
       var picks = {};
@@ -1359,6 +1437,7 @@
     }
     function publishSaveTrackingPicks() {
       saveLanderIntegrationPicks(publishCurrentLanderName(), publishReadTrackingPicks());
+      publishSaveLanderEventOverrides();
     }
     function publishTrackingSummary() {
       if (!window.nexusIntegrations) return "Not configured";
@@ -2367,7 +2446,15 @@
 
     if (publishTrackingList) {
       publishTrackingList.addEventListener("change", function (e) {
-        if (e.target.matches("[data-int-source]") && publishCurrentStep === 3) publishUpdateReview();
+        if (e.target.matches("[data-int-source]")) {
+          publishRenderLanderEvents();
+          if (publishCurrentStep === 3) publishUpdateReview();
+        }
+      });
+    }
+    if (publishLanderEventsEl) {
+      publishLanderEventsEl.addEventListener("change", function () {
+        publishSaveLanderEventOverrides();
       });
     }
 
