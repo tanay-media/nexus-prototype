@@ -330,12 +330,9 @@
 }
 .cd-section .dskp__field:last-child { margin-bottom: 0; }
 [data-source-fields="google"] .cd-google-creds {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 12px;
-}
-[data-source-fields="google"] .dskp__field--full {
-  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .cd-providers {
