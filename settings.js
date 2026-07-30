@@ -82,6 +82,9 @@
         fields: {
           g_tag_id: "AW-123456789",
           g_customer_id: "284-619-7723",
+          g_dev_token: "ABcdEfGhIjKlMnOpQrStUv",
+          g_client_id: "2846197723.apps.googleusercontent.com",
+          g_client_secret_ref: "secret://vault/google/acme-main-client",
           g_token_ref: "secret://vault/google/acme-main"
         },
         landerEventMap: defaultLanderEventMap("google"),
@@ -858,6 +861,16 @@
     document.getElementById("cd-fb-token").placeholder = r && r.source === "facebook" && r.fields.fb_token_ref ? "Leave blank to keep existing token (vault ref)" : "EAAB••••••••••••••••";
     document.getElementById("cd-g-tag").value = r && r.source === "google" ? (r.fields.g_tag_id || "") : "";
     document.getElementById("cd-g-customer").value = r && r.source === "google" ? (r.fields.g_customer_id || "") : "";
+    if (document.getElementById("cd-g-dev-token")) {
+      document.getElementById("cd-g-dev-token").value = r && r.source === "google" ? (r.fields.g_dev_token || "") : "";
+    }
+    if (document.getElementById("cd-g-client-id")) {
+      document.getElementById("cd-g-client-id").value = r && r.source === "google" ? (r.fields.g_client_id || "") : "";
+    }
+    if (document.getElementById("cd-g-client-secret")) {
+      document.getElementById("cd-g-client-secret").value = "";
+      document.getElementById("cd-g-client-secret").placeholder = r && r.source === "google" && r.fields.g_client_secret_ref ? "Leave blank to keep existing secret (vault ref)" : "GOCSPX-••••••••";
+    }
     document.getElementById("cd-g-token").value = "";
     document.getElementById("cd-g-token").placeholder = r && r.source === "google" && r.fields.g_token_ref ? "Leave blank to keep existing token (vault ref)" : "1//••••••••••••••••";
     if (document.getElementById("cd-tb-account")) {
@@ -910,6 +923,16 @@
     } else if (src === "google") {
       fields.g_tag_id = document.getElementById("cd-g-tag").value.trim();
       fields.g_customer_id = document.getElementById("cd-g-customer").value.trim();
+      if (document.getElementById("cd-g-dev-token")) {
+        fields.g_dev_token = document.getElementById("cd-g-dev-token").value.trim();
+      }
+      if (document.getElementById("cd-g-client-id")) {
+        fields.g_client_id = document.getElementById("cd-g-client-id").value.trim();
+      }
+      var newClientSecret = document.getElementById("cd-g-client-secret") ? document.getElementById("cd-g-client-secret").value.trim() : "";
+      if (newClientSecret) {
+        fields.g_client_secret_ref = "secret://vault/google/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-client";
+      }
       var newTokG = document.getElementById("cd-g-token").value.trim();
       if (newTokG) fields.g_token_ref = "secret://vault/google/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     } else if (src === "taboola") {
@@ -929,7 +952,7 @@
         r.name = nm;
         // Preserve existing secret refs when token field left blank
         var prevFields = r.fields || {};
-        ["fb_token_ref", "g_token_ref", "tb_token_ref"].forEach(function (k) {
+        ["fb_token_ref", "g_token_ref", "g_client_secret_ref", "tb_token_ref"].forEach(function (k) {
           if (prevFields[k] && fields[k] == null) fields[k] = prevFields[k];
         });
         r.source = src;

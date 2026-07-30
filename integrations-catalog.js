@@ -21,6 +21,9 @@
       fb_token_ref: "accessToken",
       g_tag_id: "tagId",
       g_customer_id: "customerId",
+      g_dev_token: "developerToken",
+      g_client_id: "clientId",
+      g_client_secret_ref: "clientSecret",
       g_token_ref: "accessToken",
       tb_account_id: "accountId",
       tb_token_ref: "accessToken",
@@ -77,7 +80,7 @@
         id: "cd_google_main",
         name: "Google Ads — main",
         source: "google",
-        fields: { g_tag_id: "AW-123456789", g_customer_id: "284-619-7723", g_token_ref: "secret://vault/google/acme-main" },
+        fields: { g_tag_id: "AW-123456789", g_customer_id: "284-619-7723", g_dev_token: "ABcdEfGhIjKlMnOpQrStUv", g_client_id: "2846197723.apps.googleusercontent.com", g_client_secret_ref: "secret://vault/google/acme-main-client", g_token_ref: "secret://vault/google/acme-main" },
         landerEventMap: defaultLanderEventMap("google"),
         eventMap: [{ from: "lead", to: "Submit lead form", conversionActionId: "customers/2846197723/conversionActions/8841502", value: { mode: "static", amount: 40, currency: "USD" } }, { from: "purchase", to: "purchase_offline", conversionActionId: "customers/2846197723/conversionActions/8841503" }],
         createdAt: "2026-04-04"
