@@ -1365,9 +1365,14 @@
         ["visit", "impression", "click"].forEach(function (key) {
           var def = base[key] || { enabled: false, eventName: "" };
           var en = srcOv[key] != null ? !!srcOv[key].enabled : !!def.enabled;
+          var meta = def.eventName || "";
+          if (cfg.source === "google") {
+            if (def.conversionLabel) meta += (meta ? " · " : "") + "send_to …/" + def.conversionLabel;
+            if (def.conversionActionId) meta += (meta ? " · " : "") + def.conversionActionId;
+          }
           html += '<label class="publish-lander-events__row">' +
             '<span class="publish-lander-events__label"><strong>' + publishEscape(LANDER_EVENT_LABELS[key]) + '</strong>' +
-            '<small>' + publishEscape(def.eventName || "") + '</small></span>' +
+            '<small>' + publishEscape(meta) + '</small></span>' +
             '<input type="checkbox" data-lander-event-source="' + publishEscape(cfg.source) + '" data-lander-event-key="' + key + '"' + (en ? " checked" : "") + ' />' +
           '</label>';
         });

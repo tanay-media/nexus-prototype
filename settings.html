@@ -391,15 +391,9 @@
             <input class="dskp__input" type="text" id="cd-g-tag" placeholder="AW-123456789" />
             <div class="dskp__hint">Baked into lander HTML for visit, impression, and click. Server upload uses OAuth below.</div>
           </div>
-          <div class="dskp__row dskp__row--2">
-            <div class="dskp__field">
-              <div class="dskp__label">Customer ID</div>
-              <input class="dskp__input" type="text" id="cd-g-customer" placeholder="123-456-7890" />
-            </div>
-            <div class="dskp__field">
-              <div class="dskp__label">Default conversion action ID</div>
-              <input class="dskp__input" type="text" id="cd-g-action" placeholder="customers/123/conversionActions/4567" />
-            </div>
+          <div class="dskp__field">
+            <div class="dskp__label">Customer ID</div>
+            <input class="dskp__input" type="text" id="cd-g-customer" placeholder="123-456-7890" />
           </div>
           <div class="dskp__field">
             <div class="dskp__label">OAuth refresh token</div>
@@ -446,9 +440,14 @@
         <div class="dskp__field" data-lander-events-section>
           <div class="dskp__label">Lander-level events</div>
           <p class="dskp__hint cd-lander-events__intro">Nexus fires these on your lander (browser tag + server API). Turn off an event to disable both paths.</p>
-          <div class="cd-lander-events-head">
+          <p class="dskp__hint cd-lander-events__google-hint" data-google-lander-hint hidden>
+            Google client tag per row: <code>gtag('event', 'conversion', &#123; send_to: 'AW-…/label' &#125;)</code> — use <strong>Conversion label</strong> for the <code>/label</code> suffix; <strong>Conversion action</strong> is for server upload.
+          </p>
+          <div class="cd-lander-events-head" id="cd-lander-events-head">
             <div class="cd-lander-events-head__event">Event</div>
             <div class="cd-lander-events-head__dest" data-lander-event-dest-label>Platform event</div>
+            <div class="cd-lander-events-head__label" data-lander-event-label-col hidden>Conversion label</div>
+            <div class="cd-lander-events-head__action" data-lander-event-action-col hidden>Conversion action</div>
             <div class="cd-lander-events-head__on">Enabled</div>
           </div>
           <div class="cd-lander-events" id="cd-lander-events"></div>

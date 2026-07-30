@@ -7,21 +7,23 @@
 (function () {
   var STORAGE_KEY = "nexus.cd.v2";
 
+  var CUSTOM_SELECT_VALUE = "__custom__";
+
   var DEFAULT_LANDER_EVENTS = {
     facebook: {
-      visit:      { enabled: true,  eventName: "PageView" },
-      impression: { enabled: false, eventName: "ViewContent" },
-      click:      { enabled: true,  eventName: "InitiateCheckout" }
+      visit:      { enabled: true, eventName: "PageView" },
+      impression: { enabled: true, eventName: "PageView" },
+      click:      { enabled: true, eventName: "ViewContent" }
     },
     google: {
-      visit:      { enabled: true,  eventName: "page_view" },
-      impression: { enabled: false, eventName: "view_content" },
-      click:      { enabled: true,  eventName: "cta_click" }
+      visit:      { enabled: true, eventName: "page_view", conversionLabel: "AbC-D_efG-h", conversionActionId: "customers/2846197723/conversionActions/8841500" },
+      impression: { enabled: true, eventName: "view_content", conversionLabel: "XyZ-Impr01", conversionActionId: "customers/2846197723/conversionActions/8841501" },
+      click:      { enabled: true, eventName: "cta_click", conversionLabel: "CtA-Click9", conversionActionId: "customers/2846197723/conversionActions/8841502" }
     },
     taboola: {
-      visit:      { enabled: true,  eventName: "page_view" },
-      impression: { enabled: false, eventName: "view_content" },
-      click:      { enabled: true,  eventName: "cta_click" }
+      visit:      { enabled: true, eventName: "page_view" },
+      impression: { enabled: true, eventName: "view_content" },
+      click:      { enabled: true, eventName: "cta_click" }
     }
   };
   var LANDER_EVENT_KEYS = [
@@ -80,7 +82,6 @@
         fields: {
           g_tag_id: "AW-123456789",
           g_customer_id: "284-619-7723",
-          g_action_id: "customers/2846197723/conversionActions/8841502",
           g_token_ref: "secret://vault/google/acme-main"
         },
         landerEventMap: defaultLanderEventMap("google"),
@@ -150,6 +151,15 @@
           parsed.rows.forEach(function (r) {
             if (!r.landerEventMap && defaultLanderEventMap(r.source)) {
               r.landerEventMap = defaultLanderEventMap(r.source);
+            }
+            if (r.source === "google" && r.fields && r.fields.g_action_id && r.landerEventMap) {
+              var legacyAction = r.fields.g_action_id;
+              ["visit", "impression", "click"].forEach(function (key) {
+                if (r.landerEventMap[key] && !r.landerEventMap[key].conversionActionId) {
+                  r.landerEventMap[key].conversionActionId = legacyAction;
+                }
+              });
+              delete r.fields.g_action_id;
             }
           });
           if (!parsed.rows.some(function (r) { return r.id === "cd_taboola_main"; })) {
@@ -418,6 +428,16 @@
     if (subEl) subEl.innerHTML = l.sub;
     var landerDestLbl = document.querySelector("[data-lander-event-dest-label]");
     if (landerDestLbl) landerDestLbl.textContent = l.name;
+    var landerActionCol = document.querySelector("[data-lander-event-action-col]");
+    var landerLabelCol = document.querySelector("[data-lander-event-label-col]");
+    var landerGoogleHint = document.querySelector("[data-google-lander-hint]");
+    var landerEventsHead = document.getElementById("cd-lander-events-head");
+    var isGoogle = src === "google";
+    if (landerActionCol) landerActionCol.hidden = !isGoogle;
+    if (landerLabelCol) landerLabelCol.hidden = !isGoogle;
+    if (landerGoogleHint) landerGoogleHint.hidden = !isGoogle;
+    if (landerEventsHead) landerEventsHead.classList.toggle("cd-lander-events-head--google", isGoogle);
+    if (landerEventsEl) landerEventsEl.classList.toggle("cd-lander-events--google", isGoogle);
 
     // Re-render existing rows so destination dropdowns reflect the new buy source
     if (eventMapEl && eventMapEl.children.length) {
@@ -442,18 +462,56 @@
     taboola: ["page_view", "view_content", "cta_click", "lead", "purchase"]
   };
 
+  function isCustomSelectValue(val) {
+    return val === CUSTOM_SELECT_VALUE;
+  }
+
+  function buildPresetSelectOptions(presets, selectedValue, includeEmpty) {
+    var opts = includeEmpty ? '<option value=""></option>' : "";
+    var inList = selectedValue && presets.indexOf(selectedValue) !== -1;
+    var isCustom = selectedValue && !inList;
+    presets.forEach(function (v) {
+      opts += '<option value="' + escapeHtml(v) + '"' + (v === selectedValue ? " selected" : "") + '>' + escapeHtml(v) + '</option>';
+    });
+    opts += '<option value="' + CUSTOM_SELECT_VALUE + '"' + (isCustom ? " selected" : "") + '>Custom…</option>';
+    return { optionsHtml: opts, isCustom: isCustom, customValue: isCustom ? selectedValue : "" };
+  }
+
+  function syncCustomFieldVisibility(selectEl, customInput) {
+    if (!selectEl || !customInput) return;
+    var show = isCustomSelectValue(selectEl.value);
+    customInput.hidden = !show;
+    customInput.required = show;
+    if (!show) customInput.value = "";
+  }
+
+  function readMappedSelectValue(selectEl, customInput) {
+    if (!selectEl) return "";
+    if (isCustomSelectValue(selectEl.value)) {
+      return customInput ? (customInput.value || "").trim() : "";
+    }
+    return (selectEl.value || "").trim();
+  }
+
   function renderLanderEventRow(evKey, evLabel, evHint, data) {
     var src = currentSource();
     var opts = LANDER_DEST_OPTIONS[src] || [];
-    var destOptions = opts.map(function (v) {
-      return '<option value="' + escapeHtml(v) + '"' + (v === data.eventName ? " selected" : "") + '>' + escapeHtml(v) + '</option>';
-    }).join("");
-    if (data.eventName && opts.indexOf(data.eventName) === -1) {
-      destOptions = '<option value="' + escapeHtml(data.eventName) + '" selected>' + escapeHtml(data.eventName) + '</option>' + destOptions;
-    }
-    return '<div class="cd-lander-row" data-lander-key="' + escapeHtml(evKey) + '">' +
+    var built = buildPresetSelectOptions(opts, data.eventName || "", false);
+    var isGoogle = src === "google";
+    var labelCell = isGoogle
+      ? '<input type="text" class="cd-lander-row__label cd-em-custom" data-lander="conversionLabel" placeholder="AbC-D_efG-h" value="' + escapeHtml(data.conversionLabel || "") + '" title="Client tag send_to suffix (AW-…/this label)" />'
+      : "";
+    var actionCell = isGoogle
+      ? '<input type="text" class="cd-lander-row__action cd-em-custom" data-lander="conversionActionId" placeholder="customers/…/conversionActions/…" value="' + escapeHtml(data.conversionActionId || "") + '" title="Server-side conversion action resource" />'
+      : "";
+    return '<div class="cd-lander-row' + (isGoogle ? " cd-lander-row--google" : "") + '" data-lander-key="' + escapeHtml(evKey) + '">' +
       '<div class="cd-lander-row__event"><strong>' + escapeHtml(evLabel) + '</strong><small>' + escapeHtml(evHint) + '</small></div>' +
-      '<select class="cd-em-select cd-lander-row__dest" data-lander="eventName">' + destOptions + '</select>' +
+      '<div class="cd-lander-row__dest-wrap">' +
+        '<select class="cd-em-select cd-lander-row__dest" data-lander="eventName">' + built.optionsHtml + '</select>' +
+        '<input type="text" class="cd-em-custom cd-lander-row__custom" data-lander="eventNameCustom" placeholder="Custom event name" value="' + escapeHtml(built.customValue) + '"' + (built.isCustom ? "" : " hidden") + ' />' +
+      '</div>' +
+      labelCell +
+      actionCell +
       '<label class="cd-lander-toggle"><input type="checkbox" data-lander="enabled"' + (data.enabled ? " checked" : "") + ' /><span class="cd-lander-toggle__ui"></span></label>' +
     '</div>';
   }
@@ -467,6 +525,12 @@
       var d = m[ev.key] || defaults[ev.key] || { enabled: false, eventName: "" };
       return renderLanderEventRow(ev.key, ev.label, ev.hint, d);
     }).join("");
+    landerEventsEl.querySelectorAll(".cd-lander-row").forEach(function (row) {
+      syncCustomFieldVisibility(
+        row.querySelector('[data-lander="eventName"]'),
+        row.querySelector('[data-lander="eventNameCustom"]')
+      );
+    });
   }
 
   function collectLanderEventMap() {
@@ -476,12 +540,32 @@
       var key = row.getAttribute("data-lander-key");
       var en = row.querySelector('[data-lander="enabled"]');
       var nm = row.querySelector('[data-lander="eventName"]');
-      out[key] = {
+      var custom = row.querySelector('[data-lander="eventNameCustom"]');
+      var entry = {
         enabled: !!(en && en.checked),
-        eventName: nm ? nm.value : ""
+        eventName: readMappedSelectValue(nm, custom)
       };
+      var labelIn = row.querySelector('[data-lander="conversionLabel"]');
+      if (labelIn) entry.conversionLabel = (labelIn.value || "").trim();
+      var actionIn = row.querySelector('[data-lander="conversionActionId"]');
+      if (actionIn) entry.conversionActionId = (actionIn.value || "").trim();
+      out[key] = entry;
     });
     return out;
+  }
+
+  if (landerEventsEl) {
+    landerEventsEl.addEventListener("change", function (e) {
+      var t = e.target;
+      if (t.matches && t.matches('[data-lander="eventName"]')) {
+        var row = t.closest(".cd-lander-row");
+        syncCustomFieldVisibility(t, row ? row.querySelector('[data-lander="eventNameCustom"]') : null);
+        if (isCustomSelectValue(t.value)) {
+          var custom = row && row.querySelector('[data-lander="eventNameCustom"]');
+          if (custom) custom.focus();
+        }
+      }
+    });
   }
 
   // ----- Event map editor (advertiser-level) -----
@@ -541,18 +625,16 @@
   function renderEventMapRow(m) {
     var src = currentSource();
     var destList = DEST_EVENTS[src] || [];
-    var advOptions = '<option value=""></option>' + ADV_EVENTS.map(function (v) {
-      return '<option value="' + escapeHtml(v) + '"' + (v === m.from ? " selected" : "") + '>' + escapeHtml(v) + '</option>';
-    }).join("");
-    if (m.from && ADV_EVENTS.indexOf(m.from) === -1) {
-      advOptions = '<option value="' + escapeHtml(m.from) + '" selected>' + escapeHtml(m.from) + '</option>' + advOptions;
-    }
+    var destPresets = destList.map(function (e) { return e.v; });
+    var advBuilt = buildPresetSelectOptions(ADV_EVENTS, m.from || "", true);
+    var isCustomDest = m.to && destPresets.indexOf(m.to) === -1;
     var destOptions = '<option value=""></option>' + destList.map(function (e) {
       var label = e.v + (e.value ? "  (+ value)" : "");
       return '<option value="' + escapeHtml(e.v) + '"' + (e.v === m.to ? " selected" : "") + '>' + escapeHtml(label) + '</option>';
     }).join("");
-
+    destOptions += '<option value="' + CUSTOM_SELECT_VALUE + '"' + (isCustomDest ? " selected" : "") + '>Custom…</option>';
     var showValue = isValueEvent(m.to, src);
+
     var val = m.value || {};
     var mode = val.mode === "static" ? "static" : "dynamic";
     var amount = val.amount != null ? String(val.amount) : "";
@@ -561,9 +643,15 @@
 
     return '<div class="cd-em-row" data-dest="' + escapeHtml(m.to || "") + '">' +
       '<div class="cd-em-row__head">' +
-        '<select class="cd-em-select cd-em-select--adv" data-em="from">' + advOptions + '</select>' +
+        '<div class="cd-em-select-wrap">' +
+          '<select class="cd-em-select cd-em-select--adv" data-em="from">' + advBuilt.optionsHtml + '</select>' +
+          '<input type="text" class="cd-em-custom" data-em="fromCustom" placeholder="Custom advertiser event" value="' + escapeHtml(advBuilt.customValue) + '"' + (advBuilt.isCustom ? "" : " hidden") + ' />' +
+        '</div>' +
         '<span class="cd-em-arrow">→</span>' +
-        '<select class="cd-em-select" data-em="to">' + destOptions + '</select>' +
+        '<div class="cd-em-select-wrap">' +
+          '<select class="cd-em-select" data-em="to">' + destOptions + '</select>' +
+          '<input type="text" class="cd-em-custom" data-em="toCustom" placeholder="Custom platform event" value="' + escapeHtml(isCustomDest ? (m.to || "") : "") + '"' + (isCustomDest ? "" : " hidden") + ' />' +
+        '</div>' +
         '<button type="button" class="cd-eventmap__rm" aria-label="Remove">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>' +
         '</button>' +
@@ -593,6 +681,10 @@
     if (!eventMapEl) return;
     var rows = pairs && pairs.length ? pairs : [{ from: "", to: "" }];
     eventMapEl.innerHTML = rows.map(renderEventMapRow).join("");
+    eventMapEl.querySelectorAll(".cd-em-row").forEach(function (row) {
+      syncCustomFieldVisibility(row.querySelector('[data-em="from"]'), row.querySelector('[data-em="fromCustom"]'));
+      syncCustomFieldVisibility(row.querySelector('[data-em="to"]'), row.querySelector('[data-em="toCustom"]'));
+    });
   }
 
   function rerenderEventMapPreservingValues() {
@@ -651,16 +743,31 @@
     // Re-render row when destination event changes (might add/remove value subrow)
     eventMapEl.addEventListener("change", function (e) {
       var t = e.target;
+      if (t.matches && t.matches('[data-em="from"]')) {
+        var row = t.closest(".cd-em-row");
+        syncCustomFieldVisibility(t, row ? row.querySelector('[data-em="fromCustom"]') : null);
+        if (isCustomSelectValue(t.value)) {
+          var custom = row && row.querySelector('[data-em="fromCustom"]');
+          if (custom) custom.focus();
+        }
+        return;
+      }
       if (t.matches && t.matches('[data-em="to"]')) {
         var row = t.closest(".cd-em-row");
+        syncCustomFieldVisibility(t, row ? row.querySelector('[data-em="toCustom"]') : null);
+        if (isCustomSelectValue(t.value)) {
+          var customTo = row && row.querySelector('[data-em="toCustom"]');
+          if (customTo) customTo.focus();
+        }
         var sub = row.querySelector(".cd-em-row__value");
-        var should = isValueEvent(t.value);
+        var resolvedTo = readMappedSelectValue(t, row.querySelector('[data-em="toCustom"]'));
+        var should = isValueEvent(resolvedTo, currentSource());
         if (should && !sub) {
           row.insertAdjacentHTML("beforeend", renderValueSubrow("dynamic", "", "USD", true));
         } else if (!should && sub) {
           sub.remove();
         }
-        row.setAttribute("data-dest", t.value || "");
+        row.setAttribute("data-dest", resolvedTo || "");
       }
     });
   }
@@ -669,8 +776,8 @@
     if (!eventMapEl) return [];
     var out = [];
     eventMapEl.querySelectorAll(".cd-em-row").forEach(function (r) {
-      var from = (r.querySelector('[data-em="from"]').value || "").trim();
-      var to = (r.querySelector('[data-em="to"]').value || "").trim();
+      var from = readMappedSelectValue(r.querySelector('[data-em="from"]'), r.querySelector('[data-em="fromCustom"]'));
+      var to = readMappedSelectValue(r.querySelector('[data-em="to"]'), r.querySelector('[data-em="toCustom"]'));
       if (!from || !to) return;
       var entry = { from: from, to: to };
       var sub = r.querySelector(".cd-em-row__value");
@@ -719,7 +826,6 @@
     document.getElementById("cd-fb-token").placeholder = r && r.source === "facebook" && r.fields.fb_token_ref ? "Leave blank to keep existing token (vault ref)" : "EAAB••••••••••••••••";
     document.getElementById("cd-g-tag").value = r && r.source === "google" ? (r.fields.g_tag_id || "") : "";
     document.getElementById("cd-g-customer").value = r && r.source === "google" ? (r.fields.g_customer_id || "") : "";
-    document.getElementById("cd-g-action").value = r && r.source === "google" ? (r.fields.g_action_id || "") : "";
     document.getElementById("cd-g-token").value = "";
     document.getElementById("cd-g-token").placeholder = r && r.source === "google" && r.fields.g_token_ref ? "Leave blank to keep existing token (vault ref)" : "1//••••••••••••••••";
     if (document.getElementById("cd-tb-account")) {
@@ -772,7 +878,6 @@
     } else if (src === "google") {
       fields.g_tag_id = document.getElementById("cd-g-tag").value.trim();
       fields.g_customer_id = document.getElementById("cd-g-customer").value.trim();
-      fields.g_action_id = document.getElementById("cd-g-action").value.trim();
       var newTokG = document.getElementById("cd-g-token").value.trim();
       if (newTokG) fields.g_token_ref = "secret://vault/google/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     } else if (src === "taboola") {
@@ -923,10 +1028,15 @@
             fbtrace_id: "A" + Math.random().toString(36).slice(2, 13).toUpperCase()
           };
         } else if (src === "google") {
+          var landerMap = collectLanderEventMap() || {};
+          var googleAction = (landerMap[ev] && landerMap[ev].conversionActionId)
+            || (landerMap.visit && landerMap.visit.conversionActionId)
+            || (landerMap.click && landerMap.click.conversionActionId)
+            || "<action>";
           endpoint = "POST googleads.googleapis.com/v15/customers/" + (document.getElementById("cd-g-customer").value || "<cid>") + ":uploadClickConversions";
           payload = {
             conversions: [{
-              conversion_action: document.getElementById("cd-g-action").value || "<action>",
+              conversion_action: googleAction,
               conversion_date_time: new Date().toISOString().replace("T", " ").slice(0, 19) + "+00:00",
               conversion_value: val,
               currency_code: cur,

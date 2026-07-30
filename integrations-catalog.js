@@ -21,7 +21,6 @@
       fb_token_ref: "accessToken",
       g_tag_id: "tagId",
       g_customer_id: "customerId",
-      g_action_id: "conversionActionId",
       g_token_ref: "accessToken",
       tb_account_id: "accountId",
       tb_token_ref: "accessToken",
@@ -36,17 +35,17 @@
     var maps = {
       facebook: {
         visit: { enabled: true, eventName: "PageView" },
-        impression: { enabled: false, eventName: "ViewContent" },
-        click: { enabled: true, eventName: "InitiateCheckout" }
+        impression: { enabled: true, eventName: "PageView" },
+        click: { enabled: true, eventName: "ViewContent" }
       },
       google: {
-        visit: { enabled: true, eventName: "page_view" },
-        impression: { enabled: false, eventName: "view_content" },
-        click: { enabled: true, eventName: "cta_click" }
+        visit: { enabled: true, eventName: "page_view", conversionLabel: "AbC-D_efG-h", conversionActionId: "customers/2846197723/conversionActions/8841500" },
+        impression: { enabled: true, eventName: "view_content", conversionLabel: "XyZ-Impr01", conversionActionId: "customers/2846197723/conversionActions/8841501" },
+        click: { enabled: true, eventName: "cta_click", conversionLabel: "CtA-Click9", conversionActionId: "customers/2846197723/conversionActions/8841502" }
       },
       taboola: {
         visit: { enabled: true, eventName: "page_view" },
-        impression: { enabled: false, eventName: "view_content" },
+        impression: { enabled: true, eventName: "view_content" },
         click: { enabled: true, eventName: "cta_click" }
       }
     };
@@ -78,7 +77,7 @@
         id: "cd_google_main",
         name: "Google Ads — main",
         source: "google",
-        fields: { g_tag_id: "AW-123456789", g_customer_id: "284-619-7723", g_action_id: "customers/2846197723/conversionActions/8841502", g_token_ref: "secret://vault/google/acme-main" },
+        fields: { g_tag_id: "AW-123456789", g_customer_id: "284-619-7723", g_token_ref: "secret://vault/google/acme-main" },
         landerEventMap: defaultLanderEventMap("google"),
         eventMap: [{ from: "lead", to: "Submit lead form", value: { mode: "static", amount: 40, currency: "USD" } }, { from: "purchase", to: "purchase_offline" }],
         createdAt: "2026-04-04"
@@ -132,6 +131,15 @@
           parsed.rows.forEach(function (r) {
             if (!r.landerEventMap && defaultLanderEventMap(r.source)) {
               r.landerEventMap = defaultLanderEventMap(r.source);
+            }
+            if (r.source === "google" && r.fields && r.fields.g_action_id && r.landerEventMap) {
+              var legacyAction = r.fields.g_action_id;
+              ["visit", "impression", "click"].forEach(function (key) {
+                if (r.landerEventMap[key] && !r.landerEventMap[key].conversionActionId) {
+                  r.landerEventMap[key].conversionActionId = legacyAction;
+                }
+              });
+              delete r.fields.g_action_id;
             }
           });
           return parsed;
