@@ -287,7 +287,7 @@
         <div class="dskp__head-text">
           <div class="dskp__eyebrow" id="cd-eyebrow">Integration</div>
           <h2 class="dskp__title" id="cd-form-title">Add destination</h2>
-          <p class="dskp__sub" id="cd-form-hint">Save credentials for one buy source. You can add more destinations later and switch the default at any time.</p>
+          <p class="dskp__sub" id="cd-form-hint">Workspace integration credentials and event mappings.</p>
         </div>
         <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -380,16 +380,15 @@
                 <span data-token-toggle-label>Show</span>
               </button>
             </div>
-            <div class="dskp__hint">Stored as a vault reference. Never synced in plaintext to Nexus.</div>
+            <div class="dskp__hint dskp__hint--icon-only"><span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Stored as a vault reference — never synced in plaintext.</span></span></div>
           </div>
         </div>
 
         <!-- Google fields -->
         <div data-source-fields="google" hidden>
           <div class="dskp__field">
-            <div class="dskp__label">Google Tag ID (AW-…) <span class="dskp__opt"><a href="https://support.google.com/google-ads/answer/6331314" target="_blank" rel="noopener">Find it</a></span></div>
+            <div class="dskp__label">Google Tag ID (AW-…) <span class="dskp__opt"><a href="https://support.google.com/google-ads/answer/6331314" target="_blank" rel="noopener">Find it</a></span> <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Baked into lander HTML. Per-event labels are set below.</span></span></div>
             <input class="dskp__input" type="text" id="cd-g-tag" placeholder="AW-123456789" />
-            <div class="dskp__hint">Baked into lander HTML for visit, impression, and click. Server upload uses OAuth below.</div>
           </div>
           <div class="dskp__field">
             <div class="dskp__label">Customer ID</div>
@@ -408,7 +407,7 @@
                 <span data-token-toggle-label>Show</span>
               </button>
             </div>
-            <div class="dskp__hint">Stored as a vault reference. Never synced in plaintext to Nexus.</div>
+            <div class="dskp__hint dskp__hint--icon-only"><span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Stored as a vault reference — never synced in plaintext.</span></span></div>
           </div>
         </div>
 
@@ -438,37 +437,13 @@
 
         <!-- Lander-level events (buy sources only) -->
         <div class="dskp__field" data-lander-events-section>
-          <div class="dskp__label">Lander-level events</div>
-          <p class="dskp__hint cd-lander-events__intro">Nexus fires these on your lander (browser tag + server API). Turn off an event to disable both paths.</p>
-          <p class="dskp__hint cd-lander-events__google-hint" data-google-lander-hint hidden>
-            Google client tag per row: <code>gtag('event', 'conversion', &#123; send_to: 'AW-…/label' &#125;)</code> — use <strong>Conversion label</strong> for the <code>/label</code> suffix; <strong>Conversion action</strong> is for server upload.
-          </p>
-          <div class="cd-lander-events-head" id="cd-lander-events-head">
-            <div class="cd-lander-events-head__event">Event</div>
-            <div class="cd-lander-events-head__dest" data-lander-event-dest-label>Platform event</div>
-            <div class="cd-lander-events-head__label" data-lander-event-label-col hidden>Conversion label</div>
-            <div class="cd-lander-events-head__action" data-lander-event-action-col hidden>Conversion action</div>
-            <div class="cd-lander-events-head__on">Enabled</div>
-          </div>
+          <div class="dskp__label">Lander-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Visit, impression, and click on your lander. Nexus fires browser tag + server API. One toggle disables both.</span></span></div>
           <div class="cd-lander-events" id="cd-lander-events"></div>
         </div>
 
         <!-- Advertiser-level events (postback) -->
         <div class="dskp__field" data-adv-events-section>
-          <div class="dskp__label">Advertiser-level events</div>
-          <p class="dskp__hint">When MAX / advertiser sends a conversion postback (<code>conversion_type</code>).</p>
-          <div class="cd-eventmap-head">
-            <div>
-              <div class="cd-eventmap-head__name">Advertiser event</div>
-              <div class="cd-eventmap-head__sub">from postback · <code>conversion_type</code></div>
-            </div>
-            <div></div>
-            <div>
-              <div class="cd-eventmap-head__name" data-source-event-label>Meta event name</div>
-              <div class="cd-eventmap-head__sub" data-source-event-sub>sent in CAPI · <code>event_name</code></div>
-            </div>
-            <div></div>
-          </div>
+          <div class="dskp__label">Advertiser-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Fires when MAX sends a postback (<code>conversion_type</code>).</span></span></div>
           <div class="cd-eventmap" id="cd-eventmap">
             <!-- rows injected by JS -->
           </div>

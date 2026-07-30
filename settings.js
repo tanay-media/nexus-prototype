@@ -86,8 +86,8 @@
         },
         landerEventMap: defaultLanderEventMap("google"),
         eventMap: [
-          { from: "lead", to: "Submit lead form", value: { mode: "static", amount: 40, currency: "USD" } },
-          { from: "purchase", to: "purchase_offline" }
+          { from: "lead", to: "Submit lead form", conversionActionId: "customers/2846197723/conversionActions/8841502", value: { mode: "static", amount: 40, currency: "USD" } },
+          { from: "purchase", to: "purchase_offline", conversionActionId: "customers/2846197723/conversionActions/8841503" }
         ],
         createdAt: "2026-04-04"
       },
@@ -188,6 +188,11 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+  function infoTip(html) {
+    return '<span class="info-tip info-tip--sm" tabindex="0">' +
+      '<span class="info-tip__icon">i</span>' +
+      '<span class="info-tip__body">' + html + '</span></span>';
   }
   function newId() {
     return "cd_" + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
@@ -428,16 +433,6 @@
     if (subEl) subEl.innerHTML = l.sub;
     var landerDestLbl = document.querySelector("[data-lander-event-dest-label]");
     if (landerDestLbl) landerDestLbl.textContent = l.name;
-    var landerActionCol = document.querySelector("[data-lander-event-action-col]");
-    var landerLabelCol = document.querySelector("[data-lander-event-label-col]");
-    var landerGoogleHint = document.querySelector("[data-google-lander-hint]");
-    var landerEventsHead = document.getElementById("cd-lander-events-head");
-    var isGoogle = src === "google";
-    if (landerActionCol) landerActionCol.hidden = !isGoogle;
-    if (landerLabelCol) landerLabelCol.hidden = !isGoogle;
-    if (landerGoogleHint) landerGoogleHint.hidden = !isGoogle;
-    if (landerEventsHead) landerEventsHead.classList.toggle("cd-lander-events-head--google", isGoogle);
-    if (landerEventsEl) landerEventsEl.classList.toggle("cd-lander-events--google", isGoogle);
 
     // Re-render existing rows so destination dropdowns reflect the new buy source
     if (eventMapEl && eventMapEl.children.length) {
@@ -498,21 +493,28 @@
     var opts = LANDER_DEST_OPTIONS[src] || [];
     var built = buildPresetSelectOptions(opts, data.eventName || "", false);
     var isGoogle = src === "google";
-    var labelCell = isGoogle
-      ? '<input type="text" class="cd-lander-row__label cd-em-custom" data-lander="conversionLabel" placeholder="AbC-D_efG-h" value="' + escapeHtml(data.conversionLabel || "") + '" title="Client tag send_to suffix (AW-…/this label)" />'
+    var googleSub = isGoogle
+      ? '<div class="cd-lander-card__sub">' +
+          '<div class="cd-lander-card__field">' +
+            '<span class="cd-lander-card__lbl">Conversion label ' + infoTip("Client tag: <code>gtag('event','conversion',&#123; send_to:'AW-…/label' &#125;)</code>") + '</span>' +
+            '<input type="text" class="cd-em-custom" data-lander="conversionLabel" placeholder="AbC-D_efG-h" value="' + escapeHtml(data.conversionLabel || "") + '" />' +
+          '</div>' +
+          '<div class="cd-lander-card__field">' +
+            '<span class="cd-lander-card__lbl">Conversion action ' + infoTip("Server upload resource: <code>customers/…/conversionActions/…</code>") + '</span>' +
+            '<input type="text" class="cd-em-custom" data-lander="conversionActionId" placeholder="customers/…/conversionActions/…" value="' + escapeHtml(data.conversionActionId || "") + '" />' +
+          '</div>' +
+        '</div>'
       : "";
-    var actionCell = isGoogle
-      ? '<input type="text" class="cd-lander-row__action cd-em-custom" data-lander="conversionActionId" placeholder="customers/…/conversionActions/…" value="' + escapeHtml(data.conversionActionId || "") + '" title="Server-side conversion action resource" />'
-      : "";
-    return '<div class="cd-lander-row' + (isGoogle ? " cd-lander-row--google" : "") + '" data-lander-key="' + escapeHtml(evKey) + '">' +
-      '<div class="cd-lander-row__event"><strong>' + escapeHtml(evLabel) + '</strong><small>' + escapeHtml(evHint) + '</small></div>' +
-      '<div class="cd-lander-row__dest-wrap">' +
-        '<select class="cd-em-select cd-lander-row__dest" data-lander="eventName">' + built.optionsHtml + '</select>' +
-        '<input type="text" class="cd-em-custom cd-lander-row__custom" data-lander="eventNameCustom" placeholder="Custom event name" value="' + escapeHtml(built.customValue) + '"' + (built.isCustom ? "" : " hidden") + ' />' +
+    return '<div class="cd-lander-card' + (isGoogle ? " cd-lander-card--google" : "") + '" data-lander-key="' + escapeHtml(evKey) + '">' +
+      '<div class="cd-lander-card__head">' +
+        '<div class="cd-lander-card__event"><strong>' + escapeHtml(evLabel) + '</strong><small>' + escapeHtml(evHint) + '</small></div>' +
+        '<div class="cd-lander-card__dest-wrap">' +
+          '<select class="cd-em-select cd-lander-row__dest" data-lander="eventName">' + built.optionsHtml + '</select>' +
+          '<input type="text" class="cd-em-custom cd-lander-row__custom" data-lander="eventNameCustom" placeholder="Custom event name" value="' + escapeHtml(built.customValue) + '"' + (built.isCustom ? "" : " hidden") + ' />' +
+        '</div>' +
+        '<label class="cd-lander-toggle"><input type="checkbox" data-lander="enabled"' + (data.enabled ? " checked" : "") + ' /><span class="cd-lander-toggle__ui"></span></label>' +
       '</div>' +
-      labelCell +
-      actionCell +
-      '<label class="cd-lander-toggle"><input type="checkbox" data-lander="enabled"' + (data.enabled ? " checked" : "") + ' /><span class="cd-lander-toggle__ui"></span></label>' +
+      googleSub +
     '</div>';
   }
 
@@ -525,7 +527,7 @@
       var d = m[ev.key] || defaults[ev.key] || { enabled: false, eventName: "" };
       return renderLanderEventRow(ev.key, ev.label, ev.hint, d);
     }).join("");
-    landerEventsEl.querySelectorAll(".cd-lander-row").forEach(function (row) {
+    landerEventsEl.querySelectorAll(".cd-lander-card").forEach(function (row) {
       syncCustomFieldVisibility(
         row.querySelector('[data-lander="eventName"]'),
         row.querySelector('[data-lander="eventNameCustom"]')
@@ -536,7 +538,7 @@
   function collectLanderEventMap() {
     if (!landerEventsEl) return null;
     var out = {};
-    landerEventsEl.querySelectorAll(".cd-lander-row").forEach(function (row) {
+    landerEventsEl.querySelectorAll(".cd-lander-card").forEach(function (row) {
       var key = row.getAttribute("data-lander-key");
       var en = row.querySelector('[data-lander="enabled"]');
       var nm = row.querySelector('[data-lander="eventName"]');
@@ -558,7 +560,7 @@
     landerEventsEl.addEventListener("change", function (e) {
       var t = e.target;
       if (t.matches && t.matches('[data-lander="eventName"]')) {
-        var row = t.closest(".cd-lander-row");
+        var row = t.closest(".cd-lander-card");
         syncCustomFieldVisibility(t, row ? row.querySelector('[data-lander="eventNameCustom"]') : null);
         if (isCustomSelectValue(t.value)) {
           var custom = row && row.querySelector('[data-lander="eventNameCustom"]');
@@ -622,6 +624,14 @@
     return !!(hit && hit.value);
   }
 
+  function renderGoogleAdvActionSubrow(m) {
+    if (currentSource() !== "google") return "";
+    return '<div class="cd-em-row__google">' +
+      '<span class="cd-em-row__field-lbl">Conversion action ' + infoTip("Server upload: <code>customers/…/conversionActions/…</code>") + '</span>' +
+      '<input type="text" class="cd-em-custom cd-em-action-id" data-em="conversionActionId" placeholder="customers/…/conversionActions/…" value="' + escapeHtml(m.conversionActionId || "") + '" />' +
+    '</div>';
+  }
+
   function renderEventMapRow(m) {
     var src = currentSource();
     var destList = DEST_EVENTS[src] || [];
@@ -656,13 +666,14 @@
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>' +
         '</button>' +
       '</div>' +
+      renderGoogleAdvActionSubrow(m) +
       (showValue ? renderValueSubrow(mode, amount, currency, staticDisabled) : "") +
     '</div>';
   }
 
   function renderValueSubrow(mode, amount, currency, staticDisabled) {
     return '<div class="cd-em-row__value">' +
-      '<span class="cd-em-row__value-lbl">value:</span>' +
+      '<span class="cd-em-row__value-lbl">value ' + infoTip("Dynamic: from postback <code>value</code> + <code>currency</code>. Static: fixed amount.") + ':</span>' +
       '<div class="cd-em-mode" data-mode="' + mode + '">' +
         '<button type="button" class="cd-em-mode__btn" data-mode-set="dynamic"' + (mode === "dynamic" ? ' aria-pressed="true"' : '') + '>Dynamic</button>' +
         '<button type="button" class="cd-em-mode__btn" data-mode-set="static"' + (mode === "static" ? ' aria-pressed="true"' : '') + '>Static</button>' +
@@ -673,7 +684,6 @@
           return '<option value="' + c + '"' + (c === currency ? " selected" : "") + '>' + c + '</option>';
         }).join("") +
       '</select>' +
-      (staticDisabled ? '<span class="cd-em-row__hint">Uses <code>value</code> + <code>currency</code> from the postback at fire time.</span>' : '') +
     '</div>';
   }
 
@@ -713,6 +723,11 @@
           row.querySelectorAll("select").forEach(function (s) { s.value = ""; });
           var sub = row.querySelector(".cd-em-row__value");
           if (sub) sub.remove();
+          var gsub = row.querySelector(".cd-em-row__google");
+          if (gsub) {
+            var act = gsub.querySelector('[data-em="conversionActionId"]');
+            if (act) act.value = "";
+          }
         }
         return;
       }
@@ -729,15 +744,6 @@
         var dyn = mode === "dynamic";
         if (amt) { amt.disabled = dyn; amt.placeholder = dyn ? "from postback" : "65.00"; }
         if (cur) cur.disabled = dyn;
-        var hint = row.querySelector(".cd-em-row__hint");
-        if (dyn && !hint) {
-          var span = document.createElement("span");
-          span.className = "cd-em-row__hint";
-          span.innerHTML = "Uses <code>value</code> + <code>currency</code> from the postback at fire time.";
-          row.querySelector(".cd-em-row__value").appendChild(span);
-        } else if (!dyn && hint) {
-          hint.remove();
-        }
       }
     });
     // Re-render row when destination event changes (might add/remove value subrow)
@@ -763,7 +769,10 @@
         var resolvedTo = readMappedSelectValue(t, row.querySelector('[data-em="toCustom"]'));
         var should = isValueEvent(resolvedTo, currentSource());
         if (should && !sub) {
-          row.insertAdjacentHTML("beforeend", renderValueSubrow("dynamic", "", "USD", true));
+          var valueHtml = renderValueSubrow("dynamic", "", "USD", true);
+          var googleSub = row.querySelector(".cd-em-row__google");
+          if (googleSub) googleSub.insertAdjacentHTML("afterend", valueHtml);
+          else row.insertAdjacentHTML("beforeend", valueHtml);
         } else if (!should && sub) {
           sub.remove();
         }
@@ -780,6 +789,10 @@
       var to = readMappedSelectValue(r.querySelector('[data-em="to"]'), r.querySelector('[data-em="toCustom"]'));
       if (!from || !to) return;
       var entry = { from: from, to: to };
+      var actionIn = r.querySelector('[data-em="conversionActionId"]');
+      if (actionIn && (actionIn.value || "").trim()) {
+        entry.conversionActionId = actionIn.value.trim();
+      }
       var sub = r.querySelector(".cd-em-row__value");
       if (sub && isValueEvent(to)) {
         var mode = sub.querySelector(".cd-em-mode").getAttribute("data-mode") || "dynamic";
@@ -856,7 +869,7 @@
     if (!r) return;
     editIdIn.value = id;
     formTitle.textContent = "Edit destination";
-    formHint.textContent = "Update name, identifiers, or rotate credentials. Leave token blank to keep the existing vault reference.";
+    formHint.textContent = "Update credentials and event mappings.";
     fillFormForRow(r);
     if (document.getElementById("cd-test-panel")) document.getElementById("cd-test-panel").hidden = true;
     formDlg.showModal();
