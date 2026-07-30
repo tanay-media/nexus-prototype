@@ -488,31 +488,44 @@
     return (selectEl.value || "").trim();
   }
 
+  function renderLanderEventsHeader(src) {
+    var destLabel = ({ facebook: "Meta event", google: "Google conversion", taboola: "Taboola event" })[src] || "Platform event";
+    if (src === "google") {
+      return '<div class="cd-lander-grid-head cd-lander-grid-head--google">' +
+        '<span>Event</span><span>' + escapeHtml(destLabel) + '</span><span>On</span>' +
+        '<span class="cd-lander-grid-head__sub cd-lander-grid-head__sub--label">Client label ' + infoTip("gtag <code>send_to: AW-…/label</code>") + '</span>' +
+        '<span class="cd-lander-grid-head__sub cd-lander-grid-head__sub--action">Server action ' + infoTip("<code>customers/…/conversionActions/…</code>") + '</span>' +
+      '</div>';
+    }
+    return '<div class="cd-lander-grid-head">' +
+      '<span>Event</span><span>' + escapeHtml(destLabel) + '</span><span>On</span>' +
+    '</div>';
+  }
+
   function renderLanderEventRow(evKey, evLabel, evHint, data) {
     var src = currentSource();
     var opts = LANDER_DEST_OPTIONS[src] || [];
     var built = buildPresetSelectOptions(opts, data.eventName || "", false);
     var isGoogle = src === "google";
+    var off = !data.enabled;
     var googleSub = isGoogle
       ? '<div class="cd-lander-card__sub">' +
-          '<div class="cd-lander-card__field">' +
-            '<span class="cd-lander-card__lbl">Conversion label ' + infoTip("Client tag: <code>gtag('event','conversion',&#123; send_to:'AW-…/label' &#125;)</code>") + '</span>' +
-            '<input type="text" class="cd-em-custom" data-lander="conversionLabel" placeholder="AbC-D_efG-h" value="' + escapeHtml(data.conversionLabel || "") + '" />' +
+          '<div class="cd-lander-card__field cd-lander-card__field--span">' +
+            '<input type="text" class="cd-em-custom" data-lander="conversionLabel" placeholder="Conversion label · e.g. AbC-D_efG-h" value="' + escapeHtml(data.conversionLabel || "") + '" />' +
           '</div>' +
-          '<div class="cd-lander-card__field">' +
-            '<span class="cd-lander-card__lbl">Conversion action ' + infoTip("Server upload resource: <code>customers/…/conversionActions/…</code>") + '</span>' +
-            '<input type="text" class="cd-em-custom" data-lander="conversionActionId" placeholder="customers/…/conversionActions/…" value="' + escapeHtml(data.conversionActionId || "") + '" />' +
+          '<div class="cd-lander-card__field cd-lander-card__field--span">' +
+            '<input type="text" class="cd-em-custom" data-lander="conversionActionId" placeholder="Conversion action · customers/…/conversionActions/…" value="' + escapeHtml(data.conversionActionId || "") + '" />' +
           '</div>' +
         '</div>'
       : "";
-    return '<div class="cd-lander-card' + (isGoogle ? " cd-lander-card--google" : "") + '" data-lander-key="' + escapeHtml(evKey) + '">' +
+    return '<div class="cd-lander-card' + (isGoogle ? " cd-lander-card--google" : "") + (off ? " is-off" : "") + '" data-lander-key="' + escapeHtml(evKey) + '">' +
       '<div class="cd-lander-card__head">' +
-        '<div class="cd-lander-card__event"><strong>' + escapeHtml(evLabel) + '</strong><small>' + escapeHtml(evHint) + '</small></div>' +
+        '<div class="cd-lander-card__event" title="' + escapeHtml(evHint) + '"><span class="cd-event-pill">' + escapeHtml(evLabel) + '</span></div>' +
         '<div class="cd-lander-card__dest-wrap">' +
           '<select class="cd-em-select cd-lander-row__dest" data-lander="eventName">' + built.optionsHtml + '</select>' +
           '<input type="text" class="cd-em-custom cd-lander-row__custom" data-lander="eventNameCustom" placeholder="Custom event name" value="' + escapeHtml(built.customValue) + '"' + (built.isCustom ? "" : " hidden") + ' />' +
         '</div>' +
-        '<label class="cd-lander-toggle"><input type="checkbox" data-lander="enabled"' + (data.enabled ? " checked" : "") + ' /><span class="cd-lander-toggle__ui"></span></label>' +
+        '<label class="cd-lander-toggle" title="' + (data.enabled ? "Enabled" : "Disabled") + '"><input type="checkbox" data-lander="enabled"' + (data.enabled ? " checked" : "") + ' /><span class="cd-lander-toggle__ui"></span></label>' +
       '</div>' +
       googleSub +
     '</div>';
@@ -523,10 +536,11 @@
     var src = currentSource();
     var defaults = defaultLanderEventMap(src) || {};
     var m = map || defaults;
-    landerEventsEl.innerHTML = LANDER_EVENT_KEYS.map(function (ev) {
+    var cards = LANDER_EVENT_KEYS.map(function (ev) {
       var d = m[ev.key] || defaults[ev.key] || { enabled: false, eventName: "" };
       return renderLanderEventRow(ev.key, ev.label, ev.hint, d);
     }).join("");
+    landerEventsEl.innerHTML = renderLanderEventsHeader(src) + cards;
     landerEventsEl.querySelectorAll(".cd-lander-card").forEach(function (row) {
       syncCustomFieldVisibility(
         row.querySelector('[data-lander="eventName"]'),
@@ -566,6 +580,11 @@
           var custom = row && row.querySelector('[data-lander="eventNameCustom"]');
           if (custom) custom.focus();
         }
+        return;
+      }
+      if (t.matches && t.matches('[data-lander="enabled"]')) {
+        var card = t.closest(".cd-lander-card");
+        if (card) card.classList.toggle("is-off", !t.checked);
       }
     });
   }
@@ -858,7 +877,7 @@
   function openAdd(src) {
     editIdIn.value = "";
     formTitle.textContent = "Add integration";
-    formHint.textContent = "Connect this account so landers in the workspace can use it.";
+    if (formHint) formHint.textContent = "";
     fillFormForRow(null);
     if (src) setSourceInDialog(src);
     if (document.getElementById("cd-test-panel")) document.getElementById("cd-test-panel").hidden = true;
@@ -869,7 +888,7 @@
     if (!r) return;
     editIdIn.value = id;
     formTitle.textContent = "Edit destination";
-    formHint.textContent = "Update credentials and event mappings.";
+    if (formHint) formHint.textContent = "";
     fillFormForRow(r);
     if (document.getElementById("cd-test-panel")) document.getElementById("cd-test-panel").hidden = true;
     formDlg.showModal();

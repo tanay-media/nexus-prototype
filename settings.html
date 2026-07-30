@@ -287,7 +287,6 @@
         <div class="dskp__head-text">
           <div class="dskp__eyebrow" id="cd-eyebrow">Integration</div>
           <h2 class="dskp__title" id="cd-form-title">Add destination</h2>
-          <p class="dskp__sub" id="cd-form-hint">Workspace integration credentials and event mappings.</p>
         </div>
         <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -343,7 +342,9 @@
           <input class="dskp__input" type="text" id="cd-name" required placeholder="e.g. Meta — ACME Growth" />
         </div>
 
-        <!-- Facebook fields -->
+        <div class="cd-section cd-section--creds" data-cd-creds-section>
+          <div class="cd-section__title">Connection</div>
+          <!-- Facebook fields -->
         <div data-source-fields="facebook">
           <div class="dskp__row dskp__row--2">
             <div class="dskp__field">
@@ -435,15 +436,15 @@
           </div>
         </div>
 
-        <!-- Lander-level events (buy sources only) -->
-        <div class="dskp__field" data-lander-events-section>
-          <div class="dskp__label">Lander-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Visit, impression, and click on your lander. Nexus fires browser tag + server API. One toggle disables both.</span></span></div>
+        </div>
+
+        <div class="cd-section" data-lander-events-section>
+          <div class="dskp__label cd-section__title">Lander-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Visit, impression, and click on your lander. One toggle disables client tag + server API.</span></span></div>
           <div class="cd-lander-events" id="cd-lander-events"></div>
         </div>
 
-        <!-- Advertiser-level events (postback) -->
-        <div class="dskp__field" data-adv-events-section>
-          <div class="dskp__label">Advertiser-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Fires when MAX sends a postback (<code>conversion_type</code>).</span></span></div>
+        <div class="cd-section" data-adv-events-section>
+          <div class="dskp__label cd-section__title">Advertiser-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Fires when MAX sends a postback (<code>conversion_type</code>).</span></span></div>
           <div class="cd-eventmap" id="cd-eventmap">
             <!-- rows injected by JS -->
           </div>
