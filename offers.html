@@ -64,10 +64,11 @@
                 <tr>
                   <th style="width:34px"></th>
                   <th>Offer</th>
-                  <th>Vertical</th>
+                  <th>Cat. 1</th>
+                  <th>Deal</th>
+                  <th class="right">Target</th>
                   <th>Status</th>
                   <th class="right">Workspaces</th>
-                  <th class="right">CPA goal</th>
                   <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
               </thead>
@@ -119,6 +120,7 @@
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <div class="field"><label for="adv-name">Advertiser name</label><input type="text" id="adv-name" required /></div>
+      <div class="field"><label for="adv-description">Description</label><textarea id="adv-description" rows="2" placeholder="Internal notes…"></textarea></div>
       <div class="field"><label for="adv-status">Status</label>
         <select id="adv-status">
           <option value="active">Active</option>
@@ -147,6 +149,7 @@
       <div class="tabs offer-detail-tabs" role="tablist" data-tabs="offer-detail">
         <button type="button" class="tab is-active" data-tab="general" role="tab" aria-selected="true">General</button>
         <button type="button" class="tab" data-tab="cta-url" role="tab" aria-selected="false">CTA URL</button>
+        <button type="button" class="tab" data-tab="buy-sources" role="tab" aria-selected="false">Buy sources</button>
         <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
       </div>
 
@@ -163,8 +166,46 @@
             <input type="text" id="offer-advertiser-new" placeholder="New advertiser name" style="display:none;margin-top:6px;" />
           </div>
           <div class="field">
-            <label for="offer-vertical">Vertical</label>
-            <select id="offer-vertical">
+            <label for="offer-status">Status</label>
+            <select id="offer-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label for="offer-description">Description</label><textarea id="offer-description" rows="2" placeholder="Internal notes…"></textarea></div>
+        <div class="field-row">
+          <div class="field">
+            <label for="offer-deal-type">Deal type</label>
+            <select id="offer-deal-type">
+              <option value="cpa">CPA</option>
+              <option value="cpc">CPC</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="offer-target-type">Target type</label>
+            <select id="offer-target-type">
+              <option value="cpa">CPA</option>
+              <option value="roas">ROAS</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="offer-target-value">Target value</label>
+            <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85" />
+          </div>
+          <div class="field" style="max-width:90px;">
+            <label for="offer-target-currency">Currency</label>
+            <select id="offer-target-currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="offer-category-l1">Category level 1</label>
+            <select id="offer-category-l1">
               <option value="">— Select —</option>
               <option value="Finance">Finance</option>
               <option value="Home & Garden">Home &amp; Garden</option>
@@ -181,25 +222,39 @@
               <option value="Others">Others</option>
             </select>
           </div>
+          <div class="field">
+            <label for="offer-category-l2">Category level 2</label>
+            <select id="offer-category-l2">
+              <option value="">— Select —</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="offer-countries">Countries</label>
+          <select id="offer-countries" multiple size="4" class="offer-countries-select">
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="GB">United Kingdom</option>
+            <option value="AU">Australia</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="IN">India</option>
+          </select>
         </div>
         <div class="field-row">
           <div class="field">
-            <label for="offer-status">Status</label>
-            <select id="offer-status">
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+            <label for="offer-max-campaign-id">MAX campaign ID</label>
+            <input type="text" id="offer-max-campaign-id" placeholder="e.g. 88421" />
           </div>
           <div class="field">
-            <label for="offer-cpa-target">CPA goal</label>
-            <input type="number" id="offer-cpa-target" min="0" step="0.01" placeholder="e.g. 85" />
+            <label for="offer-max-campaign-status">MAX campaign status</label>
+            <input type="text" id="offer-max-campaign-status" readonly class="input--readonly" placeholder="Synced from MAX" />
           </div>
-          <div class="field" style="max-width:90px;">
-            <label for="offer-cpa-currency">Currency</label>
-            <select id="offer-cpa-currency">
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
+          <div class="field">
+            <label for="offer-tracking-provider">Tracking provider</label>
+            <select id="offer-tracking-provider">
+              <option value="max">MAX</option>
+              <option value="other">Other</option>
             </select>
           </div>
         </div>
@@ -224,6 +279,15 @@
           <p class="settings-section__hint muted">Auto-generated from base URL + params above. <code>tpid</code> resolves based on <code>tps</code> value.</p>
           <textarea id="offer-enriched-url" rows="3" readonly class="input offer-url-textarea offer-url-textarea--readonly"></textarea>
         </div>
+      </section>
+
+      <section class="offer-detail-pane" data-tab-panel="buy-sources" hidden>
+        <p class="settings-section__hint muted">Limit which buy sources can run with this offer. Empty = all allowed.</p>
+        <ul class="offer-ws-list" id="offer-buy-sources-list">
+          <li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="fb" /><span>Meta (Facebook)</span></label></li>
+          <li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="google" /><span>Google Ads</span></label></li>
+          <li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="taboola" /><span>Taboola</span></label></li>
+        </ul>
       </section>
 
       <!-- Workspaces -->
@@ -254,23 +318,45 @@
     ];
 
     var advertisers = [
-      { id: "adv-hb", name: "Homebuddy",        status: "active" },
-      { id: "adv-bv", name: "Beenverified",     status: "active" },
-      { id: "adv-sf", name: "Smart Financials", status: "active" }
+      { id: "adv-hb", name: "Homebuddy",        status: "active", description: "Home improvement lead gen." },
+      { id: "adv-bv", name: "Beenverified",     status: "active", description: "People search & public records." },
+      { id: "adv-sf", name: "Smart Financials", status: "active", description: "" }
     ];
 
+    var CATEGORY_LEVEL_2 = [
+      "Walk-in Showers", "Walk-in Tubs", "Roofing", "Windows & Doors", "Solar", "Home Security",
+      "VIN Search", "Obituary Search", "People Connect", "Auto Insurance", "Debt Relief",
+      "Personal Loans", "Medicare", "Final Expense"
+    ];
+
+    function catL1(o) { return o.categoryLevel1 || o.vertical || ""; }
+    function targetOf(o) { return o.targetValue || o.cpaGoal || {}; }
+
+    var offers = [
+      { id: "hb-wis",  advertiserId: "adv-hb", name: "Walk-in showers",  categoryLevel1: "Home & Garden", categoryLevel2: "Walk-in Showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], maxCampaignId: "MAX-88421", maxCampaignStatus: "active", trackingProvider: "max", buySources: ["fb", "google"], status: "active", workspaceIds: ["acme-growth", "acme-brand"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
+      { id: "hb-wit",  advertiserId: "adv-hb", name: "Walk-in Tubs",     categoryLevel1: "Home & Garden", categoryLevel2: "Walk-in Tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], maxCampaignId: "MAX-88422", maxCampaignStatus: "active", trackingProvider: "max", buySources: ["fb"], status: "active", workspaceIds: ["acme-growth"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
+      { id: "hb-roof", advertiserId: "adv-hb", name: "Roofing",          categoryLevel1: "Home & Garden", categoryLevel2: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", buySources: [], status: "active", workspaceIds: ["acme-growth", "acme-brand", "fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
+      { id: "bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       categoryLevel1: "Autos", categoryLevel2: "VIN Search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", buySources: ["google", "taboola"], status: "active", workspaceIds: ["acme-growth", "fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
+      { id: "bv-obit", advertiserId: "adv-bv", name: "Obituary search",  categoryLevel1: "Others", categoryLevel2: "Obituary Search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", workspaceIds: ["acme-brand"], ctaUrl: "" },
+      { id: "sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   categoryLevel1: "Finance", categoryLevel2: "Auto Insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], maxCampaignId: "MAX-90102", maxCampaignStatus: "paused", trackingProvider: "max", buySources: ["fb", "google", "taboola"], status: "active", workspaceIds: ["fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
+    ];
     function advById(id) { return advertisers.find(function (a) { return a.id === id; }); }
     function advName(id) { var a = advById(id); return a ? a.name : ""; }
 
-    var offers = [
-      { id: "hb-wis",  advertiserId: "adv-hb", name: "Walk-in showers",  vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand"], cpaGoal: { targetCpa: 85, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
-      { id: "hb-wit",  advertiserId: "adv-hb", name: "Walk-in Tubs",     vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth"], cpaGoal: { targetCpa: 92, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
-      { id: "hb-roof", advertiserId: "adv-hb", name: "Roofing",          vertical: "Home & Garden", status: "active",   workspaceIds: ["acme-growth", "acme-brand", "fin-main"], cpaGoal: { targetCpa: 78, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
-      { id: "bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       vertical: "Autos",         status: "active",   workspaceIds: ["acme-growth", "fin-main"], cpaGoal: { targetCpa: 12, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
-      { id: "bv-obit", advertiserId: "adv-bv", name: "Obituary search",  vertical: "Others",        status: "inactive", workspaceIds: ["acme-brand"], cpaGoal: { targetCpa: 8, currency: "USD" }, ctaUrl: "" },
-      { id: "sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   vertical: "Finance",       status: "active",   workspaceIds: ["fin-main"], cpaGoal: { targetCpa: 45, currency: "USD" }, ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
-    ];
+    function populateCategoryL2(selected) {
+      var sel = document.getElementById("offer-category-l2");
+      if (!sel) return;
+      sel.innerHTML = '<option value="">— Select —</option>' +
+        CATEGORY_LEVEL_2.map(function (c) {
+          return '<option value="' + escapeHtml(c) + '"' + (c === selected ? " selected" : "") + '>' + escapeHtml(c) + '</option>';
+        }).join("");
+    }
 
+    function mockMaxStatus(campaignId) {
+      if (!campaignId) return "";
+      var n = parseInt(String(campaignId).replace(/\D/g, ""), 10) || 0;
+      return n % 3 === 0 ? "paused" : "active";
+    }
     var expandedAdvertisers = {};
     var activeOfferId = null;
     var tbody = document.getElementById("offers-body");
@@ -279,9 +365,16 @@
     function escapeHtml(s) {
       return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
     }
-    function fmtCpa(goal) {
-      if (!goal || goal.targetCpa == null || goal.targetCpa === 0) return "—";
-      return "$" + Number(goal.targetCpa).toFixed(goal.targetCpa % 1 ? 2 : 0);
+    function fmtDeal(o) {
+      return (o.dealType || "cpa").toUpperCase();
+    }
+    function fmtTarget(o) {
+      var tv = targetOf(o);
+      var amt = tv.amount != null ? tv.amount : tv.targetCpa;
+      if (amt == null || amt === 0) return "—";
+      var prefix = (o.targetType || "cpa") === "roas" ? "" : "$";
+      var suffix = (o.targetType || "cpa") === "roas" ? " ROAS" : "";
+      return prefix + Number(amt).toFixed(amt % 1 ? 2 : 0) + suffix;
     }
     function wsNames(ids) {
       if (!ids || !ids.length) return '<span class="muted">—</span>';
@@ -360,10 +453,11 @@
           orow.innerHTML =
             '<td></td>' +
             '<td><strong>' + escapeHtml(o.name) + '</strong></td>' +
-            '<td class="muted">' + escapeHtml(o.vertical) + '</td>' +
+            '<td class="muted">' + escapeHtml(catL1(o)) + '</td>' +
+            '<td class="muted">' + fmtDeal(o) + '</td>' +
+            '<td class="right num">' + fmtTarget(o) + '</td>' +
             '<td>' + statusBadge(o.status) + '</td>' +
             '<td class="muted" style="font-size:12.5px;">' + wsNames(o.workspaceIds) + '</td>' +
-            '<td class="right num">' + fmtCpa(o.cpaGoal) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-offer-settings" data-offer-id="' + escapeHtml(o.id) + '" title="Offer settings">' + ICON.settings + '</button>' +
               '<button type="button" class="icon-btn js-offer-clone" data-offer-id="' + escapeHtml(o.id) + '" title="Clone offer">' + ICON.clone + '</button>' +
@@ -496,6 +590,28 @@
       previewEl.value = buildEnrichedUrl(base);
     }
 
+    function renderOfferBuySources(offer) {
+      var picked = offer.buySources || [];
+      document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]").forEach(function (cb) {
+        cb.checked = picked.indexOf(cb.value) !== -1;
+      });
+    }
+
+    function setCountriesSelect(countries) {
+      var sel = document.getElementById("offer-countries");
+      if (!sel) return;
+      var picked = countries || [];
+      Array.prototype.forEach.call(sel.options, function (opt) {
+        opt.selected = picked.indexOf(opt.value) !== -1;
+      });
+    }
+
+    function getCountriesSelect() {
+      var sel = document.getElementById("offer-countries");
+      if (!sel) return [];
+      return Array.prototype.filter.call(sel.selectedOptions, function (o) { return o.value; }).map(function (o) { return o.value; });
+    }
+
     function renderOfferWorkspaces(offer) {
       var list = document.getElementById("offer-workspaces-list");
       if (!list) return;
@@ -541,18 +657,29 @@
       if (!o || !detailDlg) return;
       activeOfferId = id;
       document.getElementById("offer-detail-title").textContent = o.name || "New offer";
-      document.getElementById("offer-detail-sub").textContent = (advName(o.advertiserId) || "New advertiser") + (o.vertical ? " · " + o.vertical : "");
+      document.getElementById("offer-detail-sub").textContent = (advName(o.advertiserId) || "New advertiser") + (catL1(o) ? " · " + catL1(o) : "");
       document.getElementById("offer-name").value = o.name;
+      document.getElementById("offer-description").value = o.description || "";
       renderAdvertiserDropdown(o.advertiserId);
-      document.getElementById("offer-vertical").value = o.vertical || "";
+      populateCategoryL2(o.categoryLevel2 || "");
+      document.getElementById("offer-category-l1").value = catL1(o);
+      document.getElementById("offer-category-l2").value = o.categoryLevel2 || "";
       document.getElementById("offer-status").value = o.status || "active";
-      document.getElementById("offer-cpa-target").value = o.cpaGoal && o.cpaGoal.targetCpa ? o.cpaGoal.targetCpa : "";
-      document.getElementById("offer-cpa-currency").value = (o.cpaGoal && o.cpaGoal.currency) || "USD";
+      document.getElementById("offer-deal-type").value = o.dealType || "cpa";
+      document.getElementById("offer-target-type").value = o.targetType || "cpa";
+      var tv = targetOf(o);
+      document.getElementById("offer-target-value").value = tv.amount != null ? tv.amount : (tv.targetCpa || "");
+      document.getElementById("offer-target-currency").value = tv.currency || "USD";
+      setCountriesSelect(o.countries);
+      document.getElementById("offer-max-campaign-id").value = o.maxCampaignId || "";
+      document.getElementById("offer-max-campaign-status").value = o.maxCampaignStatus || mockMaxStatus(o.maxCampaignId);
+      document.getElementById("offer-tracking-provider").value = o.trackingProvider || "max";
       document.getElementById("offer-cta-url").value = o.ctaUrl || "";
       if (o.params) offerParams = o.params.map(function (p) { return { key: p.key, value: p.value }; });
       else offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
       renderEditableParams();
       renderOfferWorkspaces(o);
+      renderOfferBuySources(o);
       refreshEnrichedPreview();
       var firstTab = detailDlg.querySelector('.tab[data-tab="general"]');
       if (firstTab) firstTab.click();
@@ -563,19 +690,34 @@
       var o = offerById(activeOfferId);
       if (!o) return;
       o.name = document.getElementById("offer-name").value.trim() || o.name;
+      o.description = document.getElementById("offer-description").value.trim();
       o.advertiserId = getAdvertiserValue() || o.advertiserId;
-      o.vertical = document.getElementById("offer-vertical").value || o.vertical;
+      o.categoryLevel1 = document.getElementById("offer-category-l1").value;
+      o.categoryLevel2 = document.getElementById("offer-category-l2").value;
+      o.vertical = o.categoryLevel1;
       o.status = document.getElementById("offer-status").value;
-      o.cpaGoal = {
-        targetCpa: parseFloat(document.getElementById("offer-cpa-target").value) || 0,
-        currency: document.getElementById("offer-cpa-currency").value
+      o.dealType = document.getElementById("offer-deal-type").value;
+      o.targetType = document.getElementById("offer-target-type").value;
+      o.targetValue = {
+        amount: parseFloat(document.getElementById("offer-target-value").value) || 0,
+        currency: document.getElementById("offer-target-currency").value
       };
+      o.cpaGoal = { targetCpa: o.targetValue.amount, currency: o.targetValue.currency };
+      o.countries = getCountriesSelect();
+      o.maxCampaignId = document.getElementById("offer-max-campaign-id").value.trim();
+      o.maxCampaignStatus = mockMaxStatus(o.maxCampaignId);
+      document.getElementById("offer-max-campaign-status").value = o.maxCampaignStatus;
+      o.trackingProvider = document.getElementById("offer-tracking-provider").value;
       o.ctaUrl = document.getElementById("offer-cta-url").value.trim();
       readParamsFromDom();
       o.params = offerParams.map(function (p) { return { key: p.key, value: p.value }; });
       o.workspaceIds = [];
       document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
         o.workspaceIds.push(cb.value);
+      });
+      o.buySources = [];
+      document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]:checked").forEach(function (cb) {
+        o.buySources.push(cb.value);
       });
       renderAdvertiserFilter();
       render();
@@ -585,16 +727,9 @@
       var src = offerById(id);
       if (!src) return;
       var newId = "offer-" + Date.now();
-      var copy = {
-        id: newId,
-        advertiserId: src.advertiserId,
-        name: src.name + " (copy)",
-        vertical: src.vertical,
-        status: src.status,
-        workspaceIds: src.workspaceIds.slice(),
-        cpaGoal: { targetCpa: src.cpaGoal.targetCpa, currency: src.cpaGoal.currency, conversionType: src.cpaGoal.conversionType },
-        ctaUrl: src.ctaUrl
-      };
+      var copy = JSON.parse(JSON.stringify(src));
+      copy.id = newId;
+      copy.name = src.name + " (copy)";
       offers.push(copy);
       renderAdvertiserFilter();
       render();
@@ -698,12 +833,21 @@
     document.getElementById("offer-add-btn").addEventListener("click", function () {
       var id = "offer-" + Date.now();
       offers.push({
-        id: id, advertiserId: "", name: "", vertical: "", status: "active",
-        workspaceIds: [], cpaGoal: { targetCpa: 0, currency: "USD" },
-        ctaUrl: ""
+        id: id, advertiserId: "", name: "", categoryLevel1: "", dealType: "cpa", targetType: "cpa",
+        targetValue: { amount: 0, currency: "USD" }, countries: [], buySources: [],
+        status: "active", workspaceIds: [], trackingProvider: "max", ctaUrl: ""
       });
       openOfferDetail(id);
     });
+
+    populateCategoryL2("");
+    var maxIdInput = document.getElementById("offer-max-campaign-id");
+    if (maxIdInput) {
+      maxIdInput.addEventListener("input", function () {
+        var st = document.getElementById("offer-max-campaign-status");
+        if (st) st.value = mockMaxStatus(maxIdInput.value.trim());
+      });
+    }
 
     var urlOffer = new URLSearchParams(window.location.search).get("offer");
     renderAdvertiserFilter();
@@ -773,6 +917,7 @@
       activeAdvId = id;
       document.getElementById("adv-detail-title").textContent = a.name || "New advertiser";
       document.getElementById("adv-name").value = a.name;
+      document.getElementById("adv-description").value = a.description || "";
       document.getElementById("adv-status").value = a.status || "active";
       advDlg.showModal();
     }
@@ -781,6 +926,7 @@
       var a = advById(activeAdvId);
       if (!a) return;
       a.name = document.getElementById("adv-name").value.trim() || a.name;
+      a.description = document.getElementById("adv-description").value.trim();
       a.status = document.getElementById("adv-status").value;
       renderAdvTable();
       renderAdvertiserFilter();
@@ -793,7 +939,7 @@
 
     document.getElementById("adv-add-btn").addEventListener("click", function () {
       var id = "adv-" + Date.now();
-      advertisers.push({ id: id, name: "", status: "active" });
+      advertisers.push({ id: id, name: "", description: "", status: "active" });
       openAdvDetail(id);
     });
 
