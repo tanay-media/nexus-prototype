@@ -148,6 +148,7 @@
 
       <div class="tabs offer-detail-tabs" role="tablist" data-tabs="offer-detail">
         <button type="button" class="tab is-active" data-tab="general" role="tab" aria-selected="true">General</button>
+        <button type="button" class="tab" data-tab="deal" role="tab" aria-selected="false">Deal</button>
         <button type="button" class="tab" data-tab="cta-url" role="tab" aria-selected="false">CTA URL</button>
         <button type="button" class="tab" data-tab="buy-sources" role="tab" aria-selected="false">Buy sources</button>
         <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
@@ -170,35 +171,6 @@
             <select id="offer-status">
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
-            </select>
-          </div>
-        </div>
-        <div class="field"><label for="offer-description">Description</label><textarea id="offer-description" rows="2" placeholder="Internal notes…"></textarea></div>
-        <div class="field-row">
-          <div class="field">
-            <label for="offer-deal-type">Deal type</label>
-            <select id="offer-deal-type">
-              <option value="cpa">CPA</option>
-              <option value="cpc">CPC</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="offer-target-type">Target type</label>
-            <select id="offer-target-type">
-              <option value="cpa">CPA</option>
-              <option value="roas">ROAS</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="offer-target-value">Target value</label>
-            <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85" />
-          </div>
-          <div class="field" style="max-width:90px;">
-            <label for="offer-target-currency">Currency</label>
-            <select id="offer-target-currency">
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
             </select>
           </div>
         </div>
@@ -229,26 +201,62 @@
             </select>
           </div>
         </div>
-        <div class="field">
-          <label for="offer-countries">Countries</label>
-          <select id="offer-countries" multiple size="4" class="offer-countries-select">
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-            <option value="GB">United Kingdom</option>
-            <option value="AU">Australia</option>
-            <option value="DE">Germany</option>
-            <option value="FR">France</option>
-            <option value="IN">India</option>
-          </select>
-        </div>
+        <div class="field"><label for="offer-description">Description</label><textarea id="offer-description" rows="2" placeholder="Internal notes…"></textarea></div>
+      </section>
+
+      <!-- Deal -->
+      <section class="offer-detail-pane" data-tab-panel="deal" hidden>
         <div class="field-row">
           <div class="field">
-            <label for="offer-max-campaign-id">MAX campaign ID</label>
-            <input type="text" id="offer-max-campaign-id" placeholder="e.g. 88421" />
+            <label for="offer-deal-type">Deal type</label>
+            <select id="offer-deal-type">
+              <option value="cpa">CPA</option>
+              <option value="cpc">CPC</option>
+            </select>
           </div>
           <div class="field">
-            <label for="offer-max-campaign-status">MAX campaign status</label>
-            <input type="text" id="offer-max-campaign-status" readonly class="input--readonly" placeholder="Synced from MAX" />
+            <label for="offer-target-type">Target type</label>
+            <select id="offer-target-type">
+              <option value="cpa">CPA</option>
+              <option value="roas">ROAS</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="offer-target-value">Target</label>
+          <div class="offer-amount-group">
+            <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85.00" />
+            <select id="offer-target-currency" aria-label="Currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+          <p class="offer-field-hint" id="offer-target-hint">Target CPA per conversion.</p>
+        </div>
+        <div class="field">
+          <label>Countries</label>
+          <div class="offer-country-chips" id="offer-country-chips">
+            <label class="offer-chip"><input type="checkbox" value="US" /><span>US</span></label>
+            <label class="offer-chip"><input type="checkbox" value="CA" /><span>CA</span></label>
+            <label class="offer-chip"><input type="checkbox" value="GB" /><span>GB</span></label>
+            <label class="offer-chip"><input type="checkbox" value="AU" /><span>AU</span></label>
+            <label class="offer-chip"><input type="checkbox" value="DE" /><span>DE</span></label>
+            <label class="offer-chip"><input type="checkbox" value="FR" /><span>FR</span></label>
+            <label class="offer-chip"><input type="checkbox" value="IN" /><span>IN</span></label>
+          </div>
+        </div>
+        <div class="settings-section">
+          <p class="settings-section__title">MAX tracking</p>
+          <div class="field-row">
+            <div class="field">
+              <label for="offer-max-campaign-id">Campaign ID</label>
+              <input type="text" id="offer-max-campaign-id" placeholder="88421" />
+            </div>
+            <div class="field">
+              <label for="offer-max-campaign-status">Status</label>
+              <input type="text" id="offer-max-campaign-status" readonly class="input--readonly" placeholder="Synced from MAX" />
+            </div>
           </div>
           <div class="field">
             <label for="offer-tracking-provider">Tracking provider</label>
@@ -282,7 +290,8 @@
       </section>
 
       <section class="offer-detail-pane" data-tab-panel="buy-sources" hidden>
-        <p class="settings-section__hint muted">Limit which buy sources can run with this offer. Empty = all allowed.</p>
+        <p class="settings-section__hint muted">Only checked platforms can use this offer. Leave all unchecked to allow any buy source.</p>
+        <p class="offer-pane-summary" id="offer-buy-sources-summary"></p>
         <ul class="offer-ws-list" id="offer-buy-sources-list">
           <li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="fb" /><span>Meta (Facebook)</span></label></li>
           <li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="google" /><span>Google Ads</span></label></li>
@@ -292,7 +301,8 @@
 
       <!-- Workspaces -->
       <section class="offer-detail-pane" data-tab-panel="workspaces" hidden>
-        <p class="settings-section__hint muted">Map this offer to team workspaces. Landers must pick an offer mapped to their workspace.</p>
+        <p class="settings-section__hint muted">Workspaces that can tag this offer on lander CTAs.</p>
+        <p class="offer-pane-summary" id="offer-workspaces-summary"></p>
         <ul class="offer-ws-list" id="offer-workspaces-list"></ul>
       </section>
 
@@ -595,21 +605,54 @@
       document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]").forEach(function (cb) {
         cb.checked = picked.indexOf(cb.value) !== -1;
       });
+      updateBuySourcesSummary();
     }
 
     function setCountriesSelect(countries) {
-      var sel = document.getElementById("offer-countries");
-      if (!sel) return;
       var picked = countries || [];
-      Array.prototype.forEach.call(sel.options, function (opt) {
-        opt.selected = picked.indexOf(opt.value) !== -1;
+      document.querySelectorAll("#offer-country-chips input[type=checkbox]").forEach(function (cb) {
+        cb.checked = picked.indexOf(cb.value) !== -1;
+        cb.closest(".offer-chip").classList.toggle("is-on", cb.checked);
       });
     }
 
     function getCountriesSelect() {
-      var sel = document.getElementById("offer-countries");
-      if (!sel) return [];
-      return Array.prototype.filter.call(sel.selectedOptions, function (o) { return o.value; }).map(function (o) { return o.value; });
+      var out = [];
+      document.querySelectorAll("#offer-country-chips input[type=checkbox]:checked").forEach(function (cb) {
+        out.push(cb.value);
+      });
+      return out;
+    }
+
+    function syncTargetHint() {
+      var hint = document.getElementById("offer-target-hint");
+      var typeEl = document.getElementById("offer-target-type");
+      var curEl = document.getElementById("offer-target-currency");
+      if (!hint || !typeEl) return;
+      if (typeEl.value === "roas") {
+        hint.textContent = "Target ROAS multiplier (e.g. 2.4×).";
+        if (curEl) curEl.disabled = true;
+      } else {
+        hint.textContent = "Target CPA per conversion in " + (curEl ? curEl.value : "USD") + ".";
+        if (curEl) curEl.disabled = false;
+      }
+    }
+
+    function updateBuySourcesSummary() {
+      var el = document.getElementById("offer-buy-sources-summary");
+      if (!el) return;
+      var picked = [];
+      document.querySelectorAll("#offer-buy-sources-list input:checked").forEach(function (cb) {
+        picked.push(cb.parentElement.querySelector("span").textContent);
+      });
+      el.textContent = picked.length ? picked.length + " platform" + (picked.length === 1 ? "" : "s") + " selected" : "All platforms allowed";
+    }
+
+    function updateWorkspacesSummary() {
+      var el = document.getElementById("offer-workspaces-summary");
+      if (!el) return;
+      var n = document.querySelectorAll("#offer-workspaces-list input:checked").length;
+      el.textContent = n ? n + " workspace" + (n === 1 ? "" : "s") + " mapped" : "Not mapped to any workspace";
     }
 
     function renderOfferWorkspaces(offer) {
@@ -624,6 +667,7 @@
             '<span>' + escapeHtml(ws.name) + '</span>' +
           '</label></li>';
       }).join("");
+      updateWorkspacesSummary();
     }
 
     function renderAdvertiserDropdown(selectedId) {
@@ -674,6 +718,7 @@
       document.getElementById("offer-max-campaign-id").value = o.maxCampaignId || "";
       document.getElementById("offer-max-campaign-status").value = o.maxCampaignStatus || mockMaxStatus(o.maxCampaignId);
       document.getElementById("offer-tracking-provider").value = o.trackingProvider || "max";
+      syncTargetHint();
       document.getElementById("offer-cta-url").value = o.ctaUrl || "";
       if (o.params) offerParams = o.params.map(function (p) { return { key: p.key, value: p.value }; });
       else offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
@@ -841,6 +886,16 @@
     });
 
     populateCategoryL2("");
+    var targetTypeEl = document.getElementById("offer-target-type");
+    var targetCurEl = document.getElementById("offer-target-currency");
+    if (targetTypeEl) targetTypeEl.addEventListener("change", syncTargetHint);
+    if (targetCurEl) targetCurEl.addEventListener("change", syncTargetHint);
+    document.getElementById("offer-country-chips").addEventListener("change", function (e) {
+      var chip = e.target.closest(".offer-chip");
+      if (chip) chip.classList.toggle("is-on", e.target.checked);
+    });
+    document.getElementById("offer-buy-sources-list").addEventListener("change", updateBuySourcesSummary);
+    document.getElementById("offer-workspaces-list").addEventListener("change", updateWorkspacesSummary);
     var maxIdInput = document.getElementById("offer-max-campaign-id");
     if (maxIdInput) {
       maxIdInput.addEventListener("input", function () {

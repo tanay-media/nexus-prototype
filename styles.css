@@ -3016,7 +3016,51 @@ button.dsk-row-name:focus-visible strong {
   font-size: 13px;
 }
 .offer-ws-pick input { margin: 0; }
-.offer-countries-select { width: 100%; min-height: 88px; }
+.offer-amount-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.offer-amount-group input { flex: 1; min-width: 0; }
+.offer-amount-group select { width: 5.5rem; flex-shrink: 0; }
+.offer-field-hint {
+  margin: 0.35rem 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.offer-country-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.offer-chip {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.offer-chip input { position: absolute; opacity: 0; pointer-events: none; }
+.offer-chip span {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: #fff;
+}
+.offer-chip.is-on span,
+.offer-chip input:checked + span {
+  border-color: var(--brand, #1d61c9);
+  color: var(--brand, #1d61c9);
+  background: rgba(29, 97, 201, 0.08);
+}
+.offer-pane-summary {
+  margin: 0 0 0.65rem;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
 .input--readonly { background: #f5f6f8; color: var(--text-muted); cursor: default; }
 .modal--offer-detail { max-width: 680px; }
 .modal--offer-detail .modal__inner { max-height: min(88vh, 780px); overflow-y: auto; }
