@@ -70,7 +70,7 @@
         },
         eventMap: [
           { from: "lead", to: "Lead" },
-          { from: "purchase", to: "Purchase" }
+          { from: "purchase", to: "Purchase", value: { mode: "postback_minus_commission", commission: { type: "percent", amount: 15 } } }
         ],
         landerEventMap: defaultLanderEventMap("facebook"),
         createdAt: "2026-04-22"
@@ -90,7 +90,7 @@
         landerEventMap: defaultLanderEventMap("google"),
         eventMap: [
           { from: "lead", to: "Submit lead form", conversionActionId: "customers/2846197723/conversionActions/8841502", value: { mode: "static", amount: 40, currency: "USD" } },
-          { from: "purchase", to: "purchase_offline", conversionActionId: "customers/2846197723/conversionActions/8841503" }
+          { from: "purchase", to: "purchase_offline", conversionActionId: "customers/2846197723/conversionActions/8841503", value: { mode: "from_postback" } }
         ],
         createdAt: "2026-04-04"
       },
@@ -646,6 +646,30 @@
     return !!(hit && hit.value);
   }
 
+  function normalizeValueConfig(val) {
+    if (!val) return { mode: "from_postback" };
+    if (typeof val === "number") return { mode: "static", amount: val, currency: "USD" };
+    if (val.mode === "dynamic") return { mode: "from_postback" };
+    if (val.mode === "static") {
+      return {
+        mode: "static",
+        amount: val.amount != null ? val.amount : "",
+        currency: val.currency || "USD"
+      };
+    }
+    if (val.mode === "postback_minus_commission") {
+      var c = val.commission || {};
+      return {
+        mode: "postback_minus_commission",
+        commission: {
+          type: c.type === "flat" ? "flat" : "percent",
+          amount: c.amount != null ? c.amount : ""
+        }
+      };
+    }
+    return { mode: "from_postback" };
+  }
+
   function renderGoogleAdvActionSubrow(m) {
     if (currentSource() !== "google") return "";
     return '<div class="cd-em-row__google">' +
@@ -667,11 +691,11 @@
     destOptions += '<option value="' + CUSTOM_SELECT_VALUE + '"' + (isCustomDest ? " selected" : "") + '>Custom…</option>';
     var showValue = isValueEvent(m.to, src);
 
-    var val = m.value || {};
-    var mode = val.mode === "static" ? "static" : "dynamic";
+    var val = normalizeValueConfig(m.value);
+    var mode = val.mode;
     var amount = val.amount != null ? String(val.amount) : "";
     var currency = val.currency || "USD";
-    var staticDisabled = mode === "dynamic";
+    var commission = val.commission || { type: "percent", amount: "" };
 
     return '<div class="cd-em-row" data-dest="' + escapeHtml(m.to || "") + '">' +
       '<div class="cd-em-row__head">' +
@@ -689,24 +713,62 @@
         '</button>' +
       '</div>' +
       renderGoogleAdvActionSubrow(m) +
-      (showValue ? renderValueSubrow(mode, amount, currency, staticDisabled) : "") +
+      (showValue ? renderValueSubrow(mode, amount, currency, commission) : "") +
     '</div>';
   }
 
-  function renderValueSubrow(mode, amount, currency, staticDisabled) {
-    return '<div class="cd-em-row__value">' +
-      '<span class="cd-em-row__value-lbl">value ' + infoTip("Dynamic: from postback <code>value</code> + <code>currency</code>. Static: fixed amount.") + ':</span>' +
+  function renderValueSubrow(mode, amount, currency, commission) {
+    var isStatic = mode === "static";
+    var isNet = mode === "postback_minus_commission";
+    var commType = (commission && commission.type === "flat") ? "flat" : "percent";
+    var commAmt = commission && commission.amount != null ? String(commission.amount) : "";
+    return '<div class="cd-em-row__value" data-value-mode="' + mode + '">' +
+      '<span class="cd-em-row__value-lbl">revenue ' + infoTip("Static: fixed amount. From postback: uses <code>value</code> + <code>currency</code> on the conversion postback URL. Net of commission: postback value minus a flat fee or percent before upload.") + ':</span>' +
       '<div class="cd-em-mode" data-mode="' + mode + '">' +
-        '<button type="button" class="cd-em-mode__btn" data-mode-set="dynamic"' + (mode === "dynamic" ? ' aria-pressed="true"' : '') + '>Dynamic</button>' +
-        '<button type="button" class="cd-em-mode__btn" data-mode-set="static"' + (mode === "static" ? ' aria-pressed="true"' : '') + '>Static</button>' +
+        '<button type="button" class="cd-em-mode__btn" data-mode-set="static"' + (isStatic ? ' aria-pressed="true"' : '') + '>Static</button>' +
+        '<button type="button" class="cd-em-mode__btn" data-mode-set="from_postback"' + (mode === "from_postback" ? ' aria-pressed="true"' : '') + '>From postback</button>' +
+        '<button type="button" class="cd-em-mode__btn" data-mode-set="postback_minus_commission"' + (isNet ? ' aria-pressed="true"' : '') + '>Net of commission</button>' +
       '</div>' +
-      '<input type="text" class="cd-em-amount" data-em="amount" value="' + escapeHtml(amount) + '" placeholder="' + (staticDisabled ? "from postback" : "65.00") + '"' + (staticDisabled ? ' disabled' : '') + ' inputmode="decimal" />' +
-      '<select class="cd-em-currency" data-em="currency"' + (staticDisabled ? ' disabled' : '') + '>' +
-        ["USD","EUR","GBP","INR","CAD","AUD","JPY"].map(function (c) {
-          return '<option value="' + c + '"' + (c === currency ? " selected" : "") + '>' + c + '</option>';
-        }).join("") +
-      '</select>' +
+      '<div class="cd-em-value-static"' + (isStatic ? "" : ' hidden') + '>' +
+        '<input type="text" class="cd-em-amount" data-em="amount" value="' + escapeHtml(amount) + '" placeholder="65.00" inputmode="decimal" />' +
+        '<select class="cd-em-currency" data-em="currency">' +
+          ["USD","EUR","GBP","INR","CAD","AUD","JPY"].map(function (c) {
+            return '<option value="' + c + '"' + (c === currency ? " selected" : "") + '>' + c + '</option>';
+          }).join("") +
+        '</select>' +
+      '</div>' +
+      '<div class="cd-em-value-postback"' + (mode === "from_postback" ? "" : ' hidden') + '>' +
+        '<span class="cd-em-row__hint">Uses <code>value</code> and <code>currency</code> from the conversion postback URL.</span>' +
+      '</div>' +
+      '<div class="cd-em-value-net"' + (isNet ? "" : ' hidden') + '>' +
+        '<span class="cd-em-row__hint cd-em-row__hint--inline">minus</span>' +
+        '<select class="cd-em-commission-type" data-em="commissionType">' +
+          '<option value="flat"' + (commType === "flat" ? " selected" : "") + '>flat</option>' +
+          '<option value="percent"' + (commType === "percent" ? " selected" : "") + '>percent</option>' +
+        '</select>' +
+        '<input type="text" class="cd-em-commission-amt" data-em="commissionAmount" value="' + escapeHtml(commAmt) + '" placeholder="' + (commType === "flat" ? "5.00" : "15") + '" inputmode="decimal" />' +
+        '<span class="cd-em-row__hint cd-em-row__hint--inline" data-commission-suffix>' + (commType === "flat" ? "from postback value" : "% of postback value") + '</span>' +
+      '</div>' +
     '</div>';
+  }
+
+  function syncValueSubrowVisibility(sub) {
+    if (!sub) return;
+    var mode = sub.querySelector(".cd-em-mode").getAttribute("data-mode") || "from_postback";
+    var staticBlk = sub.querySelector(".cd-em-value-static");
+    var postBlk = sub.querySelector(".cd-em-value-postback");
+    var netBlk = sub.querySelector(".cd-em-value-net");
+    if (staticBlk) staticBlk.hidden = mode !== "static";
+    if (postBlk) postBlk.hidden = mode !== "from_postback";
+    if (netBlk) netBlk.hidden = mode !== "postback_minus_commission";
+    sub.setAttribute("data-value-mode", mode);
+    var commType = sub.querySelector('[data-em="commissionType"]');
+    var suffix = sub.querySelector("[data-commission-suffix]");
+    if (commType && suffix) {
+      suffix.textContent = commType.value === "flat" ? "from postback value" : "% of postback value";
+      var commAmt = sub.querySelector('[data-em="commissionAmount"]');
+      if (commAmt) commAmt.placeholder = commType.value === "flat" ? "5.00" : "15";
+    }
   }
 
   function renderEventMap(pairs) {
@@ -753,19 +815,18 @@
         }
         return;
       }
-      // Mode toggle (Static / Dynamic)
+      // Mode toggle (Static / From postback / Net of commission)
       var modeBtn = e.target.closest(".cd-em-mode__btn");
       if (modeBtn) {
         var mode = modeBtn.getAttribute("data-mode-set");
         var row = modeBtn.closest(".cd-em-row");
-        var amt = row.querySelector('[data-em="amount"]');
-        var cur = row.querySelector('[data-em="currency"]');
+        var sub = row.querySelector(".cd-em-row__value");
         row.querySelectorAll(".cd-em-mode__btn").forEach(function (b) { b.removeAttribute("aria-pressed"); });
         modeBtn.setAttribute("aria-pressed", "true");
-        row.querySelector(".cd-em-mode").setAttribute("data-mode", mode);
-        var dyn = mode === "dynamic";
-        if (amt) { amt.disabled = dyn; amt.placeholder = dyn ? "from postback" : "65.00"; }
-        if (cur) cur.disabled = dyn;
+        if (sub) {
+          sub.querySelector(".cd-em-mode").setAttribute("data-mode", mode);
+          syncValueSubrowVisibility(sub);
+        }
       }
     });
     // Re-render row when destination event changes (might add/remove value subrow)
@@ -791,7 +852,7 @@
         var resolvedTo = readMappedSelectValue(t, row.querySelector('[data-em="toCustom"]'));
         var should = isValueEvent(resolvedTo, currentSource());
         if (should && !sub) {
-          var valueHtml = renderValueSubrow("dynamic", "", "USD", true);
+          var valueHtml = renderValueSubrow("from_postback", "", "USD", { type: "percent", amount: "" });
           var googleSub = row.querySelector(".cd-em-row__google");
           if (googleSub) googleSub.insertAdjacentHTML("afterend", valueHtml);
           else row.insertAdjacentHTML("beforeend", valueHtml);
@@ -799,6 +860,10 @@
           sub.remove();
         }
         row.setAttribute("data-dest", resolvedTo || "");
+        return;
+      }
+      if (t.matches && t.matches('[data-em="commissionType"]')) {
+        syncValueSubrowVisibility(t.closest(".cd-em-row__value"));
       }
     });
   }
@@ -817,13 +882,24 @@
       }
       var sub = r.querySelector(".cd-em-row__value");
       if (sub && isValueEvent(to)) {
-        var mode = sub.querySelector(".cd-em-mode").getAttribute("data-mode") || "dynamic";
-        var amount = parseFloat(sub.querySelector('[data-em="amount"]').value);
-        var currency = sub.querySelector('[data-em="currency"]').value;
-        if (mode === "static" && !isNaN(amount)) {
-          entry.value = { mode: "static", amount: amount, currency: currency };
+        var mode = sub.querySelector(".cd-em-mode").getAttribute("data-mode") || "from_postback";
+        if (mode === "static") {
+          var amountIn = sub.querySelector('[data-em="amount"]');
+          var currencyIn = sub.querySelector('[data-em="currency"]');
+          var amount = amountIn ? parseFloat(amountIn.value) : NaN;
+          var currency = currencyIn ? currencyIn.value : "USD";
+          if (!isNaN(amount)) entry.value = { mode: "static", amount: amount, currency: currency };
+        } else if (mode === "postback_minus_commission") {
+          var commTypeEl = sub.querySelector('[data-em="commissionType"]');
+          var commAmtEl = sub.querySelector('[data-em="commissionAmount"]');
+          var commType = commTypeEl ? commTypeEl.value : "percent";
+          var commAmt = commAmtEl ? parseFloat(commAmtEl.value) : NaN;
+          entry.value = {
+            mode: "postback_minus_commission",
+            commission: { type: commType, amount: isNaN(commAmt) ? 0 : commAmt }
+          };
         } else {
-          entry.value = { mode: "dynamic" };
+          entry.value = { mode: "from_postback" };
         }
       }
       out.push(entry);

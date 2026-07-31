@@ -64,7 +64,7 @@
         source: "facebook",
         fields: { fb_pixel_id: "319847562103948", fb_action_source: "website", fb_token_ref: "secret://vault/meta/acme-prod" },
         landerEventMap: defaultLanderEventMap("facebook"),
-        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase" }],
+        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase", value: { mode: "postback_minus_commission", commission: { type: "percent", amount: 15 } } }],
         createdAt: "2026-03-12"
       },
       {
@@ -73,7 +73,7 @@
         source: "facebook",
         fields: { fb_pixel_id: "904782156390124", fb_action_source: "website", fb_token_ref: "secret://vault/meta/acme-promo" },
         landerEventMap: defaultLanderEventMap("facebook"),
-        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase" }],
+        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase", value: { mode: "postback_minus_commission", commission: { type: "percent", amount: 15 } } }],
         createdAt: "2026-04-22"
       },
       {
@@ -82,7 +82,7 @@
         source: "google",
         fields: { g_tag_id: "AW-123456789", g_customer_id: "284-619-7723", g_dev_token: "ABcdEfGhIjKlMnOpQrStUv", g_client_id: "2846197723.apps.googleusercontent.com", g_client_secret_ref: "secret://vault/google/acme-main-client", g_token_ref: "secret://vault/google/acme-main" },
         landerEventMap: defaultLanderEventMap("google"),
-        eventMap: [{ from: "lead", to: "Submit lead form", conversionActionId: "customers/2846197723/conversionActions/8841502", value: { mode: "static", amount: 40, currency: "USD" } }, { from: "purchase", to: "purchase_offline", conversionActionId: "customers/2846197723/conversionActions/8841503" }],
+        eventMap: [{ from: "lead", to: "Submit lead form", conversionActionId: "customers/2846197723/conversionActions/8841502", value: { mode: "static", amount: 40, currency: "USD" } }, { from: "purchase", to: "purchase_offline", conversionActionId: "customers/2846197723/conversionActions/8841503", value: { mode: "from_postback" } }],
         createdAt: "2026-04-04"
       },
       {
