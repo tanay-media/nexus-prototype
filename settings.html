@@ -278,9 +278,9 @@
   <!-- ============================================================
        Add / edit destination dialog
        ============================================================ -->
-  <dialog class="modal modal--cd" id="dialog-cd-form">
-    <form method="dialog" class="modal__inner" id="form-cd" autocomplete="off">
-      <div class="dskp__head">
+  <dialog class="cd-drawer" id="dialog-cd-form">
+    <form method="dialog" class="cd-drawer__inner" id="form-cd" autocomplete="off">
+      <div class="dskp__head cd-drawer__head">
         <div class="dskp__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l4 4 14-14"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         </div>
@@ -293,8 +293,16 @@
         </button>
       </div>
 
-      <div class="dskp__body">
+      <nav class="cd-drawer__steps" id="cd-drawer-steps" aria-label="Integration setup">
+        <button type="button" class="cd-drawer__step is-active" data-cd-step="1">1 · Details</button>
+        <button type="button" class="cd-drawer__step" data-cd-step="2" data-buy-only>Lander events</button>
+        <button type="button" class="cd-drawer__step" data-cd-step="3" data-buy-only>Advertiser events</button>
+      </nav>
+
+      <div class="cd-drawer__body">
         <input type="hidden" id="cd-edit-id" value="" />
+
+        <div class="cd-drawer__panel is-active" data-cd-panel="1">
 
         <div class="dskp__field" id="cd-provider-field" hidden>
           <div class="dskp__label">Provider</div>
@@ -440,23 +448,22 @@
 
         </div>
 
-        <div class="cd-section" data-lander-events-section>
-          <div class="dskp__label cd-section__title">Lander-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Visit, impression, and click on your lander. One toggle disables client tag + server API.</span></span></div>
-          <div class="cd-lander-events" id="cd-lander-events"></div>
-        </div>
-
-        <div class="cd-section" data-adv-events-section>
-          <div class="dskp__label cd-section__title">Advertiser-level events <span class="info-tip info-tip--sm" tabindex="0"><span class="info-tip__icon">i</span><span class="info-tip__body">Fires when MAX sends a postback (<code>conversion_type</code>).</span></span></div>
-          <div class="cd-eventmap" id="cd-eventmap">
-            <!-- rows injected by JS -->
-          </div>
-          <button type="button" class="cd-eventmap__add" id="cd-eventmap-add">+ Add mapping</button>
-        </div>
-
         <label class="cd-default-check" data-default-section>
           <input type="checkbox" id="cd-set-default" />
           <span>Set as workspace default after saving</span>
         </label>
+
+        </div>
+
+        <div class="cd-drawer__panel" data-cd-panel="2" hidden data-lander-events-section>
+          <p class="cd-drawer__panel-hint">Visit, impression, click — server dispatch from Nexus ingest.</p>
+          <div class="cd-lander-events" id="cd-lander-events"></div>
+        </div>
+
+        <div class="cd-drawer__panel" data-cd-panel="3" hidden data-adv-events-section>
+          <p class="cd-drawer__panel-hint">Postback <code>conversion_type</code> → platform event.</p>
+          <div class="cd-eventmap" id="cd-eventmap"></div>
+          <button type="button" class="cd-eventmap__add" id="cd-eventmap-add">+ Add mapping</button>
 
         <!-- ============= Test event panel (collapsible) ============= -->
         <div class="cd-test" id="cd-test-panel" hidden>
@@ -509,16 +516,19 @@
 
           <div class="cd-test__result" id="cd-test-result" hidden></div>
         </div>
+        </div>
       </div>
 
-      <div class="dskp__foot">
+      <div class="dskp__foot cd-drawer__foot">
+        <button type="button" class="dskp__b dskp__b--ghost" id="cd-step-back" hidden>Back</button>
         <div class="dskp__foot-spacer"></div>
         <button type="button" class="dskp__b dskp__b--ghost" data-close-dialog>Cancel</button>
-        <button type="button" class="dskp__b" id="cd-test-btn">
+        <button type="button" class="dskp__b" id="cd-test-btn" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
-          Send test event
+          Test
         </button>
-        <button type="submit" class="dskp__b dskp__b--primary" id="cd-save-btn">Save integration</button>
+        <button type="button" class="dskp__b dskp__b--primary" id="cd-step-next">Next</button>
+        <button type="submit" class="dskp__b dskp__b--primary" id="cd-save-btn" hidden>Save</button>
       </div>
     </form>
   </dialog>

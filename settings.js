@@ -213,10 +213,44 @@
   var setDefaultIn = document.getElementById("cd-set-default");
   var saveBtn = document.getElementById("cd-save-btn");
   var testBtn = document.getElementById("cd-test-btn");
+  var stepBackBtn = document.getElementById("cd-step-back");
+  var stepNextBtn = document.getElementById("cd-step-next");
+  var drawerStepsNav = document.getElementById("cd-drawer-steps");
+  var cdDrawerStep = 1;
   var deleteDlg = document.getElementById("dialog-cd-delete");
   var deleteMsg = document.getElementById("cd-delete-msg");
   var deleteBtn = document.getElementById("cd-delete-confirm");
   var deletePending = null;
+
+  function isBuySourceSrc(src) {
+    return src === "facebook" || src === "google" || src === "taboola";
+  }
+
+  function maxCdDrawerStep(src) {
+    return isBuySourceSrc(src || currentSource()) ? 3 : 1;
+  }
+
+  function setCdDrawerStep(step) {
+    var src = currentSource();
+    var max = maxCdDrawerStep(src);
+    cdDrawerStep = Math.max(1, Math.min(step, max));
+    document.querySelectorAll("[data-cd-panel]").forEach(function (p) {
+      var n = parseInt(p.getAttribute("data-cd-panel"), 10);
+      p.hidden = n !== cdDrawerStep;
+      p.classList.toggle("is-active", n === cdDrawerStep);
+    });
+    if (drawerStepsNav) {
+      drawerStepsNav.querySelectorAll(".cd-drawer__step").forEach(function (btn) {
+        var n = parseInt(btn.getAttribute("data-cd-step"), 10);
+        btn.hidden = btn.hasAttribute("data-buy-only") && !isBuySourceSrc(src);
+        btn.classList.toggle("is-active", n === cdDrawerStep);
+      });
+    }
+    if (stepBackBtn) stepBackBtn.hidden = cdDrawerStep <= 1;
+    if (stepNextBtn) stepNextBtn.hidden = cdDrawerStep >= max;
+    if (saveBtn) saveBtn.hidden = cdDrawerStep < max;
+    if (testBtn) testBtn.hidden = !isBuySourceSrc(src) || cdDrawerStep !== 3;
+  }
 
   // ----- Provider thumbs (table) -----
   var SOURCE_LABEL = {
@@ -390,13 +424,7 @@
     btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-source") === src)); });
     formDlg.setAttribute("data-source", src);
     var isClientPixel = src === "gtm" || src === "meta_pixel";
-    var isBuySource = src === "facebook" || src === "google" || src === "taboola";
-    var landerSec = document.querySelector("[data-lander-events-section]");
-    var advSec = document.querySelector("[data-adv-events-section]");
-    var emSec = document.querySelector("[data-adv-events-section]");
     var defSec = document.querySelector("[data-default-section]");
-    if (landerSec) landerSec.hidden = !isBuySource;
-    if (advSec) advSec.hidden = isClientPixel;
     if (defSec) defSec.hidden = isClientPixel;
     var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", taboola: "Taboola", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src] || "Integration";
     var eyebrow = document.getElementById("cd-eyebrow");
@@ -445,6 +473,8 @@
       var cur = collectLanderEventMap();
       renderLanderEventMap(cur && Object.keys(cur).length ? cur : null);
     }
+    if (cdDrawerStep > maxCdDrawerStep(src)) cdDrawerStep = 1;
+    setCdDrawerStep(cdDrawerStep);
   }
 
   document.querySelectorAll(".cd-prov").forEach(function (b) {
@@ -496,8 +526,6 @@
     if (src === "google") {
       return '<div class="cd-lander-grid-head cd-lander-grid-head--google">' +
         '<span>Event</span><span>' + escapeHtml(destLabel) + '</span><span>On</span>' +
-        '<span class="cd-lander-grid-head__sub cd-lander-grid-head__sub--label">Client label ' + infoTip("gtag <code>send_to: AW-…/label</code>") + '</span>' +
-        '<span class="cd-lander-grid-head__sub cd-lander-grid-head__sub--action">Server action ' + infoTip("<code>customers/…/conversionActions/…</code>") + '</span>' +
       '</div>';
     }
     return '<div class="cd-lander-grid-head">' +
@@ -513,11 +541,13 @@
     var off = !data.enabled;
     var googleSub = isGoogle
       ? '<div class="cd-lander-card__sub">' +
-          '<div class="cd-lander-card__field cd-lander-card__field--span">' +
-            '<input type="text" class="cd-em-custom" data-lander="conversionLabel" placeholder="Conversion label · e.g. AbC-D_efG-h" value="' + escapeHtml(data.conversionLabel || "") + '" />' +
+          '<div class="cd-lander-card__field">' +
+            '<label class="cd-lander-card__field-lbl">Client label</label>' +
+            '<input type="text" class="cd-em-custom" data-lander="conversionLabel" placeholder="AbC-D_efG-h" value="' + escapeHtml(data.conversionLabel || "") + '" />' +
           '</div>' +
-          '<div class="cd-lander-card__field cd-lander-card__field--span">' +
-            '<input type="text" class="cd-em-custom" data-lander="conversionActionId" placeholder="Conversion action · customers/…/conversionActions/…" value="' + escapeHtml(data.conversionActionId || "") + '" />' +
+          '<div class="cd-lander-card__field">' +
+            '<label class="cd-lander-card__field-lbl">Server action</label>' +
+            '<input type="text" class="cd-em-custom" data-lander="conversionActionId" placeholder="customers/…/conversionActions/…" value="' + escapeHtml(data.conversionActionId || "") + '" />' +
           '</div>' +
         '</div>'
       : "";
@@ -970,6 +1000,8 @@
     fillFormForRow(null);
     if (src) setSourceInDialog(src);
     if (document.getElementById("cd-test-panel")) document.getElementById("cd-test-panel").hidden = true;
+    cdDrawerStep = 1;
+    setCdDrawerStep(1);
     formDlg.showModal();
   }
   function openEdit(id) {
@@ -980,7 +1012,36 @@
     if (formHint) formHint.textContent = "";
     fillFormForRow(r);
     if (document.getElementById("cd-test-panel")) document.getElementById("cd-test-panel").hidden = true;
+    cdDrawerStep = 1;
+    setCdDrawerStep(1);
     formDlg.showModal();
+  }
+
+  if (stepNextBtn) {
+    stepNextBtn.addEventListener("click", function () {
+      if (cdDrawerStep === 1) {
+        var nm = (nameIn.value || "").trim();
+        if (!nm) { nameIn.focus(); return; }
+      }
+      setCdDrawerStep(cdDrawerStep + 1);
+    });
+  }
+  if (stepBackBtn) {
+    stepBackBtn.addEventListener("click", function () {
+      setCdDrawerStep(cdDrawerStep - 1);
+    });
+  }
+  if (drawerStepsNav) {
+    drawerStepsNav.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-cd-step]");
+      if (!btn || btn.hidden) return;
+      var target = parseInt(btn.getAttribute("data-cd-step"), 10);
+      if (target > 1 && cdDrawerStep === 1) {
+        var nmCheck = (nameIn.value || "").trim();
+        if (!nmCheck) { nameIn.focus(); return; }
+      }
+      setCdDrawerStep(target);
+    });
   }
 
   // ----- Save -----
