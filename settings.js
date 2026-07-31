@@ -753,11 +753,11 @@
     var commType = (commission && commission.type === "flat") ? "flat" : "percent";
     var commAmt = commission && commission.amount != null ? String(commission.amount) : "";
     return '<div class="cd-em-row__value" data-value-mode="' + mode + '">' +
-      '<span class="cd-em-row__value-lbl">revenue ' + infoTip("Static: fixed amount. From postback: uses <code>value</code> + <code>currency</code> on the conversion postback URL. Net of commission: postback value minus a flat fee or percent before upload.") + ':</span>' +
+      '<span class="cd-em-row__value-lbl">Revenue ' + infoTip("Fixed: same amount every fire. Postback: use <code>value</code> + <code>currency</code> from the postback. After commission: postback value minus a flat fee or %.") + '</span>' +
       '<div class="cd-em-mode" data-mode="' + mode + '">' +
-        '<button type="button" class="cd-em-mode__btn" data-mode-set="static"' + (isStatic ? ' aria-pressed="true"' : '') + '>Static</button>' +
-        '<button type="button" class="cd-em-mode__btn" data-mode-set="from_postback"' + (mode === "from_postback" ? ' aria-pressed="true"' : '') + '>From postback</button>' +
-        '<button type="button" class="cd-em-mode__btn" data-mode-set="postback_minus_commission"' + (isNet ? ' aria-pressed="true"' : '') + '>Net of commission</button>' +
+        '<button type="button" class="cd-em-mode__btn" data-mode-set="static"' + (isStatic ? ' aria-pressed="true"' : '') + '>Fixed</button>' +
+        '<button type="button" class="cd-em-mode__btn" data-mode-set="from_postback"' + (mode === "from_postback" ? ' aria-pressed="true"' : '') + '>Postback</button>' +
+        '<button type="button" class="cd-em-mode__btn" data-mode-set="postback_minus_commission"' + (isNet ? ' aria-pressed="true"' : '') + '>After commission</button>' +
       '</div>' +
       '<div class="cd-em-value-static"' + (isStatic ? "" : ' hidden') + '>' +
         '<input type="text" class="cd-em-amount" data-em="amount" value="' + escapeHtml(amount) + '" placeholder="65.00" inputmode="decimal" />' +
@@ -768,7 +768,7 @@
         '</select>' +
       '</div>' +
       '<div class="cd-em-value-postback"' + (mode === "from_postback" ? "" : ' hidden') + '>' +
-        '<span class="cd-em-row__hint">Uses <code>value</code> and <code>currency</code> from the conversion postback URL.</span>' +
+        '<span class="cd-em-row__hint">From postback <code>value</code> and <code>currency</code>.</span>' +
       '</div>' +
       '<div class="cd-em-value-net"' + (isNet ? "" : ' hidden') + '>' +
         '<span class="cd-em-row__hint cd-em-row__hint--inline">minus</span>' +
@@ -777,7 +777,7 @@
           '<option value="percent"' + (commType === "percent" ? " selected" : "") + '>percent</option>' +
         '</select>' +
         '<input type="text" class="cd-em-commission-amt" data-em="commissionAmount" value="' + escapeHtml(commAmt) + '" placeholder="' + (commType === "flat" ? "5.00" : "15") + '" inputmode="decimal" />' +
-        '<span class="cd-em-row__hint cd-em-row__hint--inline" data-commission-suffix>' + (commType === "flat" ? "from postback value" : "% of postback value") + '</span>' +
+        '<span class="cd-em-row__hint cd-em-row__hint--inline" data-commission-suffix>' + (commType === "flat" ? "off postback" : "% off postback") + '</span>' +
       '</div>' +
     '</div>';
   }
@@ -1008,7 +1008,7 @@
     var r = state.rows.find(function (x) { return x.id === id; });
     if (!r) return;
     editIdIn.value = id;
-    formTitle.textContent = "Edit destination";
+    formTitle.textContent = "Edit integration";
     if (formHint) formHint.textContent = "";
     fillFormForRow(r);
     if (document.getElementById("cd-test-panel")) document.getElementById("cd-test-panel").hidden = true;
