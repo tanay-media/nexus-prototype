@@ -2993,8 +2993,6 @@ button.dsk-row-name:focus-visible strong {
 }
 .offer-advertiser-row strong { font-size: 14px; }
 .offer-row td:first-child + td { padding-left: 0.35rem; }
-.modal--offer-detail { max-width: 640px; }
-.modal--offer-detail .modal__inner { max-height: min(88vh, 780px); overflow-y: auto; }
 .offer-detail-tabs { margin-bottom: 0.85rem; }
 .offer-detail-pane { margin-bottom: 0.5rem; }
 .offer-ws-list {
@@ -3018,6 +3016,10 @@ button.dsk-row-name:focus-visible strong {
   font-size: 13px;
 }
 .offer-ws-pick input { margin: 0; }
+.offer-countries-select { width: 100%; min-height: 88px; }
+.input--readonly { background: #f5f6f8; color: var(--text-muted); cursor: default; }
+.modal--offer-detail { max-width: 680px; }
+.modal--offer-detail .modal__inner { max-height: min(88vh, 780px); overflow-y: auto; }
 
 .modal--settings { max-width: 680px; }
 .modal--settings .modal__inner {
