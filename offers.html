@@ -1082,6 +1082,13 @@
       updateBuySourcesSummary();
     }
 
+    var offerCountrySelection = ["US"];
+    var poCountrySelection = ["US"];
+
+    function countrySelectionFor(chipsId) {
+      return chipsId === "po-country-chips" ? poCountrySelection : offerCountrySelection;
+    }
+
     function updateCountrySummary(summaryId, picked) {
       var el = document.getElementById(summaryId);
       if (!el || typeof OFFER_COUNTRIES === "undefined") return;
@@ -1117,27 +1124,27 @@
       }).join("");
       chipsEl.querySelectorAll(".offer-chip input").forEach(function (cb) {
         cb.addEventListener("change", function () {
+          var sel = countrySelectionFor(chipsId);
+          var idx = sel.indexOf(cb.value);
+          if (cb.checked && idx === -1) sel.push(cb.value);
+          if (!cb.checked && idx !== -1) sel.splice(idx, 1);
           cb.parentElement.classList.toggle("is-on", cb.checked);
-          updateCountrySummary(summaryId, getCountryPickerSelection(chipsId));
+          updateCountrySummary(summaryId, sel);
         });
       });
       updateCountrySummary(summaryId, picked);
     }
 
     function getCountryPickerSelection(chipsId) {
-      var chipsEl = document.getElementById(chipsId);
-      if (!chipsEl) return ["US"];
-      var out = [];
-      chipsEl.querySelectorAll('input[type=checkbox]:checked').forEach(function (cb) {
-        out.push(cb.value);
-      });
-      return out.length ? out : ["US"];
+      var sel = countrySelectionFor(chipsId);
+      return sel.length ? sel.slice() : ["US"];
     }
 
     function populateCountrySelect(selected) {
+      offerCountrySelection = (selected && selected.length) ? selected.slice() : ["US"];
       var search = document.getElementById("offer-country-search");
       if (search) search.value = "";
-      renderCountryPicker("offer-country-chips", "offer-country-summary", selected, "");
+      renderCountryPicker("offer-country-chips", "offer-country-summary", offerCountrySelection, "");
     }
 
     function getCountrySelect() {
@@ -1432,9 +1439,10 @@
     var poParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
 
     function populatePoCountrySelect(selected) {
+      poCountrySelection = (selected && selected.length) ? selected.slice() : ["US"];
       var search = document.getElementById("po-country-search");
       if (search) search.value = "";
-      renderCountryPicker("po-country-chips", "po-country-summary", selected, "");
+      renderCountryPicker("po-country-chips", "po-country-summary", poCountrySelection, "");
     }
 
     function getPoCountrySelect() {
@@ -1726,13 +1734,13 @@
     var offerCountrySearch = document.getElementById("offer-country-search");
     if (offerCountrySearch) {
       offerCountrySearch.addEventListener("input", function () {
-        renderCountryPicker("offer-country-chips", "offer-country-summary", getCountryPickerSelection("offer-country-chips"), offerCountrySearch.value);
+        renderCountryPicker("offer-country-chips", "offer-country-summary", offerCountrySelection, offerCountrySearch.value);
       });
     }
     var poCountrySearch = document.getElementById("po-country-search");
     if (poCountrySearch) {
       poCountrySearch.addEventListener("input", function () {
-        renderCountryPicker("po-country-chips", "po-country-summary", getCountryPickerSelection("po-country-chips"), poCountrySearch.value);
+        renderCountryPicker("po-country-chips", "po-country-summary", poCountrySelection, poCountrySearch.value);
       });
     }
     var poTargetTypeEl = document.getElementById("po-target-type");
