@@ -3023,15 +3023,39 @@ button.dsk-row-name:focus-visible strong {
 }
 .offer-amount-group input { flex: 1; min-width: 0; }
 .offer-amount-group select { width: 5.5rem; flex-shrink: 0; }
+.offer-target-labels {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+.offer-target-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.offer-target-row {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+.offer-target-row > select { width: 100%; }
 .offer-field-hint {
   margin: 0.35rem 0 0;
   font-size: 12px;
   color: var(--text-muted);
 }
+.offer-country-search { margin-bottom: 0.5rem; }
 .offer-country-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+  max-height: 9.5rem;
+  overflow-y: auto;
+  padding: 0.15rem 0;
 }
 .offer-chip {
   display: inline-flex;
