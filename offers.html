@@ -171,8 +171,32 @@
         </select>
       </div>
       <div class="field">
-        <label>Teams</label>
-        <ul class="offer-ws-list" id="adv-teams-list"></ul>
+        <label for="adv-teams-trigger">Teams</label>
+        <div class="team-ms" id="adv-teams-ms">
+          <button type="button" class="team-ms__trigger input" id="adv-teams-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="adv-teams-panel">
+            <span id="adv-teams-trigger-label">Select teams…</span>
+            <span class="team-ms__caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="team-ms__panel" id="adv-teams-panel" hidden>
+            <div class="team-ms__header">
+              <span class="team-ms__title">Select Teams</span>
+              <button type="button" class="team-ms__close" id="adv-teams-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="search-wrap team-ms__search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input class="input" type="search" id="adv-teams-search" placeholder="Search teams…" autocomplete="off" />
+            </div>
+            <ul class="team-ms__list" id="adv-teams-list" role="listbox" aria-label="Teams"></ul>
+            <div class="team-ms__footer">
+              <div class="team-ms__footer-left">
+                <button type="button" class="team-ms__link" id="adv-teams-select-all">Select All</button>
+                <span class="team-ms__sep" aria-hidden="true">|</span>
+                <button type="button" class="team-ms__link" id="adv-teams-clear">Clear</button>
+              </div>
+              <button type="button" class="btn btn--black btn--sm" id="adv-teams-apply">Apply</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
@@ -1698,14 +1722,132 @@
       return parentOffers.filter(function (p) { return p.advertiserId === advId; }).length;
     }
 
-    function renderAdvTeamsList(adv) {
+    var advTeamsDraft = [];
+
+    function advTeamsTriggerLabel(ids) {
+      if (!ids || !ids.length) return "Select teams…";
+      if (ids.length === TEAMS.length) return "All teams";
+      if (ids.length <= 2) {
+        var map = {};
+        TEAMS.forEach(function (t) { map[t.id] = t.name; });
+        return ids.map(function (id) { return map[id] || id; }).join(", ");
+      }
+      return ids.length + " teams selected";
+    }
+
+    function updateAdvTeamsTrigger() {
+      var lbl = document.getElementById("adv-teams-trigger-label");
+      if (lbl) lbl.textContent = advTeamsTriggerLabel(advTeamsDraft);
+    }
+
+    function renderAdvTeamsList(query) {
       var list = document.getElementById("adv-teams-list");
       if (!list) return;
-      var picked = (adv && adv.teamIds) ? adv.teamIds : [];
-      list.innerHTML = TEAMS.map(function (t) {
-        var checked = picked.indexOf(t.id) !== -1 ? " checked" : "";
-        return '<li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="' + escapeHtml(t.id) + '"' + checked + ' /><span>' + escapeHtml(t.name) + '</span></label></li>';
+      var q = (query || "").trim().toLowerCase();
+      var teams = TEAMS.filter(function (t) {
+        return !q || t.name.toLowerCase().indexOf(q) !== -1;
+      });
+      if (!teams.length) {
+        list.innerHTML = '<li class="team-ms__empty muted">No teams match your search.</li>';
+        return;
+      }
+      list.innerHTML = teams.map(function (t) {
+        var checked = advTeamsDraft.indexOf(t.id) !== -1;
+        return '<li class="team-ms__item" role="option" aria-selected="' + (checked ? "true" : "false") + '">' +
+          '<span class="team-ms__item-name">' + escapeHtml(t.name) + '</span>' +
+          '<label class="team-ms__check" title="Toggle ' + escapeHtml(t.name) + '">' +
+            '<input type="checkbox" value="' + escapeHtml(t.id) + '"' + (checked ? " checked" : "") + ' data-team-id="' + escapeHtml(t.id) + '" />' +
+            '<span class="team-ms__check-ui" aria-hidden="true"></span>' +
+          '</label>' +
+        '</li>';
       }).join("");
+      list.querySelectorAll("input[type=checkbox]").forEach(function (cb) {
+        cb.addEventListener("change", function () {
+          var id = cb.value;
+          var idx = advTeamsDraft.indexOf(id);
+          if (cb.checked && idx === -1) advTeamsDraft.push(id);
+          if (!cb.checked && idx !== -1) advTeamsDraft.splice(idx, 1);
+        });
+      });
+    }
+
+    function openAdvTeamsPanel() {
+      var panel = document.getElementById("adv-teams-panel");
+      var trigger = document.getElementById("adv-teams-trigger");
+      if (!panel || !trigger) return;
+      panel.hidden = false;
+      trigger.setAttribute("aria-expanded", "true");
+      var search = document.getElementById("adv-teams-search");
+      if (search) { search.value = ""; search.focus(); }
+      renderAdvTeamsList("");
+    }
+
+    function closeAdvTeamsPanel() {
+      var panel = document.getElementById("adv-teams-panel");
+      var trigger = document.getElementById("adv-teams-trigger");
+      if (panel) panel.hidden = true;
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    }
+
+    function applyAdvTeamsPanel() {
+      updateAdvTeamsTrigger();
+      closeAdvTeamsPanel();
+    }
+
+    function wireAdvTeamsPicker() {
+      var trigger = document.getElementById("adv-teams-trigger");
+      var panel = document.getElementById("adv-teams-panel");
+      var search = document.getElementById("adv-teams-search");
+      var root = document.getElementById("adv-teams-ms");
+      if (!trigger || !panel || !root) return;
+
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (panel.hidden) openAdvTeamsPanel();
+        else closeAdvTeamsPanel();
+      });
+
+      document.getElementById("adv-teams-close").addEventListener("click", function (e) {
+        e.preventDefault();
+        closeAdvTeamsPanel();
+      });
+
+      document.getElementById("adv-teams-apply").addEventListener("click", function (e) {
+        e.preventDefault();
+        applyAdvTeamsPanel();
+      });
+
+      document.getElementById("adv-teams-select-all").addEventListener("click", function (e) {
+        e.preventDefault();
+        var q = (document.getElementById("adv-teams-search").value || "").trim().toLowerCase();
+        TEAMS.forEach(function (t) {
+          if (q && t.name.toLowerCase().indexOf(q) === -1) return;
+          if (advTeamsDraft.indexOf(t.id) === -1) advTeamsDraft.push(t.id);
+        });
+        renderAdvTeamsList(document.getElementById("adv-teams-search").value);
+      });
+
+      document.getElementById("adv-teams-clear").addEventListener("click", function (e) {
+        e.preventDefault();
+        advTeamsDraft = [];
+        renderAdvTeamsList(document.getElementById("adv-teams-search").value);
+      });
+
+      if (search) {
+        search.addEventListener("input", function () {
+          renderAdvTeamsList(search.value);
+        });
+        search.addEventListener("click", function (e) { e.stopPropagation(); });
+      }
+
+      panel.addEventListener("click", function (e) { e.stopPropagation(); });
+
+      document.addEventListener("click", function (e) {
+        if (!root.contains(e.target)) closeAdvTeamsPanel();
+      });
+
+      advDlg.addEventListener("close", closeAdvTeamsPanel);
     }
 
     function filteredAdvertisers() {
@@ -1747,7 +1889,9 @@
       document.getElementById("adv-name").value = a.name;
       document.getElementById("adv-description").value = a.description || "";
       document.getElementById("adv-status").value = a.status || "active";
-      renderAdvTeamsList(a);
+      advTeamsDraft = (a.teamIds && a.teamIds.slice()) || [];
+      updateAdvTeamsTrigger();
+      closeAdvTeamsPanel();
       advDlg.showModal();
     }
 
@@ -1757,10 +1901,7 @@
       a.name = document.getElementById("adv-name").value.trim() || a.name;
       a.description = document.getElementById("adv-description").value.trim();
       a.status = document.getElementById("adv-status").value;
-      a.teamIds = [];
-      document.querySelectorAll("#adv-teams-list input[type=checkbox]:checked").forEach(function (cb) {
-        a.teamIds.push(cb.value);
-      });
+      a.teamIds = advTeamsDraft.slice();
       renderAdvTable();
       renderAdvertiserFilters();
       render();
@@ -1768,6 +1909,7 @@
 
     if (advDlg) {
       advDlg.querySelector("form").addEventListener("submit", saveAdvDetail);
+      wireAdvTeamsPicker();
     }
 
     document.getElementById("adv-add-btn").addEventListener("click", function () {
