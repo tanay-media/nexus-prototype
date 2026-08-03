@@ -301,10 +301,16 @@
           <p class="offer-field-hint" id="offer-target-hint">Target CPA per conversion in USD.</p>
         </div>
         <div class="field">
-          <label for="offer-country">Countries</label>
-          <select id="offer-country" multiple size="6" aria-describedby="offer-country-hint">
-          </select>
-          <p class="offer-field-hint" id="offer-country-hint">Hold ⌘ or Ctrl to select multiple. Default: United States.</p>
+          <label for="offer-country-search">Countries</label>
+          <div class="offer-country-ms">
+            <div class="search-wrap offer-country-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input class="input" type="search" id="offer-country-search" placeholder="Search countries…" autocomplete="off" />
+            </div>
+            <p class="offer-pane-summary" id="offer-country-summary"></p>
+            <div class="offer-country-chips" id="offer-country-chips" role="listbox" aria-label="Countries"></div>
+          </div>
+          <p class="offer-field-hint" id="offer-country-hint">Click countries to toggle selection. Default: United States.</p>
         </div>
         <div class="settings-section">
           <p class="settings-section__title">MAX tracking</p>
@@ -459,9 +465,16 @@
           <p class="offer-field-hint" id="po-target-hint">Target CPA per conversion in USD.</p>
         </div>
         <div class="field">
-          <label for="po-country">Countries</label>
-          <select id="po-country" multiple size="6"></select>
-          <p class="offer-field-hint">Hold ⌘ or Ctrl to select multiple. Default: United States.</p>
+          <label for="po-country-search">Countries</label>
+          <div class="offer-country-ms">
+            <div class="search-wrap offer-country-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input class="input" type="search" id="po-country-search" placeholder="Search countries…" autocomplete="off" />
+            </div>
+            <p class="offer-pane-summary" id="po-country-summary"></p>
+            <div class="offer-country-chips" id="po-country-chips" role="listbox" aria-label="Countries"></div>
+          </div>
+          <p class="offer-field-hint">Click countries to toggle selection. Default: United States.</p>
         </div>
         <div class="field">
           <label for="po-tracking-provider">Tracking provider</label>
@@ -1069,20 +1082,66 @@
       updateBuySourcesSummary();
     }
 
-    function populateCountrySelect(selected) {
-      var sel = document.getElementById("offer-country");
-      if (!sel || typeof OFFER_COUNTRIES === "undefined") return;
-      var picked = (selected && selected.length) ? selected : ["US"];
-      sel.innerHTML = OFFER_COUNTRIES.map(function (c) {
-        return '<option value="' + escapeHtml(c.code) + '"' + (picked.indexOf(c.code) !== -1 ? " selected" : "") + '>' + escapeHtml(c.name) + "</option>";
+    function updateCountrySummary(summaryId, picked) {
+      var el = document.getElementById(summaryId);
+      if (!el || typeof OFFER_COUNTRIES === "undefined") return;
+      var map = {};
+      OFFER_COUNTRIES.forEach(function (c) { map[c.code] = c.name; });
+      if (!picked || !picked.length) {
+        el.textContent = "No countries selected";
+        return;
+      }
+      var names = picked.map(function (code) { return map[code] || code; });
+      el.textContent = picked.length + " selected" + (names.length <= 4 ? ": " + names.join(", ") : "");
+    }
+
+    function renderCountryPicker(chipsId, summaryId, selected, query) {
+      var chipsEl = document.getElementById(chipsId);
+      if (!chipsEl || typeof OFFER_COUNTRIES === "undefined") return;
+      var picked = (selected && selected.length) ? selected.slice() : ["US"];
+      var q = (query || "").trim().toLowerCase();
+      var list = OFFER_COUNTRIES.filter(function (c) {
+        if (!q) return true;
+        return c.name.toLowerCase().indexOf(q) !== -1 || c.code.toLowerCase().indexOf(q) !== -1;
+      });
+      if (!list.length) {
+        chipsEl.innerHTML = '<span class="muted" style="font-size:13px;padding:0.25rem 0;">No countries match your search.</span>';
+        updateCountrySummary(summaryId, picked);
+        return;
+      }
+      chipsEl.innerHTML = list.map(function (c) {
+        var on = picked.indexOf(c.code) !== -1;
+        return '<label class="offer-chip' + (on ? " is-on" : "") + '">' +
+          '<input type="checkbox" value="' + escapeHtml(c.code) + '"' + (on ? " checked" : "") + ' />' +
+          '<span>' + escapeHtml(c.name) + '</span></label>';
       }).join("");
+      chipsEl.querySelectorAll(".offer-chip input").forEach(function (cb) {
+        cb.addEventListener("change", function () {
+          cb.parentElement.classList.toggle("is-on", cb.checked);
+          updateCountrySummary(summaryId, getCountryPickerSelection(chipsId));
+        });
+      });
+      updateCountrySummary(summaryId, picked);
+    }
+
+    function getCountryPickerSelection(chipsId) {
+      var chipsEl = document.getElementById(chipsId);
+      if (!chipsEl) return ["US"];
+      var out = [];
+      chipsEl.querySelectorAll('input[type=checkbox]:checked').forEach(function (cb) {
+        out.push(cb.value);
+      });
+      return out.length ? out : ["US"];
+    }
+
+    function populateCountrySelect(selected) {
+      var search = document.getElementById("offer-country-search");
+      if (search) search.value = "";
+      renderCountryPicker("offer-country-chips", "offer-country-summary", selected, "");
     }
 
     function getCountrySelect() {
-      var sel = document.getElementById("offer-country");
-      if (!sel) return ["US"];
-      var out = Array.prototype.filter.call(sel.selectedOptions, function (o) { return o.value; }).map(function (o) { return o.value; });
-      return out.length ? out : ["US"];
+      return getCountryPickerSelection("offer-country-chips");
     }
 
     function syncTargetHint() {
@@ -1373,19 +1432,13 @@
     var poParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
 
     function populatePoCountrySelect(selected) {
-      var sel = document.getElementById("po-country");
-      if (!sel || typeof OFFER_COUNTRIES === "undefined") return;
-      var picked = (selected && selected.length) ? selected : ["US"];
-      sel.innerHTML = OFFER_COUNTRIES.map(function (c) {
-        return '<option value="' + escapeHtml(c.code) + '"' + (picked.indexOf(c.code) !== -1 ? " selected" : "") + '>' + escapeHtml(c.name) + "</option>";
-      }).join("");
+      var search = document.getElementById("po-country-search");
+      if (search) search.value = "";
+      renderCountryPicker("po-country-chips", "po-country-summary", selected, "");
     }
 
     function getPoCountrySelect() {
-      var sel = document.getElementById("po-country");
-      if (!sel) return ["US"];
-      var out = Array.prototype.filter.call(sel.selectedOptions, function (o) { return o.value; }).map(function (o) { return o.value; });
-      return out.length ? out : ["US"];
+      return getCountryPickerSelection("po-country-chips");
     }
 
     function syncPoTargetHint() {
@@ -1670,6 +1723,18 @@
       populateCategoryL3(l1, this.value, "", "po");
     });
     populatePoCountrySelect(["US"]);
+    var offerCountrySearch = document.getElementById("offer-country-search");
+    if (offerCountrySearch) {
+      offerCountrySearch.addEventListener("input", function () {
+        renderCountryPicker("offer-country-chips", "offer-country-summary", getCountryPickerSelection("offer-country-chips"), offerCountrySearch.value);
+      });
+    }
+    var poCountrySearch = document.getElementById("po-country-search");
+    if (poCountrySearch) {
+      poCountrySearch.addEventListener("input", function () {
+        renderCountryPicker("po-country-chips", "po-country-summary", getCountryPickerSelection("po-country-chips"), poCountrySearch.value);
+      });
+    }
     var poTargetTypeEl = document.getElementById("po-target-type");
     var poTargetCurEl = document.getElementById("po-target-currency");
     if (poTargetTypeEl) poTargetTypeEl.addEventListener("change", syncPoTargetHint);

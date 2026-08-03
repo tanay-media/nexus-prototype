@@ -3068,6 +3068,13 @@ button.dsk-row-name:focus-visible strong {
   color: var(--text-muted);
 }
 .offer-country-search { margin-bottom: 0.5rem; }
+.offer-country-search .input { width: 100%; min-width: 0; }
+.offer-country-ms {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  background: #fff;
+}
 .offer-country-chips {
   display: flex;
   flex-wrap: wrap;
