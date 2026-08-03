@@ -162,9 +162,7 @@
             <label for="offer-advertiser-select">Advertiser</label>
             <select id="offer-advertiser-select">
               <option value="">— Select —</option>
-              <option value="__new__">+ New advertiser</option>
             </select>
-            <input type="text" id="offer-advertiser-new" placeholder="New advertiser name" style="display:none;margin-top:6px;" />
           </div>
           <div class="field">
             <label for="offer-status">Status</label>
@@ -761,36 +759,17 @@
 
     function renderAdvertiserDropdown(selectedId) {
       var sel = document.getElementById("offer-advertiser-select");
-      var newInput = document.getElementById("offer-advertiser-new");
       if (!sel) return;
       var sorted = advertisers.slice().sort(function (a, b) { return a.name.localeCompare(b.name); });
       sel.innerHTML = '<option value="">— Select —</option>' +
         sorted.map(function (a) {
           return '<option value="' + escapeHtml(a.id) + '"' + (a.id === selectedId ? ' selected' : '') + '>' + escapeHtml(a.name) + '</option>';
-        }).join("") +
-        '<option value="__new__">+ New advertiser</option>';
-      if (newInput) { newInput.style.display = "none"; newInput.value = ""; }
-    }
-
-    function resolveAdvertiserFromForm() {
-      var sel = document.getElementById("offer-advertiser-select");
-      var newInput = document.getElementById("offer-advertiser-new");
-      if (sel && sel.value === "__new__" && newInput) {
-        var name = newInput.value.trim();
-        if (!name) return { id: "" };
-        var newId = "adv-" + Date.now();
-        advertisers.push({ id: newId, name: name, status: "active" });
-        renderAdvertiserDropdown(newId);
-        sel.value = newId;
-        newInput.style.display = "none";
-        newInput.value = "";
-        return { id: newId };
-      }
-      return { id: sel ? sel.value : "" };
+        }).join("");
     }
 
     function getAdvertiserValue() {
-      return resolveAdvertiserFromForm().id;
+      var sel = document.getElementById("offer-advertiser-select");
+      return sel ? sel.value : "";
     }
 
     function openOfferDetail(id) {
@@ -834,8 +813,7 @@
       if (!o) return;
       o.name = document.getElementById("offer-name").value.trim() || o.name;
       o.description = document.getElementById("offer-description").value.trim();
-      var advPick = resolveAdvertiserFromForm();
-      o.advertiserId = advPick.id || o.advertiserId;
+      o.advertiserId = getAdvertiserValue() || o.advertiserId;
       ensureOfferAdvertiserWorkspace(o, true);
       o.categoryLevel1 = document.getElementById("offer-category-l1").value;
       o.categoryLevel2 = document.getElementById("offer-category-l2").value;
@@ -884,17 +862,6 @@
     document.getElementById("offers-search").addEventListener("input", render);
     document.getElementById("offers-status-filter").addEventListener("change", render);
     document.getElementById("offers-advertiser-filter").addEventListener("change", render);
-
-    var advSelect = document.getElementById("offer-advertiser-select");
-    var advNewInput = document.getElementById("offer-advertiser-new");
-    if (advSelect) {
-      advSelect.addEventListener("change", function () {
-        if (advNewInput) {
-          advNewInput.style.display = advSelect.value === "__new__" ? "" : "none";
-          if (advSelect.value === "__new__") setTimeout(function () { advNewInput.focus(); }, 30);
-        }
-      });
-    }
 
     var ctaUrlInput = document.getElementById("offer-cta-url");
     if (ctaUrlInput) ctaUrlInput.addEventListener("input", refreshEnrichedPreview);
