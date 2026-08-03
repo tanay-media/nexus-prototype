@@ -28,7 +28,7 @@
       <div class="page-header">
         <h1 id="page-main-title">Offers</h1>
         <div class="page-header__right">
-          <button type="button" class="btn btn--black" id="team-offer-add-btn" style="display:none;">+ New team offer</button>
+          <button type="button" class="btn btn--black" id="team-offer-add-btn">+ New offer</button>
           <button type="button" class="btn btn--black" id="parent-offer-add-btn" style="display:none;">+ New parent offer</button>
           <button type="button" class="btn btn--black" id="adv-add-btn" style="display:none;">+ New advertiser</button>
         </div>
@@ -42,7 +42,7 @@
 
       <!-- ===== TEAM OFFERS PANEL ===== -->
       <div class="page-body" id="panel-team-offers">
-        <p class="offers-intro muted">Team: <strong id="offers-team-label">ACME Media</strong> · <strong>team_offer</strong> instances — edit Deal/CTA overrides, buy sources &amp; workspaces. Parent fields are read-only.</p>
+        <p class="offers-intro muted">Team: <strong id="offers-team-label">ACME Media</strong> · <strong>team_offer</strong> instances — parent offer, advertiser &amp; categories are fixed; everything else is editable per team.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
@@ -201,16 +201,39 @@
         <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
       </div>
 
-      <!-- Parent offer (read-only) -->
-      <section class="offer-detail-pane offer-locked-pane" data-tab-panel="parent-offer">
-        <p class="settings-section__hint muted">Inherited from <strong>parent_offer</strong> — contact super-admin to change advertiser or categories.</p>
-        <div class="offer-locked-grid" id="team-parent-readonly"></div>
-      </section>
+      <!-- Parent offer + team general -->
+      <section class="offer-detail-pane" data-tab-panel="parent-offer">
+        <div id="team-parent-picker-wrap" hidden>
+          <div class="field">
+            <label for="team-parent-search">Parent offer</label>
+            <p class="settings-section__hint muted">Search and select a catalog offer mapped to this team.</p>
+            <div class="offer-parent-picker" id="team-parent-picker">
+              <div class="search-wrap offer-parent-picker__search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <input class="input" type="search" id="team-parent-search" placeholder="Search advertiser or offer…" autocomplete="off" aria-controls="team-parent-options" aria-expanded="false" />
+              </div>
+              <ul class="offer-parent-picker__list" id="team-parent-options" role="listbox" aria-label="Parent offers"></ul>
+            </div>
+          </div>
+        </div>
 
-      <!-- Deal (team overrides) -->
-      <section class="offer-detail-pane" data-tab-panel="deal" hidden>
-        <div class="field"><label for="team-offer-display-name">Display name</label><input type="text" id="team-offer-display-name" placeholder="Optional local label" /></div>
-        <div class="field-row">
+        <div id="team-parent-locked-wrap" hidden>
+          <p class="settings-section__hint muted" style="margin-top:0;">Inherited from <strong>parent_offer</strong> — contact super-admin to change advertiser or categories.</p>
+          <div class="offer-locked-pane">
+            <div class="offer-locked-grid" id="team-parent-readonly"></div>
+          </div>
+        </div>
+
+        <div class="settings-section" id="team-offer-general-wrap" style="margin-top:1rem;">
+          <p class="settings-section__title">Team offer</p>
+          <div class="field">
+            <label for="team-offer-name">Team offer name</label>
+            <input type="text" id="team-offer-name" placeholder="e.g. VIN Search — ACME Q1" />
+          </div>
+          <div class="field">
+            <label for="team-offer-description">Offer description</label>
+            <textarea id="team-offer-description" rows="2" placeholder="Internal notes for this team…"></textarea>
+          </div>
           <div class="field">
             <label for="team-offer-status">Status</label>
             <select id="team-offer-status">
@@ -218,9 +241,15 @@
               <option value="inactive">Inactive</option>
             </select>
           </div>
+        </div>
+      </section>
+
+      <!-- Deal (team editable) -->
+      <section class="offer-detail-pane" data-tab-panel="deal" hidden>
+        <div class="field-row">
           <div class="field">
             <label for="team-offer-deal-type">Deal type</label>
-            <select id="team-offer-deal-type" disabled class="input--readonly">
+            <select id="team-offer-deal-type">
               <option value="cpa">CPA</option>
               <option value="cpc">CPC</option>
             </select>
@@ -487,12 +516,12 @@
     ];
 
     var teamOffers = [
-      { id: "to-hb-wis",  parentOfferId: "po-hb-wis",  teamId: "team-acme", displayName: "", status: "active", targetValue: null, countries: null, maxCampaignId: "MAX-88421", maxCampaignStatus: "active", ctaUrl: null, buySources: ["fb", "google"], workspaceIds: ["acme-growth", "acme-brand"] },
-      { id: "to-hb-wit",  parentOfferId: "po-hb-wit",  teamId: "team-acme", displayName: "", status: "active", targetValue: null, countries: null, maxCampaignId: "MAX-88422", maxCampaignStatus: "active", ctaUrl: null, buySources: ["fb"], workspaceIds: ["acme-growth"] },
-      { id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "", status: "active", targetValue: null, countries: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: ["acme-growth", "acme-brand", "fin-main"] },
-      { id: "to-bv-vin",  parentOfferId: "po-bv-vin",  teamId: "team-acme", displayName: "", status: "active", targetValue: null, countries: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: ["google", "taboola"], workspaceIds: ["acme-growth", "fin-main"] },
-      { id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "", status: "inactive", targetValue: null, countries: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: ["acme-brand"] },
-      { id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "", status: "active", targetValue: null, countries: null, maxCampaignId: "MAX-90102", maxCampaignStatus: "paused", ctaUrl: null, buySources: ["fb", "google", "taboola"], workspaceIds: ["fin-main"] }
+      { id: "to-hb-wis",  parentOfferId: "po-hb-wis",  teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "MAX-88421", maxCampaignStatus: "active", ctaUrl: null, buySources: ["fb", "google"], workspaceIds: ["acme-growth", "acme-brand"] },
+      { id: "to-hb-wit",  parentOfferId: "po-hb-wit",  teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "MAX-88422", maxCampaignStatus: "active", ctaUrl: null, buySources: ["fb"], workspaceIds: ["acme-growth"] },
+      { id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: ["acme-growth", "acme-brand", "fin-main"] },
+      { id: "to-bv-vin",  parentOfferId: "po-bv-vin",  teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: ["google", "taboola"], workspaceIds: ["acme-growth", "fin-main"] },
+      { id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "", description: "", status: "inactive", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: ["acme-brand"] },
+      { id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "MAX-90102", maxCampaignStatus: "paused", ctaUrl: null, buySources: ["fb", "google", "taboola"], workspaceIds: ["fin-main"] }
     ];
 
     function slugifyId(s) {
@@ -549,6 +578,18 @@
     function teamOfferLabel(to) {
       var p = parentById(to.parentOfferId);
       return (to.displayName && to.displayName.trim()) || (p ? p.name : "Team offer");
+    }
+    function resolvedDealType(to) {
+      var p = parentById(to.parentOfferId);
+      return to.dealType || (p ? p.dealType : "cpa") || "cpa";
+    }
+    function resolvedTargetType(to) {
+      var p = parentById(to.parentOfferId);
+      return to.targetType || (p ? p.targetType : "cpa") || "cpa";
+    }
+    function resolvedTrackingProvider(to) {
+      var p = parentById(to.parentOfferId);
+      return to.trackingProvider || (p ? p.trackingProvider : "max") || "max";
     }
     function resolvedTarget(to) {
       var p = parentById(to.parentOfferId);
@@ -651,9 +692,13 @@
           parentOfferId: parent.id,
           teamId: teamId,
           displayName: "",
+          description: "",
           status: parent.status || "active",
+          dealType: null,
+          targetType: null,
           targetValue: null,
           countries: null,
+          trackingProvider: null,
           maxCampaignId: "",
           maxCampaignStatus: "active",
           ctaUrl: null,
@@ -666,6 +711,7 @@
     var expandedAdvertisers = {};
     var activeTeamOfferId = null;
     var activeParentOfferId = null;
+    var isNewTeamOffer = false;
     var tbody = document.getElementById("offers-body");
     var parentBody = document.getElementById("parent-offers-body");
     var teamDetailDlg = document.getElementById("dialog-team-offer-detail");
@@ -678,9 +724,8 @@
       return (p && p.dealType ? p.dealType : "cpa").toUpperCase();
     }
     function fmtTargetResolved(to) {
-      var p = parentById(to.parentOfferId);
+      var targetType = resolvedTargetType(to);
       var tv = resolvedTarget(to);
-      var targetType = (p && p.targetType) || "cpa";
       var amt = tv.amount != null ? tv.amount : tv.targetCpa;
       if (amt == null || amt === 0) return "—";
       var prefix = targetType === "roas" ? "" : "$";
@@ -803,7 +848,7 @@
             '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong></td>' +
             '<td class="muted" style="font-size:12px;">' + escapeHtml(p ? p.name : "—") + '</td>' +
             '<td class="muted">' + escapeHtml(p ? catL1FromParent(p) : "—") + '</td>' +
-            '<td class="muted">' + (p ? fmtDealParent(p) : "—") + '</td>' +
+            '<td class="muted">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + '</td>' +
             '<td class="right num">' + fmtTargetResolved(to) + '</td>' +
             '<td>' + statusBadge(to.status) + '</td>' +
             '<td class="muted" style="font-size:12.5px;">' + wsNames(to.workspaceIds) + '</td>' +
@@ -1077,56 +1122,172 @@
       return sel ? sel.value : "";
     }
 
+    function setTeamOfferTabsEnabled(enabled) {
+      if (!teamDetailDlg) return;
+      teamDetailDlg.querySelectorAll('.tab[data-tab]').forEach(function (tab) {
+        if (tab.getAttribute("data-tab") === "parent-offer") return;
+        tab.disabled = !enabled;
+        tab.classList.toggle("is-disabled", !enabled);
+        tab.setAttribute("aria-disabled", enabled ? "false" : "true");
+      });
+    }
+
+    function parentPickerLabel(p) {
+      return advName(p.advertiserId) + " — " + p.name;
+    }
+
+    function parentOffersAvailableForTeam(teamId, excludeTeamOfferId) {
+      var taken = {};
+      teamOffers.forEach(function (to) {
+        if (to.teamId !== teamId) return;
+        if (excludeTeamOfferId && to.id === excludeTeamOfferId) return;
+        if (to.parentOfferId) taken[to.parentOfferId] = true;
+      });
+      return parentOffers.filter(function (p) {
+        return p.teamIds && p.teamIds.indexOf(teamId) !== -1 && !taken[p.id];
+      });
+    }
+
+    function renderParentOfferPicker(query) {
+      var list = document.getElementById("team-parent-options");
+      if (!list) return;
+      var q = (query || "").trim().toLowerCase();
+      var available = parentOffersAvailableForTeam(CURRENT_TEAM.id, activeTeamOfferId);
+      var filtered = available.filter(function (p) {
+        if (!q) return true;
+        return parentPickerLabel(p).toLowerCase().indexOf(q) !== -1;
+      });
+      if (!filtered.length) {
+        list.innerHTML = '<li class="offer-parent-picker__empty muted">No parent offers match. Map teams on the parent offer first.</li>';
+        return;
+      }
+      list.innerHTML = filtered.map(function (p) {
+        return '<li class="offer-parent-picker__item" role="option" data-parent-offer-id="' + escapeHtml(p.id) + '" tabindex="0">' +
+          '<span class="offer-parent-picker__adv">' + escapeHtml(advName(p.advertiserId)) + '</span>' +
+          '<span class="offer-parent-picker__name">' + escapeHtml(p.name) + '</span>' +
+          '<span class="offer-parent-picker__meta muted">' + escapeHtml(catL1FromParent(p)) + ' · ' + escapeHtml(fmtDealParent(p)) + '</span>' +
+        '</li>';
+      }).join("");
+    }
+
+    function selectParentOfferForTeam(parentId) {
+      var to = teamOfferById(activeTeamOfferId);
+      if (!to) return;
+      to.parentOfferId = parentId;
+      var p = parentById(parentId);
+      document.getElementById("team-parent-picker-wrap").hidden = true;
+      document.getElementById("team-parent-locked-wrap").hidden = false;
+      document.getElementById("team-offer-general-wrap").hidden = false;
+      renderParentReadonly(p);
+      if (!document.getElementById("team-offer-name").value.trim() && p) {
+        document.getElementById("team-offer-name").placeholder = p.name;
+      }
+      loadTeamOfferDealFields(to, p);
+      ensureOfferAdvertiserWorkspace(to, false);
+      renderOfferWorkspaces(to);
+      refreshEnrichedPreview();
+      document.getElementById("team-offer-detail-title").textContent = document.getElementById("team-offer-name").value.trim() || (p ? p.name : "New team offer");
+      document.getElementById("team-offer-detail-sub").textContent = (p ? parentPickerLabel(p) : "Choose a parent offer") + " · " + CURRENT_TEAM.name;
+      setTeamOfferTabsEnabled(!!p);
+    }
+
     function renderParentReadonly(p) {
       var el = document.getElementById("team-parent-readonly");
-      if (!el || !p) return;
+      if (!el) return;
+      if (!p) {
+        el.innerHTML = '<p class="muted">Select a parent offer above.</p>';
+        return;
+      }
       el.innerHTML =
         '<div class="offer-locked-field"><span class="offer-locked-label">Parent offer</span><span class="offer-locked-value">' + escapeHtml(p.name) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Advertiser</span><span class="offer-locked-value">' + escapeHtml(advName(p.advertiserId)) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L1</span><span class="offer-locked-value">' + escapeHtml(catL1FromParent(p) || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L2</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel2 || "—") + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Category L3</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel3 || "—") + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Deal type</span><span class="offer-locked-value">' + escapeHtml(fmtDealParent(p)) + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml((p.targetType || "cpa").toUpperCase()) + '</span></div>';
+        '<div class="offer-locked-field"><span class="offer-locked-label">Category L3</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel3 || "—") + '</span></div>';
     }
 
-    function openTeamOfferDetail(id) {
-      var to = teamOfferById(id);
-      if (!to || !teamDetailDlg) return;
-      var p = parentById(to.parentOfferId);
-      activeTeamOfferId = id;
-      document.getElementById("team-offer-detail-title").textContent = teamOfferLabel(to);
-      document.getElementById("team-offer-detail-sub").textContent = (p ? p.name : "parent_offer") + " · " + CURRENT_TEAM.name;
-      renderParentReadonly(p);
-      document.getElementById("team-offer-display-name").value = to.displayName || "";
-      document.getElementById("team-offer-status").value = to.status || "active";
-      document.getElementById("team-offer-deal-type").value = (p && p.dealType) || "cpa";
+    function loadTeamOfferDealFields(to, p) {
+      document.getElementById("team-offer-deal-type").value = resolvedDealType(to);
       var targetTypeEl = document.getElementById("offer-target-type");
       if (targetTypeEl) {
-        targetTypeEl.value = (p && p.targetType) || "cpa";
-        targetTypeEl.disabled = true;
+        targetTypeEl.value = resolvedTargetType(to);
+        targetTypeEl.disabled = false;
       }
-      var tv = resolvedTarget(to);
       var parentTv = p ? targetOf(p) : {};
-      var amt = to.targetValue != null ? (to.targetValue.amount != null ? to.targetValue.amount : to.targetValue.targetCpa) : "";
-      document.getElementById("offer-target-value").value = amt !== "" && amt != null ? amt : "";
-      document.getElementById("offer-target-value").placeholder = parentTv.amount != null ? String(parentTv.amount) : (parentTv.targetCpa != null ? String(parentTv.targetCpa) : "inherit");
-      document.getElementById("offer-target-currency").value = (to.targetValue && to.targetValue.currency) || (parentTv.currency || "USD");
+      var tv = resolvedTarget(to);
+      var hasOverride = to.targetValue != null;
+      var amt = hasOverride ? (to.targetValue.amount != null ? to.targetValue.amount : to.targetValue.targetCpa) : (tv.amount != null ? tv.amount : tv.targetCpa);
+      document.getElementById("offer-target-value").value = amt != null && amt !== "" ? amt : "";
+      document.getElementById("offer-target-currency").value = (hasOverride && to.targetValue.currency) || tv.currency || parentTv.currency || "USD";
       populateCountrySelect(resolvedCountries(to));
       document.getElementById("offer-max-campaign-id").value = to.maxCampaignId || "";
       document.getElementById("offer-max-campaign-status").value = to.maxCampaignStatus || "active";
-      document.getElementById("offer-tracking-provider").value = (p && p.trackingProvider) || "max";
-      document.getElementById("offer-tracking-provider").disabled = true;
+      var tp = document.getElementById("offer-tracking-provider");
+      if (tp) {
+        tp.value = resolvedTrackingProvider(to);
+        tp.disabled = false;
+      }
       syncTargetHint();
       document.getElementById("offer-cta-url").value = to.ctaUrl || "";
-      document.getElementById("offer-cta-url").placeholder = p && p.ctaUrl ? p.ctaUrl : "inherit from parent";
+      document.getElementById("offer-cta-url").placeholder = p && p.ctaUrl ? ("Default: " + p.ctaUrl.slice(0, 60) + (p.ctaUrl.length > 60 ? "…" : "")) : "Paste team CTA URL";
       if (to.params) offerParams = to.params.map(function (x) { return { key: x.key, value: x.value }; });
       else if (p && p.params) offerParams = p.params.map(function (x) { return { key: x.key, value: x.value }; });
       else offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
       renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
-      ensureOfferAdvertiserWorkspace(to, false);
-      renderOfferWorkspaces(to);
       renderOfferBuySources(to);
+    }
+
+    function openTeamOfferDetail(id, isNew) {
+      var to = teamOfferById(id);
+      if (!to || !teamDetailDlg) return;
+      var p = to.parentOfferId ? parentById(to.parentOfferId) : null;
+      activeTeamOfferId = id;
+      isNewTeamOffer = !!isNew || !to.parentOfferId;
+      document.getElementById("team-offer-name").value = to.displayName || "";
+      document.getElementById("team-offer-description").value = to.description || "";
+      document.getElementById("team-offer-status").value = to.status || "active";
+      document.getElementById("team-offer-detail-title").textContent = teamOfferLabel(to);
+      document.getElementById("team-offer-detail-sub").textContent = (p ? parentPickerLabel(p) : "Choose a parent offer") + " · " + CURRENT_TEAM.name;
+
+      var pickerWrap = document.getElementById("team-parent-picker-wrap");
+      var lockedWrap = document.getElementById("team-parent-locked-wrap");
+      var generalWrap = document.getElementById("team-offer-general-wrap");
+
+      if (isNewTeamOffer) {
+        pickerWrap.hidden = false;
+        lockedWrap.hidden = true;
+        generalWrap.hidden = !p;
+        document.getElementById("team-parent-search").value = "";
+        renderParentOfferPicker("");
+      } else {
+        pickerWrap.hidden = true;
+        lockedWrap.hidden = false;
+        generalWrap.hidden = false;
+        renderParentReadonly(p);
+      }
+
+      if (p) loadTeamOfferDealFields(to, p);
+      else {
+        document.getElementById("team-offer-deal-type").value = "cpa";
+        document.getElementById("offer-target-type").value = "cpa";
+        document.getElementById("offer-target-value").value = "";
+        populateCountrySelect(["US"]);
+        document.getElementById("offer-max-campaign-id").value = "";
+        document.getElementById("offer-max-campaign-status").value = "active";
+        document.getElementById("offer-tracking-provider").value = "max";
+        document.getElementById("offer-cta-url").value = "";
+        offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
+        renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
+        renderOfferBuySources(to);
+      }
+
+      if (p) {
+        ensureOfferAdvertiserWorkspace(to, false);
+        renderOfferWorkspaces(to);
+      } else {
+        renderOfferWorkspaces(to);
+      }
+      setTeamOfferTabsEnabled(!!p);
       refreshEnrichedPreview();
       var firstTab = teamDetailDlg.querySelector('.tab[data-tab="parent-offer"]');
       if (firstTab) firstTab.click();
@@ -1136,9 +1297,18 @@
     function saveTeamOfferDetail() {
       var to = teamOfferById(activeTeamOfferId);
       if (!to) return;
+      if (!to.parentOfferId) {
+        alert("Please select a parent offer before saving.");
+        return;
+      }
       var p = parentById(to.parentOfferId);
-      to.displayName = document.getElementById("team-offer-display-name").value.trim();
+      to.displayName = document.getElementById("team-offer-name").value.trim();
+      to.description = document.getElementById("team-offer-description").value.trim();
       to.status = document.getElementById("team-offer-status").value;
+      var dealType = document.getElementById("team-offer-deal-type").value;
+      to.dealType = (p && dealType === p.dealType) ? null : dealType;
+      var targetType = document.getElementById("offer-target-type").value;
+      to.targetType = (p && targetType === (p.targetType || "cpa")) ? null : targetType;
       var valRaw = document.getElementById("offer-target-value").value.trim();
       var cur = document.getElementById("offer-target-currency").value;
       if (!valRaw) {
@@ -1155,6 +1325,8 @@
       to.countries = sameCountries ? null : countries;
       to.maxCampaignId = document.getElementById("offer-max-campaign-id").value.trim();
       to.maxCampaignStatus = document.getElementById("offer-max-campaign-status").value;
+      var tracking = document.getElementById("offer-tracking-provider").value;
+      to.trackingProvider = (p && tracking === (p.trackingProvider || "max")) ? null : tracking;
       var cta = document.getElementById("offer-cta-url").value.trim();
       var parentCta = p ? (p.ctaUrl || "") : "";
       to.ctaUrl = (!cta || cta === parentCta) ? null : cta;
@@ -1169,6 +1341,7 @@
       document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]:checked").forEach(function (cb) {
         to.buySources.push(cb.value);
       });
+      isNewTeamOffer = false;
       renderAdvertiserFilters();
       render();
     }
@@ -1417,6 +1590,44 @@
       parentDetailDlg.querySelector("form").addEventListener("submit", saveParentOfferDetail);
     }
 
+    document.getElementById("team-offer-add-btn").addEventListener("click", function () {
+      var id = "to-" + Date.now();
+      teamOffers.push({
+        id: id, parentOfferId: "", teamId: CURRENT_TEAM.id,
+        displayName: "", description: "", status: "active",
+        dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null,
+        maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: []
+      });
+      openTeamOfferDetail(id, true);
+    });
+
+    var teamParentSearch = document.getElementById("team-parent-search");
+    var teamParentOptions = document.getElementById("team-parent-options");
+    if (teamParentSearch) {
+      teamParentSearch.addEventListener("input", function () {
+        renderParentOfferPicker(teamParentSearch.value);
+        teamParentSearch.setAttribute("aria-expanded", "true");
+      });
+      teamParentSearch.addEventListener("focus", function () {
+        renderParentOfferPicker(teamParentSearch.value);
+        teamParentSearch.setAttribute("aria-expanded", "true");
+      });
+    }
+    if (teamParentOptions) {
+      teamParentOptions.addEventListener("click", function (e) {
+        var item = e.target.closest(".offer-parent-picker__item");
+        if (!item) return;
+        selectParentOfferForTeam(item.getAttribute("data-parent-offer-id"));
+      });
+      teamParentOptions.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        var item = e.target.closest(".offer-parent-picker__item");
+        if (!item) return;
+        e.preventDefault();
+        selectParentOfferForTeam(item.getAttribute("data-parent-offer-id"));
+      });
+    }
+
     document.getElementById("parent-offer-add-btn").addEventListener("click", function () {
       var id = "po-" + Date.now();
       parentOffers.push({
@@ -1470,7 +1681,7 @@
         document.getElementById("panel-team-offers").style.display = target === "team-offers" ? "" : "none";
         document.getElementById("panel-parent-offers").style.display = target === "parent-offers" ? "" : "none";
         document.getElementById("panel-advertisers").style.display = target === "advertisers" ? "" : "none";
-        document.getElementById("team-offer-add-btn").style.display = "none";
+        document.getElementById("team-offer-add-btn").style.display = target === "team-offers" ? "" : "none";
         document.getElementById("parent-offer-add-btn").style.display = target === "parent-offers" ? "" : "none";
         document.getElementById("adv-add-btn").style.display = target === "advertisers" ? "" : "none";
         document.getElementById("page-main-title").textContent = pageTitles[target] || "Offers";

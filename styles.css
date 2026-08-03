@@ -3007,6 +3007,12 @@ button.dsk-row-name:focus-visible strong {
 .offer-advertiser-row strong { font-size: 14px; }
 .offer-row td:first-child + td { padding-left: 0.35rem; }
 .offer-detail-tabs { margin-bottom: 0.85rem; }
+.offer-detail-tabs .tab.is-disabled,
+.offer-detail-tabs .tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 .offer-detail-pane { margin-bottom: 0.5rem; }
 .offer-ws-list {
   list-style: none;
@@ -3104,6 +3110,68 @@ button.dsk-row-name:focus-visible strong {
 .offer-locked-field { display: flex; flex-direction: column; gap: 0.15rem; }
 .offer-locked-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
 .offer-locked-value { font-size: 13.5px; color: var(--text); }
+.offer-parent-picker {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+.offer-parent-picker__search { margin: 0; }
+.offer-parent-picker__search .input {
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+  min-width: 0;
+}
+.offer-parent-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.offer-parent-picker__item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.1rem 0.75rem;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s ease;
+}
+.offer-parent-picker__item:last-child { border-bottom: none; }
+.offer-parent-picker__item:hover,
+.offer-parent-picker__item:focus {
+  background: var(--hover-bg, #f5f6f8);
+  outline: none;
+}
+.offer-parent-picker__adv {
+  grid-column: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.offer-parent-picker__name {
+  grid-column: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.offer-parent-picker__meta {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.offer-parent-picker__empty {
+  padding: 1rem 0.85rem;
+  font-size: 13px;
+}
 .modal--offer-detail { max-width: 680px; }
 .modal--offer-detail .modal__inner { max-height: min(88vh, 780px); overflow-y: auto; }
 
