@@ -549,7 +549,8 @@
       { id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing",          categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
       { id: "po-bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", status: "active", teamIds: ["team-acme", "team-fin"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
       { id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search",  categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], ctaUrl: "" },
-      { id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
+      { id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" },
+      { id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance",   categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfLife01&akey=x1y2z3" }
     ];
 
     var teamOffers = [
@@ -1226,15 +1227,23 @@
       return advName(p.advertiserId) + " — " + p.name;
     }
 
-    function parentOffersAvailableForTeam(teamId, excludeTeamOfferId) {
-      var taken = {};
-      teamOffers.forEach(function (to) {
-        if (to.teamId !== teamId) return;
-        if (excludeTeamOfferId && to.id === excludeTeamOfferId) return;
-        if (to.parentOfferId) taken[to.parentOfferId] = true;
+    function parentOffersForPicker(teamId) {
+      var advForTeam = {};
+      advertisers.forEach(function (a) {
+        if (a.teamIds && a.teamIds.indexOf(teamId) !== -1) advForTeam[a.id] = true;
       });
       return parentOffers.filter(function (p) {
-        return p.teamIds && p.teamIds.indexOf(teamId) !== -1 && !taken[p.id];
+        if (p.teamIds && p.teamIds.indexOf(teamId) !== -1) return true;
+        if (advForTeam[p.advertiserId]) return true;
+        return false;
+      });
+    }
+
+    function isParentTakenOnTeam(parentId, teamId, excludeTeamOfferId) {
+      return teamOffers.some(function (to) {
+        if (to.teamId !== teamId || to.parentOfferId !== parentId) return false;
+        if (excludeTeamOfferId && to.id === excludeTeamOfferId) return false;
+        return true;
       });
     }
 
@@ -1242,20 +1251,45 @@
       var list = document.getElementById("team-parent-options");
       if (!list) return;
       var q = (query || "").trim().toLowerCase();
-      var available = parentOffersAvailableForTeam(CURRENT_TEAM.id, activeTeamOfferId);
-      var filtered = available.filter(function (p) {
-        if (!q) return true;
-        return parentPickerLabel(p).toLowerCase().indexOf(q) !== -1;
+      var all = parentOffersForPicker(CURRENT_TEAM.id);
+      var groups = {};
+      all.forEach(function (p) {
+        var adv = advName(p.advertiserId) || "Unknown";
+        if (!groups[adv]) groups[adv] = { name: adv, offers: [] };
+        groups[adv].offers.push(p);
       });
-      if (!filtered.length) {
-        list.innerHTML = '<li class="offer-parent-picker__empty muted">No parent offers match. Map teams on the parent offer first.</li>';
+      var groupList = Object.keys(groups).sort().map(function (k) { return groups[k]; });
+      groupList.forEach(function (g) {
+        g.offers.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      });
+      if (q) {
+        groupList = groupList.map(function (g) {
+          var advMatch = g.name.toLowerCase().indexOf(q) !== -1;
+          var offers = g.offers.filter(function (p) {
+            return advMatch ||
+              p.name.toLowerCase().indexOf(q) !== -1 ||
+              catL1FromParent(p).toLowerCase().indexOf(q) !== -1 ||
+              fmtDealParent(p).toLowerCase().indexOf(q) !== -1;
+          });
+          return offers.length ? { name: g.name, offers: offers } : null;
+        }).filter(Boolean);
+      }
+      if (!groupList.length) {
+        list.innerHTML = '<li class="offer-parent-picker__empty muted">No parent offers found. Map this team on an advertiser or parent offer first.</li>';
         return;
       }
-      list.innerHTML = filtered.map(function (p) {
-        return '<li class="offer-parent-picker__item" role="option" data-parent-offer-id="' + escapeHtml(p.id) + '" tabindex="0">' +
-          '<span class="offer-parent-picker__adv">' + escapeHtml(advName(p.advertiserId)) + '</span>' +
-          '<span class="offer-parent-picker__name">' + escapeHtml(p.name) + '</span>' +
-          '<span class="offer-parent-picker__meta muted">' + escapeHtml(catL1FromParent(p)) + ' · ' + escapeHtml(fmtDealParent(p)) + '</span>' +
+      list.innerHTML = groupList.map(function (g) {
+        return '<li class="offer-parent-picker__group">' +
+          '<div class="offer-parent-picker__group-head">' + escapeHtml(g.name) + '</div>' +
+          '<ul class="offer-parent-picker__group-list">' +
+            g.offers.map(function (p) {
+              var taken = isParentTakenOnTeam(p.id, CURRENT_TEAM.id, activeTeamOfferId);
+              return '<li class="offer-parent-picker__item' + (taken ? " is-taken" : "") + '" role="option" data-parent-offer-id="' + escapeHtml(p.id) + '"' + (taken ? ' aria-disabled="true"' : ' tabindex="0"') + '">' +
+                '<span class="offer-parent-picker__name">' + escapeHtml(p.name) + '</span>' +
+                '<span class="offer-parent-picker__meta muted">' + escapeHtml(catL1FromParent(p)) + ' · ' + escapeHtml(fmtDealParent(p)) + (taken ? ' · <em>Already on team</em>' : '') + '</span>' +
+              '</li>';
+            }).join("") +
+          '</ul>' +
         '</li>';
       }).join("");
     }
@@ -1701,7 +1735,7 @@
     if (teamParentOptions) {
       teamParentOptions.addEventListener("click", function (e) {
         var item = e.target.closest(".offer-parent-picker__item");
-        if (!item) return;
+        if (!item || item.classList.contains("is-taken")) return;
         selectParentOfferForTeam(item.getAttribute("data-parent-offer-id"));
       });
       teamParentOptions.addEventListener("keydown", function (e) {
