@@ -176,23 +176,29 @@
         </div>
         <div class="field-row">
           <div class="field">
-            <label for="offer-category-l1">Category level 1</label>
-            <select id="offer-category-l1">
-              <option value="">— Select —</option>
-            </select>
+            <label for="offer-category-l1-input">Category level 1</label>
+            <div class="offer-cat-combo" id="offer-category-l1-wrap">
+              <input type="search" id="offer-category-l1-input" class="offer-cat-combo__input" placeholder="Search category…" autocomplete="off" />
+              <input type="hidden" id="offer-category-l1" value="" />
+              <ul class="offer-cat-combo__list" id="offer-category-l1-list" role="listbox" hidden></ul>
+            </div>
           </div>
           <div class="field">
-            <label for="offer-category-l2">Category level 2</label>
-            <select id="offer-category-l2" disabled>
-              <option value="">— Select level 1 first —</option>
-            </select>
+            <label for="offer-category-l2-input">Category level 2</label>
+            <div class="offer-cat-combo" id="offer-category-l2-wrap">
+              <input type="search" id="offer-category-l2-input" class="offer-cat-combo__input" placeholder="Select level 1 first" autocomplete="off" disabled />
+              <input type="hidden" id="offer-category-l2" value="" />
+              <ul class="offer-cat-combo__list" id="offer-category-l2-list" role="listbox" hidden></ul>
+            </div>
           </div>
         </div>
         <div class="field">
-          <label for="offer-category-l3">Category level 3</label>
-          <select id="offer-category-l3" disabled>
-            <option value="">— Select level 2 first —</option>
-          </select>
+          <label for="offer-category-l3-input">Category level 3</label>
+          <div class="offer-cat-combo" id="offer-category-l3-wrap">
+            <input type="search" id="offer-category-l3-input" class="offer-cat-combo__input" placeholder="Select level 2 first" autocomplete="off" disabled />
+            <input type="hidden" id="offer-category-l3" value="" />
+            <ul class="offer-cat-combo__list" id="offer-category-l3-list" role="listbox" hidden></ul>
+          </div>
         </div>
         <div class="field"><label for="offer-description">Description</label><textarea id="offer-description" rows="2" placeholder="Internal notes…"></textarea></div>
       </section>
@@ -377,40 +383,8 @@
 
     function categoryL3Key(l1, l2) { return (l1 || "") + "|" + (l2 || ""); }
 
-    function populateCategoryL1(selected) {
-      var sel = document.getElementById("offer-category-l1");
-      if (!sel || typeof OFFER_CATEGORY_L1_L2 === "undefined") return;
-      var levels = Object.keys(OFFER_CATEGORY_L1_L2).sort();
-      sel.innerHTML = '<option value="">— Select —</option>' +
-        levels.map(function (c) {
-          return '<option value="' + escapeHtml(c) + '"' + (c === selected ? " selected" : "") + '>' + escapeHtml(c) + '</option>';
-        }).join("");
-    }
-
-    function populateCategoryL2(l1, selected) {
-      var sel = document.getElementById("offer-category-l2");
-      if (!sel) return;
-      if (!l1 || !OFFER_CATEGORY_L1_L2[l1]) {
-        sel.disabled = true;
-        sel.innerHTML = '<option value="">— Select level 1 first —</option>';
-        return;
-      }
-      sel.disabled = false;
-      var items = OFFER_CATEGORY_L1_L2[l1] || [];
-      sel.innerHTML = '<option value="">— Select —</option>' +
-        items.map(function (c) {
-          return '<option value="' + escapeHtml(c) + '"' + (c === selected ? " selected" : "") + '>' + escapeHtml(c) + '</option>';
-        }).join("");
-    }
-
-    function populateCategoryL3(l1, l2, selected) {
-      var sel = document.getElementById("offer-category-l3");
-      if (!sel) return;
-      if (!l1 || !l2) {
-        sel.disabled = true;
-        sel.innerHTML = '<option value="">— Select level 2 first —</option>';
-        return;
-      }
+    function getCategoryL3Options(l1, l2) {
+      if (!l1 || !l2) return [];
       var key = categoryL3Key(l1, l2);
       var presets = (typeof OFFER_CATEGORY_L3 !== "undefined" && OFFER_CATEGORY_L3[key]) ? OFFER_CATEGORY_L3[key].slice() : [];
       offers.forEach(function (o) {
@@ -418,17 +392,107 @@
           presets.push(o.categoryLevel3);
         }
       });
-      presets.sort(function (a, b) { return a.localeCompare(b); });
-      if (!presets.length) {
-        sel.disabled = true;
-        sel.innerHTML = '<option value="">— No level 3 presets for this category —</option>';
+      return presets.sort(function (a, b) { return a.localeCompare(b); });
+    }
+
+    function getCategoryOptions(level) {
+      if (level === 1) {
+        return typeof OFFER_CATEGORY_L1_L2 !== "undefined" ? Object.keys(OFFER_CATEGORY_L1_L2).sort() : [];
+      }
+      var l1 = document.getElementById("offer-category-l1").value;
+      if (level === 2) return l1 && OFFER_CATEGORY_L1_L2[l1] ? OFFER_CATEGORY_L1_L2[l1] : [];
+      var l2 = document.getElementById("offer-category-l2").value;
+      if (level === 3) return getCategoryL3Options(l1, l2);
+      return [];
+    }
+
+    function closeCategoryComboLists(exceptListId) {
+      document.querySelectorAll(".offer-cat-combo__list").forEach(function (list) {
+        if (!exceptListId || list.id !== exceptListId) list.hidden = true;
+      });
+    }
+
+    function renderCategoryComboList(level, filter) {
+      var list = document.getElementById("offer-category-l" + level + "-list");
+      var hidden = document.getElementById("offer-category-l" + level);
+      var input = document.getElementById("offer-category-l" + level + "-input");
+      if (!list || !hidden || !input || input.disabled) return;
+      var options = getCategoryOptions(level);
+      var q = (filter != null ? filter : input.value).trim().toLowerCase();
+      var selected = hidden.value;
+      var filtered = options.filter(function (opt) {
+        return !q || opt.toLowerCase().indexOf(q) !== -1;
+      });
+      if (!filtered.length) {
+        list.innerHTML = '<li class="offer-cat-combo__empty">' + (options.length ? "No matches" : "No options") + "</li>";
+        list.hidden = false;
         return;
       }
-      sel.disabled = false;
-      sel.innerHTML = '<option value="">— Select —</option>' +
-        presets.map(function (c) {
-          return '<option value="' + escapeHtml(c) + '"' + (c === selected ? " selected" : "") + '>' + escapeHtml(c) + '</option>';
-        }).join("");
+      list.innerHTML = filtered.map(function (opt) {
+        var cls = opt === selected ? "is-selected" : "";
+        return '<li role="option" class="' + cls + '" data-value="' + escapeHtml(opt) + '">' + escapeHtml(opt) + "</li>";
+      }).join("");
+      list.hidden = false;
+    }
+
+    function setCategoryComboLevel(level, value, filterText) {
+      var hidden = document.getElementById("offer-category-l" + level);
+      var input = document.getElementById("offer-category-l" + level + "-input");
+      var list = document.getElementById("offer-category-l" + level + "-list");
+      if (!hidden || !input) return;
+      hidden.value = value || "";
+      input.value = filterText != null ? filterText : (value || "");
+      if (list) list.hidden = true;
+    }
+
+    function setCategoryComboEnabled(level, enabled, placeholder) {
+      var input = document.getElementById("offer-category-l" + level + "-input");
+      if (!input) return;
+      input.disabled = !enabled;
+      input.placeholder = placeholder || (enabled ? "Search category…" : "—");
+      if (!enabled) {
+        setCategoryComboLevel(level, "", "");
+        var list = document.getElementById("offer-category-l" + level + "-list");
+        if (list) list.hidden = true;
+      }
+    }
+
+    function populateCategoryL1(selected) {
+      setCategoryComboLevel(1, selected || "");
+      setCategoryComboEnabled(2, !!selected, selected ? "Search category…" : "Select level 1 first");
+      if (!selected) setCategoryComboEnabled(3, false, "Select level 2 first");
+    }
+
+    function populateCategoryL2(l1, selected) {
+      if (!l1 || !OFFER_CATEGORY_L1_L2[l1]) {
+        setCategoryComboLevel(2, "");
+        setCategoryComboEnabled(2, false, "Select level 1 first");
+        setCategoryComboLevel(3, "");
+        setCategoryComboEnabled(3, false, "Select level 2 first");
+        return;
+      }
+      setCategoryComboEnabled(2, true, "Search category…");
+      setCategoryComboLevel(2, selected || "");
+      if (!selected) {
+        setCategoryComboLevel(3, "");
+        setCategoryComboEnabled(3, false, "Select level 2 first");
+      }
+    }
+
+    function populateCategoryL3(l1, l2, selected) {
+      if (!l1 || !l2) {
+        setCategoryComboLevel(3, "");
+        setCategoryComboEnabled(3, false, "Select level 2 first");
+        return;
+      }
+      var presets = getCategoryL3Options(l1, l2);
+      if (!presets.length) {
+        setCategoryComboLevel(3, "");
+        setCategoryComboEnabled(3, false, "No level 3 presets for this category");
+        return;
+      }
+      setCategoryComboEnabled(3, true, "Search category…");
+      setCategoryComboLevel(3, selected || "");
     }
 
     function syncCategoryCascade(selectedL2, selectedL3) {
@@ -436,6 +500,50 @@
       populateCategoryL2(l1, selectedL2 || "");
       var l2 = document.getElementById("offer-category-l2").value;
       populateCategoryL3(l1, l2, selectedL3 || "");
+    }
+
+    function setupCategoryCombos() {
+      [1, 2, 3].forEach(function (level) {
+        var input = document.getElementById("offer-category-l" + level + "-input");
+        var list = document.getElementById("offer-category-l" + level + "-list");
+        if (!input || !list) return;
+
+        input.addEventListener("focus", function () {
+          closeCategoryComboLists(list.id);
+          renderCategoryComboList(level, input.value);
+        });
+        input.addEventListener("input", function () {
+          renderCategoryComboList(level, input.value);
+        });
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            list.hidden = true;
+            input.blur();
+          }
+        });
+
+        list.addEventListener("mousedown", function (e) {
+          var item = e.target.closest("[data-value]");
+          if (!item) return;
+          e.preventDefault();
+          var val = item.getAttribute("data-value");
+          setCategoryComboLevel(level, val);
+          list.hidden = true;
+          if (level === 1) {
+            setCategoryComboLevel(2, "");
+            setCategoryComboLevel(3, "");
+            populateCategoryL2(val, "");
+          } else if (level === 2) {
+            setCategoryComboLevel(3, "");
+            var l1 = document.getElementById("offer-category-l1").value;
+            populateCategoryL3(l1, val, "");
+          }
+        });
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".offer-cat-combo")) closeCategoryComboLists();
+      });
     }
     var expandedAdvertisers = {};
     var activeOfferId = null;
@@ -1008,14 +1116,7 @@
     var targetCurEl = document.getElementById("offer-target-currency");
     if (targetTypeEl) targetTypeEl.addEventListener("change", syncTargetHint);
     if (targetCurEl) targetCurEl.addEventListener("change", syncTargetHint);
-    document.getElementById("offer-category-l1").addEventListener("change", function () {
-      syncCategoryCascade("", "");
-    });
-    document.getElementById("offer-category-l2").addEventListener("change", function () {
-      var l1 = document.getElementById("offer-category-l1").value;
-      populateCategoryL3(l1, this.value, "");
-    });
-    var countrySearch = document.getElementById("offer-country-search");
+    document.getElementById("offer-buy-sources-list").addEventListener("change", updateBuySourcesSummary);
     if (countrySearch) {
       countrySearch.addEventListener("input", function () {
         var picked = getCountriesSelect();
