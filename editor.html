@@ -36,7 +36,7 @@
       </div>
 
       <div class="editor-top__right">
-        <button class="btn btn--ghost" type="button" id="editor-variant-settings-open">Settings</button>
+        <button class="btn btn--ghost" type="button" id="editor-settings-toggle" aria-expanded="true" aria-controls="editor-settings-rail">Settings</button>
         <div hidden aria-hidden="true">
           <input type="text" id="settings-page-title" value="Summer Sale — Up to 60% Off" />
           <textarea id="settings-description" rows="2">Limited time. Shop the biggest deals of the season before they're gone.</textarea>
@@ -209,6 +209,71 @@
         </aside>
         </div>
       </main>
+
+      <!-- Right: variant settings (matches production lander builder layout) -->
+      <aside class="editor-settings-rail" id="editor-settings-rail" aria-label="Variant settings">
+        <div class="editor-settings-rail__head">Settings</div>
+        <div class="editor-settings-rail__scroll">
+          <details class="settings-acc" open>
+            <summary class="settings-acc__head">
+              <span>General</span>
+              <svg class="settings-acc__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="settings-acc__body">
+              <div class="field field--settings">
+                <label for="variant-settings-name">Variant name</label>
+                <input type="text" id="variant-settings-name" placeholder="e.g. Main hero" />
+              </div>
+            </div>
+          </details>
+
+          <details class="settings-acc" open>
+            <summary class="settings-acc__head">
+              <span>Call to Action</span>
+              <svg class="settings-acc__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="settings-acc__body">
+              <div class="field field--settings">
+                <label for="editor-offer-dest-trigger">Destination URL</label>
+                <div class="offer-dest-picker" id="editor-offer-dest-picker">
+                  <button type="button" class="offer-dest-picker__trigger" id="editor-offer-dest-trigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="offer-dest-picker__label" id="editor-offer-dest-label">Select team offer…</span>
+                    <svg class="offer-dest-picker__caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
+                  <div class="offer-dest-picker__panel" id="editor-offer-dest-panel" hidden>
+                    <div class="offer-dest-picker__panel-head">
+                      <p class="offer-dest-picker__panel-title">Select team offer</p>
+                      <p class="offer-dest-picker__panel-sub muted">Advertiser → parent offer · sets CTA URL</p>
+                    </div>
+                    <div class="search-wrap offer-dest-picker__search">
+                      <input type="search" class="input" id="editor-offer-dest-search" placeholder="Search advertiser or offer…" autocomplete="off" />
+                    </div>
+                    <ul class="offer-parent-picker__list" id="editor-offer-dest-list" role="listbox" aria-label="Team offers"></ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="offer-dest-url-box" id="editor-offer-dest-url-box" hidden>
+                <p class="offer-dest-url-box__label">CTA URL</p>
+                <p class="offer-dest-url-box__url mono" id="editor-offer-dest-url"></p>
+                <div class="offer-dest-url-box__actions">
+                  <button type="button" class="btn btn--sm" id="editor-offer-dest-copy">Copy</button>
+                  <a class="btn btn--sm" id="editor-offer-dest-view" href="#" target="_blank" rel="noopener">View</a>
+                </div>
+              </div>
+              <p class="settings-acc__hint muted" id="editor-offer-dest-empty">Select a team offer to load its CTA URL.</p>
+
+              <div class="settings-cta-card">
+                <p class="settings-cta-card__label">CTA 1</p>
+                <div class="field field--settings">
+                  <label for="variant-settings-cta-text">Text</label>
+                  <input type="text" id="variant-settings-cta-text" placeholder="Shop Now →" />
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </aside>
     </div>
   </div>
 
@@ -572,40 +637,6 @@
         <button type="button" class="btn btn--black" id="confirm-publish-go">Confirm</button>
       </footer>
     </div>
-  </dialog>
-
-  <!-- Variant settings (variant name + CTA URL) -->
-  <dialog class="modal modal--settings" id="dialog-variant-settings">
-    <form method="dialog" class="modal__inner">
-      <div class="modal__header">
-        <div>
-          <h2 class="modal__title" id="variant-settings-title">Variant settings</h2>
-          <p class="modal__hint">Variant-level record — overridable per variant.</p>
-        </div>
-        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
-      </div>
-
-      <div class="settings-section">
-        <div class="field">
-          <label for="variant-settings-name">Variant name</label>
-          <input type="text" id="variant-settings-name" placeholder="e.g. Main hero" />
-        </div>
-        <div class="field">
-          <label for="variant-settings-cta-url">CTA URL</label>
-          <select id="variant-settings-cta-url"></select>
-        </div>
-        <div class="field" id="variant-settings-cta-url-new-wrap" hidden>
-          <label for="variant-settings-cta-url-new">New CTA URL</label>
-          <input type="url" id="variant-settings-cta-url-new" placeholder="https://tracker.acme.com/r?offer=…" />
-          <div class="field__hint">Saved to the workspace catalog when you click Save settings.</div>
-        </div>
-      </div>
-
-      <div class="modal__actions">
-        <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="submit" class="btn btn--black">Save settings</button>
-      </div>
-    </form>
   </dialog>
 
   <script src="integrations-catalog.js"></script>
@@ -1108,24 +1139,49 @@
       var t = variantSel.options[variantSel.selectedIndex].text;
       var landerName = document.getElementById("editor-lander-title").textContent || "Summer Sale";
       if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + t;
+      if (window.nexusSyncEditorSettingsRail) window.nexusSyncEditorSettingsRail();
     });
 
-    // ---- Variant settings modal (variant name + CTA URL)
+    // ---- Variant settings rail (variant name + team offer CTA)
     (function () {
-      var openBtn = document.getElementById("editor-variant-settings-open");
-      var dlg = document.getElementById("dialog-variant-settings");
-      var titleEl = document.getElementById("variant-settings-title");
+      var settingsToggle = document.getElementById("editor-settings-toggle");
+      var settingsRail = document.getElementById("editor-settings-rail");
       var nameInput = document.getElementById("variant-settings-name");
-      var ctaSel = document.getElementById("variant-settings-cta-url");
-      var ctaNewWrap = document.getElementById("variant-settings-cta-url-new-wrap");
-      var ctaNewInput = document.getElementById("variant-settings-cta-url-new");
-      var VARIANT_CTA_URL_KEY = "nexus.variant.ctaUrl.v1";
-      var CTA_URL_CATALOG_KEY = "nexus.ctaUrls.v1";
-      var CTA_URL_SEED = [
-        { id: "cta_summer", name: "Summer Sale — ACME tracker", url: "https://tracker.acme.com/r?offer=summer_2026" },
-        { id: "cta_bf", name: "Black Friday — main", url: "https://tracker.acme.com/r?offer=bf_2026" },
-        { id: "cta_referral", name: "Referral Q2", url: "https://tracker.acme.com/r?offer=referral_q2" },
-        { id: "cta_partner", name: "Partner announce", url: "https://tracker.acme.com/r?offer=partner_announce" }
+      var ctaTextInput = document.getElementById("variant-settings-cta-text");
+      var previewCtaEl = document.getElementById("preview-cta");
+      var destTrigger = document.getElementById("editor-offer-dest-trigger");
+      var destPanel = document.getElementById("editor-offer-dest-panel");
+      var destLabel = document.getElementById("editor-offer-dest-label");
+      var destSearch = document.getElementById("editor-offer-dest-search");
+      var destList = document.getElementById("editor-offer-dest-list");
+      var destUrlBox = document.getElementById("editor-offer-dest-url-box");
+      var destUrlEl = document.getElementById("editor-offer-dest-url");
+      var destEmpty = document.getElementById("editor-offer-dest-empty");
+      var destCopyBtn = document.getElementById("editor-offer-dest-copy");
+      var destViewLink = document.getElementById("editor-offer-dest-view");
+      var VARIANT_TEAM_OFFER_KEY = "nexus.variant.teamOffer.v1";
+
+      var advertisers = [
+        { id: "adv-hb", name: "HomeBuddy" },
+        { id: "adv-bv", name: "BeenVerified" },
+        { id: "adv-sf", name: "SelectQuote" }
+      ];
+      var parentOffers = [
+        { id: "po-hb-wis",  advertiserId: "adv-hb", name: "Walk-in showers", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
+        { id: "po-hb-wit",  advertiserId: "adv-hb", name: "Walk-in Tubs",     ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
+        { id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing",          ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
+        { id: "po-bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
+        { id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search",  ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Obit01&akey=obit-key-demo" },
+        { id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" },
+        { id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance",   ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfLife01&akey=x1y2z3" }
+      ];
+      var teamOffers = [
+        { id: "to-hb-wis",  parentOfferId: "po-hb-wis",  displayName: "", status: "active", ctaUrl: null },
+        { id: "to-hb-wit",  parentOfferId: "po-hb-wit",  displayName: "", status: "active", ctaUrl: null },
+        { id: "to-hb-roof", parentOfferId: "po-hb-roof", displayName: "", status: "active", ctaUrl: null },
+        { id: "to-bv-vin",  parentOfferId: "po-bv-vin",  displayName: "", status: "active", ctaUrl: null },
+        { id: "to-bv-obit", parentOfferId: "po-bv-obit", displayName: "", status: "inactive", ctaUrl: null },
+        { id: "to-sf-auto", parentOfferId: "po-sf-auto", displayName: "", status: "active", ctaUrl: null }
       ];
 
       function currentLanderName() {
@@ -1135,100 +1191,178 @@
         if (!variantSel || !variantSel.options[variantSel.selectedIndex]) return "";
         return variantSel.options[variantSel.selectedIndex].text || "";
       }
-      function variantCtaKey(landerName, variantName) {
+      function variantOfferKey(landerName, variantName) {
         return landerName + "::" + variantName;
       }
-      function loadCtaUrlCatalog() {
-        try {
-          var raw = localStorage.getItem(CTA_URL_CATALOG_KEY);
-          if (raw) {
-            var parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length) return parsed;
-          }
-        } catch (e) {}
-        return CTA_URL_SEED.slice();
+      function loadAllVariantOffers() {
+        try { return JSON.parse(localStorage.getItem(VARIANT_TEAM_OFFER_KEY)) || {}; } catch (e) { return {}; }
       }
-      function saveCtaUrlCatalog(rows) {
-        try { localStorage.setItem(CTA_URL_CATALOG_KEY, JSON.stringify(rows)); } catch (e) {}
+      function saveVariantTeamOffer(landerName, variantName, teamOfferId) {
+        var all = loadAllVariantOffers();
+        all[variantOfferKey(landerName, variantName)] = teamOfferId;
+        try { localStorage.setItem(VARIANT_TEAM_OFFER_KEY, JSON.stringify(all)); } catch (e) {}
       }
-      function loadAllVariantCtaUrls() {
-        try { return JSON.parse(localStorage.getItem(VARIANT_CTA_URL_KEY)) || {}; } catch (e) { return {}; }
+      function parentById(id) {
+        return parentOffers.find(function (p) { return p.id === id; });
       }
-      function saveVariantCtaUrlPick(landerName, variantName, ctaId) {
-        var all = loadAllVariantCtaUrls();
-        all[variantCtaKey(landerName, variantName)] = ctaId;
-        try { localStorage.setItem(VARIANT_CTA_URL_KEY, JSON.stringify(all)); } catch (e) {}
+      function advertiserName(advId) {
+        var a = advertisers.find(function (x) { return x.id === advId; });
+        return a ? a.name : "Advertiser";
       }
-      function toggleCtaNew(show) {
-        if (!ctaNewWrap) return;
-        ctaNewWrap.hidden = !show;
-        if (show && ctaNewInput) setTimeout(function () { ctaNewInput.focus(); }, 30);
+      function teamOfferLabel(to) {
+        var p = parentById(to.parentOfferId);
+        if (to.displayName) return to.displayName;
+        return p ? p.name : to.id;
       }
-      function renderCtaOptions(landerName, variantName) {
-        if (!ctaSel) return;
-        var catalog = loadCtaUrlCatalog();
-        var picked = loadAllVariantCtaUrls()[variantCtaKey(landerName, variantName)] || (catalog[0] ? catalog[0].id : "");
-        ctaSel.innerHTML =
-          '<option value="">— Select CTA URL —</option>' +
-          catalog.map(function (row) {
-            var sel = picked === row.id ? " selected" : "";
-            return '<option value="' + variantEsc(row.id) + '"' + sel + '>' + variantEsc(row.name) + '</option>';
-          }).join("") +
-          '<option value="__new__">+ Create new URL…</option>';
-        toggleCtaNew(false);
+      function resolvedCtaUrl(to) {
+        if (to.ctaUrl) return to.ctaUrl;
+        var p = parentById(to.parentOfferId);
+        return p ? (p.ctaUrl || "") : "";
       }
-      function openVariantSettings() {
-        if (!dlg || !variantSel || variantSel.value === "__new__") return;
-        var landerName = currentLanderName();
-        var variantName = currentVariantName();
-        if (titleEl) titleEl.textContent = "Variant settings — " + variantName;
-        if (nameInput) nameInput.value = variantName;
-        if (ctaNewInput) ctaNewInput.value = "";
-        renderCtaOptions(landerName, variantName);
-        dlg.showModal();
+      function findTeamOffer(id) {
+        return teamOffers.find(function (t) { return t.id === id; });
       }
-      function saveVariantSettings() {
+      function currentTeamOfferId() {
+        return loadAllVariantOffers()[variantOfferKey(currentLanderName(), currentVariantName())] || "";
+      }
+      function closeDestPanel() {
+        if (!destPanel) return;
+        destPanel.hidden = true;
+        if (destTrigger) destTrigger.setAttribute("aria-expanded", "false");
+      }
+      function openDestPanel() {
+        if (!destPanel) return;
+        destPanel.hidden = false;
+        if (destTrigger) destTrigger.setAttribute("aria-expanded", "true");
+        if (destSearch) { destSearch.value = ""; destSearch.focus(); }
+        renderDestList("");
+      }
+      function renderDestList(q) {
+        if (!destList) return;
+        var needle = (q || "").trim().toLowerCase();
+        var groups = {};
+        teamOffers.forEach(function (to) {
+          if (to.status === "inactive") return;
+          var p = parentById(to.parentOfferId);
+          if (!p) return;
+          var adv = advertiserName(p.advertiserId);
+          var label = teamOfferLabel(to);
+          var hay = (adv + " " + label + " " + p.name).toLowerCase();
+          if (needle && hay.indexOf(needle) === -1) return;
+          if (!groups[adv]) groups[adv] = [];
+          groups[adv].push({ to: to, parent: p });
+        });
+        var advNames = Object.keys(groups).sort();
+        if (!advNames.length) {
+          destList.innerHTML = '<li class="offer-parent-picker__empty muted">No team offers match your search.</li>';
+          return;
+        }
+        var picked = currentTeamOfferId();
+        destList.innerHTML = advNames.map(function (adv) {
+          return '<li class="offer-parent-picker__group">' +
+            '<div class="offer-parent-picker__group-head">' + variantEsc(adv) + '</div>' +
+            '<ul class="offer-parent-picker__group-list">' +
+              groups[adv].map(function (row) {
+                var url = resolvedCtaUrl(row.to);
+                var disabled = !url;
+                var sel = picked === row.to.id ? ' is-selected' : '';
+                return '<li class="offer-parent-picker__item' + sel + (disabled ? ' is-taken' : '') + '" role="option" data-team-offer-id="' + variantEsc(row.to.id) + '"' + (disabled ? ' aria-disabled="true"' : ' tabindex="0"') + '>' +
+                  '<span class="offer-parent-picker__name">' + variantEsc(teamOfferLabel(row.to)) + '</span>' +
+                  '<span class="offer-parent-picker__meta muted">' + (disabled ? 'No CTA URL' : 'CPA') + '</span>' +
+                '</li>';
+              }).join("") +
+            '</ul>' +
+          '</li>';
+        }).join("");
+      }
+      function refreshDestDisplay() {
+        var id = currentTeamOfferId();
+        var to = id ? findTeamOffer(id) : null;
+        var url = to ? resolvedCtaUrl(to) : "";
+        if (to && url) {
+          var p = parentById(to.parentOfferId);
+          if (destLabel) destLabel.textContent = advertiserName(p ? p.advertiserId : "") + " — " + teamOfferLabel(to);
+          if (destUrlEl) destUrlEl.textContent = url;
+          if (destViewLink) destViewLink.href = url;
+          if (destUrlBox) destUrlBox.hidden = false;
+          if (destEmpty) destEmpty.hidden = true;
+        } else {
+          if (destLabel) destLabel.textContent = "Select team offer…";
+          if (destUrlBox) destUrlBox.hidden = true;
+          if (destEmpty) destEmpty.hidden = false;
+        }
+      }
+      function syncSettingsRail() {
         if (!variantSel || variantSel.value === "__new__") return;
+        if (nameInput) nameInput.value = currentVariantName();
+        if (ctaTextInput && previewCtaEl) ctaTextInput.value = previewCtaEl.textContent || "";
+        refreshDestDisplay();
+        closeDestPanel();
+      }
+      function saveVariantNameFromRail() {
+        if (!variantSel || variantSel.value === "__new__" || !nameInput) return;
         var landerName = currentLanderName();
         var oldName = currentVariantName();
-        var newName = nameInput ? nameInput.value.trim() : "";
-        if (newName && newName !== oldName) {
-          var opt = variantSel.options[variantSel.selectedIndex];
-          opt.textContent = newName;
-          var ctaPick = loadAllVariantCtaUrls()[variantCtaKey(landerName, oldName)];
-          if (ctaPick) {
-            saveVariantCtaUrlPick(landerName, newName, ctaPick);
-            var all = loadAllVariantCtaUrls();
-            delete all[variantCtaKey(landerName, oldName)];
-            try { localStorage.setItem(VARIANT_CTA_URL_KEY, JSON.stringify(all)); } catch (e) {}
-          }
-          if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + newName;
+        var newName = nameInput.value.trim();
+        if (!newName || newName === oldName) return;
+        var opt = variantSel.options[variantSel.selectedIndex];
+        opt.textContent = newName;
+        var offerPick = loadAllVariantOffers()[variantOfferKey(landerName, oldName)];
+        if (offerPick) {
+          saveVariantTeamOffer(landerName, newName, offerPick);
+          var all = loadAllVariantOffers();
+          delete all[variantOfferKey(landerName, oldName)];
+          try { localStorage.setItem(VARIANT_TEAM_OFFER_KEY, JSON.stringify(all)); } catch (e) {}
         }
-        if (ctaSel) {
-          var val = ctaSel.value;
-          var vName = newName || oldName;
-          if (val === "__new__" && ctaNewInput) {
-            var newUrl = ctaNewInput.value.trim();
-            if (newUrl) {
-              var catalog = loadCtaUrlCatalog();
-              var newId = "cta_" + Date.now();
-              var label = newUrl.replace(/^https?:\/\//, "").slice(0, 48);
-              catalog.push({ id: newId, name: label, url: newUrl });
-              saveCtaUrlCatalog(catalog);
-              saveVariantCtaUrlPick(landerName, vName, newId);
-            }
-          } else if (val) {
-            saveVariantCtaUrlPick(landerName, vName, val);
-          }
-        }
+        if (previewTitleEl) previewTitleEl.textContent = landerName + " · " + newName;
       }
 
-      if (openBtn) openBtn.addEventListener("click", openVariantSettings);
-      if (ctaSel) ctaSel.addEventListener("change", function () { toggleCtaNew(ctaSel.value === "__new__"); });
-      if (dlg) {
-        var form = dlg.querySelector("form");
-        if (form) form.addEventListener("submit", saveVariantSettings);
+      if (settingsToggle && settingsRail) {
+        settingsToggle.addEventListener("click", function () {
+          var open = settingsRail.classList.toggle("is-collapsed");
+          settingsToggle.setAttribute("aria-expanded", open ? "false" : "true");
+        });
       }
+      if (destTrigger) {
+        destTrigger.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (destPanel && destPanel.hidden) openDestPanel();
+          else closeDestPanel();
+        });
+      }
+      if (destSearch) destSearch.addEventListener("input", function () { renderDestList(destSearch.value); });
+      if (destList) {
+        destList.addEventListener("click", function (e) {
+          var item = e.target.closest("[data-team-offer-id]");
+          if (!item || item.getAttribute("aria-disabled") === "true") return;
+          var tid = item.getAttribute("data-team-offer-id");
+          saveVariantTeamOffer(currentLanderName(), currentVariantName(), tid);
+          refreshDestDisplay();
+          closeDestPanel();
+        });
+      }
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest("#editor-offer-dest-picker")) closeDestPanel();
+      });
+      if (destCopyBtn) {
+        destCopyBtn.addEventListener("click", function () {
+          var url = destUrlEl ? destUrlEl.textContent : "";
+          if (!url || !navigator.clipboard) return;
+          navigator.clipboard.writeText(url).then(function () {
+            destCopyBtn.textContent = "Copied";
+            setTimeout(function () { destCopyBtn.textContent = "Copy"; }, 1500);
+          });
+        });
+      }
+      if (nameInput) nameInput.addEventListener("change", saveVariantNameFromRail);
+      if (ctaTextInput && previewCtaEl) {
+        ctaTextInput.addEventListener("input", function () {
+          previewCtaEl.textContent = ctaTextInput.value;
+        });
+      }
+
+      window.nexusSyncEditorSettingsRail = syncSettingsRail;
+      syncSettingsRail();
     })();
 
     // ---- Preview button (opens a non-indexed preview URL in a new tab)
