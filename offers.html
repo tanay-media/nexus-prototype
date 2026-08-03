@@ -179,27 +179,20 @@
             <label for="offer-category-l1">Category level 1</label>
             <select id="offer-category-l1">
               <option value="">— Select —</option>
-              <option value="Finance">Finance</option>
-              <option value="Home & Garden">Home &amp; Garden</option>
-              <option value="Travel">Travel</option>
-              <option value="Autos">Autos</option>
-              <option value="Health - wellness">Health - wellness</option>
-              <option value="Health - Pharma">Health - Pharma</option>
-              <option value="Shopping deals">Shopping deals</option>
-              <option value="Business & Industrial">Business &amp; Industrial</option>
-              <option value="Internet & Telecom">Internet &amp; Telecom</option>
-              <option value="Computers & Electronics">Computers &amp; Electronics</option>
-              <option value="Law & Government">Law &amp; Government</option>
-              <option value="Real Estate">Real Estate</option>
-              <option value="Others">Others</option>
             </select>
           </div>
           <div class="field">
             <label for="offer-category-l2">Category level 2</label>
-            <select id="offer-category-l2">
-              <option value="">— Select —</option>
+            <select id="offer-category-l2" disabled>
+              <option value="">— Select level 1 first —</option>
             </select>
           </div>
+        </div>
+        <div class="field">
+          <label for="offer-category-l3">Category level 3</label>
+          <select id="offer-category-l3" disabled>
+            <option value="">— Select level 2 first —</option>
+          </select>
         </div>
         <div class="field"><label for="offer-description">Description</label><textarea id="offer-description" rows="2" placeholder="Internal notes…"></textarea></div>
       </section>
@@ -214,37 +207,33 @@
               <option value="cpc">CPC</option>
             </select>
           </div>
-          <div class="field">
-            <label for="offer-target-type">Target type</label>
-            <select id="offer-target-type">
+        </div>
+        <div class="field">
+          <div class="offer-target-labels">
+            <span class="offer-target-label">Target type</span>
+            <span class="offer-target-label">Target value</span>
+          </div>
+          <div class="offer-target-row">
+            <select id="offer-target-type" aria-label="Target type">
               <option value="cpa">CPA</option>
               <option value="roas">ROAS</option>
             </select>
+            <div class="offer-amount-group">
+              <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85.00" aria-label="Target value" />
+              <select id="offer-target-currency" aria-label="Currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
           </div>
+          <p class="offer-field-hint" id="offer-target-hint">Target CPA per conversion in USD.</p>
         </div>
         <div class="field">
-          <label for="offer-target-value">Target</label>
-          <div class="offer-amount-group">
-            <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85.00" />
-            <select id="offer-target-currency" aria-label="Currency">
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-            </select>
-          </div>
-          <p class="offer-field-hint" id="offer-target-hint">Target CPA per conversion.</p>
-        </div>
-        <div class="field">
-          <label>Countries</label>
-          <div class="offer-country-chips" id="offer-country-chips">
-            <label class="offer-chip"><input type="checkbox" value="US" /><span>US</span></label>
-            <label class="offer-chip"><input type="checkbox" value="CA" /><span>CA</span></label>
-            <label class="offer-chip"><input type="checkbox" value="GB" /><span>GB</span></label>
-            <label class="offer-chip"><input type="checkbox" value="AU" /><span>AU</span></label>
-            <label class="offer-chip"><input type="checkbox" value="DE" /><span>DE</span></label>
-            <label class="offer-chip"><input type="checkbox" value="FR" /><span>FR</span></label>
-            <label class="offer-chip"><input type="checkbox" value="IN" /><span>IN</span></label>
-          </div>
+          <label for="offer-country-search">Countries</label>
+          <input type="search" id="offer-country-search" class="offer-country-search" placeholder="Search countries…" autocomplete="off" />
+          <div class="offer-country-chips" id="offer-country-chips"></div>
+          <p class="offer-field-hint" id="offer-country-hint">No countries selected</p>
         </div>
         <div class="settings-section">
           <p class="settings-section__title">MAX tracking</p>
@@ -255,7 +244,11 @@
             </div>
             <div class="field">
               <label for="offer-max-campaign-status">Status</label>
-              <input type="text" id="offer-max-campaign-status" readonly class="input--readonly" placeholder="Synced from MAX" />
+              <select id="offer-max-campaign-status">
+                <option value="active">Active</option>
+                <option value="paused">Paused</option>
+                <option value="inactive">Inactive</option>
+              </select>
             </div>
           </div>
           <div class="field">
@@ -314,6 +307,8 @@
   </dialog>
 
   <script src="app.js"></script>
+  <script src="offer-categories.js"></script>
+  <script src="offer-countries.js"></script>
   <script>
     var ICON = {
       settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
@@ -333,39 +328,81 @@
       { id: "adv-sf", name: "Smart Financials", status: "active", description: "" }
     ];
 
-    var CATEGORY_LEVEL_2 = [
-      "Walk-in Showers", "Walk-in Tubs", "Roofing", "Windows & Doors", "Solar", "Home Security",
-      "VIN Search", "Obituary Search", "People Connect", "Auto Insurance", "Debt Relief",
-      "Personal Loans", "Medicare", "Final Expense"
-    ];
-
     function catL1(o) { return o.categoryLevel1 || o.vertical || ""; }
     function targetOf(o) { return o.targetValue || o.cpaGoal || {}; }
 
     var offers = [
-      { id: "hb-wis",  advertiserId: "adv-hb", name: "Walk-in showers",  categoryLevel1: "Home & Garden", categoryLevel2: "Walk-in Showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], maxCampaignId: "MAX-88421", maxCampaignStatus: "active", trackingProvider: "max", buySources: ["fb", "google"], status: "active", workspaceIds: ["acme-growth", "acme-brand"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
-      { id: "hb-wit",  advertiserId: "adv-hb", name: "Walk-in Tubs",     categoryLevel1: "Home & Garden", categoryLevel2: "Walk-in Tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], maxCampaignId: "MAX-88422", maxCampaignStatus: "active", trackingProvider: "max", buySources: ["fb"], status: "active", workspaceIds: ["acme-growth"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
-      { id: "hb-roof", advertiserId: "adv-hb", name: "Roofing",          categoryLevel1: "Home & Garden", categoryLevel2: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", buySources: [], status: "active", workspaceIds: ["acme-growth", "acme-brand", "fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
-      { id: "bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       categoryLevel1: "Autos", categoryLevel2: "VIN Search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", buySources: ["google", "taboola"], status: "active", workspaceIds: ["acme-growth", "fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
-      { id: "bv-obit", advertiserId: "adv-bv", name: "Obituary search",  categoryLevel1: "Others", categoryLevel2: "Obituary Search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", workspaceIds: ["acme-brand"], ctaUrl: "" },
-      { id: "sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   categoryLevel1: "Finance", categoryLevel2: "Auto Insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], maxCampaignId: "MAX-90102", maxCampaignStatus: "paused", trackingProvider: "max", buySources: ["fb", "google", "taboola"], status: "active", workspaceIds: ["fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
+      { id: "hb-wis",  advertiserId: "adv-hb", name: "Walk-in showers",  categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], maxCampaignId: "MAX-88421", maxCampaignStatus: "active", trackingProvider: "max", buySources: ["fb", "google"], status: "active", workspaceIds: ["acme-growth", "acme-brand"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
+      { id: "hb-wit",  advertiserId: "adv-hb", name: "Walk-in Tubs",     categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], maxCampaignId: "MAX-88422", maxCampaignStatus: "active", trackingProvider: "max", buySources: ["fb"], status: "active", workspaceIds: ["acme-growth"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
+      { id: "hb-roof", advertiserId: "adv-hb", name: "Roofing",          categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", buySources: [], status: "active", workspaceIds: ["acme-growth", "acme-brand", "fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
+      { id: "bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", buySources: ["google", "taboola"], status: "active", workspaceIds: ["acme-growth", "fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
+      { id: "bv-obit", advertiserId: "adv-bv", name: "Obituary search",  categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", workspaceIds: ["acme-brand"], ctaUrl: "" },
+      { id: "sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], maxCampaignId: "MAX-90102", maxCampaignStatus: "paused", trackingProvider: "max", buySources: ["fb", "google", "taboola"], status: "active", workspaceIds: ["fin-main"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }
     ];
     function advById(id) { return advertisers.find(function (a) { return a.id === id; }); }
     function advName(id) { var a = advById(id); return a ? a.name : ""; }
 
-    function populateCategoryL2(selected) {
-      var sel = document.getElementById("offer-category-l2");
-      if (!sel) return;
+    function categoryL3Key(l1, l2) { return (l1 || "") + "|" + (l2 || ""); }
+
+    function populateCategoryL1(selected) {
+      var sel = document.getElementById("offer-category-l1");
+      if (!sel || typeof OFFER_CATEGORY_L1_L2 === "undefined") return;
+      var levels = Object.keys(OFFER_CATEGORY_L1_L2).sort();
       sel.innerHTML = '<option value="">— Select —</option>' +
-        CATEGORY_LEVEL_2.map(function (c) {
+        levels.map(function (c) {
           return '<option value="' + escapeHtml(c) + '"' + (c === selected ? " selected" : "") + '>' + escapeHtml(c) + '</option>';
         }).join("");
     }
 
-    function mockMaxStatus(campaignId) {
-      if (!campaignId) return "";
-      var n = parseInt(String(campaignId).replace(/\D/g, ""), 10) || 0;
-      return n % 3 === 0 ? "paused" : "active";
+    function populateCategoryL2(l1, selected) {
+      var sel = document.getElementById("offer-category-l2");
+      if (!sel) return;
+      if (!l1 || !OFFER_CATEGORY_L1_L2[l1]) {
+        sel.disabled = true;
+        sel.innerHTML = '<option value="">— Select level 1 first —</option>';
+        return;
+      }
+      sel.disabled = false;
+      var items = OFFER_CATEGORY_L1_L2[l1] || [];
+      sel.innerHTML = '<option value="">— Select —</option>' +
+        items.map(function (c) {
+          return '<option value="' + escapeHtml(c) + '"' + (c === selected ? " selected" : "") + '>' + escapeHtml(c) + '</option>';
+        }).join("");
+    }
+
+    function populateCategoryL3(l1, l2, selected) {
+      var sel = document.getElementById("offer-category-l3");
+      if (!sel) return;
+      if (!l1 || !l2) {
+        sel.disabled = true;
+        sel.innerHTML = '<option value="">— Select level 2 first —</option>';
+        return;
+      }
+      var key = categoryL3Key(l1, l2);
+      var presets = (typeof OFFER_CATEGORY_L3 !== "undefined" && OFFER_CATEGORY_L3[key]) ? OFFER_CATEGORY_L3[key].slice() : [];
+      offers.forEach(function (o) {
+        if (o.categoryLevel1 === l1 && o.categoryLevel2 === l2 && o.categoryLevel3 && presets.indexOf(o.categoryLevel3) === -1) {
+          presets.push(o.categoryLevel3);
+        }
+      });
+      presets.sort(function (a, b) { return a.localeCompare(b); });
+      if (!presets.length) {
+        sel.disabled = true;
+        sel.innerHTML = '<option value="">— No level 3 presets for this category —</option>';
+        return;
+      }
+      sel.disabled = false;
+      sel.innerHTML = '<option value="">— Select —</option>' +
+        presets.map(function (c) {
+          return '<option value="' + escapeHtml(c) + '"' + (c === selected ? " selected" : "") + '>' + escapeHtml(c) + '</option>';
+        }).join("");
+    }
+
+    function syncCategoryCascade(selectedL2, selectedL3) {
+      var l1 = document.getElementById("offer-category-l1").value;
+      populateCategoryL2(l1, selectedL2 || "");
+      var l2 = document.getElementById("offer-category-l2").value;
+      populateCategoryL3(l1, l2, selectedL3 || "");
     }
     var expandedAdvertisers = {};
     var activeOfferId = null;
@@ -608,12 +645,28 @@
       updateBuySourcesSummary();
     }
 
+    function renderCountryChips(filter) {
+      var wrap = document.getElementById("offer-country-chips");
+      if (!wrap || typeof OFFER_COUNTRIES === "undefined") return;
+      var q = (filter || "").trim().toLowerCase();
+      wrap.innerHTML = OFFER_COUNTRIES.filter(function (c) {
+        if (!q) return true;
+        return c.name.toLowerCase().indexOf(q) !== -1 || c.code.toLowerCase().indexOf(q) !== -1;
+      }).map(function (c) {
+        return '<label class="offer-chip" data-country="' + escapeHtml(c.code) + '">' +
+          '<input type="checkbox" value="' + escapeHtml(c.code) + '" />' +
+          '<span title="' + escapeHtml(c.code) + '">' + escapeHtml(c.name) + '</span></label>';
+      }).join("");
+    }
+
     function setCountriesSelect(countries) {
       var picked = countries || [];
       document.querySelectorAll("#offer-country-chips input[type=checkbox]").forEach(function (cb) {
         cb.checked = picked.indexOf(cb.value) !== -1;
-        cb.closest(".offer-chip").classList.toggle("is-on", cb.checked);
+        var chip = cb.closest(".offer-chip");
+        if (chip) chip.classList.toggle("is-on", cb.checked);
       });
+      updateCountryHint();
     }
 
     function getCountriesSelect() {
@@ -622,6 +675,21 @@
         out.push(cb.value);
       });
       return out;
+    }
+
+    function updateCountryHint() {
+      var hint = document.getElementById("offer-country-hint");
+      if (!hint) return;
+      var picked = getCountriesSelect();
+      if (!picked.length) {
+        hint.textContent = "No countries selected";
+        return;
+      }
+      var names = picked.map(function (code) {
+        var match = OFFER_COUNTRIES.find(function (c) { return c.code === code; });
+        return match ? match.name : code;
+      });
+      hint.textContent = picked.length + " selected: " + names.join(", ");
     }
 
     function syncTargetHint() {
@@ -705,9 +773,8 @@
       document.getElementById("offer-name").value = o.name;
       document.getElementById("offer-description").value = o.description || "";
       renderAdvertiserDropdown(o.advertiserId);
-      populateCategoryL2(o.categoryLevel2 || "");
-      document.getElementById("offer-category-l1").value = catL1(o);
-      document.getElementById("offer-category-l2").value = o.categoryLevel2 || "";
+      populateCategoryL1(catL1(o));
+      syncCategoryCascade(o.categoryLevel2 || "", o.categoryLevel3 || "");
       document.getElementById("offer-status").value = o.status || "active";
       document.getElementById("offer-deal-type").value = o.dealType || "cpa";
       document.getElementById("offer-target-type").value = o.targetType || "cpa";
@@ -715,8 +782,12 @@
       document.getElementById("offer-target-value").value = tv.amount != null ? tv.amount : (tv.targetCpa || "");
       document.getElementById("offer-target-currency").value = tv.currency || "USD";
       setCountriesSelect(o.countries);
+      var countrySearchEl = document.getElementById("offer-country-search");
+      if (countrySearchEl) countrySearchEl.value = "";
+      renderCountryChips("");
+      setCountriesSelect(o.countries);
       document.getElementById("offer-max-campaign-id").value = o.maxCampaignId || "";
-      document.getElementById("offer-max-campaign-status").value = o.maxCampaignStatus || mockMaxStatus(o.maxCampaignId);
+      document.getElementById("offer-max-campaign-status").value = o.maxCampaignStatus || "active";
       document.getElementById("offer-tracking-provider").value = o.trackingProvider || "max";
       syncTargetHint();
       document.getElementById("offer-cta-url").value = o.ctaUrl || "";
@@ -739,6 +810,7 @@
       o.advertiserId = getAdvertiserValue() || o.advertiserId;
       o.categoryLevel1 = document.getElementById("offer-category-l1").value;
       o.categoryLevel2 = document.getElementById("offer-category-l2").value;
+      o.categoryLevel3 = document.getElementById("offer-category-l3").value;
       o.vertical = o.categoryLevel1;
       o.status = document.getElementById("offer-status").value;
       o.dealType = document.getElementById("offer-deal-type").value;
@@ -750,8 +822,7 @@
       o.cpaGoal = { targetCpa: o.targetValue.amount, currency: o.targetValue.currency };
       o.countries = getCountriesSelect();
       o.maxCampaignId = document.getElementById("offer-max-campaign-id").value.trim();
-      o.maxCampaignStatus = mockMaxStatus(o.maxCampaignId);
-      document.getElementById("offer-max-campaign-status").value = o.maxCampaignStatus;
+      o.maxCampaignStatus = document.getElementById("offer-max-campaign-status").value;
       o.trackingProvider = document.getElementById("offer-tracking-provider").value;
       o.ctaUrl = document.getElementById("offer-cta-url").value.trim();
       readParamsFromDom();
@@ -885,24 +956,34 @@
       openOfferDetail(id);
     });
 
-    populateCategoryL2("");
+    populateCategoryL1("");
+    renderCountryChips("");
     var targetTypeEl = document.getElementById("offer-target-type");
     var targetCurEl = document.getElementById("offer-target-currency");
     if (targetTypeEl) targetTypeEl.addEventListener("change", syncTargetHint);
     if (targetCurEl) targetCurEl.addEventListener("change", syncTargetHint);
+    document.getElementById("offer-category-l1").addEventListener("change", function () {
+      syncCategoryCascade("", "");
+    });
+    document.getElementById("offer-category-l2").addEventListener("change", function () {
+      var l1 = document.getElementById("offer-category-l1").value;
+      populateCategoryL3(l1, this.value, "");
+    });
+    var countrySearch = document.getElementById("offer-country-search");
+    if (countrySearch) {
+      countrySearch.addEventListener("input", function () {
+        var picked = getCountriesSelect();
+        renderCountryChips(countrySearch.value);
+        setCountriesSelect(picked);
+      });
+    }
     document.getElementById("offer-country-chips").addEventListener("change", function (e) {
       var chip = e.target.closest(".offer-chip");
       if (chip) chip.classList.toggle("is-on", e.target.checked);
+      updateCountryHint();
     });
     document.getElementById("offer-buy-sources-list").addEventListener("change", updateBuySourcesSummary);
     document.getElementById("offer-workspaces-list").addEventListener("change", updateWorkspacesSummary);
-    var maxIdInput = document.getElementById("offer-max-campaign-id");
-    if (maxIdInput) {
-      maxIdInput.addEventListener("input", function () {
-        var st = document.getElementById("offer-max-campaign-status");
-        if (st) st.value = mockMaxStatus(maxIdInput.value.trim());
-      });
-    }
 
     var urlOffer = new URLSearchParams(window.location.search).get("offer");
     renderAdvertiserFilter();
