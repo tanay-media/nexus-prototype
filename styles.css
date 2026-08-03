@@ -2069,6 +2069,19 @@ button.dsk-row-name:focus-visible strong {
   color: var(--text);
 }
 .field textarea { min-height: 84px; resize: vertical; font-family: inherit; }
+.field select[multiple] {
+  min-height: 9rem;
+  padding: 0.35rem 0.5rem;
+}
+.field select[multiple] option {
+  padding: 0.28rem 0.4rem;
+  border-radius: 4px;
+}
+.field select[multiple] option:checked {
+  background: rgba(29, 97, 201, 0.14);
+  color: var(--brand, #1d61c9);
+  font-weight: 600;
+}
 .field__hint { font-size: 11px; color: var(--text-muted); margin-top: 0.3rem; }
 
 .modal__actions {
