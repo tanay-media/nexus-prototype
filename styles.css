@@ -3049,49 +3049,6 @@ button.dsk-row-name:focus-visible strong {
   color: var(--text-muted);
 }
 .offer-country-search { margin-bottom: 0.5rem; }
-.offer-cat-combo { position: relative; }
-.offer-cat-combo__input {
-  width: 100%;
-  box-sizing: border-box;
-}
-.offer-cat-combo__input:disabled {
-  background: #f5f6f8;
-  color: var(--text-muted);
-  cursor: not-allowed;
-}
-.offer-cat-combo__list {
-  position: absolute;
-  z-index: 30;
-  left: 0;
-  right: 0;
-  top: calc(100% + 4px);
-  max-height: 11rem;
-  overflow-y: auto;
-  margin: 0;
-  padding: 0.25rem 0;
-  list-style: none;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-.offer-cat-combo__list li {
-  padding: 0.45rem 0.65rem;
-  font-size: 13px;
-  cursor: pointer;
-}
-.offer-cat-combo__list li:hover,
-.offer-cat-combo__list li.is-selected {
-  background: rgba(29, 97, 201, 0.08);
-  color: var(--brand, #1d61c9);
-}
-.offer-cat-combo__list li.is-selected { font-weight: 600; }
-.offer-cat-combo__empty {
-  padding: 0.45rem 0.65rem;
-  font-size: 12px;
-  color: var(--text-muted);
-  cursor: default;
-}
 .offer-country-chips {
   display: flex;
   flex-wrap: wrap;
