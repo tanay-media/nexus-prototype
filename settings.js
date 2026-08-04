@@ -5,7 +5,24 @@
 // and docs/02-base-system/workspace-integrations.md §3.2.
 
 (function () {
-  var STORAGE_KEY = "nexus.cd.v2";
+  var STORAGE_KEY = "nexus.cd.v3";
+  var CURRENT_USER_EMAIL = "kyle@acme.com";
+  var DEFAULT_WS_ID = "acme-growth";
+
+  var TEAM_WORKSPACES = [
+    { id: "acme-growth", name: "ACME Growth", teamId: "acme" },
+    { id: "acme-performance", name: "ACME Performance", teamId: "acme" },
+    { id: "finance-edge", name: "FinanceEdge", teamId: "finedge" },
+    { id: "insights", name: "Insights", teamId: "finedge" }
+  ];
+
+  var VAULT_SEED = {
+    "secret://vault/meta/acme-prod": "EAABwzL9xK2mockProdToken7f3aB",
+    "secret://vault/meta/acme-promo": "EAABpromoHoliday82910TokenXy",
+    "secret://vault/google/acme-main": "1//0g_mock_refresh_token_acme_main",
+    "secret://vault/google/acme-main-client": "GOCSPX-mock_client_secret_main",
+    "secret://vault/taboola/acme": "tb_s2s_mock_token_acme_default"
+  };
 
   var CUSTOM_SELECT_VALUE = "__custom__";
 
@@ -56,7 +73,9 @@
           { from: "lead", to: "Lead" },
           { from: "purchase", to: "Purchase" }
         ],
-        createdAt: "2026-03-12"
+        createdAt: "2026-03-12",
+        createdByEmail: "kyle@acme.com",
+        secretsOwnerEmail: "kyle@acme.com"
       },
       {
         id: "cd_meta_promo",
@@ -73,7 +92,9 @@
           { from: "purchase", to: "Purchase", value: { mode: "postback_minus_commission", commission: { type: "percent", amount: 15 } } }
         ],
         landerEventMap: defaultLanderEventMap("facebook"),
-        createdAt: "2026-04-22"
+        createdAt: "2026-04-22",
+        createdByEmail: "sarah@acme.com",
+        secretsOwnerEmail: "sarah@acme.com"
       },
       {
         id: "cd_google_main",
@@ -92,7 +113,9 @@
           { from: "lead", to: "Submit lead form", conversionActionId: "customers/2846197723/conversionActions/8841502", value: { mode: "static", amount: 40, currency: "USD" } },
           { from: "purchase", to: "purchase_offline", conversionActionId: "customers/2846197723/conversionActions/8841503", value: { mode: "from_postback" } }
         ],
-        createdAt: "2026-04-04"
+        createdAt: "2026-04-04",
+        createdByEmail: "kyle@acme.com",
+        secretsOwnerEmail: "kyle@acme.com"
       },
       {
         id: "cd_taboola_main",
@@ -101,7 +124,9 @@
         fields: { tb_account_id: "1234567", tb_token_ref: "secret://vault/taboola/acme" },
         landerEventMap: defaultLanderEventMap("taboola"),
         eventMap: [{ from: "lead", to: "lead" }],
-        createdAt: "2026-04-10"
+        createdAt: "2026-04-10",
+        createdByEmail: "kyle@acme.com",
+        secretsOwnerEmail: "kyle@acme.com"
       },
       {
         id: "cd_gtm_main",
@@ -109,7 +134,9 @@
         source: "gtm",
         fields: { gtm_container: "GTM-WX7K2PL", gtm_env: "live" },
         eventMap: [],
-        createdAt: "2026-03-28"
+        createdAt: "2026-03-28",
+        createdByEmail: "kyle@acme.com",
+        secretsOwnerEmail: "kyle@acme.com"
       },
       {
         id: "cd_gtm_staging",
@@ -117,7 +144,9 @@
         source: "gtm",
         fields: { gtm_container: "GTM-5QF9D02", gtm_env: "latest" },
         eventMap: [],
-        createdAt: "2026-04-19"
+        createdAt: "2026-04-19",
+        createdByEmail: "mike@acme.com",
+        secretsOwnerEmail: "mike@acme.com"
       },
       {
         id: "cd_meta_pixel_main",
@@ -125,65 +154,159 @@
         source: "meta_pixel",
         fields: { pixel_id: "319847562103948" },
         eventMap: [],
-        createdAt: "2026-03-15"
+        createdAt: "2026-03-15",
+        createdByEmail: "kyle@acme.com",
+        secretsOwnerEmail: "kyle@acme.com"
       }
     ]
   };
 
   // ----- State -----
-  var state = load();
+  var rootState = load();
   var collapsed = {}; // provider id -> collapsed bool
+
+  function getCurrentWorkspaceId() {
+    try {
+      var sel = JSON.parse(localStorage.getItem("nexus:wsSel") || "null");
+      if (Array.isArray(sel) && sel.length === 1) return sel[0];
+    } catch (e) {}
+    return DEFAULT_WS_ID;
+  }
+
+  function wsBucket(wsId) {
+    if (!rootState.workspaces) rootState.workspaces = {};
+    if (!rootState.workspaces[wsId]) {
+      rootState.workspaces[wsId] = {
+        defaults: { facebook: null, google: null, taboola: null, gtm: null, meta_pixel: null },
+        rows: []
+      };
+    }
+    return rootState.workspaces[wsId];
+  }
+
+  function bindWorkspace() {
+    var ws = wsBucket(getCurrentWorkspaceId());
+    state.defaults = ws.defaults;
+    state.rows = ws.rows;
+  }
+
+  var state = { defaults: {}, rows: [] };
+  bindWorkspace();
+
+  function persistWorkspace() {
+    var wsId = getCurrentWorkspaceId();
+    rootState.workspaces[wsId] = { defaults: state.defaults, rows: state.rows };
+  }
+
+  function findRowGlobal(id) {
+    var found = null;
+    Object.keys(rootState.workspaces || {}).forEach(function (wsId) {
+      var bucket = rootState.workspaces[wsId];
+      var row = (bucket.rows || []).find(function (x) { return x.id === id; });
+      if (row) found = { wsId: wsId, row: row };
+    });
+    return found;
+  }
+
+  function teamWorkspacesForClone() {
+    var cur = getCurrentWorkspaceId();
+    var teamId = (TEAM_WORKSPACES.find(function (w) { return w.id === cur; }) || TEAM_WORKSPACES[0]).teamId;
+    return TEAM_WORKSPACES.filter(function (w) { return w.teamId === teamId && w.id !== cur; });
+  }
+
+  function canViewSecrets(row) {
+    return row && row.secretsOwnerEmail === CURRENT_USER_EMAIL;
+  }
+
+  function getSecretPlain(ref) {
+    if (!ref || !rootState.secretVault) return "";
+    return rootState.secretVault[ref] || "";
+  }
+
+  function setSecretPlain(ref, plain) {
+    if (!ref || !plain) return;
+    if (!rootState.secretVault) rootState.secretVault = {};
+    rootState.secretVault[ref] = plain;
+  }
+
+  function credentialsPreview(ref) {
+    var p = getSecretPlain(ref);
+    if (!p) return "••••••";
+    if (p.length <= 8) return p.slice(0, 2) + "••••" + p.slice(-2);
+    return p.slice(0, 4) + "••••" + p.slice(-4);
+  }
+
+  function ensureRowMeta(row) {
+    if (!row.createdByEmail) row.createdByEmail = CURRENT_USER_EMAIL;
+    if (!row.secretsOwnerEmail) row.secretsOwnerEmail = row.createdByEmail;
+  }
 
   function load() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.rows)) {
-          // migrate old single-default model → per-provider defaults
-          if (!parsed.defaults) {
-            parsed.defaults = { facebook: null, google: null, gtm: null, meta_pixel: null };
-            if (parsed.defaultId) {
-              var dr = parsed.rows.find(function (x) { return x.id === parsed.defaultId; });
-              if (dr) parsed.defaults[dr.source] = dr.id;
-            }
-          }
-          if (!parsed.defaults.meta_pixel && seed.defaults.meta_pixel) {
-            parsed.defaults.meta_pixel = seed.defaults.meta_pixel;
-          }
-          parsed.rows.forEach(function (r) {
-            if (!r.landerEventMap && defaultLanderEventMap(r.source)) {
-              r.landerEventMap = defaultLanderEventMap(r.source);
-            }
-            if (r.source === "google" && r.fields && r.fields.g_action_id && r.landerEventMap) {
-              var legacyAction = r.fields.g_action_id;
-              ["visit", "impression", "click"].forEach(function (key) {
-                if (r.landerEventMap[key] && !r.landerEventMap[key].conversionActionId) {
-                  r.landerEventMap[key].conversionActionId = legacyAction;
-                }
-              });
-              delete r.fields.g_action_id;
-            }
-          });
-          if (!parsed.rows.some(function (r) { return r.id === "cd_taboola_main"; })) {
-            var tb = seed.rows.find(function (r) { return r.id === "cd_taboola_main"; });
-            if (tb) parsed.rows.push(JSON.parse(JSON.stringify(tb)));
-          }
-          if (!parsed.defaults.taboola && seed.defaults.taboola) {
-            parsed.defaults.taboola = seed.defaults.taboola;
-          }
-          if (!parsed.rows.some(function (r) { return r.id === "cd_meta_pixel_main"; })) {
-            var mp = seed.rows.find(function (r) { return r.id === "cd_meta_pixel_main"; });
-            if (mp) parsed.rows.push(JSON.parse(JSON.stringify(mp)));
-          }
+        if (parsed && parsed.workspaces) {
+          if (!parsed.secretVault) parsed.secretVault = JSON.parse(JSON.stringify(VAULT_SEED));
+          migrateRows(parsed);
           return parsed;
         }
       }
+      // migrate v2 flat state
+      var legacy = localStorage.getItem("nexus.cd.v2");
+      if (legacy) {
+        var old = JSON.parse(legacy);
+        if (old && Array.isArray(old.rows)) {
+          migrateRows(old);
+          return {
+            secretVault: JSON.parse(JSON.stringify(VAULT_SEED)),
+            workspaces: { [DEFAULT_WS_ID]: { defaults: old.defaults || seed.defaults, rows: old.rows } }
+          };
+        }
+      }
     } catch (e) {}
-    return JSON.parse(JSON.stringify(seed));
+    return {
+      secretVault: JSON.parse(JSON.stringify(VAULT_SEED)),
+      workspaces: {
+        [DEFAULT_WS_ID]: {
+          defaults: JSON.parse(JSON.stringify(seed.defaults)),
+          rows: JSON.parse(JSON.stringify(seed.rows))
+        }
+      }
+    };
   }
+
+  function migrateRows(container) {
+    var rows = container.rows;
+    if (rows) {
+      rows.forEach(function (r) {
+        ensureRowMeta(r);
+        if (!r.landerEventMap && defaultLanderEventMap(r.source)) {
+          r.landerEventMap = defaultLanderEventMap(r.source);
+        }
+        if (r.source === "google" && r.fields && r.fields.g_action_id && r.landerEventMap) {
+          var legacyAction = r.fields.g_action_id;
+          ["visit", "impression", "click"].forEach(function (key) {
+            if (r.landerEventMap[key] && !r.landerEventMap[key].conversionActionId) {
+              r.landerEventMap[key].conversionActionId = legacyAction;
+            }
+          });
+          delete r.fields.g_action_id;
+        }
+      });
+      return;
+    }
+    Object.keys(container.workspaces || {}).forEach(function (wsId) {
+      var bucket = container.workspaces[wsId];
+      if (!bucket.rows) bucket.rows = [];
+      if (!bucket.defaults) bucket.defaults = {};
+      migrateRows(bucket);
+    });
+  }
+
   function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    persistWorkspace();
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rootState)); } catch (e) {}
   }
   function escapeHtml(s) {
     return String(s == null ? "" : s)
@@ -384,8 +507,12 @@
         '</td>' +
         '<td>' + idsCell(r) + '</td>' +
         '<td>' + landersCell(r) + '</td>' +
+        '<td><span class="cd-creator" title="Created by">' + escapeHtml(r.createdByEmail || "—") + '</span></td>' +
         '<td>' + defaultCell(r) + '</td>' +
         '<td class="right"><div class="actions">' +
+          '<button type="button" class="icon-btn js-cd-clone" data-id="' + r.id + '" title="Copy to workspace" aria-label="Copy to workspace">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>' +
+          '</button>' +
           '<button type="button" class="icon-btn js-cd-edit" data-id="' + r.id + '" title="Edit" aria-label="Edit">' +
             '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4v16h16v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>' +
           '</button>' +
@@ -403,7 +530,7 @@
       var label = SOURCE_LABEL[src] || { name: src };
       var n = grp.length;
       var isCol = !!collapsed[src];
-      html += '<tr class="cd-group-row' + (isCol ? ' is-collapsed' : '') + '" data-toggle-group="' + src + '"><td colspan="5">' +
+      html += '<tr class="cd-group-row' + (isCol ? ' is-collapsed' : '') + '" data-toggle-group="' + src + '"><td colspan="6">' +
         '<div class="cd-group-head">' +
           '<svg class="cd-group-chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>' +
           (SOURCE_THUMB[src] || "") +
@@ -795,7 +922,7 @@
     var commType = sub.querySelector('[data-em="commissionType"]');
     var suffix = sub.querySelector("[data-commission-suffix]");
     if (commType && suffix) {
-      suffix.textContent = commType.value === "flat" ? "from postback value" : "% of postback value";
+      suffix.textContent = commType.value === "flat" ? "off postback" : "% off postback";
       var commAmt = sub.querySelector('[data-em="commissionAmount"]');
       if (commAmt) commAmt.placeholder = commType.value === "flat" ? "5.00" : "15";
     }
@@ -957,31 +1084,105 @@
     });
   });
 
+  // ----- Credentials UI (secrets owner vs masked) -----
+  function bindCredReplace(btn) {
+    btn.addEventListener("click", function () {
+      var inputId = btn.getAttribute("data-target");
+      var input = document.getElementById(inputId);
+      if (!input) return;
+      input.disabled = false;
+      input.value = "";
+      input.placeholder = "Paste new token…";
+      input.focus();
+      var wrap = input.closest(".dskp__field");
+      var status = wrap && wrap.querySelector(".cd-cred-status");
+      if (status) status.innerHTML = '<span class="cd-cred-badge cd-cred-badge--warn">Replacing</span> Paste a new token — you will become the secrets owner.';
+    });
+  }
+
+  document.querySelectorAll(".js-cred-replace").forEach(bindCredReplace);
+
+  function applySecretField(inputId, ref, row, isNew) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    var wrap = input.closest(".dskp__field");
+    var status = wrap ? wrap.querySelector(".cd-cred-status") : null;
+    if (!status && wrap) {
+      status = document.createElement("div");
+      status.className = "cd-cred-status";
+      var tokenWrap = wrap.querySelector(".dskp__token");
+      if (tokenWrap) wrap.insertBefore(status, tokenWrap);
+      else wrap.appendChild(status);
+    }
+    var ownerView = isNew || !row || canViewSecrets(row);
+    if (ref && !ownerView) {
+      input.value = "";
+      input.type = "password";
+      input.disabled = true;
+      input.placeholder = "Configured · " + credentialsPreview(ref);
+      if (status) {
+        status.innerHTML = '<span class="cd-cred-badge cd-cred-badge--locked">● Configured</span>' +
+          ' Only <strong>' + escapeHtml(row.secretsOwnerEmail) + '</strong> can view. ' +
+          '<button type="button" class="cd-cred-replace js-cred-replace" data-target="' + inputId + '">Replace token</button>';
+        var rep = status.querySelector(".js-cred-replace");
+        if (rep) bindCredReplace(rep);
+      }
+    } else if (ref && ownerView) {
+      input.disabled = false;
+      input.type = "text";
+      input.value = getSecretPlain(ref);
+      if (status) status.innerHTML = '<span class="cd-cred-badge cd-cred-badge--ok">● Configured</span> Full token visible to you as secrets owner.';
+    } else {
+      input.disabled = false;
+      input.type = "password";
+      input.value = "";
+      if (status) status.innerHTML = "";
+    }
+  }
+
   // ----- Open / fill dialog -----
   function fillFormForRow(r) {
     setSourceInDialog(r ? r.source : "facebook");
     nameIn.value = r ? r.name : "";
     document.getElementById("cd-fb-pixel").value = r && r.source === "facebook" ? (r.fields.fb_pixel_id || "") : "";
     document.getElementById("cd-fb-action-source").value = r && r.source === "facebook" ? (r.fields.fb_action_source || "website") : "website";
-    document.getElementById("cd-fb-token").value = r && r.source === "facebook" ? "" : "";
-    document.getElementById("cd-fb-token").placeholder = r && r.source === "facebook" && r.fields.fb_token_ref ? "Leave blank to keep existing token (vault ref)" : "EAAB••••••••••••••••";
+    applySecretField("cd-fb-token", r && r.source === "facebook" ? r.fields.fb_token_ref : null, r, !r);
     document.getElementById("cd-g-tag").value = r && r.source === "google" ? (r.fields.g_tag_id || "") : "";
     document.getElementById("cd-g-customer").value = r && r.source === "google" ? (r.fields.g_customer_id || "") : "";
-    if (document.getElementById("cd-g-dev-token")) {
-      document.getElementById("cd-g-dev-token").value = "";
-    }
     if (document.getElementById("cd-g-client-id")) {
       document.getElementById("cd-g-client-id").value = r && r.source === "google" ? (r.fields.g_client_id || "") : "";
     }
-    if (document.getElementById("cd-g-client-secret")) {
-      document.getElementById("cd-g-client-secret").value = "";
+    applySecretField("cd-g-client-secret", r && r.source === "google" ? r.fields.g_client_secret_ref : null, r, !r);
+    if (document.getElementById("cd-g-dev-token")) {
+      var devIn = document.getElementById("cd-g-dev-token");
+      var devWrap = devIn.closest(".dskp__field");
+      var devStatus = devWrap ? devWrap.querySelector(".cd-cred-status") : null;
+      if (!devStatus && devWrap) {
+        devStatus = document.createElement("div");
+        devStatus.className = "cd-cred-status";
+        devWrap.insertBefore(devStatus, devIn);
+      }
+      if (r && r.source === "google" && r.fields.g_dev_token && !canViewSecrets(r)) {
+        devIn.value = "";
+        devIn.disabled = true;
+        devIn.placeholder = "Configured · " + credentialsPreview(r.fields.g_dev_token);
+        if (devStatus) devStatus.innerHTML = '<span class="cd-cred-badge cd-cred-badge--locked">● Configured</span> Only secrets owner can view.';
+      } else if (r && r.source === "google" && r.fields.g_dev_token && canViewSecrets(r)) {
+        devIn.disabled = false;
+        devIn.type = "text";
+        devIn.value = r.fields.g_dev_token;
+        if (devStatus) devStatus.innerHTML = '<span class="cd-cred-badge cd-cred-badge--ok">● Configured</span>';
+      } else {
+        devIn.disabled = false;
+        devIn.value = "";
+        if (devStatus) devStatus.innerHTML = "";
+      }
     }
-    if (document.getElementById("cd-g-token")) {
-      document.getElementById("cd-g-token").value = "";
-    }
+    applySecretField("cd-g-token", r && r.source === "google" ? r.fields.g_token_ref : null, r, !r);
     if (document.getElementById("cd-tb-account")) {
       document.getElementById("cd-tb-account").value = r && r.source === "taboola" ? (r.fields.tb_account_id || "") : "";
     }
+    applySecretField("cd-tb-token", r && r.source === "taboola" ? r.fields.tb_token_ref : null, r, !r);
     document.getElementById("cd-gtm-container").value = r && r.source === "gtm" ? (r.fields.gtm_container || "") : "";
     if (document.getElementById("cd-gtm-env")) document.getElementById("cd-gtm-env").value = r && r.source === "gtm" ? (r.fields.gtm_env || "live") : "live";
     if (document.getElementById("cd-meta-pixel-id")) document.getElementById("cd-meta-pixel-id").value = r && r.source === "meta_pixel" ? (r.fields.pixel_id || "") : "";
@@ -1052,11 +1253,16 @@
     if (!nm) { nameIn.focus(); return; }
 
     var fields = {};
+    var becameSecretsOwner = false;
     if (src === "facebook") {
       fields.fb_pixel_id = document.getElementById("cd-fb-pixel").value.trim();
       fields.fb_action_source = document.getElementById("cd-fb-action-source").value;
       var newTok = document.getElementById("cd-fb-token").value.trim();
-      if (newTok) fields.fb_token_ref = "secret://vault/meta/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      if (newTok) {
+        fields.fb_token_ref = "secret://vault/meta/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        setSecretPlain(fields.fb_token_ref, newTok);
+        becameSecretsOwner = true;
+      }
     } else if (src === "google") {
       fields.g_tag_id = document.getElementById("cd-g-tag").value.trim();
       fields.g_customer_id = document.getElementById("cd-g-customer").value.trim();
@@ -1064,16 +1270,30 @@
         fields.g_client_id = document.getElementById("cd-g-client-id").value.trim();
       }
       var newDev = document.getElementById("cd-g-dev-token") ? document.getElementById("cd-g-dev-token").value.trim() : "";
-      if (newDev) fields.g_dev_token = newDev;
+      if (newDev) {
+        fields.g_dev_token = newDev;
+        becameSecretsOwner = true;
+      }
       var newClientSecret = document.getElementById("cd-g-client-secret") ? document.getElementById("cd-g-client-secret").value.trim() : "";
       if (newClientSecret) {
         fields.g_client_secret_ref = "secret://vault/google/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-client";
+        setSecretPlain(fields.g_client_secret_ref, newClientSecret);
+        becameSecretsOwner = true;
       }
       var newTokG = document.getElementById("cd-g-token").value.trim();
-      if (newTokG) fields.g_token_ref = "secret://vault/google/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      if (newTokG) {
+        fields.g_token_ref = "secret://vault/google/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        setSecretPlain(fields.g_token_ref, newTokG);
+        becameSecretsOwner = true;
+      }
     } else if (src === "taboola") {
       fields.tb_account_id = document.getElementById("cd-tb-account").value.trim();
-      fields.tb_token_ref = "secret://vault/taboola/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      var newTb = document.getElementById("cd-tb-token") ? document.getElementById("cd-tb-token").value.trim() : "";
+      if (newTb) {
+        fields.tb_token_ref = "secret://vault/taboola/" + nm.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        setSecretPlain(fields.tb_token_ref, newTb);
+        becameSecretsOwner = true;
+      }
     } else if (src === "gtm") {
       fields.gtm_container = document.getElementById("cd-gtm-container").value.trim();
       fields.gtm_env = document.getElementById("cd-gtm-env").value;
@@ -1095,6 +1315,7 @@
         r.fields = fields;
         r.landerEventMap = collectLanderEventMap();
         r.eventMap = collectEventMap();
+        if (becameSecretsOwner) r.secretsOwnerEmail = CURRENT_USER_EMAIL;
       }
     } else {
       var nid = newId();
@@ -1105,7 +1326,9 @@
         fields: fields,
         landerEventMap: collectLanderEventMap(),
         eventMap: collectEventMap(),
-        createdAt: new Date().toISOString().slice(0, 10)
+        createdAt: new Date().toISOString().slice(0, 10),
+        createdByEmail: CURRENT_USER_EMAIL,
+        secretsOwnerEmail: CURRENT_USER_EMAIL
       });
       if (setDefaultIn.checked || !(state.defaults && state.defaults[src])) {
         state.defaults = state.defaults || {};
@@ -1281,6 +1504,7 @@
         return;
       }
       if ((t = e.target.closest(".js-cd-edit"))) { openEdit(t.getAttribute("data-id")); return; }
+      if ((t = e.target.closest(".js-cd-clone"))) { openClone(t.getAttribute("data-id")); return; }
       if ((t = e.target.closest(".js-cd-default"))) {
         var did = t.getAttribute("data-id");
         var dr = state.rows.find(function (x) { return x.id === did; });
@@ -1417,4 +1641,76 @@
 
   // initial paint
   render();
+
+  // ----- Clone to workspace -----
+  var cloneDlg = document.getElementById("dialog-cd-clone");
+  var cloneSourceIn = document.getElementById("cd-clone-source-id");
+  var cloneNameIn = document.getElementById("cd-clone-name");
+  var cloneWsSel = document.getElementById("cd-clone-ws");
+  var cloneDefaultIn = document.getElementById("cd-clone-set-default");
+  var cloneNote = document.getElementById("cd-clone-note");
+  var cloneConfirmBtn = document.getElementById("cd-clone-confirm");
+
+  function openClone(id) {
+    var found = findRowGlobal(id);
+    if (!found || !cloneDlg) return;
+    var r = found.row;
+    cloneSourceIn.value = id;
+    cloneNameIn.value = r.name;
+    var targets = teamWorkspacesForClone();
+    cloneWsSel.innerHTML = targets.map(function (w) {
+      return '<option value="' + escapeHtml(w.id) + '">' + escapeHtml(w.name) + '</option>';
+    }).join("");
+    if (!targets.length) {
+      cloneWsSel.innerHTML = '<option value="">No other workspace in this team</option>';
+      cloneConfirmBtn.disabled = true;
+    } else {
+      cloneConfirmBtn.disabled = false;
+    }
+    var ownerView = canViewSecrets(r);
+    cloneNote.innerHTML = ownerView
+      ? "Credentials will be copied (same vault ref). <strong>You</strong> will see full tokens in the new integration."
+      : "Credentials will be copied — the clone will work without re-pasting. You will <strong>not</strong> see tokens (owner: <strong>' + escapeHtml(r.secretsOwnerEmail) + '</strong>).";
+    cloneDlg.showModal();
+  }
+
+  if (cloneConfirmBtn) {
+    cloneConfirmBtn.addEventListener("click", function () {
+      var srcId = cloneSourceIn.value;
+      var targetWs = cloneWsSel.value;
+      if (!srcId || !targetWs) return;
+      var found = findRowGlobal(srcId);
+      if (!found) return;
+      var src = found.row;
+      var nm = (cloneNameIn.value || "").trim() || src.name;
+      var clone = JSON.parse(JSON.stringify(src));
+      clone.id = newId();
+      clone.name = nm;
+      clone.createdByEmail = CURRENT_USER_EMAIL;
+      clone.secretsOwnerEmail = src.secretsOwnerEmail;
+      clone.createdAt = new Date().toISOString().slice(0, 10);
+      ensureRowMeta(clone);
+      var bucket = wsBucket(targetWs);
+      bucket.rows.push(clone);
+      if (cloneDefaultIn && cloneDefaultIn.checked) {
+        bucket.defaults = bucket.defaults || {};
+        bucket.defaults[clone.source] = clone.id;
+      }
+      save();
+      bindWorkspace();
+      render();
+      cloneDlg.close();
+      if (targetWs === getCurrentWorkspaceId()) {
+        openEdit(clone.id);
+      }
+    });
+  }
+
+  // Re-bind when workspace scope changes in top strip
+  window.addEventListener("storage", function (e) {
+    if (e.key === "nexus:wsSel") {
+      bindWorkspace();
+      render();
+    }
+  });
 })();

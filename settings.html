@@ -96,6 +96,7 @@
                     <th>Name</th>
                     <th>Identifiers</th>
                     <th>Applied to</th>
+                    <th>Creator</th>
                     <th>Default</th>
                     <th class="right">Actions</th>
                   </tr>
@@ -408,16 +409,16 @@
               <input class="dskp__input" type="text" id="cd-g-client-id" placeholder="123456789012-abcdefg…" autocomplete="off" />
             </div>
             <div class="dskp__field">
-              <div class="dskp__label">Client secret <span class="dskp__opt">(leave blank to keep current)</span></div>
-              <input class="dskp__input" type="password" id="cd-g-client-secret" placeholder="Paste new token to replace…" autocomplete="off" />
+              <div class="dskp__label">Client secret</div>
+              <input class="dskp__input" type="password" id="cd-g-client-secret" placeholder="Paste OAuth client secret…" autocomplete="off" />
             </div>
             <div class="dskp__field">
-              <div class="dskp__label">Developer token <span class="dskp__opt">(leave blank to keep current)</span></div>
-              <input class="dskp__input" type="password" id="cd-g-dev-token" placeholder="Paste new token to replace…" autocomplete="off" />
+              <div class="dskp__label">Developer token</div>
+              <input class="dskp__input" type="password" id="cd-g-dev-token" placeholder="Paste developer token…" autocomplete="off" />
             </div>
             <div class="dskp__field">
-              <div class="dskp__label">Refresh token <span class="dskp__opt">(leave blank to keep current)</span></div>
-              <input class="dskp__input" type="password" id="cd-g-token" placeholder="Paste new token to replace…" autocomplete="off" />
+              <div class="dskp__label">Refresh token</div>
+              <input class="dskp__input" type="password" id="cd-g-token" placeholder="Paste OAuth refresh token…" autocomplete="off" />
             </div>
           </div>
         </div>
@@ -435,6 +436,20 @@
           <div class="dskp__field">
             <div class="dskp__label">Account ID</div>
             <input class="dskp__input" type="text" id="cd-tb-account" placeholder="1234567" />
+          </div>
+          <div class="dskp__field">
+            <div class="dskp__label">S2S access token</div>
+            <div class="dskp__token">
+              <input id="cd-tb-token" type="password" placeholder="Paste Taboola S2S token…" />
+              <button type="button" class="dskp__token-btn" data-token-paste data-target="cd-tb-token" title="Paste from clipboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/></svg>
+                Paste
+              </button>
+              <button type="button" class="dskp__token-btn" data-token-toggle data-target="cd-tb-token" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span data-token-toggle-label>Show</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -531,6 +546,45 @@
         <button type="submit" class="dskp__b dskp__b--primary" id="cd-save-btn" hidden>Save</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Clone to workspace -->
+  <dialog class="modal modal--dsk-pro" id="dialog-cd-clone">
+    <div class="modal__inner">
+      <input type="hidden" id="cd-clone-source-id" value="" />
+      <div class="dskp__head">
+        <div class="dskp__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </div>
+        <div class="dskp__head-text">
+          <h2 class="dskp__title">Copy to workspace</h2>
+          <p class="dskp__sub">Clone this integration into another workspace in the same team. Credentials are shared via the same vault reference.</p>
+        </div>
+        <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="dskp__body cd-clone-body">
+        <div class="dskp__field">
+          <div class="dskp__label">Target workspace</div>
+          <select class="dskp__select" id="cd-clone-ws"></select>
+        </div>
+        <div class="dskp__field">
+          <div class="dskp__label">Integration name</div>
+          <input class="dskp__input" type="text" id="cd-clone-name" placeholder="Name in target workspace" />
+        </div>
+        <p class="cd-clone-note" id="cd-clone-note"></p>
+        <label class="cd-default-check">
+          <input type="checkbox" id="cd-clone-set-default" checked />
+          <span>Set as default in target workspace</span>
+        </label>
+      </div>
+      <div class="dskp__foot">
+        <div class="dskp__foot-spacer"></div>
+        <button type="button" class="dskp__b dskp__b--ghost" data-close-dialog>Cancel</button>
+        <button type="button" class="dskp__b dskp__b--primary" id="cd-clone-confirm">Copy integration</button>
+      </div>
+    </div>
   </dialog>
 
   <!-- Delete confirm -->
