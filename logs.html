@@ -148,7 +148,7 @@
                   <col class="g-visit"><col class="g-visit"><col class="g-visit"><col class="g-visit"><col class="g-visit"><col class="g-visit">
                   <col class="g-click"><col class="g-click"><col class="g-click">
                   <col class="g-pb"><col class="g-pb"><col class="g-pb"><col class="g-pb">
-                  <col class="g-fire"><col class="g-fire"><col class="g-fire"><col class="g-fire">
+                  <col class="g-fire"><col class="g-fire"><col class="g-fire"><col class="g-fire"><col class="g-fire">
                   <col class="c-view">
                 </colgroup>
                 <thead>
@@ -158,7 +158,7 @@
                     <th class="grp grp--visit" colspan="6">① Visit <small>Buy source → Nexus</small></th>
                     <th class="grp grp--click" colspan="3">② Click on lander <small>Nexus → Tracking</small></th>
                     <th class="grp grp--pb" colspan="4">③ Conversion received <small>Tracking → Nexus</small></th>
-                    <th class="grp grp--fire" colspan="4">④ Destination fire <small>Nexus → Buy source</small></th>
+                    <th class="grp grp--fire" colspan="5">④ Destination fire <small>Nexus → Buy source</small></th>
                     <th></th>
                   </tr>
                   <tr class="flat-thead-cols">
@@ -178,8 +178,9 @@
                     <th class="col--pb sortable" data-sort="conversion_type">conversion_type</th>
                     <th class="col--pb sortable" data-sort="conversion_value">conversion_value</th>
                     <th class="col--fire sortable" data-sort="fired_time">conv_fired_at</th>
+                    <th class="col--fire sortable" data-sort="external_id">external_id</th>
                     <th class="col--fire sortable" data-sort="buy_source">buy_source</th>
-                    <th class="col--fire sortable" data-sort="destination">buy_source_id</th>
+                    <th class="col--fire sortable" data-sort="integration_name">integration_name</th>
                     <th class="col--fire sortable" data-sort="response">conv_fire_response</th>
                     <th></th>
                   </tr>
@@ -200,8 +201,9 @@
                     <th class="col--pb"><input class="flat-cf" data-col="conversion_type" placeholder="filter…" /></th>
                     <th class="col--pb"><input class="flat-cf" data-col="conversion_value" placeholder="filter…" /></th>
                     <th class="col--fire"></th>
+                    <th class="col--fire"><input class="flat-cf" data-col="external_id" placeholder="filter…" /></th>
                     <th class="col--fire"><input class="flat-cf" data-col="buy_source" placeholder="filter…" /></th>
-                    <th class="col--fire"><input class="flat-cf" data-col="destination" placeholder="filter…" /></th>
+                    <th class="col--fire"><input class="flat-cf" data-col="integration_name" placeholder="filter…" /></th>
                     <th class="col--fire"><input class="flat-cf" data-col="response" placeholder="filter…" /></th>
                     <th></th>
                   </tr>

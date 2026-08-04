@@ -163,7 +163,12 @@
   function destNameCell(j) {
     var f = j.destinationFire;
     if (!f) return '<span class="flat-muted">—</span>';
-    return idCell(f.destinationId || "");
+    return plain(f.destinationName || f.destinationId || "");
+  }
+  function externalIdOf(j) {
+    var p = j.postback;
+    if (!p) return "";
+    return p.externalId || (p.raw && p.raw.external_id) || "";
   }
   function plain(v) { return v ? '<span class="flat-mono">' + escapeHtml(v) + '</span>' : '<span class="flat-muted">—</span>'; }
   function valCell(j) {
@@ -341,8 +346,10 @@
       case "conversion_type": return pr.conv ? (p.conversionType || "") : "";
       case "conversion_value": return pr.conv ? (p.value || 0) : 0;
       case "fired_time": return pr.conv ? (fireTimeOf(j) || "") : "";
+      case "external_id": return pr.conv ? externalIdOf(j) : "";
       case "buy_source": return pr.conv ? (SOURCE_NAME[j.buySource] || j.buySource || "") : "";
-      case "destination": return pr.conv && f ? (f.destinationId || "") : "";
+      case "integration_name": return pr.conv && f ? (f.destinationName || f.destinationId || "") : "";
+      case "destination": return pr.conv && f ? (f.destinationName || f.destinationId || "") : "";
       case "response": return pr.conv && f ? (f.status === "ok" ? "200 ok" : f.status === "pending" ? "queued" : (httpStatusOf(f) + " failed")) : "";
       case "_imp": return pr.imp ? "1" : "";
       case "_click": return pr.click ? "1" : "";
@@ -447,6 +454,7 @@
       '<td class="col--pb">' + (pr.conv ? valCell(j) : dash) + '</td>' +
       // 4) Destination fire
       '<td class="col--fire">' + (pr.conv ? plain(fmtTs(fireTimeOf(j))) : dash) + '</td>' +
+      '<td class="col--fire">' + (pr.conv ? idCell(externalIdOf(j)) : dash) + '</td>' +
       '<td class="col--fire">' + (pr.conv ? sourceCell(j) : dash) + '</td>' +
       '<td class="col--fire">' + (pr.conv ? destNameCell(j) : dash) + '</td>' +
       '<td class="col--fire">' + (pr.conv ? respCell(j) : dash) + '</td>' +
@@ -704,7 +712,7 @@
     var rows = currentRows();
     var selCids = Object.keys(selected).filter(function (k) { return selected[k]; });
     var exportRows = selCids.length ? rows.filter(function (j) { return selected[rowKey(j)]; }) : rows;
-    var header = ["received_at", "lander", "entry_url", "country", "device", "click_url", "conversion_id", "type", "value", "currency", "buy_source", "destination", "response"];
+    var header = ["received_at", "lander", "entry_url", "country", "device", "click_url", "conversion_id", "type", "value", "currency", "conv_fired_at", "external_id", "buy_source", "integration_name", "response"];
     var matrix = [header];
     exportRows.forEach(function (j) {
       var f = j.destinationFire;
@@ -714,8 +722,9 @@
         fmtTs(p.ts), j.visit ? j.visit.lander : "", visitRawUrl(j) || "",
         j.visit ? (j.visit.country || "") : "", j.visit ? (j.visit.device || "") : "",
         clickUrl(j) || "", p.conversionId, p.conversionType || "", p.value || "",
-        p.currency || "", SOURCE_NAME[j.buySource] || j.buySource || "",
-        f ? (f.destinationId || "") : "", resp
+        p.currency || "", f ? fmtTs(fireTimeOf(j)) : "",
+        externalIdOf(j), SOURCE_NAME[j.buySource] || j.buySource || "",
+        f ? (f.destinationName || f.destinationId || "") : "", resp
       ]);
     });
     return matrix;
