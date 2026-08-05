@@ -566,32 +566,54 @@
     </div>
   </dialog>
 
-  <!-- Copy team offer settings -->
+  <!-- Duplicate team offer -->
   <dialog class="modal modal--settings" id="dialog-team-offer-clone">
     <div class="modal__inner">
-      <input type="hidden" id="team-clone-target-id" value="" />
+      <input type="hidden" id="team-clone-source-id" value="" />
       <div class="modal__header">
         <div>
-          <h2 class="modal__title">Copy team offer settings</h2>
-          <p class="modal__hint" id="team-clone-target-label" style="margin-bottom:0;">Apply deployment settings from another team offer on this team.</p>
+          <h2 class="modal__title">Duplicate team offer</h2>
+          <p class="modal__hint" style="margin-bottom:0;">Copy deployment settings (deal, CTA, buy sources, MAX). Pick workspaces to map on the duplicate.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <div class="modal__body">
-        <div class="settings-field">
-          <label for="team-clone-source">Copy settings from</label>
-          <select id="team-clone-source" class="select"></select>
+        <div class="field">
+          <label for="team-clone-name">New team offer name</label>
+          <input type="text" id="team-clone-name" class="input" placeholder="e.g. VIN Search (copy)" required autofocus />
         </div>
-        <p class="muted" style="font-size:12.5px;margin:.75rem 0 .5rem;">Include:</p>
-        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-workspaces" checked /> <span>Workspaces</span></label>
-        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-buysources" checked /> <span>Buy sources</span></label>
-        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-deal" checked /> <span>Deal overrides (status, target, countries)</span></label>
-        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-cta" checked /> <span>CTA URL override</span></label>
-        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-max" checked /> <span>MAX campaign fields</span></label>
+        <div class="field">
+          <label for="team-clone-ws-trigger">Map to workspaces</label>
+          <div class="team-ms" id="team-clone-ws-ms">
+            <button type="button" class="team-ms__trigger input" id="team-clone-ws-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="team-clone-ws-panel">
+              <span id="team-clone-ws-trigger-label">No workspaces selected</span>
+              <span class="team-ms__caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="team-ms__panel" id="team-clone-ws-panel" hidden>
+              <div class="team-ms__header">
+                <span class="team-ms__title">Select workspaces</span>
+                <button type="button" class="team-ms__close" id="team-clone-ws-close" aria-label="Close">&times;</button>
+              </div>
+              <div class="search-wrap team-ms__search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <input class="input" type="search" id="team-clone-ws-search" placeholder="Search workspaces…" autocomplete="off" />
+              </div>
+              <ul class="team-ms__list" id="team-clone-ws-list" role="listbox" aria-label="Workspaces for duplicate"></ul>
+              <div class="team-ms__footer">
+                <div class="team-ms__footer-left">
+                  <button type="button" class="team-ms__link" id="team-clone-ws-select-all">Select all</button>
+                  <span class="team-ms__sep" aria-hidden="true">|</span>
+                  <button type="button" class="team-ms__link" id="team-clone-ws-clear">Clear</button>
+                </div>
+                <button type="button" class="btn btn--black btn--sm" id="team-clone-ws-apply">Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="button" class="btn btn--black" id="team-clone-confirm">Copy settings</button>
+        <button type="button" class="btn btn--black" id="team-clone-confirm">Duplicate</button>
       </div>
     </div>
   </dialog>
@@ -973,7 +995,7 @@
             '<td>' + statusBadge(to.status) + '</td>' +
             '<td class="muted" style="font-size:12.5px;">' + wsNames(to.workspaceIds) + '</td>' +
             '<td class="right"><div class="actions">' +
-              '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Copy settings from another team offer">' + ICON.clone + '</button>' +
+              '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Duplicate team offer">' + ICON.clone + '</button>' +
               '<button type="button" class="icon-btn js-team-offer-settings" data-team-offer-id="' + escapeHtml(to.id) + '" title="Edit team offer">' + ICON.settings + '</button>' +
             '</div></td>';
           tbody.appendChild(orow);
@@ -1792,40 +1814,120 @@
       return clone.id;
     }
 
-    function copyTeamOfferSettings(targetId, sourceId, fields) {
-      var target = teamOfferById(targetId);
-      var source = teamOfferById(sourceId);
-      if (!target || !source || target.id === source.id) return false;
-      if (fields.workspaces) target.workspaceIds = (source.workspaceIds || []).slice();
-      if (fields.buySources) target.buySources = (source.buySources || []).slice();
-      if (fields.deal) {
-        target.displayName = source.displayName;
-        target.description = source.description;
-        target.status = source.status;
-        target.dealType = source.dealType;
-        target.targetType = source.targetType;
-        target.targetValue = source.targetValue ? JSON.parse(JSON.stringify(source.targetValue)) : null;
-        target.countries = source.countries ? source.countries.slice() : null;
-        target.trackingProvider = source.trackingProvider;
-      }
-      if (fields.cta) target.ctaUrl = source.ctaUrl;
-      if (fields.max) {
-        target.maxCampaignId = source.maxCampaignId;
-        target.maxCampaignStatus = source.maxCampaignStatus;
-      }
-      return true;
-    }
-
-    function teamOffersForCopySource(excludeId) {
-      return teamOffers.filter(function (to) {
-        return to.teamId === CURRENT_TEAM.id && to.id !== excludeId;
-      });
+    function cloneTeamOffer(sourceId, opts) {
+      var src = teamOfferById(sourceId);
+      if (!src) return null;
+      var clone = JSON.parse(JSON.stringify(src));
+      clone.id = "to-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6);
+      clone.displayName = opts.name || (teamOfferLabel(src) + " (copy)");
+      clone.workspaceIds = (opts.workspaceIds || []).slice();
+      teamOffers.push(clone);
+      return clone.id;
     }
 
     var parentCloneDlg = document.getElementById("dialog-parent-offer-clone");
     var teamCloneDlg = document.getElementById("dialog-team-offer-clone");
 
     var parentCloneTeamsDraft = [];
+    var teamCloneWorkspacesDraft = [];
+
+    function teamCloneWorkspacesLabel(ids) {
+      if (!ids || !ids.length) return "No workspaces selected";
+      var teamWs = workspacesInTeam(CURRENT_TEAM.id);
+      if (ids.length === teamWs.length) return "All workspaces";
+      if (ids.length <= 2) {
+        var map = {};
+        teamWs.forEach(function (w) { map[w.id] = w.name; });
+        return ids.map(function (id) { return map[id] || id; }).join(", ");
+      }
+      return ids.length + " workspaces selected";
+    }
+
+    function updateTeamCloneWorkspacesTrigger() {
+      var lbl = document.getElementById("team-clone-ws-trigger-label");
+      if (lbl) lbl.textContent = teamCloneWorkspacesLabel(teamCloneWorkspacesDraft);
+    }
+
+    function renderTeamCloneWorkspacesList(query) {
+      var list = document.getElementById("team-clone-ws-list");
+      if (!list) return;
+      var q = (query || "").trim().toLowerCase();
+      var workspaces = workspacesInTeam(CURRENT_TEAM.id).filter(function (w) {
+        return !q || w.name.toLowerCase().indexOf(q) !== -1;
+      });
+      if (!workspaces.length) {
+        list.innerHTML = '<li class="team-ms__empty muted">No workspaces match your search.</li>';
+        return;
+      }
+      list.innerHTML = workspaces.map(function (w) {
+        var checked = teamCloneWorkspacesDraft.indexOf(w.id) !== -1;
+        return '<li class="team-ms__item" role="option" aria-selected="' + (checked ? "true" : "false") + '">' +
+          '<span class="team-ms__item-name">' + escapeHtml(w.name) + '</span>' +
+          '<label class="team-ms__check" title="Toggle ' + escapeHtml(w.name) + '">' +
+            '<input type="checkbox" value="' + escapeHtml(w.id) + '"' + (checked ? " checked" : "") + ' />' +
+            '<span class="team-ms__check-ui" aria-hidden="true"></span>' +
+          '</label>' +
+        '</li>';
+      }).join("");
+      list.querySelectorAll("input[type=checkbox]").forEach(function (cb) {
+        cb.addEventListener("change", function () {
+          var id = cb.value;
+          var idx = teamCloneWorkspacesDraft.indexOf(id);
+          if (cb.checked && idx === -1) teamCloneWorkspacesDraft.push(id);
+          if (!cb.checked && idx !== -1) teamCloneWorkspacesDraft.splice(idx, 1);
+        });
+      });
+    }
+
+    function openTeamCloneWorkspacesPanel() {
+      var panel = document.getElementById("team-clone-ws-panel");
+      var trigger = document.getElementById("team-clone-ws-trigger");
+      if (!panel || !trigger) return;
+      panel.hidden = false;
+      trigger.setAttribute("aria-expanded", "true");
+      var search = document.getElementById("team-clone-ws-search");
+      if (search) { search.value = ""; search.focus(); }
+      renderTeamCloneWorkspacesList("");
+    }
+
+    function closeTeamCloneWorkspacesPanel() {
+      var panel = document.getElementById("team-clone-ws-panel");
+      var trigger = document.getElementById("team-clone-ws-trigger");
+      if (panel) panel.hidden = true;
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    }
+
+    function wireTeamCloneWorkspacesMs() {
+      var ms = document.getElementById("team-clone-ws-ms");
+      var trigger = document.getElementById("team-clone-ws-trigger");
+      if (!ms || !trigger) return;
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var panel = document.getElementById("team-clone-ws-panel");
+        if (panel && panel.hidden) openTeamCloneWorkspacesPanel();
+        else closeTeamCloneWorkspacesPanel();
+      });
+      document.getElementById("team-clone-ws-close").addEventListener("click", closeTeamCloneWorkspacesPanel);
+      document.getElementById("team-clone-ws-apply").addEventListener("click", function () {
+        updateTeamCloneWorkspacesTrigger();
+        closeTeamCloneWorkspacesPanel();
+      });
+      document.getElementById("team-clone-ws-select-all").addEventListener("click", function () {
+        teamCloneWorkspacesDraft = workspacesInTeam(CURRENT_TEAM.id).map(function (w) { return w.id; });
+        renderTeamCloneWorkspacesList(document.getElementById("team-clone-ws-search").value);
+      });
+      document.getElementById("team-clone-ws-clear").addEventListener("click", function () {
+        teamCloneWorkspacesDraft = [];
+        renderTeamCloneWorkspacesList(document.getElementById("team-clone-ws-search").value);
+      });
+      document.getElementById("team-clone-ws-search").addEventListener("input", function () {
+        renderTeamCloneWorkspacesList(this.value);
+      });
+      document.addEventListener("click", function (e) {
+        if (!ms.contains(e.target)) closeTeamCloneWorkspacesPanel();
+      });
+    }
+    wireTeamCloneWorkspacesMs();
 
     function parentCloneTeamsLabel(ids) {
       if (!ids || !ids.length) return "No teams selected";
@@ -1937,26 +2039,17 @@
       setTimeout(function () { nameIn.focus(); nameIn.select(); }, 50);
     }
 
-    function openTeamOfferClone(targetId) {
-      var target = teamOfferById(targetId);
-      if (!target || !teamCloneDlg) return;
-      var sources = teamOffersForCopySource(targetId);
-      if (!sources.length) {
-        window.alert("No other team offers on this team to copy from.");
-        return;
-      }
-      document.getElementById("team-clone-target-id").value = targetId;
-      document.getElementById("team-clone-target-label").innerHTML =
-        'Copy into <strong>' + escapeHtml(teamOfferLabel(target)) + '</strong> from another team offer on ' + escapeHtml(CURRENT_TEAM.name) + '.';
-      var sel = document.getElementById("team-clone-source");
-      sel.innerHTML = sources.map(function (to) {
-        return '<option value="' + escapeHtml(to.id) + '">' + escapeHtml(teamOfferLabel(to)) + '</option>';
-      }).join("");
-      ["workspaces", "buysources", "deal", "cta", "max"].forEach(function (k) {
-        var el = document.getElementById("team-clone-f-" + k);
-        if (el) el.checked = true;
-      });
+    function openTeamOfferClone(sourceId) {
+      var src = teamOfferById(sourceId);
+      if (!src || !teamCloneDlg) return;
+      document.getElementById("team-clone-source-id").value = sourceId;
+      var nameIn = document.getElementById("team-clone-name");
+      nameIn.value = teamOfferLabel(src) + " (copy)";
+      teamCloneWorkspacesDraft = (src.workspaceIds || []).slice();
+      updateTeamCloneWorkspacesTrigger();
+      closeTeamCloneWorkspacesPanel();
       teamCloneDlg.showModal();
+      setTimeout(function () { nameIn.focus(); nameIn.select(); }, 50);
     }
 
     document.getElementById("parent-clone-confirm").addEventListener("click", function () {
@@ -1977,19 +2070,17 @@
     });
 
     document.getElementById("team-clone-confirm").addEventListener("click", function () {
-      var targetId = document.getElementById("team-clone-target-id").value;
-      var sourceId = document.getElementById("team-clone-source").value;
-      var ok = copyTeamOfferSettings(targetId, sourceId, {
-        workspaces: document.getElementById("team-clone-f-workspaces").checked,
-        buySources: document.getElementById("team-clone-f-buysources").checked,
-        deal: document.getElementById("team-clone-f-deal").checked,
-        cta: document.getElementById("team-clone-f-cta").checked,
-        max: document.getElementById("team-clone-f-max").checked
+      var srcId = document.getElementById("team-clone-source-id").value;
+      var name = document.getElementById("team-clone-name").value.trim();
+      if (!name) { document.getElementById("team-clone-name").focus(); return; }
+      var newId = cloneTeamOffer(srcId, {
+        name: name,
+        workspaceIds: teamCloneWorkspacesDraft.slice()
       });
-      if (ok) {
+      if (newId) {
         render();
         teamCloneDlg.close();
-        openTeamOfferDetail(targetId);
+        openTeamOfferDetail(newId);
       }
     });
 
