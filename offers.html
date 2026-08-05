@@ -518,29 +518,54 @@
   <dialog class="modal modal--settings" id="dialog-parent-offer-clone">
     <div class="modal__inner">
       <input type="hidden" id="parent-clone-source-id" value="" />
-      <div class="modal__head">
+      <div class="modal__header">
         <div>
           <h2 class="modal__title">Duplicate parent offer</h2>
-          <p class="modal__hint">Copy catalog fields (General, Deal, CTA URL). Team mappings are optional.</p>
+          <p class="modal__hint" style="margin-bottom:0;">Copy catalog fields (General, Deal, CTA URL). Pick teams to map on the duplicate.</p>
         </div>
-        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <div class="modal__body">
-        <div class="settings-field">
+        <div class="field">
           <label for="parent-clone-name">New parent offer name</label>
-          <input type="text" id="parent-clone-name" class="input" placeholder="e.g. Walk-in showers (copy)" />
+          <input type="text" id="parent-clone-name" class="input" placeholder="e.g. Walk-in showers (copy)" required autofocus />
         </div>
-        <div class="settings-field">
+        <div class="field">
           <label for="parent-clone-advertiser">Advertiser</label>
           <select id="parent-clone-advertiser" class="select"></select>
         </div>
-        <label class="cd-default-check" style="margin-top:.75rem;">
-          <input type="checkbox" id="parent-clone-map-teams" />
-          <span>Map same teams as source</span>
-        </label>
-        <label class="cd-default-check" id="parent-clone-spawn-wrap" style="margin-top:.35rem;" hidden>
+        <div class="field">
+          <label for="parent-clone-teams-trigger">Map to teams</label>
+          <p class="settings-section__hint muted" style="margin:0 0 .4rem;">Optional — mapped teams get a <strong>team_offer</strong> spawned on duplicate.</p>
+          <div class="team-ms" id="parent-clone-teams-ms">
+            <button type="button" class="team-ms__trigger input" id="parent-clone-teams-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="parent-clone-teams-panel">
+              <span id="parent-clone-teams-trigger-label">No teams selected</span>
+              <span class="team-ms__caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="team-ms__panel" id="parent-clone-teams-panel" hidden>
+              <div class="team-ms__header">
+                <span class="team-ms__title">Select teams</span>
+                <button type="button" class="team-ms__close" id="parent-clone-teams-close" aria-label="Close">&times;</button>
+              </div>
+              <div class="search-wrap team-ms__search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <input class="input" type="search" id="parent-clone-teams-search" placeholder="Search teams…" autocomplete="off" />
+              </div>
+              <ul class="team-ms__list" id="parent-clone-teams-list" role="listbox" aria-label="Teams for duplicate"></ul>
+              <div class="team-ms__footer">
+                <div class="team-ms__footer-left">
+                  <button type="button" class="team-ms__link" id="parent-clone-teams-select-all">Select all</button>
+                  <span class="team-ms__sep" aria-hidden="true">|</span>
+                  <button type="button" class="team-ms__link" id="parent-clone-teams-clear">Clear</button>
+                </div>
+                <button type="button" class="btn btn--black btn--sm" id="parent-clone-teams-apply">Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <label class="cd-default-check" id="parent-clone-spawn-wrap" style="margin-top:.5rem;" hidden>
           <input type="checkbox" id="parent-clone-spawn-team-offers" checked />
-          <span>Spawn <strong>team_offer</strong> rows for mapped teams</span>
+          <span>Spawn <strong>team_offer</strong> for each selected team</span>
         </label>
       </div>
       <div class="modal__actions">
@@ -554,12 +579,12 @@
   <dialog class="modal modal--settings" id="dialog-team-offer-clone">
     <div class="modal__inner">
       <input type="hidden" id="team-clone-target-id" value="" />
-      <div class="modal__head">
+      <div class="modal__header">
         <div>
           <h2 class="modal__title">Copy team offer settings</h2>
-          <p class="modal__hint" id="team-clone-target-label">Apply deployment settings from another team offer on this team.</p>
+          <p class="modal__hint" id="team-clone-target-label" style="margin-bottom:0;">Apply deployment settings from another team offer on this team.</p>
         </div>
-        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <div class="modal__body">
         <div class="settings-field">
@@ -1769,10 +1794,10 @@
       clone.id = newParentOfferId();
       clone.name = opts.name || (src.name + " (copy)");
       clone.advertiserId = opts.advertiserId || src.advertiserId;
-      clone.teamIds = opts.mapTeams ? (src.teamIds || []).slice() : [];
+      clone.teamIds = (opts.teamIds || []).slice();
       if (clone.params) clone.params = clone.params.map(function (x) { return { key: x.key, value: x.value }; });
       parentOffers.push(clone);
-      if (opts.mapTeams && opts.spawnTeamOffers) spawnTeamOffersForParent(clone);
+      if (clone.teamIds.length && opts.spawnTeamOffers) spawnTeamOffersForParent(clone);
       return clone.id;
     }
 
@@ -1809,19 +1834,123 @@
     var parentCloneDlg = document.getElementById("dialog-parent-offer-clone");
     var teamCloneDlg = document.getElementById("dialog-team-offer-clone");
 
+    var parentCloneTeamsDraft = [];
+
+    function parentCloneTeamsLabel(ids) {
+      if (!ids || !ids.length) return "No teams selected";
+      if (ids.length === TEAMS.length) return "All teams";
+      if (ids.length <= 2) {
+        var map = {};
+        TEAMS.forEach(function (t) { map[t.id] = t.name; });
+        return ids.map(function (id) { return map[id] || id; }).join(", ");
+      }
+      return ids.length + " teams selected";
+    }
+
+    function updateParentCloneTeamsTrigger() {
+      var lbl = document.getElementById("parent-clone-teams-trigger-label");
+      if (lbl) lbl.textContent = parentCloneTeamsLabel(parentCloneTeamsDraft);
+      var spawnWrap = document.getElementById("parent-clone-spawn-wrap");
+      if (spawnWrap) spawnWrap.hidden = !parentCloneTeamsDraft.length;
+    }
+
+    function renderParentCloneTeamsList(query) {
+      var list = document.getElementById("parent-clone-teams-list");
+      if (!list) return;
+      var q = (query || "").trim().toLowerCase();
+      var teams = TEAMS.filter(function (t) {
+        return !q || t.name.toLowerCase().indexOf(q) !== -1;
+      });
+      if (!teams.length) {
+        list.innerHTML = '<li class="team-ms__empty muted">No teams match your search.</li>';
+        return;
+      }
+      list.innerHTML = teams.map(function (t) {
+        var checked = parentCloneTeamsDraft.indexOf(t.id) !== -1;
+        return '<li class="team-ms__item" role="option" aria-selected="' + (checked ? "true" : "false") + '">' +
+          '<span class="team-ms__item-name">' + escapeHtml(t.name) + '</span>' +
+          '<label class="team-ms__check" title="Toggle ' + escapeHtml(t.name) + '">' +
+            '<input type="checkbox" value="' + escapeHtml(t.id) + '"' + (checked ? " checked" : "") + ' />' +
+            '<span class="team-ms__check-ui" aria-hidden="true"></span>' +
+          '</label>' +
+        '</li>';
+      }).join("");
+      list.querySelectorAll("input[type=checkbox]").forEach(function (cb) {
+        cb.addEventListener("change", function () {
+          var id = cb.value;
+          var idx = parentCloneTeamsDraft.indexOf(id);
+          if (cb.checked && idx === -1) parentCloneTeamsDraft.push(id);
+          if (!cb.checked && idx !== -1) parentCloneTeamsDraft.splice(idx, 1);
+        });
+      });
+    }
+
+    function openParentCloneTeamsPanel() {
+      var panel = document.getElementById("parent-clone-teams-panel");
+      var trigger = document.getElementById("parent-clone-teams-trigger");
+      if (!panel || !trigger) return;
+      panel.hidden = false;
+      trigger.setAttribute("aria-expanded", "true");
+      var search = document.getElementById("parent-clone-teams-search");
+      if (search) { search.value = ""; search.focus(); }
+      renderParentCloneTeamsList("");
+    }
+
+    function closeParentCloneTeamsPanel() {
+      var panel = document.getElementById("parent-clone-teams-panel");
+      var trigger = document.getElementById("parent-clone-teams-trigger");
+      if (panel) panel.hidden = true;
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+    }
+
+    function wireParentCloneTeamsMs() {
+      var ms = document.getElementById("parent-clone-teams-ms");
+      var trigger = document.getElementById("parent-clone-teams-trigger");
+      if (!ms || !trigger) return;
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var panel = document.getElementById("parent-clone-teams-panel");
+        if (panel && panel.hidden) openParentCloneTeamsPanel();
+        else closeParentCloneTeamsPanel();
+      });
+      document.getElementById("parent-clone-teams-close").addEventListener("click", closeParentCloneTeamsPanel);
+      document.getElementById("parent-clone-teams-apply").addEventListener("click", function () {
+        updateParentCloneTeamsTrigger();
+        closeParentCloneTeamsPanel();
+      });
+      document.getElementById("parent-clone-teams-select-all").addEventListener("click", function () {
+        parentCloneTeamsDraft = TEAMS.map(function (t) { return t.id; });
+        renderParentCloneTeamsList(document.getElementById("parent-clone-teams-search").value);
+      });
+      document.getElementById("parent-clone-teams-clear").addEventListener("click", function () {
+        parentCloneTeamsDraft = [];
+        renderParentCloneTeamsList(document.getElementById("parent-clone-teams-search").value);
+      });
+      document.getElementById("parent-clone-teams-search").addEventListener("input", function () {
+        renderParentCloneTeamsList(this.value);
+      });
+      document.addEventListener("click", function (e) {
+        if (!ms.contains(e.target)) closeParentCloneTeamsPanel();
+      });
+    }
+    wireParentCloneTeamsMs();
+
     function openParentOfferClone(parentId) {
       var p = parentById(parentId);
       if (!p || !parentCloneDlg) return;
       document.getElementById("parent-clone-source-id").value = parentId;
-      document.getElementById("parent-clone-name").value = p.name + " (copy)";
+      var nameIn = document.getElementById("parent-clone-name");
+      nameIn.value = p.name + " (copy)";
       var advSel = document.getElementById("parent-clone-advertiser");
       advSel.innerHTML = advertisers.map(function (a) {
         return '<option value="' + escapeHtml(a.id) + '"' + (a.id === p.advertiserId ? " selected" : "") + '>' + escapeHtml(a.name) + '</option>';
       }).join("");
-      document.getElementById("parent-clone-map-teams").checked = false;
+      parentCloneTeamsDraft = (p.teamIds || []).slice();
+      updateParentCloneTeamsTrigger();
       document.getElementById("parent-clone-spawn-team-offers").checked = true;
-      document.getElementById("parent-clone-spawn-wrap").hidden = true;
+      closeParentCloneTeamsPanel();
       parentCloneDlg.showModal();
+      setTimeout(function () { nameIn.focus(); nameIn.select(); }, 50);
     }
 
     function openTeamOfferClone(targetId) {
@@ -1846,20 +1975,16 @@
       teamCloneDlg.showModal();
     }
 
-    document.getElementById("parent-clone-map-teams").addEventListener("change", function () {
-      document.getElementById("parent-clone-spawn-wrap").hidden = !this.checked;
-    });
-
     document.getElementById("parent-clone-confirm").addEventListener("click", function () {
       var srcId = document.getElementById("parent-clone-source-id").value;
       var name = document.getElementById("parent-clone-name").value.trim();
       if (!name) { document.getElementById("parent-clone-name").focus(); return; }
-      var mapTeams = document.getElementById("parent-clone-map-teams").checked;
+      var teamIds = parentCloneTeamsDraft.slice();
       var newId = cloneParentOffer(srcId, {
         name: name,
         advertiserId: document.getElementById("parent-clone-advertiser").value,
-        mapTeams: mapTeams,
-        spawnTeamOffers: mapTeams && document.getElementById("parent-clone-spawn-team-offers").checked
+        teamIds: teamIds,
+        spawnTeamOffers: teamIds.length > 0 && document.getElementById("parent-clone-spawn-team-offers").checked
       });
       if (newId) {
         renderAdvertiserFilters();
