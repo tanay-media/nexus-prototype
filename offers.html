@@ -514,6 +514,72 @@
     </form>
   </dialog>
 
+  <!-- Clone parent offer -->
+  <dialog class="modal modal--settings" id="dialog-parent-offer-clone">
+    <div class="modal__inner">
+      <input type="hidden" id="parent-clone-source-id" value="" />
+      <div class="modal__head">
+        <div>
+          <h2 class="modal__title">Duplicate parent offer</h2>
+          <p class="modal__hint">Copy catalog fields (General, Deal, CTA URL). Team mappings are optional.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="settings-field">
+          <label for="parent-clone-name">New parent offer name</label>
+          <input type="text" id="parent-clone-name" class="input" placeholder="e.g. Walk-in showers (copy)" />
+        </div>
+        <div class="settings-field">
+          <label for="parent-clone-advertiser">Advertiser</label>
+          <select id="parent-clone-advertiser" class="select"></select>
+        </div>
+        <label class="cd-default-check" style="margin-top:.75rem;">
+          <input type="checkbox" id="parent-clone-map-teams" />
+          <span>Map same teams as source</span>
+        </label>
+        <label class="cd-default-check" id="parent-clone-spawn-wrap" style="margin-top:.35rem;" hidden>
+          <input type="checkbox" id="parent-clone-spawn-team-offers" checked />
+          <span>Spawn <strong>team_offer</strong> rows for mapped teams</span>
+        </label>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="parent-clone-confirm">Duplicate</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Copy team offer settings -->
+  <dialog class="modal modal--settings" id="dialog-team-offer-clone">
+    <div class="modal__inner">
+      <input type="hidden" id="team-clone-target-id" value="" />
+      <div class="modal__head">
+        <div>
+          <h2 class="modal__title">Copy team offer settings</h2>
+          <p class="modal__hint" id="team-clone-target-label">Apply deployment settings from another team offer on this team.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <div class="modal__body">
+        <div class="settings-field">
+          <label for="team-clone-source">Copy settings from</label>
+          <select id="team-clone-source" class="select"></select>
+        </div>
+        <p class="muted" style="font-size:12.5px;margin:.75rem 0 .5rem;">Include:</p>
+        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-workspaces" checked /> <span>Workspaces</span></label>
+        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-buysources" checked /> <span>Buy sources</span></label>
+        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-deal" checked /> <span>Deal overrides (status, target, countries)</span></label>
+        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-cta" checked /> <span>CTA URL override</span></label>
+        <label class="cd-default-check"><input type="checkbox" id="team-clone-f-max" checked /> <span>MAX campaign fields</span></label>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="team-clone-confirm">Copy settings</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="app.js"></script>
   <script src="offer-categories.js"></script>
   <script src="offer-countries.js"></script>
@@ -891,6 +957,7 @@
             '<td>' + statusBadge(to.status) + '</td>' +
             '<td class="muted" style="font-size:12.5px;">' + wsNames(to.workspaceIds) + '</td>' +
             '<td class="right"><div class="actions">' +
+              '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Copy settings from another team offer">' + ICON.clone + '</button>' +
               '<button type="button" class="icon-btn js-team-offer-settings" data-team-offer-id="' + escapeHtml(to.id) + '" title="Edit team offer">' + ICON.settings + '</button>' +
             '</div></td>';
           tbody.appendChild(orow);
@@ -936,7 +1003,10 @@
             '<td class="right num">' + fmtTargetParent(p) + '</td>' +
             '<td>' + statusBadge(p.status) + '</td>' +
             '<td class="muted" style="font-size:12px;">' + teamNames(p.teamIds) + '</td>' +
-            '<td class="right"><button type="button" class="icon-btn js-parent-offer-settings" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Edit parent offer">' + ICON.settings + '</button></td>';
+            '<td class="right"><div class="actions">' +
+              '<button type="button" class="icon-btn js-parent-offer-clone" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Duplicate parent offer">' + ICON.clone + '</button>' +
+              '<button type="button" class="icon-btn js-parent-offer-settings" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Edit parent offer">' + ICON.settings + '</button>' +
+            '</div></td>';
           parentBody.appendChild(orow);
         });
       });
@@ -1688,8 +1758,138 @@
       return true;
     }
 
+    function newParentOfferId() {
+      return "po-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6);
+    }
+
+    function cloneParentOffer(sourceId, opts) {
+      var src = parentById(sourceId);
+      if (!src) return null;
+      var clone = JSON.parse(JSON.stringify(src));
+      clone.id = newParentOfferId();
+      clone.name = opts.name || (src.name + " (copy)");
+      clone.advertiserId = opts.advertiserId || src.advertiserId;
+      clone.teamIds = opts.mapTeams ? (src.teamIds || []).slice() : [];
+      if (clone.params) clone.params = clone.params.map(function (x) { return { key: x.key, value: x.value }; });
+      parentOffers.push(clone);
+      if (opts.mapTeams && opts.spawnTeamOffers) spawnTeamOffersForParent(clone);
+      return clone.id;
+    }
+
+    function copyTeamOfferSettings(targetId, sourceId, fields) {
+      var target = teamOfferById(targetId);
+      var source = teamOfferById(sourceId);
+      if (!target || !source || target.id === source.id) return false;
+      if (fields.workspaces) target.workspaceIds = (source.workspaceIds || []).slice();
+      if (fields.buySources) target.buySources = (source.buySources || []).slice();
+      if (fields.deal) {
+        target.displayName = source.displayName;
+        target.description = source.description;
+        target.status = source.status;
+        target.dealType = source.dealType;
+        target.targetType = source.targetType;
+        target.targetValue = source.targetValue ? JSON.parse(JSON.stringify(source.targetValue)) : null;
+        target.countries = source.countries ? source.countries.slice() : null;
+        target.trackingProvider = source.trackingProvider;
+      }
+      if (fields.cta) target.ctaUrl = source.ctaUrl;
+      if (fields.max) {
+        target.maxCampaignId = source.maxCampaignId;
+        target.maxCampaignStatus = source.maxCampaignStatus;
+      }
+      return true;
+    }
+
+    function teamOffersForCopySource(excludeId) {
+      return teamOffers.filter(function (to) {
+        return to.teamId === CURRENT_TEAM.id && to.id !== excludeId;
+      });
+    }
+
+    var parentCloneDlg = document.getElementById("dialog-parent-offer-clone");
+    var teamCloneDlg = document.getElementById("dialog-team-offer-clone");
+
+    function openParentOfferClone(parentId) {
+      var p = parentById(parentId);
+      if (!p || !parentCloneDlg) return;
+      document.getElementById("parent-clone-source-id").value = parentId;
+      document.getElementById("parent-clone-name").value = p.name + " (copy)";
+      var advSel = document.getElementById("parent-clone-advertiser");
+      advSel.innerHTML = advertisers.map(function (a) {
+        return '<option value="' + escapeHtml(a.id) + '"' + (a.id === p.advertiserId ? " selected" : "") + '>' + escapeHtml(a.name) + '</option>';
+      }).join("");
+      document.getElementById("parent-clone-map-teams").checked = false;
+      document.getElementById("parent-clone-spawn-team-offers").checked = true;
+      document.getElementById("parent-clone-spawn-wrap").hidden = true;
+      parentCloneDlg.showModal();
+    }
+
+    function openTeamOfferClone(targetId) {
+      var target = teamOfferById(targetId);
+      if (!target || !teamCloneDlg) return;
+      var sources = teamOffersForCopySource(targetId);
+      if (!sources.length) {
+        window.alert("No other team offers on this team to copy from.");
+        return;
+      }
+      document.getElementById("team-clone-target-id").value = targetId;
+      document.getElementById("team-clone-target-label").innerHTML =
+        'Copy into <strong>' + escapeHtml(teamOfferLabel(target)) + '</strong> from another team offer on ' + escapeHtml(CURRENT_TEAM.name) + '.';
+      var sel = document.getElementById("team-clone-source");
+      sel.innerHTML = sources.map(function (to) {
+        return '<option value="' + escapeHtml(to.id) + '">' + escapeHtml(teamOfferLabel(to)) + '</option>';
+      }).join("");
+      ["workspaces", "buysources", "deal", "cta", "max"].forEach(function (k) {
+        var el = document.getElementById("team-clone-f-" + k);
+        if (el) el.checked = true;
+      });
+      teamCloneDlg.showModal();
+    }
+
+    document.getElementById("parent-clone-map-teams").addEventListener("change", function () {
+      document.getElementById("parent-clone-spawn-wrap").hidden = !this.checked;
+    });
+
+    document.getElementById("parent-clone-confirm").addEventListener("click", function () {
+      var srcId = document.getElementById("parent-clone-source-id").value;
+      var name = document.getElementById("parent-clone-name").value.trim();
+      if (!name) { document.getElementById("parent-clone-name").focus(); return; }
+      var mapTeams = document.getElementById("parent-clone-map-teams").checked;
+      var newId = cloneParentOffer(srcId, {
+        name: name,
+        advertiserId: document.getElementById("parent-clone-advertiser").value,
+        mapTeams: mapTeams,
+        spawnTeamOffers: mapTeams && document.getElementById("parent-clone-spawn-team-offers").checked
+      });
+      if (newId) {
+        renderAdvertiserFilters();
+        render();
+        parentCloneDlg.close();
+        openParentOfferDetail(newId);
+      }
+    });
+
+    document.getElementById("team-clone-confirm").addEventListener("click", function () {
+      var targetId = document.getElementById("team-clone-target-id").value;
+      var sourceId = document.getElementById("team-clone-source").value;
+      var ok = copyTeamOfferSettings(targetId, sourceId, {
+        workspaces: document.getElementById("team-clone-f-workspaces").checked,
+        buySources: document.getElementById("team-clone-f-buysources").checked,
+        deal: document.getElementById("team-clone-f-deal").checked,
+        cta: document.getElementById("team-clone-f-cta").checked,
+        max: document.getElementById("team-clone-f-max").checked
+      });
+      if (ok) {
+        render();
+        teamCloneDlg.close();
+        openTeamOfferDetail(targetId);
+      }
+    });
+
     tbody.addEventListener("click", function (e) {
       if (handleAdvertiserToggle(e)) return;
+      var cbtn = e.target.closest(".js-team-offer-clone");
+      if (cbtn) { openTeamOfferClone(cbtn.getAttribute("data-team-offer-id")); return; }
       var sbtn = e.target.closest(".js-team-offer-settings");
       if (sbtn) { openTeamOfferDetail(sbtn.getAttribute("data-team-offer-id")); return; }
     });
@@ -1697,6 +1897,8 @@
     if (parentBody) {
       parentBody.addEventListener("click", function (e) {
         if (handleAdvertiserToggle(e)) return;
+        var cbtn = e.target.closest(".js-parent-offer-clone");
+        if (cbtn) { openParentOfferClone(cbtn.getAttribute("data-parent-offer-id")); return; }
         var sbtn = e.target.closest(".js-parent-offer-settings");
         if (sbtn) { openParentOfferDetail(sbtn.getAttribute("data-parent-offer-id")); return; }
       });
