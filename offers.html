@@ -531,12 +531,7 @@
           <input type="text" id="parent-clone-name" class="input" placeholder="e.g. Walk-in showers (copy)" required autofocus />
         </div>
         <div class="field">
-          <label for="parent-clone-advertiser">Advertiser</label>
-          <select id="parent-clone-advertiser" class="select"></select>
-        </div>
-        <div class="field">
           <label for="parent-clone-teams-trigger">Map to teams</label>
-          <p class="settings-section__hint muted" style="margin:0 0 .4rem;">Optional — mapped teams get a <strong>team_offer</strong> spawned on duplicate.</p>
           <div class="team-ms" id="parent-clone-teams-ms">
             <button type="button" class="team-ms__trigger input" id="parent-clone-teams-trigger" aria-haspopup="listbox" aria-expanded="false" aria-controls="parent-clone-teams-panel">
               <span id="parent-clone-teams-trigger-label">No teams selected</span>
@@ -563,10 +558,6 @@
             </div>
           </div>
         </div>
-        <label class="cd-default-check" id="parent-clone-spawn-wrap" style="margin-top:.5rem;" hidden>
-          <input type="checkbox" id="parent-clone-spawn-team-offers" checked />
-          <span>Spawn <strong>team_offer</strong> for each selected team</span>
-        </label>
       </div>
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
@@ -1797,7 +1788,7 @@
       clone.teamIds = (opts.teamIds || []).slice();
       if (clone.params) clone.params = clone.params.map(function (x) { return { key: x.key, value: x.value }; });
       parentOffers.push(clone);
-      if (clone.teamIds.length && opts.spawnTeamOffers) spawnTeamOffersForParent(clone);
+      if (clone.teamIds.length) spawnTeamOffersForParent(clone);
       return clone.id;
     }
 
@@ -1850,8 +1841,6 @@
     function updateParentCloneTeamsTrigger() {
       var lbl = document.getElementById("parent-clone-teams-trigger-label");
       if (lbl) lbl.textContent = parentCloneTeamsLabel(parentCloneTeamsDraft);
-      var spawnWrap = document.getElementById("parent-clone-spawn-wrap");
-      if (spawnWrap) spawnWrap.hidden = !parentCloneTeamsDraft.length;
     }
 
     function renderParentCloneTeamsList(query) {
@@ -1941,13 +1930,8 @@
       document.getElementById("parent-clone-source-id").value = parentId;
       var nameIn = document.getElementById("parent-clone-name");
       nameIn.value = p.name + " (copy)";
-      var advSel = document.getElementById("parent-clone-advertiser");
-      advSel.innerHTML = advertisers.map(function (a) {
-        return '<option value="' + escapeHtml(a.id) + '"' + (a.id === p.advertiserId ? " selected" : "") + '>' + escapeHtml(a.name) + '</option>';
-      }).join("");
       parentCloneTeamsDraft = (p.teamIds || []).slice();
       updateParentCloneTeamsTrigger();
-      document.getElementById("parent-clone-spawn-team-offers").checked = true;
       closeParentCloneTeamsPanel();
       parentCloneDlg.showModal();
       setTimeout(function () { nameIn.focus(); nameIn.select(); }, 50);
@@ -1982,9 +1966,7 @@
       var teamIds = parentCloneTeamsDraft.slice();
       var newId = cloneParentOffer(srcId, {
         name: name,
-        advertiserId: document.getElementById("parent-clone-advertiser").value,
-        teamIds: teamIds,
-        spawnTeamOffers: teamIds.length > 0 && document.getElementById("parent-clone-spawn-team-offers").checked
+        teamIds: teamIds
       });
       if (newId) {
         renderAdvertiserFilters();
