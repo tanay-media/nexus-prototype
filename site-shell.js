@@ -10,7 +10,7 @@
     '    <img src="img/nexus-wordmark.png" alt="nexus" width="96" height="24" />\n' +
     "  </a>\n" +
     '  <nav aria-label="Primary">\n' +
-    '    <a href="/offers">Offers</a>\n' +
+    '    <a href="/offers">Team Offers</a>\n' +
     '    <a href="/help">Help</a>\n' +
     "  </nav>\n" +
     "</header>";

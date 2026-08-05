@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Offers · nexus</title>
+  <title>Team Offers · nexus</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -16,7 +16,7 @@
         <a href="landers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Landers</a>
         <a href="widgets.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Widgets</a>
         <a href="reports.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Reports</a>
-        <a href="offers.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</a>
+        <a href="offers.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Team Offers</a>
         <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
         <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
         <a href="settings.html" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</a>
@@ -26,7 +26,7 @@
 
     <main class="main">
       <div class="page-header">
-        <h1 id="page-main-title">Offers</h1>
+        <h1 id="page-main-title">Team Offers</h1>
         <div class="page-header__right">
           <button type="button" class="btn btn--black" id="team-offer-add-btn">+ New offer</button>
           <button type="button" class="btn btn--black" id="parent-offer-add-btn" style="display:none;">+ New parent offer</button>
@@ -35,7 +35,7 @@
       </div>
 
       <div class="tabs page-level-tabs" role="tablist" data-tabs="page-level">
-        <button type="button" class="tab is-active" data-page-tab="team-offers" role="tab" aria-selected="true">Offers</button>
+        <button type="button" class="tab is-active" data-page-tab="team-offers" role="tab" aria-selected="true">Team Offers</button>
         <button type="button" class="tab" data-page-tab="parent-offers" role="tab" aria-selected="false">Parent offers</button>
         <button type="button" class="tab" data-page-tab="advertisers" role="tab" aria-selected="false">Advertisers</button>
       </div>
@@ -60,7 +60,7 @@
         </div>
 
         <div class="card">
-          <div class="table-scroll" role="region" aria-label="Offers">
+          <div class="table-scroll" role="region" aria-label="Team offers">
             <table class="table" id="offers-table">
               <thead>
                 <tr>
@@ -1802,7 +1802,7 @@
 
     // ---- Page-level tabs ----
     var pageTabs = document.querySelectorAll("[data-page-tab]");
-    var pageTitles = { "team-offers": "Offers", "parent-offers": "Parent offers", "advertisers": "Advertisers" };
+    var pageTitles = { "team-offers": "Team Offers", "parent-offers": "Parent offers", "advertisers": "Advertisers" };
     pageTabs.forEach(function (tab) {
       tab.addEventListener("click", function () {
         var target = tab.getAttribute("data-page-tab");
@@ -1815,7 +1815,7 @@
         document.getElementById("team-offer-add-btn").style.display = target === "team-offers" ? "" : "none";
         document.getElementById("parent-offer-add-btn").style.display = target === "parent-offers" ? "" : "none";
         document.getElementById("adv-add-btn").style.display = target === "advertisers" ? "" : "none";
-        document.getElementById("page-main-title").textContent = pageTitles[target] || "Offers";
+        document.getElementById("page-main-title").textContent = pageTitles[target] || "Team Offers";
         if (target === "advertisers") renderAdvTable();
       });
     });
