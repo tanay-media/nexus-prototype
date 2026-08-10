@@ -57,6 +57,10 @@
           <select class="select" id="offers-advertiser-filter" aria-label="Advertiser filter">
             <option value="">All advertisers</option>
           </select>
+          <label class="offer-ws-pick" style="display:flex;align-items:center;gap:.35rem;font-size:13px;white-space:nowrap;">
+            <input type="checkbox" id="offers-show-deleted" />
+            <span>Show soft-deleted</span>
+          </label>
         </div>
 
         <div class="card">
@@ -68,10 +72,11 @@
                   <th>Team offer</th>
                   <th>Parent offer name</th>
                   <th>Cat. 1</th>
-                  <th>Deal</th>
+                  <th class="right">Deal value</th>
                   <th class="right">Target</th>
                   <th>Status</th>
                   <th>Effective</th>
+                  <th>Deleted</th>
                   <th class="right">Workspaces</th>
                   <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
@@ -109,7 +114,7 @@
                   <th style="width:34px"></th>
                   <th>Parent offer</th>
                   <th>Cat. 1</th>
-                  <th>Deal</th>
+                  <th class="right">Deal value</th>
                   <th class="right">Target</th>
                   <th>Status</th>
                   <th>Effective</th>
@@ -280,15 +285,15 @@
           </div>
           <div class="offer-target-row">
             <div class="offer-amount-group" style="grid-column: span 2;">
-              <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" required />
-              <select id="offer-target-currency" aria-label="Currency">
+              <input type="number" id="offer-deal-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" />
+              <select id="offer-deal-currency" aria-label="Currency">
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
                 <option value="GBP">GBP</option>
               </select>
             </div>
           </div>
-          <p class="offer-field-hint" id="offer-target-hint">Team deal value override. Parent default shown as placeholder when empty.</p>
+          <p class="offer-field-hint" id="offer-deal-hint">Team deal value override. Leave empty to inherit parent deal value.</p>
         </div>
         <div class="field">
           <label for="offer-campaign-id">Campaign ID</label>
@@ -401,6 +406,23 @@
               <option value="cpc">CPC</option>
             </select>
           </div>
+        </div>
+        <div class="field">
+          <div class="offer-target-labels">
+            <span class="offer-target-label">Deal value</span>
+            <span class="offer-target-label">Currency</span>
+          </div>
+          <div class="offer-target-row">
+            <div class="offer-amount-group" style="grid-column: span 2;">
+              <input type="number" id="po-deal-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" required />
+              <select id="po-deal-currency" aria-label="Deal currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+          </div>
+          <p class="offer-field-hint" id="po-deal-hint">Commercial value for the deal type (e.g. CPA payout or CPC bid).</p>
         </div>
         <div class="field">
           <div class="offer-target-labels">
@@ -668,6 +690,7 @@
     function softDeleteTeamOffer(to) {
       if (!to.deletedAt) {
         to.deletedAt = new Date().toISOString();
+        to.deletedBy = CURRENT_USER.email;
         touchEntity(to);
       }
     }
@@ -675,6 +698,7 @@
     function restoreTeamOffer(to) {
       if (to.deletedAt) {
         to.deletedAt = null;
+        to.deletedBy = null;
         touchEntity(to);
       }
     }
@@ -716,22 +740,22 @@
     ];
 
     var parentOffers = [
-      Object.assign({ id: "po-hb-wis", advertiserId: "adv-hb", name: "Walk-in showers", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Canonical walk-in shower CPA offer for Homebuddy US campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" }, auditFields()),
-      Object.assign({ id: "po-hb-wit", advertiserId: "adv-hb", name: "Walk-in Tubs", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Walk-in tub install leads for Homebuddy across US and Canada markets.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" }, auditFields()),
-      Object.assign({ id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Roof replacement and repair lead offer for Homebuddy US homeowners.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" }, auditFields()),
-      Object.assign({ id: "po-bv-vin", advertiserId: "adv-bv", name: "VIN Search", categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", status: "active", teamIds: ["team-acme", "team-fin"], description: "Vehicle history and VIN lookup offer for Beenverified search traffic.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" }, auditFields()),
-      Object.assign({ id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search", categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], description: "Obituary and memorial search offer currently paused in catalog.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234" }, auditFields()),
-      Object.assign({ id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Auto insurance quote funnel with ROAS target for Smart Financials.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }, auditFields()),
-      Object.assign({ id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Life insurance lead offer for Smart Financials US acquisition campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfLife01&akey=x1y2z3" }, auditFields())
+      Object.assign({ id: "po-hb-wis", advertiserId: "adv-hb", name: "Walk-in showers", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", dealValue: { amount: 85, currency: "USD" }, targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Canonical walk-in shower CPA offer for Homebuddy US campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" }, auditFields()),
+      Object.assign({ id: "po-hb-wit", advertiserId: "adv-hb", name: "Walk-in Tubs", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", dealValue: { amount: 92, currency: "USD" }, targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Walk-in tub install leads for Homebuddy across US and Canada markets.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" }, auditFields()),
+      Object.assign({ id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", dealValue: { amount: 78, currency: "USD" }, targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Roof replacement and repair lead offer for Homebuddy US homeowners.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" }, auditFields()),
+      Object.assign({ id: "po-bv-vin", advertiserId: "adv-bv", name: "VIN Search", categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", dealValue: { amount: 0.45, currency: "USD" }, targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", status: "active", teamIds: ["team-acme", "team-fin"], description: "Vehicle history and VIN lookup offer for Beenverified search traffic.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" }, auditFields()),
+      Object.assign({ id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search", categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", dealValue: { amount: 8, currency: "USD" }, targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], description: "Obituary and memorial search offer currently paused in catalog.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234" }, auditFields()),
+      Object.assign({ id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", dealValue: { amount: 55, currency: "USD" }, targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Auto insurance quote funnel with ROAS target for Smart Financials.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }, auditFields()),
+      Object.assign({ id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", dealValue: { amount: 45, currency: "USD" }, targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Life insurance lead offer for Smart Financials US acquisition campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfLife01&akey=x1y2z3" }, auditFields())
     ];
 
     var teamOffers = [
-      Object.assign({ id: "to-hb-wis", parentOfferId: "po-hb-wis", teamId: "team-acme", displayName: "Walk-in showers — ACME", description: "", status: "active", dealValue: { amount: 85, currency: "USD" }, campaignId: "MAX-88421", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", buySources: ["fb", "google"], workspaceIds: ["acme-growth", "acme-brand"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "to-hb-wit", parentOfferId: "po-hb-wit", teamId: "team-acme", displayName: "Walk-in Tubs — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-88422", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890", buySources: ["fb"], workspaceIds: ["acme-growth"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "Roofing — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-88423", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4", buySources: [], workspaceIds: ["acme-growth", "acme-brand"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "to-bv-vin", parentOfferId: "po-bv-vin", teamId: "team-acme", displayName: "VIN Search — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-90101", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6", buySources: ["google", "taboola"], workspaceIds: ["acme-growth", "fin-main"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "Obituary search — ACME", description: "", status: "inactive", dealValue: null, campaignId: "MAX-90110", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234", buySources: [], workspaceIds: ["acme-brand"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "Auto Insurance — ACME", description: "", status: "active", dealValue: { amount: 2.4, currency: "USD" }, campaignId: "MAX-90102", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4", buySources: ["fb", "google", "taboola"], workspaceIds: ["fin-main"], deletedAt: null }, auditFields())
+      Object.assign({ id: "to-hb-wis", parentOfferId: "po-hb-wis", teamId: "team-acme", displayName: "Walk-in showers — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-88421", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", buySources: ["fb", "google"], workspaceIds: ["acme-growth", "acme-brand"], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-hb-wit", parentOfferId: "po-hb-wit", teamId: "team-acme", displayName: "Walk-in Tubs — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-88422", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890", buySources: ["fb"], workspaceIds: ["acme-growth"], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "Roofing — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-88423", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4", buySources: ["fb"], workspaceIds: ["acme-growth", "acme-brand"], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-bv-vin", parentOfferId: "po-bv-vin", teamId: "team-acme", displayName: "VIN Search — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-90101", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6", buySources: ["google", "taboola"], workspaceIds: ["acme-growth", "fin-main"], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "Obituary search — ACME", description: "", status: "inactive", dealValue: null, campaignId: "MAX-90110", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234", buySources: [], workspaceIds: ["acme-brand"], deletedAt: "2025-07-15T10:30:00.000Z", deletedBy: "ops@acme.media" }, auditFields()),
+      Object.assign({ id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "Auto Insurance — ACME", description: "", status: "active", dealValue: { amount: 50, currency: "USD" }, campaignId: "MAX-90102", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4", buySources: ["fb", "google", "taboola"], workspaceIds: ["fin-main"], deletedAt: null, deletedBy: null }, auditFields())
     ];
 
     function slugifyId(s) {
@@ -801,10 +825,14 @@
       var p = parentById(to.parentOfferId);
       return (p ? p.trackingProvider : "max") || "max";
     }
+    function resolvedDealValue(to) {
+      if (to.dealValue) return to.dealValue;
+      var p = parentById(to.parentOfferId);
+      return p ? dealOf(p) : {};
+    }
     function resolvedTarget(to) {
       var p = parentById(to.parentOfferId);
-      if (to.dealValue) return to.dealValue;
-      return p ? (p.targetValue || p.cpaGoal || {}) : {};
+      return p ? targetOf(p) : {};
     }
     function resolvedCountries(to) {
       var p = parentById(to.parentOfferId);
@@ -822,6 +850,7 @@
     }
 
     function catL1FromParent(p) { return p ? (p.categoryLevel1 || p.vertical || "") : ""; }
+    function dealOf(o) { return o.dealValue || o.deal || {}; }
     function targetOf(o) { return o.targetValue || o.cpaGoal || {}; }
     function advById(id) { return advertisers.find(function (a) { return a.id === id; }); }
     function advName(id) { var a = advById(id); return a ? a.name : ""; }
@@ -922,7 +951,8 @@
           ctaUrl: parent.ctaUrl || "",
           buySources: [],
           workspaceIds: [],
-          deletedAt: null
+          deletedAt: null,
+          deletedBy: null
         }, auditFields()));
       });
     }
@@ -942,22 +972,44 @@
     function fmtDealParent(p) {
       return (p && p.dealType ? p.dealType : "cpa").toUpperCase();
     }
+    function fmtMoneyAmount(amt, dealTypeOrTargetType, isRoasTarget) {
+      if (amt == null || amt === "") return "—";
+      if (isRoasTarget) return Number(amt).toFixed(amt % 1 ? 2 : 1) + "×";
+      var prefix = (dealTypeOrTargetType === "cpc" || dealTypeOrTargetType === "cpa") ? "$" : "$";
+      return prefix + Number(amt).toFixed(amt % 1 ? 2 : 0);
+    }
+    function fmtDealValueParent(p) {
+      var dv = dealOf(p);
+      var amt = dv.amount != null ? dv.amount : dv.targetCpa;
+      if (amt == null || amt === "") return "—";
+      return fmtMoneyAmount(amt, p.dealType || "cpa", false);
+    }
+    function fmtDealValueResolved(to) {
+      var dv = resolvedDealValue(to);
+      var amt = dv.amount != null ? dv.amount : dv.targetCpa;
+      if (amt == null || amt === "") return "—";
+      return fmtMoneyAmount(amt, resolvedDealType(to), false);
+    }
     function fmtTargetResolved(to) {
       var targetType = resolvedTargetType(to);
       var tv = resolvedTarget(to);
       var amt = tv.amount != null ? tv.amount : tv.targetCpa;
       if (amt == null || amt === 0) return "—";
-      var prefix = targetType === "roas" ? "" : "$";
-      var suffix = targetType === "roas" ? " ROAS" : "";
-      return prefix + Number(amt).toFixed(amt % 1 ? 2 : 0) + suffix;
+      if (targetType === "roas") return Number(amt).toFixed(amt % 1 ? 2 : 1) + "×";
+      return "$" + Number(amt).toFixed(amt % 1 ? 2 : 0);
     }
     function fmtTargetParent(p) {
       var tv = targetOf(p);
       var amt = tv.amount != null ? tv.amount : tv.targetCpa;
       if (amt == null || amt === 0) return "—";
       var prefix = (p.targetType || "cpa") === "roas" ? "" : "$";
-      var suffix = (p.targetType || "cpa") === "roas" ? " ROAS" : "";
+      var suffix = (p.targetType || "cpa") === "roas" ? "×" : "";
       return prefix + Number(amt).toFixed(amt % 1 ? 2 : 0) + suffix;
+    }
+    function fmtDeletedAt(iso) {
+      if (!iso) return '<span class="muted">—</span>';
+      var d = new Date(iso);
+      return '<span class="muted" style="font-size:12px;" title="' + escapeHtml(iso) + '">' + escapeHtml(d.toLocaleDateString()) + '</span>';
     }
     function wsNames(ids) {
       if (!ids || !ids.length) return '<span class="muted">—</span>';
@@ -993,13 +1045,16 @@
       var q = (document.getElementById("offers-search").value || "").trim().toLowerCase();
       var status = document.getElementById("offers-status-filter").value;
       var adv = document.getElementById("offers-advertiser-filter").value;
+      var showDeleted = document.getElementById("offers-show-deleted") && document.getElementById("offers-show-deleted").checked;
       return teamOffers.filter(function (to) {
         if (to.teamId !== CURRENT_TEAM.id) return false;
-        if (to.deletedAt) return false;
+        if (to.deletedAt && !showDeleted) return false;
         var p = parentById(to.parentOfferId);
         if (!p) return false;
-        if (!isAdvertiserMappedToTeam(p.advertiserId, to.teamId)) return false;
-        if (!isParentMappedToTeam(p.id, to.teamId)) return false;
+        if (!showDeleted) {
+          if (!isAdvertiserMappedToTeam(p.advertiserId, to.teamId)) return false;
+          if (!isParentMappedToTeam(p.id, to.teamId)) return false;
+        }
         var eff = teamOfferEffectiveStatus(to);
         if (status && eff !== status) return false;
         if (adv && p.advertiserId !== adv) return false;
@@ -1050,7 +1105,7 @@
       var groups = groupTeamOffersByAdvertiser(rows);
       tbody.innerHTML = "";
       if (!groups.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
         return;
       }
       groups.forEach(function (g) {
@@ -1062,24 +1117,25 @@
           '<td class="lander-row__toggle">' +
             '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button>' +
           '</td>' +
-          '<td colspan="9"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
+          '<td colspan="10"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
             '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' team offer' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
         tbody.appendChild(tr);
         g.offers.forEach(function (to) {
           var p = parentById(to.parentOfferId);
           var orow = document.createElement("tr");
-          orow.className = "offer-row variant-row";
+          orow.className = "offer-row variant-row" + (to.deletedAt ? " is-soft-deleted" : "");
           if (!expanded) orow.hidden = true;
           orow.setAttribute("data-team-offer-id", to.id);
           orow.innerHTML =
             '<td></td>' +
-            '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong></td>' +
+            '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong>' + (to.deletedAt ? ' <span class="badge badge--archived">Deleted</span>' : '') + '</td>' +
             '<td class="muted" style="font-size:12px;">' + escapeHtml(p ? p.name : "—") + '</td>' +
             '<td class="muted">' + escapeHtml(p ? catL1FromParent(p) : "—") + '</td>' +
-            '<td class="muted">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + '</td>' +
+            '<td class="right num">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + ' ' + fmtDealValueResolved(to) + '</td>' +
             '<td class="right num">' + fmtTargetResolved(to) + '</td>' +
             '<td>' + statusBadge(to.status) + '</td>' +
             '<td>' + effectiveBadge(teamOfferEffectiveStatus(to)) + '</td>' +
+            '<td>' + fmtDeletedAt(to.deletedAt) + '</td>' +
             '<td class="muted" style="font-size:12.5px;">' + wsNames(to.workspaceIds) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Duplicate team offer">' + ICON.clone + '</button>' +
@@ -1124,7 +1180,7 @@
             '<td></td>' +
             '<td><strong>' + escapeHtml(p.name) + '</strong></td>' +
             '<td class="muted">' + escapeHtml(catL1FromParent(p)) + '</td>' +
-            '<td class="muted">' + fmtDealParent(p) + '</td>' +
+            '<td class="right num">' + escapeHtml(fmtDealParent(p)) + ' ' + fmtDealValueParent(p) + '</td>' +
             '<td class="right num">' + fmtTargetParent(p) + '</td>' +
             '<td>' + statusBadge(p.status) + '</td>' +
             '<td>' + effectiveBadge(parentOfferEffectiveStatus(p)) + '</td>' +
@@ -1346,17 +1402,29 @@
       return getCountryPickerSelection("offer-country-chips");
     }
 
-    function syncTargetHint(p) {
-      var hint = document.getElementById("offer-target-hint");
-      var curEl = document.getElementById("offer-target-currency");
+    function syncDealHint(p) {
+      var hint = document.getElementById("offer-deal-hint");
+      var curEl = document.getElementById("offer-deal-currency");
       if (!hint) return;
-      var targetType = p ? (p.targetType || "cpa") : "cpa";
-      if (targetType === "roas") {
-        hint.textContent = "Team deal value (ROAS multiplier). Leave empty to inherit parent.";
-        if (curEl) curEl.disabled = true;
+      var dealType = p ? (p.dealType || "cpa") : "cpa";
+      var parentDv = p ? dealOf(p) : {};
+      var parentAmt = parentDv.amount != null ? parentDv.amount : parentDv.targetCpa;
+      if (dealType === "cpc") {
+        hint.textContent = "Team CPC bid override. Parent default: " + (parentAmt != null ? "$" + parentAmt : "—");
       } else {
-        hint.textContent = "Team deal value (CPA). Leave empty to inherit parent default.";
-        if (curEl) curEl.disabled = false;
+        hint.textContent = "Team CPA payout override. Parent default: " + (parentAmt != null ? "$" + parentAmt : "—");
+      }
+      if (curEl) curEl.disabled = false;
+    }
+
+    function syncPoDealHint() {
+      var hint = document.getElementById("po-deal-hint");
+      var typeEl = document.getElementById("po-deal-type");
+      if (!hint || !typeEl) return;
+      if (typeEl.value === "cpc") {
+        hint.textContent = "CPC bid per click (e.g. $0.45).";
+      } else {
+        hint.textContent = "CPA payout per conversion (e.g. $85).";
       }
     }
 
@@ -1431,8 +1499,8 @@
       var el = document.getElementById("team-offer-inherited-deal");
       if (!el || !p) return;
       el.innerHTML =
-        '<div class="offer-locked-field"><span class="offer-locked-label">Deal type</span><span class="offer-locked-value">' + escapeHtml((p.dealType || "cpa").toUpperCase()) + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml((p.targetType || "cpa").toUpperCase()) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Deal type</span><span class="offer-locked-value">' + escapeHtml((p.dealType || "cpa").toUpperCase()) + ' · ' + escapeHtml(fmtDealValueParent(p)) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml((p.targetType || "cpa").toUpperCase()) + ' · ' + escapeHtml(fmtTargetParent(p)) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Countries</span><span class="offer-locked-value">' + escapeHtml((p.countries || ["US"]).join(", ")) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Tracking</span><span class="offer-locked-value">' + escapeHtml((p.trackingProvider || "max").toUpperCase()) + '</span></div>';
     }
@@ -1517,19 +1585,19 @@
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L1</span><span class="offer-locked-value">' + escapeHtml(catL1FromParent(p) || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L2</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel2 || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L3</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel3 || "—") + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Deal</span><span class="offer-locked-value">' + escapeHtml(fmtDealParent(p)) + ' · ' + escapeHtml(fmtTargetParent(p)) + '</span></div>';
+        '<div class="offer-locked-field"><span class="offer-locked-label">Deal</span><span class="offer-locked-value">' + escapeHtml(fmtDealParent(p)) + ' ' + escapeHtml(fmtDealValueParent(p)) + ' · Target ' + escapeHtml(fmtTargetParent(p)) + '</span></div>';
     }
 
     function loadTeamOfferDealFields(to, p) {
-      var parentTv = p ? targetOf(p) : {};
-      var tv = resolvedTarget(to);
+      var parentDv = p ? dealOf(p) : {};
       var hasOverride = to.dealValue != null;
-      var amt = hasOverride ? (to.dealValue.amount != null ? to.dealValue.amount : to.dealValue.targetCpa) : (parentTv.amount != null ? parentTv.amount : parentTv.targetCpa);
-      document.getElementById("offer-target-value").value = hasOverride && amt != null && amt !== "" ? amt : "";
-      document.getElementById("offer-target-value").placeholder = parentTv.amount != null ? String(parentTv.amount) : "85.00";
-      document.getElementById("offer-target-currency").value = (hasOverride && to.dealValue.currency) || tv.currency || parentTv.currency || "USD";
+      var amt = hasOverride ? (to.dealValue.amount != null ? to.dealValue.amount : to.dealValue.targetCpa) : null;
+      var parentAmt = parentDv.amount != null ? parentDv.amount : parentDv.targetCpa;
+      document.getElementById("offer-deal-value").value = hasOverride && amt != null && amt !== "" ? amt : "";
+      document.getElementById("offer-deal-value").placeholder = parentAmt != null ? String(parentAmt) : "0.00";
+      document.getElementById("offer-deal-currency").value = (hasOverride && to.dealValue.currency) || parentDv.currency || "USD";
       document.getElementById("offer-campaign-id").value = to.campaignId || "";
-      syncTargetHint(p);
+      syncDealHint(p);
       renderInheritedDealFields(p);
       document.getElementById("offer-cta-url").value = to.ctaUrl || "";
       document.getElementById("offer-cta-url").placeholder = p && p.ctaUrl ? ("Parent default: " + p.ctaUrl.slice(0, 60) + (p.ctaUrl.length > 60 ? "…" : "")) : "Paste team CTA URL";
@@ -1570,8 +1638,8 @@
 
       if (p) loadTeamOfferDealFields(to, p);
       else {
-        document.getElementById("offer-target-value").value = "";
-        document.getElementById("offer-target-currency").value = "USD";
+        document.getElementById("offer-deal-value").value = "";
+        document.getElementById("offer-deal-currency").value = "USD";
         document.getElementById("offer-campaign-id").value = "";
         document.getElementById("offer-cta-url").value = "";
         offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
@@ -1604,13 +1672,13 @@
       to.displayName = name;
       to.description = document.getElementById("team-offer-description").value.trim();
       to.status = document.getElementById("team-offer-status").value;
-      var valRaw = document.getElementById("offer-target-value").value.trim();
-      var cur = document.getElementById("offer-target-currency").value;
+      var valRaw = document.getElementById("offer-deal-value").value.trim();
+      var cur = document.getElementById("offer-deal-currency").value;
       if (!valRaw) {
         to.dealValue = null;
       } else {
         var amt = parseFloat(valRaw) || 0;
-        var parentAmt = p ? (targetOf(p).amount != null ? targetOf(p).amount : targetOf(p).targetCpa) : null;
+        var parentAmt = p ? (dealOf(p).amount != null ? dealOf(p).amount : dealOf(p).targetCpa) : null;
         if (parentAmt != null && amt === parentAmt) to.dealValue = null;
         else to.dealValue = { amount: amt, currency: cur };
       }
@@ -1722,12 +1790,16 @@
       document.getElementById("po-category-l1").value = catL1FromParent(p);
       syncCategoryCascade(p.categoryLevel2 || "", p.categoryLevel3 || "", "po");
       document.getElementById("po-deal-type").value = p.dealType || "cpa";
+      var dv = dealOf(p);
+      document.getElementById("po-deal-value").value = dv.amount != null ? dv.amount : (dv.targetCpa || "");
+      document.getElementById("po-deal-currency").value = dv.currency || "USD";
       document.getElementById("po-target-type").value = p.targetType || "cpa";
       var tv = targetOf(p);
       document.getElementById("po-target-value").value = tv.amount != null ? tv.amount : (tv.targetCpa || "");
       document.getElementById("po-target-currency").value = tv.currency || "USD";
       populatePoCountrySelect(p.countries);
       document.getElementById("po-tracking-provider").value = p.trackingProvider || "max";
+      syncPoDealHint();
       syncPoTargetHint();
       document.getElementById("po-cta-url").value = p.ctaUrl || "";
       if (p.params) poParams = p.params.map(function (x) { return { key: x.key, value: x.value }; });
@@ -1757,12 +1829,17 @@
       if (!validateRequiredDescription(p.description, "Parent offer description")) return;
       p.vertical = p.categoryLevel1;
       p.dealType = document.getElementById("po-deal-type").value;
+      p.dealValue = {
+        amount: parseFloat(document.getElementById("po-deal-value").value) || 0,
+        currency: document.getElementById("po-deal-currency").value
+      };
+      if (document.getElementById("po-deal-value").value.trim() === "") { alert("Deal value is required."); return; }
       p.targetType = document.getElementById("po-target-type").value;
       p.targetValue = {
         amount: parseFloat(document.getElementById("po-target-value").value) || 0,
         currency: document.getElementById("po-target-currency").value
       };
-      if (!p.targetValue.amount) { alert("Target value is required."); return; }
+      if (document.getElementById("po-target-value").value.trim() === "") { alert("Target value is required."); return; }
       p.cpaGoal = { targetCpa: p.targetValue.amount, currency: p.targetValue.currency };
       p.countries = getPoCountrySelect();
       if (!p.countries.length) { alert("Select at least one country."); return; }
@@ -1831,6 +1908,8 @@
     document.getElementById("offers-search").addEventListener("input", render);
     document.getElementById("offers-status-filter").addEventListener("change", render);
     document.getElementById("offers-advertiser-filter").addEventListener("change", render);
+    var showDeletedEl = document.getElementById("offers-show-deleted");
+    if (showDeletedEl) showDeletedEl.addEventListener("change", render);
     document.getElementById("parent-offers-search").addEventListener("input", render);
     document.getElementById("parent-offers-status-filter").addEventListener("change", render);
     document.getElementById("parent-offers-advertiser-filter").addEventListener("change", render);
@@ -1886,6 +1965,7 @@
       clone.displayName = opts.name || (teamOfferLabel(src) + " (copy)");
       clone.workspaceIds = (opts.workspaceIds || []).slice();
       clone.deletedAt = null;
+      clone.deletedBy = null;
       Object.assign(clone, auditFields());
       teamOffers.push(clone);
       return clone.id;
@@ -2181,7 +2261,7 @@
         id: id, parentOfferId: "", teamId: CURRENT_TEAM.id,
         displayName: "", description: "", status: "active",
         dealValue: null, campaignId: "", ctaUrl: "",
-        buySources: [], workspaceIds: [], deletedAt: null
+        buySources: [], workspaceIds: [], deletedAt: null, deletedBy: null
       }, auditFields()));
       openTeamOfferDetail(id, true);
     });
@@ -2217,7 +2297,7 @@
       var id = "po-" + Date.now();
       parentOffers.push(Object.assign({
         id: id, advertiserId: "", name: "", categoryLevel1: "", categoryLevel2: "", categoryLevel3: "",
-        description: "", dealType: "cpa", targetType: "cpa",
+        description: "", dealType: "cpa", dealValue: { amount: 0, currency: "USD" }, targetType: "cpa",
         targetValue: { amount: 0, currency: "USD" }, countries: ["US"], teamIds: [], status: "active", ctaUrl: ""
       }, auditFields()));
       openParentOfferDetail(id);
@@ -2246,6 +2326,8 @@
     }
     var poTargetTypeEl = document.getElementById("po-target-type");
     var poTargetCurEl = document.getElementById("po-target-currency");
+    var poDealTypeEl = document.getElementById("po-deal-type");
+    if (poDealTypeEl) poDealTypeEl.addEventListener("change", syncPoDealHint);
     if (poTargetTypeEl) poTargetTypeEl.addEventListener("change", syncPoTargetHint);
     if (poTargetCurEl) poTargetCurEl.addEventListener("change", syncPoTargetHint);
     var poTeamsList = document.getElementById("po-teams-list");
@@ -2255,10 +2337,6 @@
     var wsTeamLabel = document.getElementById("offer-workspaces-team-label");
     if (teamLabel) teamLabel.textContent = CURRENT_TEAM.name;
     if (wsTeamLabel) wsTeamLabel.textContent = CURRENT_TEAM.name;
-    var targetTypeEl = document.getElementById("offer-target-type");
-    var targetCurEl = document.getElementById("offer-target-currency");
-    if (targetTypeEl) targetTypeEl.addEventListener("change", syncTargetHint);
-    if (targetCurEl) targetCurEl.addEventListener("change", syncTargetHint);
     document.getElementById("offer-buy-sources-list").addEventListener("change", updateBuySourcesSummary);
     document.getElementById("offer-workspaces-list").addEventListener("change", updateWorkspacesSummary);
 
