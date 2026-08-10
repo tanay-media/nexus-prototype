@@ -282,20 +282,15 @@
       <!-- Deal (team-owned fields only) -->
       <section class="offer-detail-pane" data-tab-panel="deal" hidden>
         <p class="settings-section__hint muted" style="margin-top:0;">Deal type, target type &amp; countries are inherited from parent offer (read-only on General tab).</p>
-        <div class="field">
-          <div class="offer-target-labels">
-            <span class="offer-target-label">Deal value</span>
-            <span class="offer-target-label">Currency</span>
-          </div>
-          <div class="offer-target-row">
-            <div class="offer-amount-group" style="grid-column: span 2;">
-              <input type="number" id="offer-deal-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" />
-              <select id="offer-deal-currency" aria-label="Currency">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
-            </div>
+        <div class="field offer-money-field">
+          <label for="offer-deal-value">Deal value</label>
+          <div class="offer-amount-group">
+            <input type="number" id="offer-deal-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" />
+            <select id="offer-deal-currency" aria-label="Currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
           </div>
           <p class="offer-field-hint" id="offer-deal-hint">Team deal value override. Leave empty to inherit parent deal value.</p>
         </div>
@@ -414,43 +409,38 @@
             </select>
           </div>
         </div>
-        <div class="field">
-          <div class="offer-target-labels">
-            <span class="offer-target-label">Deal value</span>
-            <span class="offer-target-label">Currency</span>
-          </div>
-          <div class="offer-target-row">
-            <div class="offer-amount-group" style="grid-column: span 2;">
-              <input type="number" id="po-deal-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" required />
-              <select id="po-deal-currency" aria-label="Deal currency">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
-            </div>
+        <div class="field offer-money-field">
+          <label for="po-deal-value">Deal value</label>
+          <div class="offer-amount-group">
+            <input type="number" id="po-deal-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" required />
+            <select id="po-deal-currency" aria-label="Deal currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
           </div>
           <p class="offer-field-hint" id="po-deal-hint">Commercial value for the deal type (e.g. CPA payout or CPC bid).</p>
         </div>
-        <div class="field">
-          <div class="offer-target-labels">
-            <span class="offer-target-label">Target type</span>
-            <span class="offer-target-label">Target value</span>
-          </div>
-          <div class="offer-target-row">
+        <div class="field-row">
+          <div class="field">
+            <label for="po-target-type">Target type</label>
             <select id="po-target-type" aria-label="Target type">
               <option value="cpa">CPA</option>
               <option value="roas">ROAS</option>
             </select>
-            <div class="offer-amount-group">
-              <input type="number" id="po-target-value" min="0" step="0.01" placeholder="85.00" />
-              <select id="po-target-currency" aria-label="Currency">
+          </div>
+          <div class="field offer-money-field">
+            <label for="po-target-value">Target value</label>
+            <div class="offer-amount-group" id="po-target-amount-group">
+              <input type="number" id="po-target-value" min="0" step="0.01" placeholder="85.00" aria-label="Target value" />
+              <select id="po-target-currency" class="offer-currency-select" aria-label="Currency">
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
                 <option value="GBP">GBP</option>
               </select>
             </div>
+            <p class="offer-field-hint" id="po-target-hint">Target CPA per conversion in USD.</p>
           </div>
-          <p class="offer-field-hint" id="po-target-hint">Target CPA per conversion in USD.</p>
         </div>
         <div class="field">
           <label for="po-country-search">Countries</label>
@@ -1712,12 +1702,15 @@
       var hint = document.getElementById("po-target-hint");
       var typeEl = document.getElementById("po-target-type");
       var curEl = document.getElementById("po-target-currency");
+      var group = document.getElementById("po-target-amount-group");
       if (!hint || !typeEl) return;
       if (typeEl.value === "roas") {
         hint.textContent = "Target ROAS multiplier (e.g. 2.4×).";
+        if (group) group.classList.add("is-roas");
         if (curEl) curEl.disabled = true;
       } else {
         hint.textContent = "Target CPA per conversion in " + (curEl ? curEl.value : "USD") + ".";
+        if (group) group.classList.remove("is-roas");
         if (curEl) curEl.disabled = false;
       }
     }

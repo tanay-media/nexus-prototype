@@ -3036,32 +3036,29 @@ button.dsk-row-name:focus-visible strong {
 }
 .offer-ws-pick input { margin: 0; }
 .offer-amount-group {
-  display: flex;
+  display: inline-flex;
   gap: 0.5rem;
   align-items: stretch;
+  max-width: 14rem;
+  width: 100%;
 }
-.offer-amount-group input { flex: 1; min-width: 0; }
-.offer-amount-group select { width: 5.5rem; flex-shrink: 0; }
-.offer-target-labels {
-  display: grid;
-  grid-template-columns: 7.5rem 1fr;
-  gap: 0.5rem;
-  margin-bottom: 0.35rem;
+.offer-amount-group input[type="number"] {
+  flex: 1 1 6.5rem;
+  min-width: 5rem;
+  max-width: 9rem;
+  width: auto;
 }
-.offer-target-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+.offer-amount-group select,
+.offer-amount-group .offer-currency-select {
+  width: 5.25rem;
+  flex-shrink: 0;
 }
-.offer-target-row {
-  display: grid;
-  grid-template-columns: 7.5rem 1fr;
-  gap: 0.5rem;
-  align-items: stretch;
+.offer-money-field .offer-amount-group {
+  margin-top: 0.15rem;
 }
-.offer-target-row > select { width: 100%; }
+.offer-amount-group.is-roas .offer-currency-select {
+  display: none;
+}
 .offer-field-hint {
   margin: 0.35rem 0 0;
   font-size: 12px;
