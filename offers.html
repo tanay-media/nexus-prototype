@@ -42,7 +42,7 @@
 
       <!-- ===== TEAM OFFERS PANEL ===== -->
       <div class="page-body" id="panel-team-offers">
-        <p class="offers-intro muted">Team: <strong id="offers-team-label">ACME Media</strong> · <strong>team_offer</strong> instances — parent offer, advertiser &amp; categories are fixed; everything else is editable per team.</p>
+        <p class="offers-intro muted">Team: <strong id="offers-team-label">ACME Media</strong> · <strong>team_offer</strong> deployments — parent catalog fields are inherited; team controls deal value, campaign ID, CTA, buy sources &amp; workspaces.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
@@ -71,6 +71,7 @@
                   <th>Deal</th>
                   <th class="right">Target</th>
                   <th>Status</th>
+                  <th>Effective</th>
                   <th class="right">Workspaces</th>
                   <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
@@ -111,6 +112,7 @@
                   <th>Deal</th>
                   <th class="right">Target</th>
                   <th>Status</th>
+                  <th>Effective</th>
                   <th>Teams</th>
                   <th class="right" style="min-width:80px;">Actions</th>
                 </tr>
@@ -163,7 +165,7 @@
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <div class="field"><label for="adv-name">Advertiser name</label><input type="text" id="adv-name" required /></div>
-      <div class="field"><label for="adv-description">Description</label><textarea id="adv-description" rows="2" placeholder="Internal notes…"></textarea></div>
+      <div class="field"><label for="adv-description">Description</label><textarea id="adv-description" rows="2" minlength="20" maxlength="100" required placeholder="20–100 characters required…"></textarea><p class="offer-field-hint">Required · 20–100 characters.</p></div>
       <div class="field"><label for="adv-status">Status</label>
         <select id="adv-status">
           <option value="active">Active</option>
@@ -212,7 +214,7 @@
       <div class="modal__header">
         <div>
           <h2 class="modal__title" id="team-offer-detail-title">Team offer</h2>
-          <p class="modal__hint" id="team-offer-detail-sub">team_offer · overrides inherit from parent when empty</p>
+          <p class="modal__hint" id="team-offer-detail-sub">team_offer · parent fields inherited; team owns deal value, campaign ID, CTA &amp; workspaces</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
@@ -268,29 +270,17 @@
         </div>
       </section>
 
-      <!-- Deal (team editable) -->
+      <!-- Deal (team-owned fields only) -->
       <section class="offer-detail-pane" data-tab-panel="deal" hidden>
-        <div class="field-row">
-          <div class="field">
-            <label for="team-offer-deal-type">Deal type</label>
-            <select id="team-offer-deal-type">
-              <option value="cpa">CPA</option>
-              <option value="cpc">CPC</option>
-            </select>
-          </div>
-        </div>
+        <p class="settings-section__hint muted" style="margin-top:0;">Deal type, target type &amp; countries are inherited from parent offer (read-only on General tab).</p>
         <div class="field">
           <div class="offer-target-labels">
-            <span class="offer-target-label">Target type</span>
-            <span class="offer-target-label">Target value</span>
+            <span class="offer-target-label">Deal value</span>
+            <span class="offer-target-label">Currency</span>
           </div>
           <div class="offer-target-row">
-            <select id="offer-target-type" aria-label="Target type">
-              <option value="cpa">CPA</option>
-              <option value="roas">ROAS</option>
-            </select>
-            <div class="offer-amount-group">
-              <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85.00" aria-label="Target value" />
+            <div class="offer-amount-group" style="grid-column: span 2;">
+              <input type="number" id="offer-target-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" required />
               <select id="offer-target-currency" aria-label="Currency">
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
@@ -298,49 +288,18 @@
               </select>
             </div>
           </div>
-          <p class="offer-field-hint" id="offer-target-hint">Target CPA per conversion in USD.</p>
+          <p class="offer-field-hint" id="offer-target-hint">Team deal value override. Parent default shown as placeholder when empty.</p>
         </div>
         <div class="field">
-          <label for="offer-country-search">Countries</label>
-          <div class="offer-country-ms">
-            <div class="search-wrap offer-country-search">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-              <input class="input" type="search" id="offer-country-search" placeholder="Search countries…" autocomplete="off" />
-            </div>
-            <p class="offer-pane-summary" id="offer-country-summary"></p>
-            <div class="offer-country-chips" id="offer-country-chips" role="listbox" aria-label="Countries"></div>
-          </div>
-          <p class="offer-field-hint" id="offer-country-hint">Click countries to toggle selection. Default: United States.</p>
+          <label for="offer-campaign-id">Campaign ID</label>
+          <input type="text" id="offer-campaign-id" placeholder="MAX-88421" required />
         </div>
-        <div class="settings-section">
-          <p class="settings-section__title">MAX tracking</p>
-          <div class="field-row">
-            <div class="field">
-              <label for="offer-max-campaign-id">Campaign ID</label>
-              <input type="text" id="offer-max-campaign-id" placeholder="88421" />
-            </div>
-            <div class="field">
-              <label for="offer-max-campaign-status">Status</label>
-              <select id="offer-max-campaign-status">
-                <option value="active">Active</option>
-                <option value="paused">Paused</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label for="offer-tracking-provider">Tracking provider</label>
-            <select id="offer-tracking-provider">
-              <option value="max">MAX</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
+        <div class="offer-locked-pane" id="team-offer-inherited-deal"></div>
       </section>
 
       <!-- CTA URL (single) -->
       <section class="offer-detail-pane" data-tab-panel="cta-url" hidden>
-        <p class="settings-section__hint muted">Paste the base (max) URL. Nexus appends tracking params automatically. All landers on this offer inherit this URL.</p>
+        <p class="settings-section__hint muted">Team CTA URL (required). Tracking params below are inherited from parent offer.</p>
         <div class="field">
           <label for="offer-cta-url">Base URL</label>
           <textarea id="offer-cta-url" rows="2" placeholder="https://trk.pmsrv.co/v2/trk?adid=…&akey=…" class="input offer-url-textarea"></textarea>
@@ -360,7 +319,7 @@
       </section>
 
       <section class="offer-detail-pane" data-tab-panel="buy-sources" hidden>
-        <p class="settings-section__hint muted">Only checked platforms can use this offer. Leave all unchecked to allow any buy source.</p>
+        <p class="settings-section__hint muted">Only checked platforms can use this offer. At least one buy source is required.</p>
         <p class="offer-pane-summary" id="offer-buy-sources-summary"></p>
         <ul class="offer-ws-list" id="offer-buy-sources-list">
           <li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="fb" /><span>Meta (Facebook)</span></label></li>
@@ -371,7 +330,7 @@
 
       <!-- Workspaces -->
       <section class="offer-detail-pane" data-tab-panel="workspaces" hidden>
-        <p class="settings-section__hint muted">Workspaces in <strong id="offer-workspaces-team-label">this team</strong> that can tag this offer. A matching workspace is auto-created on save if none exists.</p>
+        <p class="settings-section__hint muted">Workspaces in <strong id="offer-workspaces-team-label">this team</strong> that can tag this offer. Workspaces are created manually per team.</p>
         <p class="offer-pane-summary" id="offer-workspaces-summary"></p>
         <ul class="offer-ws-list" id="offer-workspaces-list"></ul>
       </section>
@@ -430,7 +389,7 @@
           <label for="po-category-l3">Category level 3</label>
           <select id="po-category-l3" disabled><option value="">— Select level 2 first —</option></select>
         </div>
-        <div class="field"><label for="po-description">Description</label><textarea id="po-description" rows="2" placeholder="Internal notes…"></textarea></div>
+        <div class="field"><label for="po-description">Description</label><textarea id="po-description" rows="2" minlength="20" maxlength="100" required placeholder="20–100 characters required…"></textarea><p class="offer-field-hint">Required · 20–100 characters.</p></div>
       </section>
 
       <section class="offer-detail-pane" data-tab-panel="deal" hidden>
@@ -483,17 +442,10 @@
             <option value="other">Other</option>
           </select>
         </div>
-        <div class="settings-section" style="margin-top:1rem;">
-          <p class="settings-section__title">MAX tracking</p>
-          <div class="field">
-            <label for="po-max-campaign-id">Campaign ID</label>
-            <input type="text" id="po-max-campaign-id" placeholder="MAX-88421" />
-          </div>
-        </div>
       </section>
 
       <section class="offer-detail-pane" data-tab-panel="cta-url" hidden>
-        <p class="settings-section__hint muted">Default CTA URL for all team instances (unless overridden).</p>
+        <p class="settings-section__hint muted">Default CTA URL for catalog; teams set their own CTA on team offer.</p>
         <div class="field">
           <label for="po-cta-url">Base URL</label>
           <textarea id="po-cta-url" rows="2" placeholder="https://trk.pmsrv.co/v2/trk?adid=…" class="input offer-url-textarea"></textarea>
@@ -636,6 +588,8 @@
     };
 
     var CURRENT_TEAM = { id: "team-acme", name: "ACME Media" };
+    var CURRENT_USER = { email: "ops@mediaedge.com" };
+    var NOW_ISO = "2026-08-10T10:00:00.000Z";
 
     var TEAMS = [
       { id: "team-acme", name: "ACME Media" },
@@ -648,29 +602,136 @@
       { id: "fin-main", name: "FinanceEdge Main", teamId: "team-acme" }
     ];
 
+    function auditFields() {
+      return {
+        createdAt: NOW_ISO,
+        updatedAt: NOW_ISO,
+        createdBy: CURRENT_USER.email,
+        updatedBy: CURRENT_USER.email
+      };
+    }
+
+    function touchEntity(entity) {
+      entity.updatedAt = new Date().toISOString();
+      entity.updatedBy = CURRENT_USER.email;
+    }
+
+    function validateRequiredDescription(text, label) {
+      var t = (text || "").trim();
+      if (t.length < 20 || t.length > 100) {
+        alert(label + " must be between 20 and 100 characters.");
+        return false;
+      }
+      return true;
+    }
+
+    function isAdvertiserMappedToTeam(advertiserId, teamId) {
+      var a = advById(advertiserId);
+      return !!(a && a.teamIds && a.teamIds.indexOf(teamId) !== -1);
+    }
+
+    function isParentMappedToTeam(parentId, teamId) {
+      var p = parentById(parentId);
+      return !!(p && p.teamIds && p.teamIds.indexOf(teamId) !== -1);
+    }
+
+    function parentOfferEffectiveStatus(p) {
+      if (!p) return "inactive";
+      var adv = advById(p.advertiserId);
+      if (!adv || adv.status === "inactive" || p.status === "inactive") return "inactive";
+      return "active";
+    }
+
+    function teamOfferEffectiveStatus(to) {
+      if (!to || to.deletedAt) return "inactive";
+      var p = parentById(to.parentOfferId);
+      if (!p) return "inactive";
+      if (to.status === "inactive") return "inactive";
+      if (parentOfferEffectiveStatus(p) === "inactive") return "inactive";
+      if (!isAdvertiserMappedToTeam(p.advertiserId, to.teamId)) return "inactive";
+      if (!isParentMappedToTeam(p.id, to.teamId)) return "inactive";
+      return "active";
+    }
+
+    function isTeamOfferVisible(to) {
+      return teamOfferEffectiveStatus(to) === "active" || !to.deletedAt;
+    }
+
+    function teamOffersForAdvertiserTeam(advertiserId, teamId) {
+      return teamOffers.filter(function (to) {
+        if (to.teamId !== teamId) return false;
+        var p = parentById(to.parentOfferId);
+        return p && p.advertiserId === advertiserId;
+      });
+    }
+
+    function softDeleteTeamOffer(to) {
+      if (!to.deletedAt) {
+        to.deletedAt = new Date().toISOString();
+        touchEntity(to);
+      }
+    }
+
+    function restoreTeamOffer(to) {
+      if (to.deletedAt) {
+        to.deletedAt = null;
+        touchEntity(to);
+      }
+    }
+
+    function syncTeamOffersOnAdvertiserTeamChange(advertiser, prevTeamIds) {
+      var prev = prevTeamIds || [];
+      var next = advertiser.teamIds || [];
+      prev.forEach(function (teamId) {
+        if (next.indexOf(teamId) === -1) {
+          teamOffersForAdvertiserTeam(advertiser.id, teamId).forEach(softDeleteTeamOffer);
+        }
+      });
+      next.forEach(function (teamId) {
+        if (prev.indexOf(teamId) === -1) {
+          teamOffersForAdvertiserTeam(advertiser.id, teamId).forEach(restoreTeamOffer);
+        }
+      });
+    }
+
+    function syncTeamOffersOnParentTeamChange(parent, prevTeamIds) {
+      var prev = prevTeamIds || [];
+      var next = parent.teamIds || [];
+      prev.forEach(function (teamId) {
+        if (next.indexOf(teamId) === -1) {
+          teamOffers.filter(function (to) {
+            return to.parentOfferId === parent.id && to.teamId === teamId;
+          }).forEach(softDeleteTeamOffer);
+        }
+      });
+      next.forEach(function (teamId) {
+        if (prev.indexOf(teamId) === -1) spawnTeamOffersForParent(parent, teamId);
+      });
+    }
+
     var advertisers = [
-      { id: "adv-hb", name: "Homebuddy",        status: "active", description: "Home improvement lead gen.", teamIds: ["team-acme"] },
-      { id: "adv-bv", name: "Beenverified",     status: "active", description: "People search & public records.", teamIds: ["team-acme", "team-fin"] },
-      { id: "adv-sf", name: "Smart Financials", status: "active", description: "", teamIds: ["team-acme", "team-fin"] }
+      Object.assign({ id: "adv-hb", name: "Homebuddy", status: "active", description: "Home improvement lead gen partner for US walk-in and roofing offers.", teamIds: ["team-acme"] }, auditFields()),
+      Object.assign({ id: "adv-bv", name: "Beenverified", status: "active", description: "People search and public records advertiser for VIN and obituary offers.", teamIds: ["team-acme", "team-fin"] }, auditFields()),
+      Object.assign({ id: "adv-sf", name: "Smart Financials", status: "active", description: "Insurance and finance lead gen advertiser for auto and life verticals.", teamIds: ["team-acme", "team-fin"] }, auditFields())
     ];
 
     var parentOffers = [
-      { id: "po-hb-wis",  advertiserId: "adv-hb", name: "Walk-in showers",  categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], trackingProvider: "max", maxCampaignId: "MAX-88421", status: "active", teamIds: ["team-acme"], description: "", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" },
-      { id: "po-hb-wit",  advertiserId: "adv-hb", name: "Walk-in Tubs",     categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], trackingProvider: "max", maxCampaignId: "MAX-88422", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" },
-      { id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing",          categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", maxCampaignId: "", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" },
-      { id: "po-bv-vin",  advertiserId: "adv-bv", name: "VIN Search",       categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", status: "active", teamIds: ["team-acme", "team-fin"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" },
-      { id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search",  categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], ctaUrl: "" },
-      { id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance",   categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], trackingProvider: "max", maxCampaignId: "MAX-90102", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" },
-      { id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance",   categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], trackingProvider: "max", maxCampaignId: "MAX-90150", status: "active", teamIds: ["team-acme"], ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfLife01&akey=x1y2z3" }
+      Object.assign({ id: "po-hb-wis", advertiserId: "adv-hb", name: "Walk-in showers", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Canonical walk-in shower CPA offer for Homebuddy US campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f" }, auditFields()),
+      Object.assign({ id: "po-hb-wit", advertiserId: "adv-hb", name: "Walk-in Tubs", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Walk-in tub install leads for Homebuddy across US and Canada markets.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890" }, auditFields()),
+      Object.assign({ id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Roof replacement and repair lead offer for Homebuddy US homeowners.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4" }, auditFields()),
+      Object.assign({ id: "po-bv-vin", advertiserId: "adv-bv", name: "VIN Search", categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", status: "active", teamIds: ["team-acme", "team-fin"], description: "Vehicle history and VIN lookup offer for Beenverified search traffic.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6" }, auditFields()),
+      Object.assign({ id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search", categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], description: "Obituary and memorial search offer currently paused in catalog.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234" }, auditFields()),
+      Object.assign({ id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Auto insurance quote funnel with ROAS target for Smart Financials.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4" }, auditFields()),
+      Object.assign({ id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Life insurance lead offer for Smart Financials US acquisition campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfLife01&akey=x1y2z3" }, auditFields())
     ];
 
     var teamOffers = [
-      { id: "to-hb-wis",  parentOfferId: "po-hb-wis",  teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "MAX-88421", maxCampaignStatus: "active", ctaUrl: null, buySources: ["fb", "google"], workspaceIds: ["acme-growth", "acme-brand"] },
-      { id: "to-hb-wit",  parentOfferId: "po-hb-wit",  teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "MAX-88422", maxCampaignStatus: "active", ctaUrl: null, buySources: ["fb"], workspaceIds: ["acme-growth"] },
-      { id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: ["acme-growth", "acme-brand", "fin-main"] },
-      { id: "to-bv-vin",  parentOfferId: "po-bv-vin",  teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: ["google", "taboola"], workspaceIds: ["acme-growth", "fin-main"] },
-      { id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "", description: "", status: "inactive", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: ["acme-brand"] },
-      { id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "", description: "", status: "active", dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null, maxCampaignId: "MAX-90102", maxCampaignStatus: "paused", ctaUrl: null, buySources: ["fb", "google", "taboola"], workspaceIds: ["fin-main"] }
+      Object.assign({ id: "to-hb-wis", parentOfferId: "po-hb-wis", teamId: "team-acme", displayName: "Walk-in showers — ACME", description: "", status: "active", dealValue: { amount: 85, currency: "USD" }, campaignId: "MAX-88421", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", buySources: ["fb", "google"], workspaceIds: ["acme-growth", "acme-brand"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "to-hb-wit", parentOfferId: "po-hb-wit", teamId: "team-acme", displayName: "Walk-in Tubs — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-88422", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890", buySources: ["fb"], workspaceIds: ["acme-growth"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "Roofing — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-88423", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4", buySources: [], workspaceIds: ["acme-growth", "acme-brand"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "to-bv-vin", parentOfferId: "po-bv-vin", teamId: "team-acme", displayName: "VIN Search — ACME", description: "", status: "active", dealValue: null, campaignId: "MAX-90101", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6", buySources: ["google", "taboola"], workspaceIds: ["acme-growth", "fin-main"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "Obituary search — ACME", description: "", status: "inactive", dealValue: null, campaignId: "MAX-90110", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234", buySources: [], workspaceIds: ["acme-brand"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "Auto Insurance — ACME", description: "", status: "active", dealValue: { amount: 2.4, currency: "USD" }, campaignId: "MAX-90102", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4", buySources: ["fb", "google", "taboola"], workspaceIds: ["fin-main"], deletedAt: null }, auditFields())
     ];
 
     function slugifyId(s) {
@@ -730,28 +791,34 @@
     }
     function resolvedDealType(to) {
       var p = parentById(to.parentOfferId);
-      return to.dealType || (p ? p.dealType : "cpa") || "cpa";
+      return (p ? p.dealType : "cpa") || "cpa";
     }
     function resolvedTargetType(to) {
       var p = parentById(to.parentOfferId);
-      return to.targetType || (p ? p.targetType : "cpa") || "cpa";
+      return (p ? p.targetType : "cpa") || "cpa";
     }
     function resolvedTrackingProvider(to) {
       var p = parentById(to.parentOfferId);
-      return to.trackingProvider || (p ? p.trackingProvider : "max") || "max";
+      return (p ? p.trackingProvider : "max") || "max";
     }
     function resolvedTarget(to) {
       var p = parentById(to.parentOfferId);
-      return to.targetValue || (p ? (p.targetValue || p.cpaGoal) : {}) || {};
+      if (to.dealValue) return to.dealValue;
+      return p ? (p.targetValue || p.cpaGoal || {}) : {};
     }
     function resolvedCountries(to) {
       var p = parentById(to.parentOfferId);
-      return to.countries || (p ? p.countries : null) || ["US"];
+      return p ? (p.countries || ["US"]) : ["US"];
     }
     function resolvedCtaUrl(to) {
-      var p = parentById(to.parentOfferId);
       if (to.ctaUrl) return to.ctaUrl;
+      var p = parentById(to.parentOfferId);
       return p ? (p.ctaUrl || "") : "";
+    }
+    function resolvedTrackingParams(to) {
+      var p = parentById(to.parentOfferId);
+      if (p && p.params) return p.params;
+      return DEFAULT_PARAMS;
     }
 
     function catL1FromParent(p) { return p ? (p.categoryLevel1 || p.vertical || "") : ""; }
@@ -831,29 +898,32 @@
       populateCategoryL3(l1, l2, selectedL3 || "", prefix);
     }
 
-    function spawnTeamOffersForParent(parent) {
+    function spawnTeamOffersForParent(parent, onlyTeamId) {
       if (!parent || !parent.teamIds) return;
-      parent.teamIds.forEach(function (teamId) {
-        var exists = teamOffers.some(function (t) { return t.parentOfferId === parent.id && t.teamId === teamId; });
-        if (exists) return;
-        teamOffers.push({
+      var teamIds = onlyTeamId ? [onlyTeamId] : parent.teamIds;
+      teamIds.forEach(function (teamId) {
+        if (!isAdvertiserMappedToTeam(parent.advertiserId, teamId)) return;
+        var existing = teamOffers.filter(function (t) {
+          return t.parentOfferId === parent.id && t.teamId === teamId;
+        });
+        if (existing.length) {
+          existing.forEach(restoreTeamOffer);
+          return;
+        }
+        teamOffers.push(Object.assign({
           id: "to-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6),
           parentOfferId: parent.id,
           teamId: teamId,
-          displayName: "",
+          displayName: parent.name + " — " + (TEAMS.find(function (t) { return t.id === teamId; }) || {}).name || teamId,
           description: "",
-          status: parent.status || "active",
-          dealType: null,
-          targetType: null,
-          targetValue: null,
-          countries: null,
-          trackingProvider: null,
-          maxCampaignId: "",
-          maxCampaignStatus: "active",
-          ctaUrl: null,
+          status: "active",
+          dealValue: null,
+          campaignId: "",
+          ctaUrl: parent.ctaUrl || "",
           buySources: [],
-          workspaceIds: []
-        });
+          workspaceIds: [],
+          deletedAt: null
+        }, auditFields()));
       });
     }
 
@@ -901,6 +971,11 @@
         : '<span class="badge badge--active">Active</span>';
     }
 
+    function effectiveBadge(effective) {
+      if (effective === "active") return '<span class="badge badge--active">Active</span>';
+      return '<span class="badge badge--archived">Inactive</span>';
+    }
+
     function groupTeamOffersByAdvertiser(rows) {
       var map = {};
       rows.forEach(function (to) {
@@ -920,9 +995,13 @@
       var adv = document.getElementById("offers-advertiser-filter").value;
       return teamOffers.filter(function (to) {
         if (to.teamId !== CURRENT_TEAM.id) return false;
+        if (to.deletedAt) return false;
         var p = parentById(to.parentOfferId);
         if (!p) return false;
-        if (status && to.status !== status) return false;
+        if (!isAdvertiserMappedToTeam(p.advertiserId, to.teamId)) return false;
+        if (!isParentMappedToTeam(p.id, to.teamId)) return false;
+        var eff = teamOfferEffectiveStatus(to);
+        if (status && eff !== status) return false;
         if (adv && p.advertiserId !== adv) return false;
         var label = teamOfferLabel(to).toLowerCase();
         var an = advName(p.advertiserId).toLowerCase();
@@ -971,7 +1050,7 @@
       var groups = groupTeamOffersByAdvertiser(rows);
       tbody.innerHTML = "";
       if (!groups.length) {
-        tbody.innerHTML = '<tr><td colspan="9" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
         return;
       }
       groups.forEach(function (g) {
@@ -983,7 +1062,7 @@
           '<td class="lander-row__toggle">' +
             '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button>' +
           '</td>' +
-          '<td colspan="8"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
+          '<td colspan="9"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
             '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' team offer' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
         tbody.appendChild(tr);
         g.offers.forEach(function (to) {
@@ -1000,6 +1079,7 @@
             '<td class="muted">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + '</td>' +
             '<td class="right num">' + fmtTargetResolved(to) + '</td>' +
             '<td>' + statusBadge(to.status) + '</td>' +
+            '<td>' + effectiveBadge(teamOfferEffectiveStatus(to)) + '</td>' +
             '<td class="muted" style="font-size:12.5px;">' + wsNames(to.workspaceIds) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Duplicate team offer">' + ICON.clone + '</button>' +
@@ -1024,7 +1104,7 @@
       });
       parentBody.innerHTML = "";
       if (!groupList.length) {
-        parentBody.innerHTML = '<tr><td colspan="8" class="muted" style="padding:1.5rem;text-align:center;">No parent offers found.</td></tr>';
+        parentBody.innerHTML = '<tr><td colspan="9" class="muted" style="padding:1.5rem;text-align:center;">No parent offers found.</td></tr>';
         return;
       }
       groupList.forEach(function (g) {
@@ -1034,7 +1114,7 @@
         tr.className = "offer-advertiser-row";
         tr.innerHTML =
           '<td class="lander-row__toggle"><button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button></td>' +
-          '<td colspan="7"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
+          '<td colspan="8"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
         parentBody.appendChild(tr);
         g.offers.forEach(function (p) {
           var orow = document.createElement("tr");
@@ -1047,6 +1127,7 @@
             '<td class="muted">' + fmtDealParent(p) + '</td>' +
             '<td class="right num">' + fmtTargetParent(p) + '</td>' +
             '<td>' + statusBadge(p.status) + '</td>' +
+            '<td>' + effectiveBadge(parentOfferEffectiveStatus(p)) + '</td>' +
             '<td class="muted" style="font-size:12px;">' + teamNames(p.teamIds) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-parent-offer-clone" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Duplicate parent offer">' + ICON.clone + '</button>' +
@@ -1082,10 +1163,8 @@
 
     var offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
 
-    function tpidForTps(tps) {
-      if (tps === "fb") return "{{fbclid}}";
-      if (tps === "google" || tps === "taboola") return "{{clid}}";
-      return "{{clid}}";
+    function tpidForTps() {
+      return "{{visit_id}}";
     }
 
     function macroOptions(selected) {
@@ -1267,16 +1346,16 @@
       return getCountryPickerSelection("offer-country-chips");
     }
 
-    function syncTargetHint() {
+    function syncTargetHint(p) {
       var hint = document.getElementById("offer-target-hint");
-      var typeEl = document.getElementById("offer-target-type");
       var curEl = document.getElementById("offer-target-currency");
-      if (!hint || !typeEl) return;
-      if (typeEl.value === "roas") {
-        hint.textContent = "Target ROAS multiplier (e.g. 2.4×).";
+      if (!hint) return;
+      var targetType = p ? (p.targetType || "cpa") : "cpa";
+      if (targetType === "roas") {
+        hint.textContent = "Team deal value (ROAS multiplier). Leave empty to inherit parent.";
         if (curEl) curEl.disabled = true;
       } else {
-        hint.textContent = "Target CPA per conversion in " + (curEl ? curEl.value : "USD") + ".";
+        hint.textContent = "Team deal value (CPA). Leave empty to inherit parent default.";
         if (curEl) curEl.disabled = false;
       }
     }
@@ -1343,23 +1422,19 @@
     }
 
     function parentOffersForPicker(teamId) {
-      var advForTeam = {};
-      advertisers.forEach(function (a) {
-        if (a.teamIds && a.teamIds.indexOf(teamId) !== -1) advForTeam[a.id] = true;
-      });
       return parentOffers.filter(function (p) {
-        if (p.teamIds && p.teamIds.indexOf(teamId) !== -1) return true;
-        if (advForTeam[p.advertiserId]) return true;
-        return false;
+        return p.teamIds && p.teamIds.indexOf(teamId) !== -1 && isAdvertiserMappedToTeam(p.advertiserId, teamId);
       });
     }
 
-    function isParentTakenOnTeam(parentId, teamId, excludeTeamOfferId) {
-      return teamOffers.some(function (to) {
-        if (to.teamId !== teamId || to.parentOfferId !== parentId) return false;
-        if (excludeTeamOfferId && to.id === excludeTeamOfferId) return false;
-        return true;
-      });
+    function renderInheritedDealFields(p) {
+      var el = document.getElementById("team-offer-inherited-deal");
+      if (!el || !p) return;
+      el.innerHTML =
+        '<div class="offer-locked-field"><span class="offer-locked-label">Deal type</span><span class="offer-locked-value">' + escapeHtml((p.dealType || "cpa").toUpperCase()) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml((p.targetType || "cpa").toUpperCase()) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Countries</span><span class="offer-locked-value">' + escapeHtml((p.countries || ["US"]).join(", ")) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Tracking</span><span class="offer-locked-value">' + escapeHtml((p.trackingProvider || "max").toUpperCase()) + '</span></div>';
     }
 
     function renderParentOfferPicker(query) {
@@ -1390,7 +1465,7 @@
         }).filter(Boolean);
       }
       if (!groupList.length) {
-        list.innerHTML = '<li class="offer-parent-picker__empty muted">No parent offers found. Map this team on an advertiser or parent offer first.</li>';
+        list.innerHTML = '<li class="offer-parent-picker__empty muted">No parent offers mapped to this team. Ask super-admin to map a parent offer.</li>';
         return;
       }
       list.innerHTML = groupList.map(function (g) {
@@ -1398,10 +1473,9 @@
           '<div class="offer-parent-picker__group-head">' + escapeHtml(g.name) + '</div>' +
           '<ul class="offer-parent-picker__group-list">' +
             g.offers.map(function (p) {
-              var taken = isParentTakenOnTeam(p.id, CURRENT_TEAM.id, activeTeamOfferId);
-              return '<li class="offer-parent-picker__item' + (taken ? " is-taken" : "") + '" role="option" data-parent-offer-id="' + escapeHtml(p.id) + '"' + (taken ? ' aria-disabled="true"' : ' tabindex="0"') + '">' +
+              return '<li class="offer-parent-picker__item" role="option" data-parent-offer-id="' + escapeHtml(p.id) + '" tabindex="0">' +
                 '<span class="offer-parent-picker__name">' + escapeHtml(p.name) + '</span>' +
-                '<span class="offer-parent-picker__meta muted">' + escapeHtml(catL1FromParent(p)) + ' · ' + escapeHtml(fmtDealParent(p)) + (taken ? ' · <em>Already on team</em>' : '') + '</span>' +
+                '<span class="offer-parent-picker__meta muted">' + escapeHtml(catL1FromParent(p)) + ' · ' + escapeHtml(fmtDealParent(p)) + '</span>' +
               '</li>';
             }).join("") +
           '</ul>' +
@@ -1422,7 +1496,6 @@
         document.getElementById("team-offer-name").placeholder = p.name;
       }
       loadTeamOfferDealFields(to, p);
-      ensureOfferAdvertiserWorkspace(to, false);
       renderOfferWorkspaces(to);
       refreshEnrichedPreview();
       document.getElementById("team-offer-detail-title").textContent = document.getElementById("team-offer-name").value.trim() || (p ? p.name : "New team offer");
@@ -1440,39 +1513,29 @@
       el.innerHTML =
         '<div class="offer-locked-field"><span class="offer-locked-label">Parent offer name</span><span class="offer-locked-value">' + escapeHtml(p.name) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Advertiser</span><span class="offer-locked-value">' + escapeHtml(advName(p.advertiserId)) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Parent status</span><span class="offer-locked-value">' + escapeHtml(p.status) + ' · effective ' + escapeHtml(parentOfferEffectiveStatus(p)) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L1</span><span class="offer-locked-value">' + escapeHtml(catL1FromParent(p) || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L2</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel2 || "—") + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Category L3</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel3 || "—") + '</span></div>';
+        '<div class="offer-locked-field"><span class="offer-locked-label">Category L3</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel3 || "—") + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Deal</span><span class="offer-locked-value">' + escapeHtml(fmtDealParent(p)) + ' · ' + escapeHtml(fmtTargetParent(p)) + '</span></div>';
     }
 
     function loadTeamOfferDealFields(to, p) {
-      document.getElementById("team-offer-deal-type").value = resolvedDealType(to);
-      var targetTypeEl = document.getElementById("offer-target-type");
-      if (targetTypeEl) {
-        targetTypeEl.value = resolvedTargetType(to);
-        targetTypeEl.disabled = false;
-      }
       var parentTv = p ? targetOf(p) : {};
       var tv = resolvedTarget(to);
-      var hasOverride = to.targetValue != null;
-      var amt = hasOverride ? (to.targetValue.amount != null ? to.targetValue.amount : to.targetValue.targetCpa) : (tv.amount != null ? tv.amount : tv.targetCpa);
-      document.getElementById("offer-target-value").value = amt != null && amt !== "" ? amt : "";
-      document.getElementById("offer-target-currency").value = (hasOverride && to.targetValue.currency) || tv.currency || parentTv.currency || "USD";
-      populateCountrySelect(resolvedCountries(to));
-      document.getElementById("offer-max-campaign-id").value = to.maxCampaignId || "";
-      document.getElementById("offer-max-campaign-status").value = to.maxCampaignStatus || "active";
-      var tp = document.getElementById("offer-tracking-provider");
-      if (tp) {
-        tp.value = resolvedTrackingProvider(to);
-        tp.disabled = false;
-      }
-      syncTargetHint();
+      var hasOverride = to.dealValue != null;
+      var amt = hasOverride ? (to.dealValue.amount != null ? to.dealValue.amount : to.dealValue.targetCpa) : (parentTv.amount != null ? parentTv.amount : parentTv.targetCpa);
+      document.getElementById("offer-target-value").value = hasOverride && amt != null && amt !== "" ? amt : "";
+      document.getElementById("offer-target-value").placeholder = parentTv.amount != null ? String(parentTv.amount) : "85.00";
+      document.getElementById("offer-target-currency").value = (hasOverride && to.dealValue.currency) || tv.currency || parentTv.currency || "USD";
+      document.getElementById("offer-campaign-id").value = to.campaignId || "";
+      syncTargetHint(p);
+      renderInheritedDealFields(p);
       document.getElementById("offer-cta-url").value = to.ctaUrl || "";
-      document.getElementById("offer-cta-url").placeholder = p && p.ctaUrl ? ("Default: " + p.ctaUrl.slice(0, 60) + (p.ctaUrl.length > 60 ? "…" : "")) : "Paste team CTA URL";
-      if (to.params) offerParams = to.params.map(function (x) { return { key: x.key, value: x.value }; });
-      else if (p && p.params) offerParams = p.params.map(function (x) { return { key: x.key, value: x.value }; });
-      else offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
+      document.getElementById("offer-cta-url").placeholder = p && p.ctaUrl ? ("Parent default: " + p.ctaUrl.slice(0, 60) + (p.ctaUrl.length > 60 ? "…" : "")) : "Paste team CTA URL";
+      offerParams = (p && p.params) ? p.params.map(function (x) { return { key: x.key, value: x.value }; }) : DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
       renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
+      document.getElementById("offer-params-editable").querySelectorAll("input, select, button").forEach(function (el) { el.disabled = true; });
       renderOfferBuySources(to);
     }
 
@@ -1507,25 +1570,16 @@
 
       if (p) loadTeamOfferDealFields(to, p);
       else {
-        document.getElementById("team-offer-deal-type").value = "cpa";
-        document.getElementById("offer-target-type").value = "cpa";
         document.getElementById("offer-target-value").value = "";
-        populateCountrySelect(["US"]);
-        document.getElementById("offer-max-campaign-id").value = "";
-        document.getElementById("offer-max-campaign-status").value = "active";
-        document.getElementById("offer-tracking-provider").value = "max";
+        document.getElementById("offer-target-currency").value = "USD";
+        document.getElementById("offer-campaign-id").value = "";
         document.getElementById("offer-cta-url").value = "";
         offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
         renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
         renderOfferBuySources(to);
       }
 
-      if (p) {
-        ensureOfferAdvertiserWorkspace(to, false);
-        renderOfferWorkspaces(to);
-      } else {
-        renderOfferWorkspaces(to);
-      }
+      renderOfferWorkspaces(to);
       setTeamOfferTabsEnabled(!!p);
       refreshEnrichedPreview();
       var firstTab = teamDetailDlg.querySelector('.tab[data-tab="parent-offer"]');
@@ -1541,45 +1595,38 @@
         return;
       }
       var p = parentById(to.parentOfferId);
-      to.displayName = document.getElementById("team-offer-name").value.trim();
+      var name = document.getElementById("team-offer-name").value.trim();
+      if (!name) { alert("Team offer name is required."); return; }
+      var campaignId = document.getElementById("offer-campaign-id").value.trim();
+      if (!campaignId) { alert("Campaign ID is required."); return; }
+      var cta = document.getElementById("offer-cta-url").value.trim();
+      if (!cta) { alert("CTA URL is required."); return; }
+      to.displayName = name;
       to.description = document.getElementById("team-offer-description").value.trim();
       to.status = document.getElementById("team-offer-status").value;
-      var dealType = document.getElementById("team-offer-deal-type").value;
-      to.dealType = (p && dealType === p.dealType) ? null : dealType;
-      var targetType = document.getElementById("offer-target-type").value;
-      to.targetType = (p && targetType === (p.targetType || "cpa")) ? null : targetType;
       var valRaw = document.getElementById("offer-target-value").value.trim();
       var cur = document.getElementById("offer-target-currency").value;
       if (!valRaw) {
-        to.targetValue = null;
+        to.dealValue = null;
       } else {
         var amt = parseFloat(valRaw) || 0;
         var parentAmt = p ? (targetOf(p).amount != null ? targetOf(p).amount : targetOf(p).targetCpa) : null;
-        if (parentAmt != null && amt === parentAmt) to.targetValue = null;
-        else to.targetValue = { amount: amt, currency: cur };
+        if (parentAmt != null && amt === parentAmt) to.dealValue = null;
+        else to.dealValue = { amount: amt, currency: cur };
       }
-      var countries = getCountrySelect();
-      var parentCountries = p ? (p.countries || ["US"]) : ["US"];
-      var sameCountries = countries.length === parentCountries.length && countries.every(function (c) { return parentCountries.indexOf(c) !== -1; });
-      to.countries = sameCountries ? null : countries;
-      to.maxCampaignId = document.getElementById("offer-max-campaign-id").value.trim();
-      to.maxCampaignStatus = document.getElementById("offer-max-campaign-status").value;
-      var tracking = document.getElementById("offer-tracking-provider").value;
-      to.trackingProvider = (p && tracking === (p.trackingProvider || "max")) ? null : tracking;
-      var cta = document.getElementById("offer-cta-url").value.trim();
-      var parentCta = p ? (p.ctaUrl || "") : "";
-      to.ctaUrl = (!cta || cta === parentCta) ? null : cta;
-      readParamsFromDom("offer-params-editable", offerParams);
-      to.params = offerParams.map(function (x) { return { key: x.key, value: x.value }; });
-      ensureOfferAdvertiserWorkspace(to, true);
+      to.campaignId = campaignId;
+      to.ctaUrl = cta;
       to.workspaceIds = [];
       document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
         to.workspaceIds.push(cb.value);
       });
+      if (!to.workspaceIds.length) { alert("Select at least one workspace."); return; }
       to.buySources = [];
       document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]:checked").forEach(function (cb) {
         to.buySources.push(cb.value);
       });
+      if (!to.buySources.length) { alert("Select at least one buy source."); return; }
+      touchEntity(to);
       isNewTeamOffer = false;
       renderAdvertiserFilters();
       render();
@@ -1681,7 +1728,6 @@
       document.getElementById("po-target-currency").value = tv.currency || "USD";
       populatePoCountrySelect(p.countries);
       document.getElementById("po-tracking-provider").value = p.trackingProvider || "max";
-      document.getElementById("po-max-campaign-id").value = p.maxCampaignId || "";
       syncPoTargetHint();
       document.getElementById("po-cta-url").value = p.ctaUrl || "";
       if (p.params) poParams = p.params.map(function (x) { return { key: x.key, value: x.value }; });
@@ -1697,13 +1743,18 @@
     function saveParentOfferDetail() {
       var p = parentById(activeParentOfferId);
       if (!p) return;
-      p.name = document.getElementById("po-name").value.trim() || p.name;
+      p.name = document.getElementById("po-name").value.trim();
       p.description = document.getElementById("po-description").value.trim();
-      p.advertiserId = document.getElementById("po-advertiser-select").value || p.advertiserId;
+      p.advertiserId = document.getElementById("po-advertiser-select").value;
       p.status = document.getElementById("po-status").value;
       p.categoryLevel1 = document.getElementById("po-category-l1").value;
       p.categoryLevel2 = document.getElementById("po-category-l2").value;
       p.categoryLevel3 = document.getElementById("po-category-l3").value;
+      if (!p.name || !p.advertiserId || !p.categoryLevel1 || !p.categoryLevel2 || !p.categoryLevel3) {
+        alert("All parent offer critical fields are required.");
+        return;
+      }
+      if (!validateRequiredDescription(p.description, "Parent offer description")) return;
       p.vertical = p.categoryLevel1;
       p.dealType = document.getElementById("po-deal-type").value;
       p.targetType = document.getElementById("po-target-type").value;
@@ -1711,18 +1762,22 @@
         amount: parseFloat(document.getElementById("po-target-value").value) || 0,
         currency: document.getElementById("po-target-currency").value
       };
+      if (!p.targetValue.amount) { alert("Target value is required."); return; }
       p.cpaGoal = { targetCpa: p.targetValue.amount, currency: p.targetValue.currency };
       p.countries = getPoCountrySelect();
+      if (!p.countries.length) { alert("Select at least one country."); return; }
       p.trackingProvider = document.getElementById("po-tracking-provider").value;
-      p.maxCampaignId = document.getElementById("po-max-campaign-id").value.trim();
       p.ctaUrl = document.getElementById("po-cta-url").value.trim();
       readParamsFromDom("po-params-editable", poParams);
       p.params = poParams.map(function (x) { return { key: x.key, value: x.value }; });
+      var prevTeamIds = (p.teamIds || []).slice();
       p.teamIds = [];
       document.querySelectorAll("#po-teams-list input[type=checkbox]:checked").forEach(function (cb) {
         p.teamIds.push(cb.value);
       });
+      syncTeamOffersOnParentTeamChange(p, prevTeamIds);
       spawnTeamOffersForParent(p);
+      touchEntity(p);
       renderAdvertiserFilters();
       render();
     }
@@ -1830,6 +1885,8 @@
       clone.id = "to-" + Date.now() + "-" + Math.random().toString(36).slice(2, 6);
       clone.displayName = opts.name || (teamOfferLabel(src) + " (copy)");
       clone.workspaceIds = (opts.workspaceIds || []).slice();
+      clone.deletedAt = null;
+      Object.assign(clone, auditFields());
       teamOffers.push(clone);
       return clone.id;
     }
@@ -2120,12 +2177,12 @@
 
     document.getElementById("team-offer-add-btn").addEventListener("click", function () {
       var id = "to-" + Date.now();
-      teamOffers.push({
+      teamOffers.push(Object.assign({
         id: id, parentOfferId: "", teamId: CURRENT_TEAM.id,
         displayName: "", description: "", status: "active",
-        dealType: null, targetType: null, targetValue: null, countries: null, trackingProvider: null,
-        maxCampaignId: "", maxCampaignStatus: "active", ctaUrl: null, buySources: [], workspaceIds: []
-      });
+        dealValue: null, campaignId: "", ctaUrl: "",
+        buySources: [], workspaceIds: [], deletedAt: null
+      }, auditFields()));
       openTeamOfferDetail(id, true);
     });
 
@@ -2144,7 +2201,7 @@
     if (teamParentOptions) {
       teamParentOptions.addEventListener("click", function (e) {
         var item = e.target.closest(".offer-parent-picker__item");
-        if (!item || item.classList.contains("is-taken")) return;
+        if (!item) return;
         selectParentOfferForTeam(item.getAttribute("data-parent-offer-id"));
       });
       teamParentOptions.addEventListener("keydown", function (e) {
@@ -2158,10 +2215,11 @@
 
     document.getElementById("parent-offer-add-btn").addEventListener("click", function () {
       var id = "po-" + Date.now();
-      parentOffers.push({
-        id: id, advertiserId: "", name: "", categoryLevel1: "", dealType: "cpa", targetType: "cpa",
+      parentOffers.push(Object.assign({
+        id: id, advertiserId: "", name: "", categoryLevel1: "", categoryLevel2: "", categoryLevel3: "",
+        description: "", dealType: "cpa", targetType: "cpa",
         targetValue: { amount: 0, currency: "USD" }, countries: ["US"], teamIds: [], status: "active", ctaUrl: ""
-      });
+      }, auditFields()));
       openParentOfferDetail(id);
     });
 
@@ -2414,10 +2472,18 @@
     function saveAdvDetail() {
       var a = advById(activeAdvId);
       if (!a) return;
-      a.name = document.getElementById("adv-name").value.trim() || a.name;
+      var name = document.getElementById("adv-name").value.trim();
+      if (!name) { alert("Advertiser name is required."); return; }
+      var dup = advertisers.some(function (x) { return x.id !== a.id && x.name.toLowerCase() === name.toLowerCase(); });
+      if (dup) { alert("Advertiser name must be unique."); return; }
+      if (!validateRequiredDescription(document.getElementById("adv-description").value, "Advertiser description")) return;
+      var prevTeamIds = (a.teamIds || []).slice();
+      a.name = name;
       a.description = document.getElementById("adv-description").value.trim();
       a.status = document.getElementById("adv-status").value;
       a.teamIds = advTeamsDraft.slice();
+      syncTeamOffersOnAdvertiserTeamChange(a, prevTeamIds);
+      touchEntity(a);
       renderAdvTable();
       renderAdvertiserFilters();
       render();
@@ -2430,7 +2496,7 @@
 
     document.getElementById("adv-add-btn").addEventListener("click", function () {
       var id = "adv-" + Date.now();
-      advertisers.push({ id: id, name: "", description: "", status: "active", teamIds: [] });
+      advertisers.push(Object.assign({ id: id, name: "", description: "", status: "active", teamIds: [] }, auditFields()));
       openAdvDetail(id);
     });
 
