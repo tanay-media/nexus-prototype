@@ -3112,6 +3112,26 @@ button.dsk-row-name:focus-visible strong {
 .team-inherited-strip {
   margin: 0.65rem 0 1rem;
 }
+.offer-ws-col { min-width: 140px; max-width: 220px; }
+.offer-ws-cell { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.offer-ws-tag {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: #eef0f3;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text);
+  white-space: nowrap;
+}
+.offer-params-readonly {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+}
+.offer-params-readonly li { margin: 0.15rem 0; }
+.offer-params-readonly code { font-size: 12px; }
 .offer-locked-pane { background: #f8f9fb; border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1rem; }
 .offer-locked-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem 1.25rem; }
 .offer-locked-field { display: flex; flex-direction: column; gap: 0.15rem; }

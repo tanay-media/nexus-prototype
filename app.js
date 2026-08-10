@@ -132,7 +132,7 @@
       var a = document.querySelector(".sidebar .nav a.is-active");
       if (a) return (a.textContent || "").replace(/\s+/g, " ").trim();
       var file = pathFile.replace(".html", "");
-      var map  = { "index": "Home", "landers": "Landers", "reports": "Reports", "offers": "Team Offers", "domains": "Domains", "logs": "Logs", "editor": "Editor" };
+      var map  = { "index": "Home", "landers": "Landers", "reports": "Reports", "offers": "Offers", "domains": "Domains", "logs": "Logs", "editor": "Editor" };
       return map[file] || (file.charAt(0).toUpperCase() + file.slice(1));
     })();
 
