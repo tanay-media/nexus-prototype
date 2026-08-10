@@ -42,6 +42,7 @@
       </div>
 
       <div class="toolbar" data-toolbar="published-only">
+        <p id="landers-inactive-offer-banner" class="settings-section__hint" style="display:none;width:100%;margin:0 0 .5rem;padding:.5rem .75rem;background:#fff8e6;border:1px solid #f0d78c;border-radius:6px;color:#7a5b00;"></p>
         <div class="search-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           <input class="input" type="search" id="landers-search" placeholder="Search by name, url, variant" />
@@ -77,6 +78,7 @@
               <tr>
                 <th class="lander-row__toggle" style="width: 44px;"></th>
                 <th class="is-sortable" data-sort="name">Name<span class="th-sort" aria-hidden="true">↕</span></th>
+                <th>Offer</th>
                 <th>Traffic</th>
                 <th class="is-sortable" data-sort="updated">Last updated<span class="th-sort" aria-hidden="true">↕</span></th>
                 <th class="is-sortable" data-sort="by">By<span class="th-sort" aria-hidden="true">↕</span></th>
@@ -368,6 +370,7 @@
 
   <script src="integrations-catalog.js"></script>
   <script src="macro-enriched-lander-urls.js"></script>
+  <script src="offers-governance.js"></script>
   <script src="app.js"></script>
   <script src="thumbs.js"></script>
   <script>
@@ -378,7 +381,7 @@
       {
         id: "summer-sale", name: "Summer Sale", url: "https://offers.acme.com/summer-sale-hero",
         split: "60/40%", updated: "2h ago", updatedDate: "Apr 20, 2026", by: "Kyle",
-        status: "published", offerName: "Walk-in showers",
+        status: "published", offerName: "Walk-in showers", teamOfferId: "to-hb-wis",
         visits: 200000, impressions: 169700, clicks: 114374, conversions: 78608, score: 0.46,
         variants: [
           { name: "Main hero",          split: "60%", updated: "2h ago", by: "Kyle", visits: 150000, impressions: 128492, clicks: 91710, conversions: 66188, score: 0.52 },
@@ -388,7 +391,7 @@
       {
         id: "referral-q2", name: "Referral Q2", url: "https://refer.acme.com/referral-q2",
         split: "70/30%", updated: "5h ago", updatedDate: "Apr 19, 2026", by: "Maya",
-        status: "published", offerName: "Walk-in Tubs",
+        status: "published", offerName: "Walk-in Tubs", teamOfferId: "to-hb-wit",
         visits: 32000, impressions: 25545, clicks: 12973, conversions: 7019, score: 0.27,
         variants: [
           { name: "Single-field entry", split: "70%", updated: "5h ago", by: "Maya", visits: 22400, impressions: 17881, clicks: 9082, conversions: 4913, score: 0.28 },
@@ -398,7 +401,7 @@
       {
         id: "founder-letter", name: "Founder Letter", url: "https://offers.acme.com/founder-letter",
         split: "100%", updated: "6h ago", updatedDate: "Apr 20, 2026", by: "Sam",
-        status: "published", offerName: "Roofing",
+        status: "published", offerName: "Roofing", teamOfferId: "to-hb-roof",
         visits: 28000, impressions: 22104, clicks: 9947, conversions: 3580, score: 0.16,
         variants: [
           { name: "Long form", split: "100%", updated: "6h ago", by: "Sam", visits: 28000, impressions: 22104, clicks: 9947, conversions: 3580, score: 0.16 }
@@ -407,7 +410,7 @@
       {
         id: "black-friday", name: "Black Friday", url: "https://offers.acme.com/black-friday-2026",
         split: "100%", updated: "5d ago", updatedDate: "Apr 15, 2026", by: "Dana",
-        status: "published", offerName: "VIN Search",
+        status: "published", offerName: "VIN Search", teamOfferId: "to-bv-vin",
         visits: 11000, impressions: 8720, clicks: 1570, conversions: 279, score: 0.03,
         variants: [
           { name: "Orange bold", split: "100%", updated: "5d ago", by: "Dana", visits: 11000, impressions: 8720, clicks: 1570, conversions: 279, score: 0.03 }
@@ -416,7 +419,7 @@
       {
         id: "spring-promo", name: "Spring Promo", url: "https://offers.acme.com/spring-promo",
         split: "100%", updated: "1d ago", updatedDate: "Apr 19, 2026", by: "Kyle",
-        status: "published", offerName: "Auto Insurance",
+        status: "published", offerName: "Auto Insurance", teamOfferId: "to-sf-auto",
         visits: 8200, impressions: 6100, clicks: 2100, conversions: 380, score: 0.12,
         variants: [
           { name: "Main promo", split: "100%", updated: "1d ago", by: "Kyle", visits: 8200, impressions: 6100, clicks: 2100, conversions: 380, score: 0.12 }
@@ -425,7 +428,7 @@
       {
         id: "partner-announce", name: "Partner Announce", url: "https://try.acme.com/partner-announce",
         split: "100%", updated: "1d ago", updatedDate: "Apr 19, 2026", by: "Kyle",
-        status: "published", offerName: "Roofing",
+        status: "published", offerName: "Roofing", teamOfferId: "to-hb-roof",
         visits: 4500, impressions: 3441, clicks: 1307, conversions: 497, score: 0.14,
         variants: [
           { name: "Press style", split: "100%", updated: "1d ago", by: "Kyle", visits: 4500, impressions: 3441, clicks: 1307, conversions: 497, score: 0.14 }
@@ -435,7 +438,7 @@
       {
         id: "fall-preview", name: "Fall Preview", url: "https://offers.acme.com/fall-preview",
         split: "100%", updated: "3w ago", updatedDate: "Apr 01, 2026", by: "Maya",
-        status: "unpublished", offerName: "Walk-in showers",
+        status: "unpublished", offerName: "Walk-in showers", teamOfferId: "to-hb-wis",
         visits: 620, impressions: 412, clicks: 118, conversions: 21, score: 0.05,
         variants: [
           { name: "Cozy warm palette", split: "100%", updated: "3w ago", by: "Maya", visits: 620, impressions: 412, clicks: 118, conversions: 21, score: 0.05 }
@@ -444,7 +447,7 @@
       {
         id: "holiday-teaser", name: "Holiday Teaser", url: "https://offers.acme.com/holiday-teaser",
         split: "100%", updated: "2mo ago", updatedDate: "Feb 18, 2026", by: "Sam",
-        status: "unpublished", offerName: "VIN Search",
+        status: "unpublished", offerName: "VIN Search", teamOfferId: "to-bv-vin",
         visits: 180, impressions: 96, clicks: 22, conversions: 3, score: 0.03,
         variants: [
           { name: "Gift-led hero", split: "100%", updated: "2mo ago", by: "Sam", visits: 180, impressions: 96, clicks: 22, conversions: 3, score: 0.03 }
@@ -453,13 +456,42 @@
       {
         id: "partner-pulse-draft", name: "Partner Pulse", url: "https://try.acme.com/partner-pulse",
         split: "100%", updated: "just now", updatedDate: "Apr 23, 2026", by: "Kyle",
-        status: "unpublished", offerName: "Auto Insurance",
+        status: "unpublished", offerName: "Auto Insurance", teamOfferId: "to-sf-auto",
         visits: 0, impressions: 0, clicks: 0, conversions: 0, score: 0,
         variants: [
           { name: "V1 — Draft hero", split: "100%", updated: "just now", by: "Kyle", visits: 0, impressions: 0, clicks: 0, conversions: 0, score: 0 }
         ]
       }
     ];
+
+    // --------------------------------------------------------------------
+    // Team offer effective status (from Offers Wall governance store)
+    // --------------------------------------------------------------------
+    function landerTeamOfferEffectiveStatus(l) {
+      if (!l.teamOfferId || !window.NexusOffersGov) return "active";
+      var to = NexusOffersGov.teamOfferById(l.teamOfferId);
+      if (!to) return "inactive";
+      return NexusOffersGov.teamOfferEffectiveStatus(to);
+    }
+
+    function renderLanderOfferCell(l) {
+      var eff = landerTeamOfferEffectiveStatus(l);
+      var name = escapeHtml(l.offerName || "—");
+      if (eff === "active") return '<span class="muted">' + name + '</span>';
+      return '<span class="muted">' + name + '</span> <span class="badge badge--archived" title="Linked team offer is inactive or soft-deleted">Inactive offer</span>';
+    }
+
+    function updateInactiveOfferBanner(rows) {
+      var banner = document.getElementById("landers-inactive-offer-banner");
+      if (!banner) return;
+      var bad = rows.filter(function (l) { return landerTeamOfferEffectiveStatus(l) !== "active"; });
+      if (!bad.length) {
+        banner.style.display = "none";
+        return;
+      }
+      banner.style.display = "";
+      banner.textContent = bad.length + " lander" + (bad.length === 1 ? " uses an" : "s use") + " inactive or soft-deleted team offer — review Team Offers before publishing traffic.";
+    }
 
     // --------------------------------------------------------------------
     // Icon helpers
@@ -626,6 +658,7 @@
       tbody.innerHTML = "";
       rows.forEach(function (l) { tbody.appendChild(renderLanderRow(l)); });
       countT.textContent = landers.filter(function (x) { return x.status === "published"; }).length;
+      updateInactiveOfferBanner(rows);
       applySortIndicators();
     }
 
@@ -656,6 +689,7 @@
             '</div>' +
           '</div>' +
         '</td>' +
+        '<td>' + renderLanderOfferCell(l) + '</td>' +
         '<td class="muted"><span class="traffic-cell">' + escapeHtml(l.split) +
           '<button type="button" class="icon-btn traffic-weight-btn js-manage-weights" data-lander-id="' + l.id + '" title="Manage weights" aria-label="Manage weights">' + ICON.edit + '</button></span></td>' +
         '<td class="muted" title="' + l.updatedDate + '">' + l.updated + '</td>' +
