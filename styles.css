@@ -3109,6 +3109,9 @@ button.dsk-row-name:focus-visible strong {
   color: var(--text);
 }
 .input--readonly { background: #f5f6f8; color: var(--text-muted); cursor: default; }
+.team-inherited-strip {
+  margin: 0.65rem 0 1rem;
+}
 .offer-locked-pane { background: #f8f9fb; border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1rem; }
 .offer-locked-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem 1.25rem; }
 .offer-locked-field { display: flex; flex-direction: column; gap: 0.15rem; }

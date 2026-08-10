@@ -236,6 +236,13 @@
         <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
       </div>
 
+      <div id="team-inherited-strip" class="team-inherited-strip" hidden>
+        <p class="settings-section__hint muted" style="margin:0 0 0.5rem;">Inherited from <strong>parent_offer</strong> — contact super-admin to change advertiser or categories.</p>
+        <div class="offer-locked-pane">
+          <div class="offer-locked-grid" id="team-parent-readonly"></div>
+        </div>
+      </div>
+
       <!-- Parent offer + team general -->
       <section class="offer-detail-pane" data-tab-panel="parent-offer">
         <div id="team-parent-picker-wrap" hidden>
@@ -252,14 +259,7 @@
           </div>
         </div>
 
-        <div id="team-parent-locked-wrap" hidden>
-          <p class="settings-section__hint muted" style="margin-top:0;">Inherited from <strong>parent_offer</strong> — contact super-admin to change advertiser or categories.</p>
-          <div class="offer-locked-pane">
-            <div class="offer-locked-grid" id="team-parent-readonly"></div>
-          </div>
-        </div>
-
-        <div class="settings-section" id="team-offer-general-wrap" style="margin-top:1rem;">
+        <div class="settings-section" id="team-offer-general-wrap">
           <p class="settings-section__title">Team offer</p>
           <div class="field">
             <label for="team-offer-name">Team offer name</label>
@@ -281,9 +281,10 @@
 
       <!-- Deal (team-owned fields only) -->
       <section class="offer-detail-pane" data-tab-panel="deal" hidden>
-        <p class="settings-section__hint muted" style="margin-top:0;">Deal type, target type &amp; countries are inherited from parent offer (read-only on General tab).</p>
+        <div class="offer-locked-pane" id="team-offer-inherited-deal" style="margin-bottom:1rem;"></div>
+        <p class="settings-section__title">Team deployment</p>
         <div class="field offer-money-field">
-          <label for="offer-deal-value">Deal value</label>
+          <label for="offer-deal-value">Deal value override</label>
           <div class="offer-amount-group">
             <input type="number" id="offer-deal-value" min="0" step="0.01" placeholder="85.00" aria-label="Deal value" />
             <select id="offer-deal-currency" aria-label="Currency">
@@ -292,7 +293,7 @@
               <option value="GBP">GBP</option>
             </select>
           </div>
-          <p class="offer-field-hint" id="offer-deal-hint">Team deal value override. Leave empty to inherit parent deal value.</p>
+          <p class="offer-field-hint" id="offer-deal-hint">Leave empty to inherit parent deal value.</p>
         </div>
         <div class="field">
           <label for="offer-campaign-provider">Campaign provider</label>
@@ -305,12 +306,11 @@
           <label for="offer-campaign-id">Campaign ID</label>
           <input type="text" id="offer-campaign-id" placeholder="MAX-88421" required />
         </div>
-        <div class="offer-locked-pane" id="team-offer-inherited-deal"></div>
       </section>
 
       <!-- CTA URL (single) -->
       <section class="offer-detail-pane" data-tab-panel="cta-url" hidden>
-        <p class="settings-section__hint muted">Team CTA URL (required). Tracking params below are inherited from parent offer.</p>
+        <p class="settings-section__hint muted" style="margin-top:0;">Team CTA URL and tracking params. Defaults come from parent offer when not overridden.</p>
         <div class="field">
           <label for="offer-cta-url">Base URL</label>
           <textarea id="offer-cta-url" rows="2" placeholder="https://trk.pmsrv.co/v2/trk?adid=…&akey=…" class="input offer-url-textarea"></textarea>
@@ -318,7 +318,7 @@
 
         <div class="settings-section" style="margin-top:1.2rem;">
           <p class="settings-section__title">Tracking params</p>
-          <p class="settings-section__hint muted">Appended to the base URL. Change any value to a macro or static string.</p>
+          <p class="settings-section__hint muted">Team override — appended to the base URL. Change any value to a macro or static string.</p>
           <div class="offer-params-editable" id="offer-params-editable"></div>
         </div>
 
@@ -795,9 +795,31 @@
       return p ? (p.ctaUrl || "") : "";
     }
     function resolvedTrackingParams(to) {
+      if (to.trackingParams && to.trackingParams.length) return to.trackingParams;
+      if (to.params && to.params.length) return to.params;
       var p = parentById(to.parentOfferId);
       if (p && p.params) return p.params;
       return DEFAULT_PARAMS;
+    }
+
+    function paramsEqual(a, b) {
+      if (!a || !b || a.length !== b.length) return false;
+      for (var i = 0; i < a.length; i++) {
+        if (a[i].key !== b[i].key || a[i].value !== b[i].value) return false;
+      }
+      return true;
+    }
+
+    function loadTeamOfferParams(to, p) {
+      var parentParams = (p && p.params) ? p.params.map(function (x) { return { key: x.key, value: x.value }; }) : DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
+      var teamParams = (to.trackingParams || to.params || []).map(function (x) { return { key: x.key, value: x.value }; });
+      offerParams = teamParams.length ? teamParams : parentParams.slice();
+      renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
+    }
+
+    function updateTeamInheritedStrip(show) {
+      var strip = document.getElementById("team-inherited-strip");
+      if (strip) strip.hidden = !show;
     }
 
     function catL1FromParent(p) { return p ? (p.categoryLevel1 || p.vertical || "") : ""; }
@@ -907,6 +929,7 @@
           ctaUrl: parent.ctaUrl || "",
           buySources: [],
           workspaceMaps: [],
+          trackingParams: null,
           deletedAt: null,
           deletedBy: null
         }, auditFields()));
@@ -1470,12 +1493,20 @@
 
     function renderInheritedDealFields(p) {
       var el = document.getElementById("team-offer-inherited-deal");
-      if (!el || !p) return;
+      if (!el || !p) {
+        if (el) el.innerHTML = '<p class="muted" style="margin:0;">Select a parent offer to view inherited deal fields.</p>';
+        return;
+      }
+      var targetType = p.targetType || "cpa";
+      var targetVal = fmtTargetParent(p);
       el.innerHTML =
-        '<div class="offer-locked-field"><span class="offer-locked-label">Deal type</span><span class="offer-locked-value">' + escapeHtml((p.dealType || "cpa").toUpperCase()) + ' · ' + escapeHtml(fmtDealValueParent(p)) + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml((p.targetType || "cpa").toUpperCase()) + ' · ' + escapeHtml(fmtTargetParent(p)) + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Countries</span><span class="offer-locked-value">' + escapeHtml((p.countries || ["US"]).join(", ")) + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Tracking</span><span class="offer-locked-value">' + escapeHtml((p.trackingProvider || "max").toUpperCase()) + '</span></div>';
+        '<p class="settings-section__hint muted" style="margin:0 0 0.65rem;">Inherited from parent offer (read-only)</p>' +
+        '<div class="offer-locked-grid">' +
+          '<div class="offer-locked-field"><span class="offer-locked-label">Deal type</span><span class="offer-locked-value">' + escapeHtml((p.dealType || "cpa").toUpperCase()) + '</span></div>' +
+          '<div class="offer-locked-field"><span class="offer-locked-label">Deal value</span><span class="offer-locked-value">' + escapeHtml(fmtDealParent(p)) + ' ' + escapeHtml(fmtDealValueParent(p)) + '</span></div>' +
+          '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml(targetType.toUpperCase()) + '</span></div>' +
+          '<div class="offer-locked-field"><span class="offer-locked-label">Target value</span><span class="offer-locked-value">' + escapeHtml(targetVal) + '</span></div>' +
+        '</div>';
     }
 
     function renderParentOfferPicker(query) {
@@ -1530,8 +1561,8 @@
       to.parentOfferId = parentId;
       var p = parentById(parentId);
       document.getElementById("team-parent-picker-wrap").hidden = true;
-      document.getElementById("team-parent-locked-wrap").hidden = false;
       document.getElementById("team-offer-general-wrap").hidden = false;
+      updateTeamInheritedStrip(true);
       renderParentReadonly(p);
       if (!document.getElementById("team-offer-name").value.trim() && p) {
         document.getElementById("team-offer-name").placeholder = p.name;
@@ -1558,7 +1589,8 @@
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L1</span><span class="offer-locked-value">' + escapeHtml(catL1FromParent(p) || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L2</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel2 || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L3</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel3 || "—") + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Deal</span><span class="offer-locked-value">' + escapeHtml(fmtDealParent(p)) + ' ' + escapeHtml(fmtDealValueParent(p)) + ' · Target ' + escapeHtml(fmtTargetParent(p)) + '</span></div>';
+        '<div class="offer-locked-field"><span class="offer-locked-label">Countries</span><span class="offer-locked-value">' + escapeHtml((p.countries || ["US"]).join(", ")) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Tracking provider</span><span class="offer-locked-value">' + escapeHtml((p.trackingProvider || "max").toUpperCase()) + '</span></div>';
     }
 
     function loadTeamOfferDealFields(to, p) {
@@ -1575,9 +1607,7 @@
       renderInheritedDealFields(p);
       document.getElementById("offer-cta-url").value = to.ctaUrl || "";
       document.getElementById("offer-cta-url").placeholder = p && p.ctaUrl ? ("Parent default: " + p.ctaUrl.slice(0, 60) + (p.ctaUrl.length > 60 ? "…" : "")) : "Paste team CTA URL";
-      offerParams = (p && p.params) ? p.params.map(function (x) { return { key: x.key, value: x.value }; }) : DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
-      renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
-      document.getElementById("offer-params-editable").querySelectorAll("input, select, button").forEach(function (el) { el.disabled = true; });
+      loadTeamOfferParams(to, p);
       renderOfferBuySources(to);
     }
 
@@ -1594,18 +1624,17 @@
       document.getElementById("team-offer-detail-sub").textContent = (p ? parentPickerLabel(p) : "Choose a parent offer") + " · " + CURRENT_TEAM.name;
 
       var pickerWrap = document.getElementById("team-parent-picker-wrap");
-      var lockedWrap = document.getElementById("team-parent-locked-wrap");
       var generalWrap = document.getElementById("team-offer-general-wrap");
 
       if (isNewTeamOffer) {
         pickerWrap.hidden = false;
-        lockedWrap.hidden = true;
+        updateTeamInheritedStrip(!!p);
         generalWrap.hidden = !p;
         document.getElementById("team-parent-search").value = "";
         renderParentOfferPicker("");
       } else {
         pickerWrap.hidden = true;
-        lockedWrap.hidden = false;
+        updateTeamInheritedStrip(!!p);
         generalWrap.hidden = false;
         renderParentReadonly(p);
       }
@@ -1619,6 +1648,7 @@
         document.getElementById("offer-cta-url").value = "";
         offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
         renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
+        renderInheritedDealFields(null);
         renderOfferBuySources(to);
       }
 
@@ -1661,6 +1691,13 @@
       to.campaignId = campaignId;
       to.campaignProvider = document.getElementById("offer-campaign-provider").value;
       to.ctaUrl = cta;
+      readParamsFromDom("offer-params-editable", offerParams);
+      var parentParams = (p && p.params) ? p.params : DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
+      if (paramsEqual(offerParams, parentParams)) {
+        to.trackingParams = null;
+      } else {
+        to.trackingParams = offerParams.map(function (x) { return { key: x.key, value: x.value }; });
+      }
       to.workspaceMaps = [];
       document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
         to.workspaceMaps.push({ workspaceId: cb.value, teamId: to.teamId || CURRENT_TEAM.id });
