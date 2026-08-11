@@ -66,14 +66,13 @@
               <thead>
                 <tr>
                   <th style="width:34px"></th>
-                  <th>Team offer</th>
+                  <th>Advertiser &gt; Team offer</th>
                   <th>Parent offer name</th>
                   <th>Cat. 1</th>
-                  <th class="right">Deal value</th>
-                  <th class="right">Target</th>
+                  <th class="right">Deal</th>
                   <th>Status</th>
-                  <th>Effective</th>
-                  <th>Created by</th>
+                  <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this offer can be used on landers"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this team offer can be used on landers. Inactive if the team offer, parent offer, advertiser, or team mapping is inactive.</span></span></th>
+                  <th>Last updated</th>
                   <th class="offer-ws-col">Workspaces</th>
                   <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
@@ -980,6 +979,32 @@
       if (!entity || !entity.createdBy) return '<span class="muted">—</span>';
       return '<span class="muted" style="font-size:12px;">' + escapeHtml(entity.createdBy) + '</span>';
     }
+    function fmtUpdatedAt(entity) {
+      if (!entity || !entity.updatedAt) return '<span class="muted">—</span>';
+      var d = new Date(entity.updatedAt);
+      return '<span class="muted offer-updated-at" title="' + escapeHtml(entity.updatedAt) + '">' + escapeHtml(d.toLocaleDateString()) + '</span>';
+    }
+    function wsNamesCompact(ids) {
+      if (!ids || !ids.length) return '<span class="muted">—</span>';
+      var wsMap = {};
+      TEAM_WORKSPACES.forEach(function (ws) { wsMap[ws.id] = ws.name; });
+      var names = ids.map(function (id) { return wsMap[id] || id; });
+      var maxShow = 2;
+      var visible = names.slice(0, maxShow);
+      var rest = names.length - maxShow;
+      var html = '<span class="offer-ws-cell offer-ws-cell--compact">';
+      visible.forEach(function (n) {
+        html += '<span class="offer-ws-tag">' + escapeHtml(n) + '</span>';
+      });
+      if (rest > 0) {
+        var listHtml = names.map(function (n) { return escapeHtml(n); }).join("<br>");
+        html += '<span class="info-tip info-tip--sm offer-ws-more-tip" tabindex="0" aria-label="' + escapeHtml(names.join(", ")) + '">' +
+          '<span class="offer-ws-more">+' + rest + ' more</span>' +
+          '<span class="info-tip__body">' + listHtml + '</span></span>';
+      }
+      html += "</span>";
+      return html;
+    }
     function wsNames(ids) {
       if (!ids || !ids.length) return '<span class="muted">—</span>';
       var wsMap = {};
@@ -1073,7 +1098,7 @@
       var groups = groupTeamOffersByAdvertiser(rows);
       tbody.innerHTML = "";
       if (!groups.length) {
-        tbody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
         return;
       }
       groups.forEach(function (g) {
@@ -1085,7 +1110,7 @@
           '<td class="lander-row__toggle">' +
             '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button>' +
           '</td>' +
-          '<td colspan="10"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
+          '<td colspan="9"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
             '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' team offer' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
         tbody.appendChild(tr);
         g.offers.forEach(function (to) {
@@ -1099,12 +1124,11 @@
             '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong>' + (to.deletedAt ? ' <span class="badge badge--archived">Deleted</span>' : '') + '</td>' +
             '<td class="muted" style="font-size:12px;">' + escapeHtml(p ? p.name : "—") + '</td>' +
             '<td class="muted">' + escapeHtml(p ? catL1FromParent(p) : "—") + '</td>' +
-            '<td class="right num">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + ' ' + fmtDealValueResolved(to) + '</td>' +
-            '<td class="right num">' + fmtTargetResolved(to) + '</td>' +
+            '<td class="right num"><span class="offer-deal-cell">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + ' <span class="offer-deal-value">' + fmtDealValueResolved(to) + '</span></span></td>' +
             '<td>' + statusBadge(to.status) + '</td>' +
             '<td>' + effectiveBadge(teamOfferEffectiveStatus(to)) + '</td>' +
-            '<td>' + fmtCreatedBy(to) + '</td>' +
-            '<td class="offer-ws-col">' + wsNames(getWorkspaceIds(to)) + '</td>' +
+            '<td>' + fmtUpdatedAt(to) + '</td>' +
+            '<td class="offer-ws-col">' + wsNamesCompact(getWorkspaceIds(to)) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Duplicate team offer">' + ICON.clone + '</button>' +
               '<button type="button" class="icon-btn js-team-offer-settings" data-team-offer-id="' + escapeHtml(to.id) + '" title="Edit team offer">' + ICON.edit + '</button>' +
