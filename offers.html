@@ -68,7 +68,7 @@
                   <th style="width:34px"></th>
                   <th>Advertiser &gt; Team offer</th>
                   <th>Parent offer name</th>
-                  <th>Cat. 1</th>
+                  <th>Cat. 2</th>
                   <th class="right">Deal</th>
                   <th>Status</th>
                   <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this offer can be used on landers"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this team offer can be used on landers. Inactive if the team offer, parent offer, advertiser, or team mapping is inactive.</span></span></th>
@@ -108,13 +108,14 @@
               <thead>
                 <tr>
                   <th style="width:34px"></th>
-                  <th>Parent offer</th>
-                  <th>Cat. 1</th>
-                  <th>Deal</th>
-                  <th class="right">Target</th>
+                  <th>Advertiser &gt; Parent offer</th>
+                  <th>Cat. 2</th>
+                  <th>Deal type</th>
+                  <th>Target type</th>
+                  <th class="right">Target value</th>
                   <th>Status</th>
-                  <th>Effective</th>
-                  <th>Created by</th>
+                  <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this parent offer is available for team deployments"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this parent offer is available for team deployments. Inactive if the parent offer or its advertiser is inactive.</span></span></th>
+                  <th>Last updated</th>
                   <th>Teams</th>
                   <th class="right" style="min-width:80px;">Actions</th>
                 </tr>
@@ -808,6 +809,7 @@
     }
 
     function catL1FromParent(p) { return p ? (p.categoryLevel1 || p.vertical || "") : ""; }
+    function catL2FromParent(p) { return p ? (p.categoryLevel2 || "") : ""; }
     function dealOf(o) { return o.dealValue || o.deal || {}; }
     function targetOf(o) { return o.targetValue || o.cpaGoal || {}; }
     function advById(id) { return advertisers.find(function (a) { return a.id === id; }); }
@@ -961,6 +963,9 @@
       if (amt == null || amt === 0) return "—";
       if (targetType === "roas") return Number(amt).toFixed(amt % 1 ? 2 : 1) + "×";
       return "$" + Number(amt).toFixed(amt % 1 ? 2 : 0);
+    }
+    function fmtTargetTypeParent(p) {
+      return ((p && p.targetType) || "cpa").toUpperCase();
     }
     function fmtTargetParent(p) {
       var tv = targetOf(p);
@@ -1123,7 +1128,7 @@
             '<td></td>' +
             '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong>' + (to.deletedAt ? ' <span class="badge badge--archived">Deleted</span>' : '') + '</td>' +
             '<td class="muted" style="font-size:12px;">' + escapeHtml(p ? p.name : "—") + '</td>' +
-            '<td class="muted">' + escapeHtml(p ? catL1FromParent(p) : "—") + '</td>' +
+            '<td class="muted">' + escapeHtml(p ? catL2FromParent(p) : "—") + '</td>' +
             '<td class="right num"><span class="offer-deal-cell">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + ' <span class="offer-deal-value">' + fmtDealValueResolved(to) + '</span></span></td>' +
             '<td>' + statusBadge(to.status) + '</td>' +
             '<td>' + effectiveBadge(teamOfferEffectiveStatus(to)) + '</td>' +
@@ -1152,7 +1157,7 @@
       });
       parentBody.innerHTML = "";
       if (!groupList.length) {
-        parentBody.innerHTML = '<tr><td colspan="10" class="muted" style="padding:1.5rem;text-align:center;">No parent offers found.</td></tr>';
+        parentBody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No parent offers found.</td></tr>';
         return;
       }
       groupList.forEach(function (g) {
@@ -1162,7 +1167,7 @@
         tr.className = "offer-advertiser-row";
         tr.innerHTML =
           '<td class="lander-row__toggle"><button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button></td>' +
-          '<td colspan="9"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
+          '<td colspan="10"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
         parentBody.appendChild(tr);
         g.offers.forEach(function (p) {
           var orow = document.createElement("tr");
@@ -1171,12 +1176,13 @@
           orow.innerHTML =
             '<td></td>' +
             '<td><strong>' + escapeHtml(p.name) + '</strong></td>' +
-            '<td class="muted">' + escapeHtml(catL1FromParent(p)) + '</td>' +
+            '<td class="muted">' + escapeHtml(catL2FromParent(p) || "—") + '</td>' +
             '<td>' + escapeHtml(fmtDealParent(p)) + '</td>' +
+            '<td>' + escapeHtml(fmtTargetTypeParent(p)) + '</td>' +
             '<td class="right num">' + fmtTargetParent(p) + '</td>' +
             '<td>' + statusBadge(p.status) + '</td>' +
             '<td>' + effectiveBadge(parentOfferEffectiveStatus(p)) + '</td>' +
-            '<td>' + fmtCreatedBy(p) + '</td>' +
+            '<td>' + fmtUpdatedAt(p) + '</td>' +
             '<td class="muted" style="font-size:12px;">' + teamNames(p.teamIds) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-parent-offer-clone" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Duplicate parent offer">' + ICON.clone + '</button>' +
