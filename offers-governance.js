@@ -2,8 +2,8 @@
 (function (w) {
   "use strict";
 
-  var STORAGE_KEY = "nexus-offers-gov::v6";
-  var LEGACY_STORAGE_KEYS = ["nexus-offers-gov::v5", "nexus-offers-gov::v4"];
+  var STORAGE_KEY = "nexus-offers-gov::v7";
+  var LEGACY_STORAGE_KEYS = ["nexus-offers-gov::v6", "nexus-offers-gov::v5", "nexus-offers-gov::v4"];
 
   var DEFAULT_TRACKING_PARAMS = [
     { key: "cp1", value: "{{campaign_id}}" },
@@ -56,13 +56,13 @@
     ];
 
     var parentOffers = [
-      Object.assign({ id: "po-hb-wis", advertiserId: "adv-hb", name: "Walk-in showers", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Canonical walk-in shower CPA offer for Homebuddy US campaigns.", buySources: ["fb", "google"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-hb-wit", advertiserId: "adv-hb", name: "Walk-in Tubs", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], status: "active", teamIds: ["team-acme"], description: "Walk-in tub install leads for Homebuddy across US and Canada markets.", buySources: ["fb"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Roof replacement and repair lead offer for Homebuddy US homeowners.", buySources: ["fb", "google"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-bv-vin", advertiserId: "adv-bv", name: "VIN Search", categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme", "team-fin"], description: "Vehicle history and VIN lookup offer for Beenverified search traffic.", buySources: ["google", "taboola", "fb"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search", categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], description: "Obituary and memorial search offer currently paused in catalog.", buySources: ["google"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], status: "active", teamIds: ["team-acme"], description: "Auto insurance quote funnel with ROAS target for Smart Financials.", buySources: ["fb", "google", "taboola"], deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Life insurance lead offer for Smart Financials US acquisition campaigns.", buySources: ["fb", "google"], deletedAt: null }, auditFields())
+      Object.assign({ id: "po-hb-wis", advertiserId: "adv-hb", name: "Walk-in showers", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Canonical walk-in shower CPA offer for Homebuddy US campaigns.", deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-hb-wit", advertiserId: "adv-hb", name: "Walk-in Tubs", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], status: "active", teamIds: ["team-acme"], description: "Walk-in tub install leads for Homebuddy across US and Canada markets.", deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Roof replacement and repair lead offer for Homebuddy US homeowners.", deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-bv-vin", advertiserId: "adv-bv", name: "VIN Search", categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme", "team-fin"], description: "Vehicle history and VIN lookup offer for Beenverified search traffic.", deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search", categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], description: "Obituary and memorial search offer currently paused in catalog.", deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], status: "active", teamIds: ["team-acme"], description: "Auto insurance quote funnel with ROAS target for Smart Financials.", deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Life insurance lead offer for Smart Financials US acquisition campaigns.", deletedAt: null }, auditFields())
     ];
 
     var teamOffers = [
@@ -127,6 +127,12 @@
     });
   }
 
+  function migrateParentOfferBuySources(state) {
+    (state.parentOffers || []).forEach(function (po) {
+      delete po.buySources;
+    });
+  }
+
   function loadState() {
     try {
       var keys = [STORAGE_KEY].concat(LEGACY_STORAGE_KEYS);
@@ -136,6 +142,7 @@
         var parsed = JSON.parse(raw);
         migrateTeamOfferWorkspaceFields(parsed);
         migrateTeamOfferTrackingParams(parsed);
+        migrateParentOfferBuySources(parsed);
         if (keys[i] !== STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
         return parsed;
       }

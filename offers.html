@@ -324,7 +324,7 @@
 
       <section class="offer-detail-pane" data-tab-panel="buy-sources" hidden>
         <p class="settings-section__title">Team buy sources</p>
-        <p class="settings-section__hint muted">Select from parent-allowed platforms. At least one is required.</p>
+        <p class="settings-section__hint muted">Select platforms for this deployment. From A360 <code>GET /buy-sources</code>. At least one is required.</p>
         <p class="offer-pane-summary" id="offer-buy-sources-summary"></p>
         <ul class="offer-ws-list" id="offer-buy-sources-list"></ul>
       </section>
@@ -435,12 +435,6 @@
             <div class="offer-country-chips" id="po-country-chips" role="listbox" aria-label="Countries"></div>
           </div>
           <p class="offer-field-hint">Click countries to toggle selection. Default: United States.</p>
-        </div>
-        <div class="settings-section" style="margin-top:1.2rem;">
-          <p class="settings-section__title">Allowed buy sources</p>
-          <p class="settings-section__hint muted">Catalog platforms teams may select from. From A360 <code>GET /buy-sources</code>.</p>
-          <p class="offer-pane-summary" id="po-buy-sources-summary"></p>
-          <ul class="offer-ws-list" id="po-buy-sources-list"></ul>
         </div>
       </section>
 
@@ -757,15 +751,13 @@
       return DEFAULT_PARAMS;
     }
 
-    function parentBuySourcesOf(p) {
-      return (p && p.buySources && p.buySources.length) ? p.buySources.slice() : [];
+    function allBuySourceIds() {
+      return Gov.A360_BUY_SOURCES.map(function (bs) { return bs.id; });
     }
 
     function resolvedBuySources(to) {
-      var parentBs = parentBuySourcesOf(parentById(to.parentOfferId));
-      if (to.buySources == null) return parentBs;
-      if (!to.buySources.length) return parentBs;
-      return to.buySources.filter(function (id) { return parentBs.indexOf(id) !== -1; });
+      if (to.buySources && to.buySources.length) return to.buySources.slice();
+      return allBuySourceIds();
     }
 
     function buySourceLabels(ids) {
@@ -773,29 +765,6 @@
       var map = {};
       Gov.A360_BUY_SOURCES.forEach(function (bs) { map[bs.id] = bs.name; });
       return ids.map(function (id) { return map[id] || id; }).join(", ");
-    }
-
-    function buySourceTagsHtml(ids) {
-      if (!ids || !ids.length) return '<span class="muted">None set on parent</span>';
-      var map = {};
-      Gov.A360_BUY_SOURCES.forEach(function (bs) { map[bs.id] = bs.name; });
-      return '<span class="offer-ws-cell">' + ids.map(function (id) {
-        return '<span class="offer-ws-tag">' + escapeHtml(map[id] || id) + '</span>';
-      }).join("") + '</span>';
-    }
-
-    function teamBuySourcesOverridden(to) {
-      return to.buySources != null;
-    }
-
-    function arraysEqual(a, b) {
-      if (!a || !b || a.length !== b.length) return false;
-      var sa = a.slice().sort();
-      var sb = b.slice().sort();
-      for (var i = 0; i < sa.length; i++) {
-        if (sa[i] !== sb[i]) return false;
-      }
-      return true;
     }
 
     function paramsEqual(a, b) {
@@ -829,8 +798,8 @@
       renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
     }
 
-    function loadTeamBuySources(to, p) {
-      renderTeamBuySources(to, p);
+    function loadTeamBuySources(to) {
+      renderTeamBuySources(to);
     }
 
     function updateTeamTabInheritedPanels(p) {
@@ -1312,19 +1281,17 @@
       previewEl.value = buildEnrichedUrl(base, "offer-params-editable", offerParams);
     }
 
-    function renderTeamBuySources(to, p) {
+    function renderTeamBuySources(to) {
       populateBuySourcesCatalog("offer-buy-sources-list");
-      var parentBs = parentBuySourcesOf(p);
-      var picked = teamBuySourcesOverridden(to) ? (to.buySources || []) : parentBs.slice();
+      var picked = resolvedBuySources(to);
       var list = document.getElementById("offer-buy-sources-list");
       if (!list) return;
       list.querySelectorAll(".offer-ws-row").forEach(function (row) {
         var cb = row.querySelector("input[type=checkbox]");
         if (!cb) return;
-        var allowed = !parentBs.length || parentBs.indexOf(cb.value) !== -1;
-        row.hidden = !allowed;
+        row.hidden = false;
+        cb.disabled = false;
         cb.checked = picked.indexOf(cb.value) !== -1;
-        cb.disabled = !allowed;
       });
       updateBuySourcesSummary(picked);
     }
@@ -1347,25 +1314,6 @@
         return;
       }
       el.textContent = picked.length + " platform" + (picked.length === 1 ? "" : "s") + " selected: " + buySourceLabels(picked);
-    }
-
-    function updatePoBuySourcesSummary(picked) {
-      var el = document.getElementById("po-buy-sources-summary");
-      if (!el) return;
-      if (!picked || !picked.length) {
-        el.textContent = "No platforms selected";
-        return;
-      }
-      el.textContent = picked.length + " platform" + (picked.length === 1 ? "" : "s") + " allowed: " + buySourceLabels(picked);
-    }
-
-    function renderPoBuySources(p) {
-      populateBuySourcesCatalog("po-buy-sources-list");
-      var picked = parentBuySourcesOf(p);
-      document.querySelectorAll("#po-buy-sources-list input[type=checkbox]").forEach(function (cb) {
-        cb.checked = picked.indexOf(cb.value) !== -1;
-      });
-      updatePoBuySourcesSummary(picked);
     }
 
     var offerCountrySelection = ["US"];
@@ -1630,7 +1578,7 @@
       document.getElementById("offer-cta-url").value = to.ctaUrl || "";
       loadTeamOfferParams(to);
       refreshEnrichedPreview();
-      loadTeamBuySources(to, p);
+      loadTeamBuySources(to);
     }
 
     function openTeamOfferDetail(id, isNew) {
@@ -1670,7 +1618,7 @@
         offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
         renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
         renderInheritedDealFields(null);
-        loadTeamBuySources(to, null);
+        loadTeamBuySources(to);
       }
 
       renderOfferWorkspaces(to);
@@ -1716,15 +1664,11 @@
         to.workspaceMaps.push({ workspaceId: cb.value, teamId: to.teamId || CURRENT_TEAM.id });
       });
       if (!to.workspaceMaps.length) { alert("Select at least one workspace."); return; }
-      var parentBs = parentBuySourcesOf(p);
-      if (!parentBs.length) { alert("Parent offer must allow at least one buy source."); return; }
       to.buySources = [];
       document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]:checked").forEach(function (cb) {
-        if (parentBs.indexOf(cb.value) !== -1) to.buySources.push(cb.value);
+        to.buySources.push(cb.value);
       });
-      if (!to.buySources.length) { alert("Select at least one buy source from the parent-allowed list."); return; }
-      if (arraysEqual(to.buySources, parentBs)) to.buySources = null;
-      if (!resolvedBuySources(to).length) { alert("At least one buy source is required."); return; }
+      if (!to.buySources.length) { alert("Select at least one buy source."); return; }
       if (prevStatus !== to.status) {
         Gov.notifyGovernanceEvent("effective_status_changed", {
           message: "Team offer \"" + to.displayName + "\" status changed to " + to.status + ". Effective: " + teamOfferEffectiveStatus(to) + ".",
@@ -1816,7 +1760,6 @@
       populatePoCountrySelect(p.countries);
       syncPoDealHint();
       syncPoTargetHint();
-      renderPoBuySources(p);
       renderPoTeams(p);
       var firstTab = parentDetailDlg.querySelector('.tab[data-tab="general"]');
       if (firstTab) firstTab.click();
@@ -1854,11 +1797,7 @@
       delete p.trackingProvider;
       delete p.ctaUrl;
       delete p.params;
-      p.buySources = [];
-      document.querySelectorAll("#po-buy-sources-list input[type=checkbox]:checked").forEach(function (cb) {
-        p.buySources.push(cb.value);
-      });
-      if (!p.buySources.length) { alert("Select at least one allowed buy source for this parent offer."); return; }
+      delete p.buySources;
       var prevTeamIds = (p.teamIds || []).slice();
       p.teamIds = [];
       document.querySelectorAll("#po-teams-list input[type=checkbox]:checked").forEach(function (cb) {
@@ -1939,14 +1878,6 @@
         updateBuySourcesSummary(picked);
       });
     }
-    var poBsList = document.getElementById("po-buy-sources-list");
-    if (poBsList) {
-      poBsList.addEventListener("change", function () {
-        var picked = [];
-        poBsList.querySelectorAll("input:checked").forEach(function (cb) { picked.push(cb.value); });
-        updatePoBuySourcesSummary(picked);
-      });
-    }
 
     wireParamsContainer("offer-params-editable", offerParams, refreshEnrichedPreview);
 
@@ -1980,6 +1911,7 @@
       clone.advertiserId = opts.advertiserId || src.advertiserId;
       clone.teamIds = (opts.teamIds || []).slice();
       if (clone.params) clone.params = clone.params.map(function (x) { return { key: x.key, value: x.value }; });
+      delete clone.buySources;
       parentOffers.push(clone);
       if (clone.teamIds.length) spawnTeamOffersForParent(clone);
       return clone.id;
@@ -2330,7 +2262,7 @@
       parentOffers.push(Object.assign({
         id: id, advertiserId: "", name: "", categoryLevel1: "", categoryLevel2: "", categoryLevel3: "",
         description: "", dealType: "cpa", targetType: "cpa",
-        targetValue: { amount: 0, currency: "USD" }, countries: ["US"], teamIds: [], status: "active", buySources: []
+        targetValue: { amount: 0, currency: "USD" }, countries: ["US"], teamIds: [], status: "active"
       }, auditFields()));
       openParentOfferDetail(id);
     });
