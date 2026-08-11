@@ -1186,7 +1186,28 @@
       { key: "purl", value: "https://{{route}}" }
     ];
 
+    var TRACKING_PARAM_TOOLTIPS = {
+      cp1: "Optional parameter to send additional properties of a click. Usually the campaign ID.",
+      cp2: "Optional parameter to send additional properties of a click. Usually the ad set ID.",
+      cp3: "Optional parameter to send additional properties of a click. Usually the ad ID.",
+      cp4: "Optional parameter to send additional properties of a click. Usually the variant name.",
+      tpid: "The ID sent to the tracking campaign provider for conversion reporting. Very crucial — typically <code>{{visit_id}}</code> by default.",
+      tps: "The third-party source sent to the tracking campaign provider so conversions are reported to that source. Typically <code>nexus</code> by default.",
+      ppid: "Parent publisher ID required by the tracking campaign provider for billing.",
+      pid: "Publisher ID required by the tracking campaign provider for billing.",
+      purl: "Publisher URL — the visit URL from which traffic is sent to the tracking campaign provider. Typically <code>https://{{route}}</code>."
+    };
+
     var offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
+
+    function trackingParamTipHtml(key) {
+      var tip = TRACKING_PARAM_TOOLTIPS[key];
+      if (!tip) return "";
+      var plain = tip.replace(/<[^>]+>/g, "");
+      return '<span class="info-tip info-tip--sm offer-param-tip" tabindex="0" aria-label="' + escapeHtml(plain) + '">' +
+        '<span class="info-tip__icon">i</span>' +
+        '<span class="info-tip__body">' + tip + '</span></span>';
+    }
 
     function isMacroValue(value) {
       return AVAILABLE_MACROS.indexOf(value) !== -1;
@@ -1242,7 +1263,10 @@
         var modeIsMacro = isMacroParam(p);
         var toggleLabel = modeIsMacro ? "static" : "macro";
         return '<div class="offer-param-row" data-row-idx="' + i + '">' +
-          '<input type="text" class="input offer-pk-input mono" data-idx="' + i + '" value="' + escapeHtml(p.key) + '" />' +
+          '<div class="offer-pk-cell">' +
+            '<input type="text" class="input offer-pk-input mono" data-idx="' + i + '" value="' + escapeHtml(p.key) + '" />' +
+            trackingParamTipHtml(p.key) +
+          '</div>' +
           '<div class="offer-pv-cell">' + paramValueHtml(p, i) + '</div>' +
           '<button type="button" class="btn-link offer-pv-toggle" data-idx="' + i + '" title="Switch to ' + toggleLabel + '">' + toggleLabel + '</button>' +
           '<button type="button" class="btn-icon offer-pr-remove" data-idx="' + i + '" title="Remove">&times;</button>' +

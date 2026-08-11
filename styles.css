@@ -7002,13 +7002,42 @@ details.pop.pop--more[open] > summary { background: var(--bg-hover); }
 .offer-params-editable { display: flex; flex-direction: column; gap: 6px; }
 .offer-param-row {
   display: grid;
-  grid-template-columns: 70px 1fr auto auto;
+  grid-template-columns: minmax(92px, auto) 1fr auto auto;
   gap: 8px;
   align-items: center;
   padding: 6px 10px;
   background: var(--bg-subtle, #fafaf8);
   border: 1px solid var(--border);
   border-radius: 7px;
+}
+.offer-pk-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.offer-pk-cell .offer-pk-input { flex: 1; min-width: 0; }
+.offer-param-tip { flex-shrink: 0; }
+.offer-param-tip .info-tip__body {
+  top: 50%;
+  left: calc(100% + 8px);
+  width: 240px;
+  transform: translateY(-50%) translateX(-2px);
+}
+.offer-param-tip:hover .info-tip__body,
+.offer-param-tip:focus-visible .info-tip__body,
+.offer-param-tip:focus-within .info-tip__body {
+  transform: translateY(-50%) translateX(0);
+}
+.info-tip--sm .info-tip__icon {
+  width: 14px;
+  height: 14px;
+  font-size: 9px;
+}
+.info-tip--sm .info-tip__body {
+  font-size: 11px;
+  max-width: 260px;
+  line-height: 1.45;
 }
 .offer-pk-input {
   font-size: 12.5px;
