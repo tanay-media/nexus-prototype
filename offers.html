@@ -402,7 +402,6 @@
             </select>
           </div>
         </div>
-        <p class="offer-field-hint" id="po-deal-hint">Commercial deal type for this catalog offer. Deal value is set per team offer.</p>
         <div class="field-row">
           <div class="field">
             <label for="po-target-type">Target type</label>
@@ -1398,17 +1397,6 @@
       if (curEl) curEl.disabled = false;
     }
 
-    function syncPoDealHint() {
-      var hint = document.getElementById("po-deal-hint");
-      var typeEl = document.getElementById("po-deal-type");
-      if (!hint || !typeEl) return;
-      if (typeEl.value === "cpc") {
-        hint.textContent = "CPC deal type — team sets bid value per deployment.";
-      } else {
-        hint.textContent = "CPA deal type — team sets payout value per deployment.";
-      }
-    }
-
     function updateWorkspacesSummary() {
       var el = document.getElementById("offer-workspaces-summary");
       if (!el) return;
@@ -1758,7 +1746,6 @@
       document.getElementById("po-target-value").value = tv.amount != null ? tv.amount : (tv.targetCpa || "");
       document.getElementById("po-target-currency").value = tv.currency || "USD";
       populatePoCountrySelect(p.countries);
-      syncPoDealHint();
       syncPoTargetHint();
       renderPoTeams(p);
       var firstTab = parentDetailDlg.querySelector('.tab[data-tab="general"]');
@@ -2290,8 +2277,6 @@
     }
     var poTargetTypeEl = document.getElementById("po-target-type");
     var poTargetCurEl = document.getElementById("po-target-currency");
-    var poDealTypeEl = document.getElementById("po-deal-type");
-    if (poDealTypeEl) poDealTypeEl.addEventListener("change", syncPoDealHint);
     if (poTargetTypeEl) poTargetTypeEl.addEventListener("change", syncPoTargetHint);
     if (poTargetCurEl) poTargetCurEl.addEventListener("change", syncPoTargetHint);
     var poTeamsList = document.getElementById("po-teams-list");
