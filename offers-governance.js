@@ -2,7 +2,20 @@
 (function (w) {
   "use strict";
 
-  var STORAGE_KEY = "nexus-offers-gov::v3";
+  var STORAGE_KEY = "nexus-offers-gov::v6";
+  var LEGACY_STORAGE_KEYS = ["nexus-offers-gov::v5", "nexus-offers-gov::v4"];
+
+  var DEFAULT_TRACKING_PARAMS = [
+    { key: "cp1", value: "{{campaign_id}}" },
+    { key: "cp2", value: "{{adset_id}}" },
+    { key: "cp3", value: "{{ad_id}}" },
+    { key: "cp4", value: "{{variant_name}}" },
+    { key: "tpid", value: "{{visit_id}}" },
+    { key: "tps", value: "fb" },
+    { key: "ppid", value: "8PRN625DH" },
+    { key: "pid", value: "8PRN625DH" },
+    { key: "purl", value: "https://{{route}}" }
+  ];
   var ALERTS_KEY = "nexus-offers-alerts::v1";
 
   var CURRENT_USER = { email: "ops@mediaedge.com" };
@@ -43,23 +56,23 @@
     ];
 
     var parentOffers = [
-      Object.assign({ id: "po-hb-wis", advertiserId: "adv-hb", name: "Walk-in showers", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Canonical walk-in shower CPA offer for Homebuddy US campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-hb-wit", advertiserId: "adv-hb", name: "Walk-in Tubs", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Walk-in tub install leads for Homebuddy across US and Canada markets.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890", deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Roof replacement and repair lead offer for Homebuddy US homeowners.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4", deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-bv-vin", advertiserId: "adv-bv", name: "VIN Search", categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], trackingProvider: "other", status: "active", teamIds: ["team-acme", "team-fin"], description: "Vehicle history and VIN lookup offer for Beenverified search traffic.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6", deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search", categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], description: "Obituary and memorial search offer currently paused in catalog.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234", deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Auto insurance quote funnel with ROAS target for Smart Financials.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4", deletedAt: null }, auditFields()),
-      Object.assign({ id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], trackingProvider: "max", status: "active", teamIds: ["team-acme"], description: "Life insurance lead offer for Smart Financials US acquisition campaigns.", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfLife01&akey=x1y2z3", deletedAt: null }, auditFields())
+      Object.assign({ id: "po-hb-wis", advertiserId: "adv-hb", name: "Walk-in showers", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in showers", dealType: "cpa", targetType: "cpa", targetValue: { amount: 85, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Canonical walk-in shower CPA offer for Homebuddy US campaigns.", buySources: ["fb", "google"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-hb-wit", advertiserId: "adv-hb", name: "Walk-in Tubs", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Walk-in tubs", dealType: "cpa", targetType: "cpa", targetValue: { amount: 92, currency: "USD" }, countries: ["US", "CA"], status: "active", teamIds: ["team-acme"], description: "Walk-in tub install leads for Homebuddy across US and Canada markets.", buySources: ["fb"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-hb-roof", advertiserId: "adv-hb", name: "Roofing", categoryLevel1: "Home & Garden", categoryLevel2: "Home Improvement", categoryLevel3: "Roofing", dealType: "cpa", targetType: "cpa", targetValue: { amount: 78, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Roof replacement and repair lead offer for Homebuddy US homeowners.", buySources: ["fb", "google"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-bv-vin", advertiserId: "adv-bv", name: "VIN Search", categoryLevel1: "Autos & Vehicles", categoryLevel2: "Vehicle Shopping", categoryLevel3: "VIN search", dealType: "cpc", targetType: "cpa", targetValue: { amount: 12, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme", "team-fin"], description: "Vehicle history and VIN lookup offer for Beenverified search traffic.", buySources: ["google", "taboola", "fb"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-bv-obit", advertiserId: "adv-bv", name: "Obituary search", categoryLevel1: "People & Society", categoryLevel2: "Family & Relationships", categoryLevel3: "Obituary search", dealType: "cpa", targetType: "cpa", targetValue: { amount: 8, currency: "USD" }, countries: ["US"], status: "inactive", teamIds: ["team-acme"], description: "Obituary and memorial search offer currently paused in catalog.", buySources: ["google"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-sf-auto", advertiserId: "adv-sf", name: "Auto Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Auto insurance", dealType: "cpa", targetType: "roas", targetValue: { amount: 2.4, currency: "USD" }, countries: ["US", "GB"], status: "active", teamIds: ["team-acme"], description: "Auto insurance quote funnel with ROAS target for Smart Financials.", buySources: ["fb", "google", "taboola"], deletedAt: null }, auditFields()),
+      Object.assign({ id: "po-sf-life", advertiserId: "adv-sf", name: "Life Insurance", categoryLevel1: "Finance", categoryLevel2: "Insurance", categoryLevel3: "Life insurance", dealType: "cpa", targetType: "cpa", targetValue: { amount: 45, currency: "USD" }, countries: ["US"], status: "active", teamIds: ["team-acme"], description: "Life insurance lead offer for Smart Financials US acquisition campaigns.", buySources: ["fb", "google"], deletedAt: null }, auditFields())
     ];
 
     var teamOffers = [
-      Object.assign({ id: "to-hb-wis", parentOfferId: "po-hb-wis", teamId: "team-acme", displayName: "Walk-in showers — ACME", description: "", status: "active", dealValue: { amount: 85, currency: "USD" }, campaignId: "MAX-88421", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", buySources: ["fb", "google"], workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }, { workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
-      Object.assign({ id: "to-hb-wis-b", parentOfferId: "po-hb-wis", teamId: "team-acme", displayName: "Walk-in showers — ACME (Brand only)", description: "Second deployment for brand workspace.", status: "active", dealValue: { amount: 85, currency: "USD" }, campaignId: "MAX-88429", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", buySources: ["fb"], workspaceMaps: [{ workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
-      Object.assign({ id: "to-hb-wit", parentOfferId: "po-hb-wit", teamId: "team-acme", displayName: "Walk-in Tubs — ACME", description: "", status: "active", dealValue: { amount: 92, currency: "USD" }, campaignId: "MAX-88422", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890", buySources: ["fb"], workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
-      Object.assign({ id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "Roofing — ACME", description: "", status: "active", dealValue: { amount: 78, currency: "USD" }, campaignId: "MAX-88423", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4", buySources: ["fb"], workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }, { workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
-      Object.assign({ id: "to-bv-vin", parentOfferId: "po-bv-vin", teamId: "team-acme", displayName: "VIN Search — ACME", description: "", status: "active", dealValue: { amount: 0.45, currency: "USD" }, campaignId: "MAX-90101", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6", buySources: ["google", "taboola"], workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }, { workspaceId: "fin-main", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
-      Object.assign({ id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "Obituary search — ACME", description: "", status: "inactive", dealValue: { amount: 8, currency: "USD" }, campaignId: "MAX-90110", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234", buySources: ["google"], workspaceMaps: [{ workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: "2025-07-15T10:30:00.000Z", deletedBy: "ops@acme.media" }, auditFields()),
-      Object.assign({ id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "Auto Insurance — ACME", description: "", status: "inactive", dealValue: { amount: 50, currency: "USD" }, campaignId: "MAX-90102", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4", buySources: ["fb", "google", "taboola"], workspaceMaps: [{ workspaceId: "fin-main", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields())
+      Object.assign({ id: "to-hb-wis", parentOfferId: "po-hb-wis", teamId: "team-acme", displayName: "Walk-in showers — ACME", description: "", status: "active", dealValue: { amount: 85, currency: "USD" }, campaignId: "MAX-88421", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", trackingParams: DEFAULT_TRACKING_PARAMS.map(function (x) { return { key: x.key, value: x.value }; }), buySources: null, workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }, { workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-hb-wis-b", parentOfferId: "po-hb-wis", teamId: "team-acme", displayName: "Walk-in showers — ACME (Brand only)", description: "Second deployment for brand workspace.", status: "active", dealValue: { amount: 85, currency: "USD" }, campaignId: "MAX-88429", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=RmWGqVoe&akey=cac2c3c0-d6d7-45b7-b3f0-3d107b37584f", trackingParams: DEFAULT_TRACKING_PARAMS.map(function (x) { return { key: x.key, value: x.value }; }), buySources: ["fb"], workspaceMaps: [{ workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-hb-wit", parentOfferId: "po-hb-wit", teamId: "team-acme", displayName: "Walk-in Tubs — ACME", description: "", status: "active", dealValue: { amount: 92, currency: "USD" }, campaignId: "MAX-88422", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=Xk9pLmTu&akey=b1c2d3e4-f5a6-7890-abcd-ef1234567890", trackingParams: DEFAULT_TRACKING_PARAMS.map(function (x) { return { key: x.key, value: x.value }; }), buySources: null, workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-hb-roof", parentOfferId: "po-hb-roof", teamId: "team-acme", displayName: "Roofing — ACME", description: "", status: "active", dealValue: { amount: 78, currency: "USD" }, campaignId: "MAX-88423", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=QwRoof01&akey=a1b2c3d4", trackingParams: DEFAULT_TRACKING_PARAMS.map(function (x) { return { key: x.key, value: x.value }; }), buySources: null, workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }, { workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-bv-vin", parentOfferId: "po-bv-vin", teamId: "team-acme", displayName: "VIN Search — ACME", description: "", status: "active", dealValue: { amount: 0.45, currency: "USD" }, campaignId: "MAX-90101", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvVin01&akey=z9y8x7w6", trackingParams: DEFAULT_TRACKING_PARAMS.map(function (x) { return { key: x.key, value: x.value }; }), buySources: ["google", "taboola"], workspaceMaps: [{ workspaceId: "acme-growth", teamId: "team-acme" }, { workspaceId: "fin-main", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields()),
+      Object.assign({ id: "to-bv-obit", parentOfferId: "po-bv-obit", teamId: "team-acme", displayName: "Obituary search — ACME", description: "", status: "inactive", dealValue: { amount: 8, currency: "USD" }, campaignId: "MAX-90110", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=BvOb01&akey=obit1234", trackingParams: DEFAULT_TRACKING_PARAMS.map(function (x) { return { key: x.key, value: x.value }; }), buySources: null, workspaceMaps: [{ workspaceId: "acme-brand", teamId: "team-acme" }], deletedAt: "2025-07-15T10:30:00.000Z", deletedBy: "ops@acme.media" }, auditFields()),
+      Object.assign({ id: "to-sf-auto", parentOfferId: "po-sf-auto", teamId: "team-acme", displayName: "Auto Insurance — ACME", description: "", status: "inactive", dealValue: { amount: 50, currency: "USD" }, campaignId: "MAX-90102", campaignProvider: "max", ctaUrl: "https://trk.pmsrv.co/v2/trk?adid=SfAuto01&akey=m1n2o3p4", trackingParams: DEFAULT_TRACKING_PARAMS.map(function (x) { return { key: x.key, value: x.value }; }), buySources: null, workspaceMaps: [{ workspaceId: "fin-main", teamId: "team-acme" }], deletedAt: null, deletedBy: null }, auditFields())
     ];
 
     var advertiserTeamMappings = [];
@@ -97,12 +110,33 @@
     });
   }
 
+  function normalizeTrackingParams(params) {
+    if (!params || !params.length) return params;
+    return params.map(function (p) {
+      var val = p.value;
+      if (p.key === "tpid" && (val === "auto" || !val)) val = "{{visit_id}}";
+      if (p.key === "purl" && (val === "{{route}}" || !val)) val = "https://{{route}}";
+      return { key: p.key, value: val };
+    });
+  }
+
+  function migrateTeamOfferTrackingParams(state) {
+    (state.teamOffers || []).forEach(function (to) {
+      if (to.trackingParams) to.trackingParams = normalizeTrackingParams(to.trackingParams);
+      if (to.params) to.params = normalizeTrackingParams(to.params);
+    });
+  }
+
   function loadState() {
     try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
+      var keys = [STORAGE_KEY].concat(LEGACY_STORAGE_KEYS);
+      for (var i = 0; i < keys.length; i++) {
+        var raw = localStorage.getItem(keys[i]);
+        if (!raw) continue;
         var parsed = JSON.parse(raw);
         migrateTeamOfferWorkspaceFields(parsed);
+        migrateTeamOfferTrackingParams(parsed);
+        if (keys[i] !== STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
         return parsed;
       }
     } catch (e) {}

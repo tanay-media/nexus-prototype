@@ -3132,6 +3132,17 @@ button.dsk-row-name:focus-visible strong {
 }
 .offer-params-readonly li { margin: 0.15rem 0; }
 .offer-params-readonly code { font-size: 12px; }
+.offer-inherit-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+}
 .offer-locked-pane { background: #f8f9fb; border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1rem; }
 .offer-locked-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem 1.25rem; }
 .offer-locked-field { display: flex; flex-direction: column; gap: 0.15rem; }

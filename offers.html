@@ -86,7 +86,7 @@
 
       <!-- ===== PARENT OFFERS PANEL ===== -->
       <div class="page-body" id="panel-parent-offers" style="display:none;">
-        <p class="offers-intro muted">Super-admin · <strong>parent_offer</strong> catalog — General, Deal &amp; CTA URL. Map teams to spawn <strong>team_offer</strong> instances.</p>
+        <p class="offers-intro muted">Super-admin · <strong>parent_offer</strong> catalog — General, Deal &amp; Teams. Map teams to spawn <strong>team_offer</strong> instances.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
@@ -303,32 +303,28 @@
         </div>
       </section>
 
-      <!-- CTA URL (single) -->
+      <!-- CTA URL (team-owned) -->
       <section class="offer-detail-pane" data-tab-panel="cta-url" hidden>
-        <div class="offer-locked-pane" id="team-cta-inherited" style="margin-bottom:1rem;"></div>
-        <p class="settings-section__title">Team CTA URL</p>
+        <p class="settings-section__hint muted" style="margin-top:0;">Team CTA URL and tracking params — set per deployment.</p>
         <div class="field">
           <label for="offer-cta-url">Base URL</label>
-          <textarea id="offer-cta-url" rows="2" placeholder="https://trk.pmsrv.co/v2/trk?adid=…&akey=…" class="input offer-url-textarea"></textarea>
+          <textarea id="offer-cta-url" rows="2" placeholder="https://trk.pmsrv.co/v2/trk?adid=…&akey=…" class="input offer-url-textarea" required></textarea>
         </div>
-
         <div class="settings-section" style="margin-top:1.2rem;">
           <p class="settings-section__title">Tracking params</p>
-          <p class="settings-section__hint muted">Team override — appended to the base URL. Change any value to a macro or static string.</p>
+          <p class="settings-section__hint muted">Appended to the base URL. Change any value to a macro or static string.</p>
           <div class="offer-params-editable" id="offer-params-editable"></div>
         </div>
-
         <div class="settings-section" style="margin-top:1.2rem;">
           <p class="settings-section__title">Final enriched URL</p>
-          <p class="settings-section__hint muted">Auto-generated from base URL + params above. <code>tpid</code> resolves based on <code>tps</code> value.</p>
+          <p class="settings-section__hint muted">Auto-generated from base URL + params above.</p>
           <textarea id="offer-enriched-url" rows="3" readonly class="input offer-url-textarea offer-url-textarea--readonly"></textarea>
         </div>
       </section>
 
       <section class="offer-detail-pane" data-tab-panel="buy-sources" hidden>
-        <div class="offer-locked-pane" id="team-buysources-inherited" style="margin-bottom:1rem;"></div>
-        <p class="settings-section__title">Allowed buy sources</p>
-        <p class="settings-section__hint muted">Platforms from A360 <code>GET /buy-sources</code>. At least one buy source is required.</p>
+        <p class="settings-section__title">Team buy sources</p>
+        <p class="settings-section__hint muted">Select from parent-allowed platforms. At least one is required.</p>
         <p class="offer-pane-summary" id="offer-buy-sources-summary"></p>
         <ul class="offer-ws-list" id="offer-buy-sources-list"></ul>
       </section>
@@ -361,7 +357,6 @@
       <div class="tabs offer-detail-tabs" role="tablist" data-tabs="parent-offer-detail">
         <button type="button" class="tab is-active" data-tab="general" role="tab" aria-selected="true">General</button>
         <button type="button" class="tab" data-tab="deal" role="tab" aria-selected="false">Deal</button>
-        <button type="button" class="tab" data-tab="cta-url" role="tab" aria-selected="false">CTA URL</button>
         <button type="button" class="tab" data-tab="teams" role="tab" aria-selected="false">Teams</button>
       </div>
 
@@ -441,28 +436,11 @@
           </div>
           <p class="offer-field-hint">Click countries to toggle selection. Default: United States.</p>
         </div>
-        <div class="field">
-          <label for="po-tracking-provider">Tracking provider</label>
-          <select id="po-tracking-provider">
-            <option value="max">MAX</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-      </section>
-
-      <section class="offer-detail-pane" data-tab-panel="cta-url" hidden>
-        <p class="settings-section__hint muted">Default CTA URL for catalog; teams set their own CTA on team offer.</p>
-        <div class="field">
-          <label for="po-cta-url">Base URL</label>
-          <textarea id="po-cta-url" rows="2" placeholder="https://trk.pmsrv.co/v2/trk?adid=…" class="input offer-url-textarea"></textarea>
-        </div>
         <div class="settings-section" style="margin-top:1.2rem;">
-          <p class="settings-section__title">Tracking params</p>
-          <div class="offer-params-editable" id="po-params-editable"></div>
-        </div>
-        <div class="settings-section" style="margin-top:1.2rem;">
-          <p class="settings-section__title">Final enriched URL</p>
-          <textarea id="po-enriched-url" rows="3" readonly class="input offer-url-textarea offer-url-textarea--readonly"></textarea>
+          <p class="settings-section__title">Allowed buy sources</p>
+          <p class="settings-section__hint muted">Catalog platforms teams may select from. From A360 <code>GET /buy-sources</code>.</p>
+          <p class="offer-pane-summary" id="po-buy-sources-summary"></p>
+          <ul class="offer-ws-list" id="po-buy-sources-list"></ul>
         </div>
       </section>
 
@@ -759,9 +737,8 @@
       var p = parentById(to.parentOfferId);
       return (p ? p.targetType : "cpa") || "cpa";
     }
-    function resolvedTrackingProvider(to) {
-      var p = parentById(to.parentOfferId);
-      return (p ? p.trackingProvider : "max") || "max";
+    function resolvedCtaUrl(to) {
+      return (to.ctaUrl && to.ctaUrl.trim()) ? to.ctaUrl.trim() : "";
     }
     function resolvedDealValue(to) {
       return to.dealValue || {};
@@ -774,17 +751,51 @@
       var p = parentById(to.parentOfferId);
       return p ? (p.countries || ["US"]) : ["US"];
     }
-    function resolvedCtaUrl(to) {
-      if (to.ctaUrl) return to.ctaUrl;
-      var p = parentById(to.parentOfferId);
-      return p ? (p.ctaUrl || "") : "";
-    }
     function resolvedTrackingParams(to) {
       if (to.trackingParams && to.trackingParams.length) return to.trackingParams;
       if (to.params && to.params.length) return to.params;
-      var p = parentById(to.parentOfferId);
-      if (p && p.params) return p.params;
       return DEFAULT_PARAMS;
+    }
+
+    function parentBuySourcesOf(p) {
+      return (p && p.buySources && p.buySources.length) ? p.buySources.slice() : [];
+    }
+
+    function resolvedBuySources(to) {
+      var parentBs = parentBuySourcesOf(parentById(to.parentOfferId));
+      if (to.buySources == null) return parentBs;
+      if (!to.buySources.length) return parentBs;
+      return to.buySources.filter(function (id) { return parentBs.indexOf(id) !== -1; });
+    }
+
+    function buySourceLabels(ids) {
+      if (!ids || !ids.length) return "—";
+      var map = {};
+      Gov.A360_BUY_SOURCES.forEach(function (bs) { map[bs.id] = bs.name; });
+      return ids.map(function (id) { return map[id] || id; }).join(", ");
+    }
+
+    function buySourceTagsHtml(ids) {
+      if (!ids || !ids.length) return '<span class="muted">None set on parent</span>';
+      var map = {};
+      Gov.A360_BUY_SOURCES.forEach(function (bs) { map[bs.id] = bs.name; });
+      return '<span class="offer-ws-cell">' + ids.map(function (id) {
+        return '<span class="offer-ws-tag">' + escapeHtml(map[id] || id) + '</span>';
+      }).join("") + '</span>';
+    }
+
+    function teamBuySourcesOverridden(to) {
+      return to.buySources != null;
+    }
+
+    function arraysEqual(a, b) {
+      if (!a || !b || a.length !== b.length) return false;
+      var sa = a.slice().sort();
+      var sb = b.slice().sort();
+      for (var i = 0; i < sa.length; i++) {
+        if (sa[i] !== sb[i]) return false;
+      }
+      return true;
     }
 
     function paramsEqual(a, b) {
@@ -795,11 +806,31 @@
       return true;
     }
 
-    function loadTeamOfferParams(to, p) {
-      var parentParams = (p && p.params) ? p.params.map(function (x) { return { key: x.key, value: x.value }; }) : DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
-      var teamParams = (to.trackingParams || to.params || []).map(function (x) { return { key: x.key, value: x.value }; });
-      offerParams = teamParams.length ? teamParams : parentParams.slice();
+    function normalizeTrackingParams(params) {
+      if (!params || !params.length) {
+        return DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
+      }
+      return params.map(function (p) {
+        var val = p.value;
+        if (p.key === "tpid" && (val === "auto" || !val)) val = "{{visit_id}}";
+        if (p.key === "purl" && (val === "{{route}}" || !val)) val = "https://{{route}}";
+        return { key: p.key, value: val };
+      });
+    }
+
+    function loadTeamOfferParams(to) {
+      if (to.trackingParams && to.trackingParams.length) {
+        offerParams = normalizeTrackingParams(to.trackingParams);
+      } else if (to.params && to.params.length) {
+        offerParams = normalizeTrackingParams(to.params);
+      } else {
+        offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
+      }
       renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
+    }
+
+    function loadTeamBuySources(to, p) {
+      renderTeamBuySources(to, p);
     }
 
     function updateTeamTabInheritedPanels(p) {
@@ -807,8 +838,6 @@
       if (generalLocked) generalLocked.hidden = !p;
       renderParentReadonly(p);
       renderInheritedDealFields(p);
-      renderInheritedCtaFields(p);
-      renderInheritedBuySourcesContext(p);
     }
 
     function catL1FromParent(p) { return p ? (p.categoryLevel1 || p.vertical || "") : ""; }
@@ -915,10 +944,9 @@
           dealValue: null,
           campaignId: "",
           campaignProvider: "max",
-          ctaUrl: parent.ctaUrl || "",
-          buySources: [],
-          workspaceMaps: [],
+          ctaUrl: null,
           trackingParams: null,
+          buySources: null,
           deletedAt: null,
           deletedBy: null
         }, auditFields()));
@@ -1175,7 +1203,7 @@
     // ---- CTA URL enrichment ----
     var AVAILABLE_MACROS = [
       "{{campaign_id}}", "{{adset_id}}", "{{ad_id}}", "{{variant_name}}",
-      "{{clid}}", "{{fbclid}}", "{{route}}", "{{lander_name}}", "{{offer_name}}"
+      "{{visit_id}}", "{{clid}}", "{{fbclid}}", "{{route}}", "{{lander_name}}", "{{offer_name}}"
     ];
 
     var DEFAULT_PARAMS = [
@@ -1191,10 +1219,6 @@
     ];
 
     var offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
-
-    function tpidForTps() {
-      return "{{visit_id}}";
-    }
 
     function macroOptions(selected) {
       var opts = '<option value="">— custom —</option>';
@@ -1261,35 +1285,25 @@
       });
     }
 
-    function getCurrentTps() {
-      for (var i = 0; i < offerParams.length; i++) {
-        if (offerParams[i].key === "tps") return offerParams[i].value || "fb";
-      }
-      return "fb";
-    }
-
     function buildEnrichedUrl(baseUrl, containerId, params) {
       if (!baseUrl) return "";
-      readParamsFromDom(containerId, params);
-      var tps = "fb";
-      for (var i = 0; i < params.length; i++) {
-        if (params[i].key === "tps") { tps = params[i].value || "fb"; break; }
-      }
+      if (containerId) readParamsFromDom(containerId, params);
       var sep = baseUrl.indexOf("?") !== -1 ? "&" : "?";
       var parts = [];
       params.forEach(function (p) {
         var val = p.value;
-        if (p.key === "tpid" && val === "auto") val = tpidForTps(tps);
+        if (p.key === "tpid" && (val === "auto" || !val)) val = "{{visit_id}}";
+        if (p.key === "purl" && (val === "{{route}}" || !val)) val = "https://{{route}}";
         parts.push(encodeURIComponent(p.key) + "=" + val);
       });
       return baseUrl + sep + parts.join("&");
     }
 
     function refreshEnrichedPreview() {
-      var urlInput = document.getElementById("offer-cta-url");
       var previewEl = document.getElementById("offer-enriched-url");
       if (!previewEl) return;
-      var base = urlInput ? urlInput.value.trim() : "";
+      var urlEl = document.getElementById("offer-cta-url");
+      var base = urlEl ? urlEl.value.trim() : "";
       if (!base) {
         var to = teamOfferById(activeTeamOfferId);
         if (to) base = resolvedCtaUrl(to);
@@ -1298,22 +1312,60 @@
       previewEl.value = buildEnrichedUrl(base, "offer-params-editable", offerParams);
     }
 
-    function renderOfferBuySources(offer) {
-      populateBuySourcesCatalog();
-      var picked = offer.buySources || [];
-      document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]").forEach(function (cb) {
+    function renderTeamBuySources(to, p) {
+      populateBuySourcesCatalog("offer-buy-sources-list");
+      var parentBs = parentBuySourcesOf(p);
+      var picked = teamBuySourcesOverridden(to) ? (to.buySources || []) : parentBs.slice();
+      var list = document.getElementById("offer-buy-sources-list");
+      if (!list) return;
+      list.querySelectorAll(".offer-ws-row").forEach(function (row) {
+        var cb = row.querySelector("input[type=checkbox]");
+        if (!cb) return;
+        var allowed = !parentBs.length || parentBs.indexOf(cb.value) !== -1;
+        row.hidden = !allowed;
         cb.checked = picked.indexOf(cb.value) !== -1;
+        cb.disabled = !allowed;
       });
-      updateBuySourcesSummary();
+      updateBuySourcesSummary(picked);
     }
 
-    function populateBuySourcesCatalog() {
-      var list = document.getElementById("offer-buy-sources-list");
+    function populateBuySourcesCatalog(listId) {
+      listId = listId || "offer-buy-sources-list";
+      var list = document.getElementById(listId);
       if (!list || list.dataset.populated === "1") return;
       list.innerHTML = Gov.A360_BUY_SOURCES.map(function (bs) {
         return '<li class="offer-ws-row"><label class="offer-ws-pick"><input type="checkbox" value="' + escapeHtml(bs.id) + '" /><span>' + escapeHtml(bs.name) + '</span></label></li>';
       }).join("");
       list.dataset.populated = "1";
+    }
+
+    function updateBuySourcesSummary(picked) {
+      var el = document.getElementById("offer-buy-sources-summary");
+      if (!el) return;
+      if (!picked || !picked.length) {
+        el.textContent = "No platforms selected";
+        return;
+      }
+      el.textContent = picked.length + " platform" + (picked.length === 1 ? "" : "s") + " selected: " + buySourceLabels(picked);
+    }
+
+    function updatePoBuySourcesSummary(picked) {
+      var el = document.getElementById("po-buy-sources-summary");
+      if (!el) return;
+      if (!picked || !picked.length) {
+        el.textContent = "No platforms selected";
+        return;
+      }
+      el.textContent = picked.length + " platform" + (picked.length === 1 ? "" : "s") + " allowed: " + buySourceLabels(picked);
+    }
+
+    function renderPoBuySources(p) {
+      populateBuySourcesCatalog("po-buy-sources-list");
+      var picked = parentBuySourcesOf(p);
+      document.querySelectorAll("#po-buy-sources-list input[type=checkbox]").forEach(function (cb) {
+        cb.checked = picked.indexOf(cb.value) !== -1;
+      });
+      updatePoBuySourcesSummary(picked);
     }
 
     var offerCountrySelection = ["US"];
@@ -1409,16 +1461,6 @@
       }
     }
 
-    function updateBuySourcesSummary() {
-      var el = document.getElementById("offer-buy-sources-summary");
-      if (!el) return;
-      var picked = [];
-      document.querySelectorAll("#offer-buy-sources-list input:checked").forEach(function (cb) {
-        picked.push(cb.parentElement.querySelector("span").textContent);
-      });
-      el.textContent = picked.length ? picked.length + " platform" + (picked.length === 1 ? "" : "s") + " selected" : "All platforms allowed";
-    }
-
     function updateWorkspacesSummary() {
       var el = document.getElementById("offer-workspaces-summary");
       if (!el) return;
@@ -1492,49 +1534,6 @@
           '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml(targetType.toUpperCase()) + '</span></div>' +
           '<div class="offer-locked-field"><span class="offer-locked-label">Target value</span><span class="offer-locked-value">' + escapeHtml(targetVal) + '</span></div>' +
           '<div class="offer-locked-field"><span class="offer-locked-label">Countries</span><span class="offer-locked-value">' + escapeHtml((p.countries || ["US"]).join(", ")) + '</span></div>' +
-          '<div class="offer-locked-field"><span class="offer-locked-label">Tracking provider</span><span class="offer-locked-value">' + escapeHtml((p.trackingProvider || "max").toUpperCase()) + '</span></div>' +
-        '</div>';
-    }
-
-    function renderParamsReadonly(params) {
-      if (!params || !params.length) return '<span class="muted">—</span>';
-      return '<ul class="offer-params-readonly">' + params.map(function (p) {
-        return '<li><code>' + escapeHtml(p.key) + '</code> = <code>' + escapeHtml(p.value) + '</code></li>';
-      }).join("") + '</ul>';
-    }
-
-    function renderInheritedCtaFields(p) {
-      var el = document.getElementById("team-cta-inherited");
-      if (!el) return;
-      if (!p) {
-        el.innerHTML = "";
-        el.hidden = true;
-        return;
-      }
-      el.hidden = false;
-      var params = (p.params && p.params.length) ? p.params : DEFAULT_PARAMS;
-      el.innerHTML =
-        '<p class="settings-section__hint muted" style="margin:0 0 0.65rem;">Inherited parent CTA (read-only)</p>' +
-        '<div class="offer-locked-grid">' +
-          '<div class="offer-locked-field" style="grid-column:1/-1;"><span class="offer-locked-label">Base URL</span><span class="offer-locked-value mono" style="word-break:break-all;">' + escapeHtml(p.ctaUrl || "—") + '</span></div>' +
-          '<div class="offer-locked-field" style="grid-column:1/-1;"><span class="offer-locked-label">Default params</span><span class="offer-locked-value">' + renderParamsReadonly(params) + '</span></div>' +
-        '</div>';
-    }
-
-    function renderInheritedBuySourcesContext(p) {
-      var el = document.getElementById("team-buysources-inherited");
-      if (!el) return;
-      if (!p) {
-        el.innerHTML = "";
-        el.hidden = true;
-        return;
-      }
-      el.hidden = false;
-      el.innerHTML =
-        '<p class="settings-section__hint muted" style="margin:0 0 0.65rem;">Inherited targeting context (read-only)</p>' +
-        '<div class="offer-locked-grid">' +
-          '<div class="offer-locked-field"><span class="offer-locked-label">Countries</span><span class="offer-locked-value">' + escapeHtml((p.countries || ["US"]).join(", ")) + '</span></div>' +
-          '<div class="offer-locked-field"><span class="offer-locked-label">Tracking provider</span><span class="offer-locked-value">' + escapeHtml((p.trackingProvider || "max").toUpperCase()) + '</span></div>' +
         '</div>';
     }
 
@@ -1613,7 +1612,6 @@
       el.innerHTML =
         '<div class="offer-locked-field"><span class="offer-locked-label">Parent offer name</span><span class="offer-locked-value">' + escapeHtml(p.name) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Advertiser</span><span class="offer-locked-value">' + escapeHtml(advName(p.advertiserId)) + '</span></div>' +
-        '<div class="offer-locked-field"><span class="offer-locked-label">Parent status</span><span class="offer-locked-value">' + escapeHtml(p.status) + ' · effective ' + escapeHtml(parentOfferEffectiveStatus(p)) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L1</span><span class="offer-locked-value">' + escapeHtml(catL1FromParent(p) || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L2</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel2 || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L3</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel3 || "—") + '</span></div>';
@@ -1630,9 +1628,9 @@
       syncDealHint(p);
       renderInheritedDealFields(p);
       document.getElementById("offer-cta-url").value = to.ctaUrl || "";
-      document.getElementById("offer-cta-url").placeholder = p && p.ctaUrl ? ("Parent default: " + p.ctaUrl.slice(0, 60) + (p.ctaUrl.length > 60 ? "…" : "")) : "Paste team CTA URL";
-      loadTeamOfferParams(to, p);
-      renderOfferBuySources(to);
+      loadTeamOfferParams(to);
+      refreshEnrichedPreview();
+      loadTeamBuySources(to, p);
     }
 
     function openTeamOfferDetail(id, isNew) {
@@ -1672,9 +1670,7 @@
         offerParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
         renderEditableParams("offer-params-editable", offerParams, "offer-param-add");
         renderInheritedDealFields(null);
-        renderInheritedCtaFields(null);
-        renderInheritedBuySourcesContext(null);
-        renderOfferBuySources(to);
+        loadTeamBuySources(to, null);
       }
 
       renderOfferWorkspaces(to);
@@ -1698,8 +1694,6 @@
       if (!name) { alert("Team offer name is required."); return; }
       var campaignId = document.getElementById("offer-campaign-id").value.trim();
       if (!campaignId) { alert("Campaign ID is required."); return; }
-      var cta = document.getElementById("offer-cta-url").value.trim();
-      if (!cta) { alert("CTA URL is required."); return; }
       to.displayName = name;
       to.description = document.getElementById("team-offer-description").value.trim();
       to.status = document.getElementById("team-offer-status").value;
@@ -1712,24 +1706,25 @@
       to.dealValue = { amount: parseFloat(valRaw) || 0, currency: cur };
       to.campaignId = campaignId;
       to.campaignProvider = document.getElementById("offer-campaign-provider").value;
+      var cta = document.getElementById("offer-cta-url").value.trim();
+      if (!cta) { alert("CTA URL is required."); return; }
       to.ctaUrl = cta;
       readParamsFromDom("offer-params-editable", offerParams);
-      var parentParams = (p && p.params) ? p.params : DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
-      if (paramsEqual(offerParams, parentParams)) {
-        to.trackingParams = null;
-      } else {
-        to.trackingParams = offerParams.map(function (x) { return { key: x.key, value: x.value }; });
-      }
+      to.trackingParams = normalizeTrackingParams(offerParams);
       to.workspaceMaps = [];
       document.querySelectorAll("#offer-workspaces-list input[type=checkbox]:checked").forEach(function (cb) {
         to.workspaceMaps.push({ workspaceId: cb.value, teamId: to.teamId || CURRENT_TEAM.id });
       });
       if (!to.workspaceMaps.length) { alert("Select at least one workspace."); return; }
+      var parentBs = parentBuySourcesOf(p);
+      if (!parentBs.length) { alert("Parent offer must allow at least one buy source."); return; }
       to.buySources = [];
       document.querySelectorAll("#offer-buy-sources-list input[type=checkbox]:checked").forEach(function (cb) {
-        to.buySources.push(cb.value);
+        if (parentBs.indexOf(cb.value) !== -1) to.buySources.push(cb.value);
       });
-      if (!to.buySources.length) { alert("Select at least one buy source."); return; }
+      if (!to.buySources.length) { alert("Select at least one buy source from the parent-allowed list."); return; }
+      if (arraysEqual(to.buySources, parentBs)) to.buySources = null;
+      if (!resolvedBuySources(to).length) { alert("At least one buy source is required."); return; }
       if (prevStatus !== to.status) {
         Gov.notifyGovernanceEvent("effective_status_changed", {
           message: "Team offer \"" + to.displayName + "\" status changed to " + to.status + ". Effective: " + teamOfferEffectiveStatus(to) + ".",
@@ -1743,8 +1738,6 @@
       renderAdvertiserFilters();
       render();
     }
-
-    var poParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
 
     function populatePoCountrySelect(selected) {
       poCountrySelection = (selected && selected.length) ? selected.slice() : ["US"];
@@ -1802,27 +1795,6 @@
         }).join("");
     }
 
-    function refreshPoEnrichedPreview() {
-      var urlInput = document.getElementById("po-cta-url");
-      var previewEl = document.getElementById("po-enriched-url");
-      if (!previewEl) return;
-      var base = urlInput ? urlInput.value.trim() : "";
-      if (!base) { previewEl.value = "(paste a CTA URL above to see preview)"; return; }
-      readParamsFromDom("po-params-editable", poParams);
-      var tps = "fb";
-      for (var i = 0; i < poParams.length; i++) {
-        if (poParams[i].key === "tps") { tps = poParams[i].value || "fb"; break; }
-      }
-      var sep = base.indexOf("?") !== -1 ? "&" : "?";
-      var parts = [];
-      poParams.forEach(function (p) {
-        var val = p.value;
-        if (p.key === "tpid" && val === "auto") val = tpidForTps(tps);
-        parts.push(encodeURIComponent(p.key) + "=" + val);
-      });
-      previewEl.value = base + sep + parts.join("&");
-    }
-
     function openParentOfferDetail(id) {
       var p = parentById(id);
       if (!p || !parentDetailDlg) return;
@@ -1842,15 +1814,10 @@
       document.getElementById("po-target-value").value = tv.amount != null ? tv.amount : (tv.targetCpa || "");
       document.getElementById("po-target-currency").value = tv.currency || "USD";
       populatePoCountrySelect(p.countries);
-      document.getElementById("po-tracking-provider").value = p.trackingProvider || "max";
       syncPoDealHint();
       syncPoTargetHint();
-      document.getElementById("po-cta-url").value = p.ctaUrl || "";
-      if (p.params) poParams = p.params.map(function (x) { return { key: x.key, value: x.value }; });
-      else poParams = DEFAULT_PARAMS.map(function (x) { return { key: x.key, value: x.value }; });
-      renderEditableParams("po-params-editable", poParams, "po-param-add");
+      renderPoBuySources(p);
       renderPoTeams(p);
-      refreshPoEnrichedPreview();
       var firstTab = parentDetailDlg.querySelector('.tab[data-tab="general"]');
       if (firstTab) firstTab.click();
       parentDetailDlg.showModal();
@@ -1884,10 +1851,14 @@
       p.cpaGoal = { targetCpa: p.targetValue.amount, currency: p.targetValue.currency };
       p.countries = getPoCountrySelect();
       if (!p.countries.length) { alert("Select at least one country."); return; }
-      p.trackingProvider = document.getElementById("po-tracking-provider").value;
-      p.ctaUrl = document.getElementById("po-cta-url").value.trim();
-      readParamsFromDom("po-params-editable", poParams);
-      p.params = poParams.map(function (x) { return { key: x.key, value: x.value }; });
+      delete p.trackingProvider;
+      delete p.ctaUrl;
+      delete p.params;
+      p.buySources = [];
+      document.querySelectorAll("#po-buy-sources-list input[type=checkbox]:checked").forEach(function (cb) {
+        p.buySources.push(cb.value);
+      });
+      if (!p.buySources.length) { alert("Select at least one allowed buy source for this parent offer."); return; }
       var prevTeamIds = (p.teamIds || []).slice();
       p.teamIds = [];
       document.querySelectorAll("#po-teams-list input[type=checkbox]:checked").forEach(function (cb) {
@@ -1926,7 +1897,7 @@
           if (!p) return;
           var isMacro = p.value.indexOf("{{") !== -1 || p.key === "tps" || (p.key === "tpid" && p.value === "auto");
           p.value = isMacro ? "" : AVAILABLE_MACROS[0];
-          renderEditableParams(containerId, params, containerId === "po-params-editable" ? "po-param-add" : "offer-param-add");
+          renderEditableParams(containerId, params, "offer-param-add");
           if (onChange) onChange();
           return;
         }
@@ -1935,7 +1906,7 @@
           var rIdx = parseInt(removeBtn.getAttribute("data-idx"));
           readParamsFromDom(containerId, params);
           params.splice(rIdx, 1);
-          renderEditableParams(containerId, params, containerId === "po-params-editable" ? "po-param-add" : "offer-param-add");
+          renderEditableParams(containerId, params, "offer-param-add");
           if (onChange) onChange();
           return;
         }
@@ -1943,7 +1914,7 @@
         if (addBtn) {
           readParamsFromDom(containerId, params);
           params.push({ key: "", value: "" });
-          renderEditableParams(containerId, params, containerId === "po-params-editable" ? "po-param-add" : "offer-param-add");
+          renderEditableParams(containerId, params, "offer-param-add");
           var lastKey = container.querySelector('.offer-pk-input[data-idx="' + (params.length - 1) + '"]');
           if (lastKey) lastKey.focus();
         }
@@ -1959,11 +1930,25 @@
 
     var ctaUrlInput = document.getElementById("offer-cta-url");
     if (ctaUrlInput) ctaUrlInput.addEventListener("input", refreshEnrichedPreview);
-    var poCtaUrlInput = document.getElementById("po-cta-url");
-    if (poCtaUrlInput) poCtaUrlInput.addEventListener("input", refreshPoEnrichedPreview);
+
+    var offerBsList = document.getElementById("offer-buy-sources-list");
+    if (offerBsList) {
+      offerBsList.addEventListener("change", function () {
+        var picked = [];
+        offerBsList.querySelectorAll("input:checked").forEach(function (cb) { picked.push(cb.value); });
+        updateBuySourcesSummary(picked);
+      });
+    }
+    var poBsList = document.getElementById("po-buy-sources-list");
+    if (poBsList) {
+      poBsList.addEventListener("change", function () {
+        var picked = [];
+        poBsList.querySelectorAll("input:checked").forEach(function (cb) { picked.push(cb.value); });
+        updatePoBuySourcesSummary(picked);
+      });
+    }
 
     wireParamsContainer("offer-params-editable", offerParams, refreshEnrichedPreview);
-    wireParamsContainer("po-params-editable", poParams, refreshPoEnrichedPreview);
 
     function handleAdvertiserToggle(e, tableBody) {
       var tbtn = e.target.closest("[data-advertiser-toggle]");
@@ -2307,8 +2292,8 @@
       teamOffers.push(Object.assign({
         id: id, parentOfferId: "", teamId: CURRENT_TEAM.id,
         displayName: "", description: "", status: "active",
-        dealValue: null, campaignId: "", campaignProvider: "max", ctaUrl: "",
-        buySources: [], workspaceMaps: [], deletedAt: null, deletedBy: null
+        dealValue: null, campaignId: "", campaignProvider: "max", ctaUrl: null, trackingParams: null,
+        buySources: null, workspaceMaps: [], deletedAt: null, deletedBy: null
       }, auditFields()));
       openTeamOfferDetail(id, true);
     });
@@ -2345,7 +2330,7 @@
       parentOffers.push(Object.assign({
         id: id, advertiserId: "", name: "", categoryLevel1: "", categoryLevel2: "", categoryLevel3: "",
         description: "", dealType: "cpa", targetType: "cpa",
-        targetValue: { amount: 0, currency: "USD" }, countries: ["US"], teamIds: [], status: "active", ctaUrl: ""
+        targetValue: { amount: 0, currency: "USD" }, countries: ["US"], teamIds: [], status: "active", buySources: []
       }, auditFields()));
       openParentOfferDetail(id);
     });
