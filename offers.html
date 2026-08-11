@@ -148,7 +148,7 @@
                 <tr>
                   <th>Advertiser</th>
                   <th>Status</th>
-                  <th>Created by</th>
+                  <th>Last updated</th>
                   <th class="right">Parent offers</th>
                   <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
@@ -2581,7 +2581,7 @@
         tr.innerHTML =
           '<td><strong>' + escapeHtml(a.name) + '</strong></td>' +
           '<td>' + (a.status === "inactive" ? '<span class="badge badge--archived">Inactive</span>' : '<span class="badge badge--active">Active</span>') + '</td>' +
-          '<td>' + fmtCreatedBy(a) + '</td>' +
+          '<td>' + fmtUpdatedAt(a) + '</td>' +
           '<td class="right num">' + offerCountForAdv(a.id) + '</td>' +
           '<td class="right"><div class="actions">' +
             '<button type="button" class="icon-btn js-adv-edit" data-adv-id="' + escapeHtml(a.id) + '" title="Edit">' + ICON.edit + '</button>' +
