@@ -1191,11 +1191,11 @@
       cp2: "Optional parameter to send additional properties of a click. Usually the ad set ID.",
       cp3: "Optional parameter to send additional properties of a click. Usually the ad ID.",
       cp4: "Optional parameter to send additional properties of a click. Usually the variant name.",
-      tpid: "The ID sent to the tracking campaign provider for conversion reporting. Very crucial — typically <code>{{visit_id}}</code> by default.",
-      tps: "The third-party source sent to the tracking campaign provider so conversions are reported to that source. Typically <code>nexus</code> by default.",
+      tpid: "The ID sent to the tracking campaign provider for conversion reporting. Very crucial — usually <code>{{visit_id}}</code> by default.",
+      tps: "The third-party source sent to the tracking campaign provider so conversions are reported to that source. Usually <code>nexus</code> by default.",
       ppid: "Parent publisher ID required by the tracking campaign provider for billing.",
       pid: "Publisher ID required by the tracking campaign provider for billing.",
-      purl: "Publisher URL — the visit URL from which traffic is sent to the tracking campaign provider. Typically <code>https://{{route}}</code>."
+      purl: "Publisher URL — the visit URL from which traffic is sent to the tracking campaign provider. Usually <code>https://{{route}}</code>."
     };
 
     var offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
