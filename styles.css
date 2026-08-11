@@ -3112,9 +3112,28 @@ button.dsk-row-name:focus-visible strong {
 .team-inherited-strip {
   margin: 0.65rem 0 1rem;
 }
-.offer-ws-col { min-width: 120px; max-width: 180px; }
-.offer-ws-cell { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
-.offer-ws-cell--compact { flex-wrap: nowrap; max-width: 100%; }
+.offer-ws-col {
+  width: 148px;
+  max-width: 148px;
+  overflow: hidden;
+}
+.table tbody td.offer-ws-col {
+  overflow: hidden;
+  min-width: 0;
+  vertical-align: middle;
+}
+.offer-ws-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.offer-ws-cell--compact {
+  line-height: 1.35;
+}
 .offer-ws-more {
   display: inline-block;
   padding: 0.1rem 0.4rem;
@@ -3160,7 +3179,8 @@ button.dsk-row-name:focus-visible strong {
 .offer-deal-value { font-weight: 600; color: var(--text); }
 .offer-updated-at { font-size: 12px; white-space: nowrap; }
 .offer-ws-tag {
-  display: inline-block;
+  display: block;
+  max-width: 100%;
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
   background: #eef0f3;
@@ -3168,6 +3188,22 @@ button.dsk-row-name:focus-visible strong {
   line-height: 1.35;
   color: var(--text);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1 1 calc(50% - 0.2rem);
+}
+.offer-ws-cell--compact .offer-ws-tag {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+.offer-ws-cell--compact .offer-ws-more-tip {
+  flex: 0 0 auto;
+}
+#offers-table th:last-child,
+#offers-table td:last-child {
+  white-space: nowrap;
+  width: 88px;
 }
 .offer-params-readonly {
   margin: 0;

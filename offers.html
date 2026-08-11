@@ -1002,7 +1002,7 @@
       var rest = names.length - maxShow;
       var html = '<span class="offer-ws-cell offer-ws-cell--compact">';
       visible.forEach(function (n) {
-        html += '<span class="offer-ws-tag">' + escapeHtml(n) + '</span>';
+        html += '<span class="offer-ws-tag" title="' + escapeHtml(n) + '">' + escapeHtml(n) + '</span>';
       });
       if (rest > 0) {
         var listHtml = names.map(function (n) { return escapeHtml(n); }).join("<br>");
@@ -1018,7 +1018,8 @@
       var wsMap = {};
       TEAM_WORKSPACES.forEach(function (ws) { wsMap[ws.id] = ws.name; });
       return '<span class="offer-ws-cell">' + ids.map(function (id) {
-        return '<span class="offer-ws-tag">' + escapeHtml(wsMap[id] || id) + '</span>';
+        var name = wsMap[id] || id;
+        return '<span class="offer-ws-tag" title="' + escapeHtml(name) + '">' + escapeHtml(name) + '</span>';
       }).join("") + '</span>';
     }
     function statusBadge(status) {
