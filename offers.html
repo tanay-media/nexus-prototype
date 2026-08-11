@@ -1188,6 +1188,17 @@
 
     var offerParams = DEFAULT_PARAMS.map(function (p) { return { key: p.key, value: p.value }; });
 
+    function isMacroValue(value) {
+      return AVAILABLE_MACROS.indexOf(value) !== -1;
+    }
+
+    function isMacroParam(p) {
+      if (!p) return false;
+      if (p.key === "tps") return true;
+      if (p.key === "tpid" && p.value === "auto") return true;
+      return isMacroValue(p.value);
+    }
+
     function macroOptions(selected) {
       var opts = '<option value="">— custom —</option>';
       AVAILABLE_MACROS.forEach(function (m) {
@@ -1197,7 +1208,7 @@
     }
 
     function paramValueHtml(p, i) {
-      var isMacro = p.value.indexOf("{{") !== -1;
+      var isMacro = isMacroParam(p);
       var isTps = p.key === "tps";
       var isAuto = p.key === "tpid" && p.value === "auto";
 
@@ -1228,7 +1239,7 @@
       var container = document.getElementById(containerId);
       if (!container) return;
       container.innerHTML = params.map(function (p, i) {
-        var modeIsMacro = p.value.indexOf("{{") !== -1 || p.key === "tps" || (p.key === "tpid" && p.value === "auto");
+        var modeIsMacro = isMacroParam(p);
         var toggleLabel = modeIsMacro ? "static" : "macro";
         return '<div class="offer-param-row" data-row-idx="' + i + '">' +
           '<input type="text" class="input offer-pk-input mono" data-idx="' + i + '" value="' + escapeHtml(p.key) + '" />' +
@@ -1821,7 +1832,7 @@
           readParamsFromDom(containerId, params);
           var p = params[idx];
           if (!p) return;
-          var isMacro = p.value.indexOf("{{") !== -1 || p.key === "tps" || (p.key === "tpid" && p.value === "auto");
+          var isMacro = isMacroParam(p);
           p.value = isMacro ? "" : AVAILABLE_MACROS[0];
           renderEditableParams(containerId, params, "offer-param-add");
           if (onChange) onChange();
