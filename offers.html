@@ -72,6 +72,7 @@
                   <th class="right">Deal</th>
                   <th>Status</th>
                   <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this offer can be used on landers"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this team offer can be used on landers. Inactive if the team offer, parent offer, advertiser, or team mapping is inactive.</span></span></th>
+                  <th>Created by</th>
                   <th>Last updated</th>
                   <th class="offer-ws-col">Workspaces</th>
                   <th class="right" style="min-width:100px;">Actions</th>
@@ -115,6 +116,7 @@
                   <th class="right">Target value</th>
                   <th>Status</th>
                   <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this parent offer is available for team deployments"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this parent offer is available for team deployments. Inactive if the parent offer or its advertiser is inactive.</span></span></th>
+                  <th>Created by</th>
                   <th>Last updated</th>
                   <th>Teams</th>
                   <th class="right" style="min-width:80px;">Actions</th>
@@ -149,6 +151,7 @@
                 <tr>
                   <th>Advertiser</th>
                   <th>Status</th>
+                  <th>Created by</th>
                   <th>Last updated</th>
                   <th class="right">Parent offers</th>
                   <th class="right" style="min-width:100px;">Actions</th>
@@ -1103,7 +1106,7 @@
       var groups = groupTeamOffersByAdvertiser(rows);
       tbody.innerHTML = "";
       if (!groups.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
         return;
       }
       groups.forEach(function (g) {
@@ -1115,7 +1118,7 @@
           '<td class="lander-row__toggle">' +
             '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button>' +
           '</td>' +
-          '<td colspan="9"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
+          '<td colspan="10"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
             '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' team offer' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
         tbody.appendChild(tr);
         g.offers.forEach(function (to) {
@@ -1132,6 +1135,7 @@
             '<td class="right num"><span class="offer-deal-cell">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + ' <span class="offer-deal-value">' + fmtDealValueResolved(to) + '</span></span></td>' +
             '<td>' + statusBadge(to.status) + '</td>' +
             '<td>' + effectiveBadge(teamOfferEffectiveStatus(to)) + '</td>' +
+            '<td>' + fmtCreatedBy(to) + '</td>' +
             '<td>' + fmtUpdatedAt(to) + '</td>' +
             '<td class="offer-ws-col">' + wsNamesCompact(getWorkspaceIds(to)) + '</td>' +
             '<td class="right"><div class="actions">' +
@@ -1157,7 +1161,7 @@
       });
       parentBody.innerHTML = "";
       if (!groupList.length) {
-        parentBody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No parent offers found.</td></tr>';
+        parentBody.innerHTML = '<tr><td colspan="12" class="muted" style="padding:1.5rem;text-align:center;">No parent offers found.</td></tr>';
         return;
       }
       groupList.forEach(function (g) {
@@ -1167,7 +1171,7 @@
         tr.className = "offer-advertiser-row";
         tr.innerHTML =
           '<td class="lander-row__toggle"><button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button></td>' +
-          '<td colspan="10"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
+          '<td colspan="11"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
         parentBody.appendChild(tr);
         g.offers.forEach(function (p) {
           var orow = document.createElement("tr");
@@ -1182,6 +1186,7 @@
             '<td class="right num">' + fmtTargetParent(p) + '</td>' +
             '<td>' + statusBadge(p.status) + '</td>' +
             '<td>' + effectiveBadge(parentOfferEffectiveStatus(p)) + '</td>' +
+            '<td>' + fmtCreatedBy(p) + '</td>' +
             '<td>' + fmtUpdatedAt(p) + '</td>' +
             '<td class="muted" style="font-size:12px;">' + teamNames(p.teamIds) + '</td>' +
             '<td class="right"><div class="actions">' +
@@ -2579,7 +2584,7 @@
       rows.sort(function (a, b) { return a.name.localeCompare(b.name); });
       advBody.innerHTML = "";
       if (!rows.length) {
-        advBody.innerHTML = '<tr><td colspan="5" class="muted" style="padding:1.5rem;text-align:center;">No advertisers found.</td></tr>';
+        advBody.innerHTML = '<tr><td colspan="6" class="muted" style="padding:1.5rem;text-align:center;">No advertisers found.</td></tr>';
         return;
       }
       rows.forEach(function (a) {
@@ -2587,6 +2592,7 @@
         tr.innerHTML =
           '<td><strong>' + escapeHtml(a.name) + '</strong></td>' +
           '<td>' + (a.status === "inactive" ? '<span class="badge badge--archived">Inactive</span>' : '<span class="badge badge--active">Active</span>') + '</td>' +
+          '<td>' + fmtCreatedBy(a) + '</td>' +
           '<td>' + fmtUpdatedAt(a) + '</td>' +
           '<td class="right num">' + offerCountForAdv(a.id) + '</td>' +
           '<td class="right"><div class="actions">' +
