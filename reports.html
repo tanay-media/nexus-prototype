@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Reports · nexus</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="keyword-blocks.css" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -37,6 +38,7 @@
             <option>Founder Letter</option>
             <option>Partner Announce</option>
             <option>Black Friday</option>
+            <option>Hedge Your Future</option>
           </select>
           <button class="btn">↓ Export CSV</button>
         </div>
@@ -50,6 +52,72 @@
 
       <div class="reports-layout">
         <div class="reports-main-stack">
+        <div class="card reports-funnel-card" id="kb-reports-funnel">
+          <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <h3 class="settings-section__title" style="margin:0;">Keyword blocks funnel</h3>
+              <p class="muted" style="margin:4px 0 0;font-size:12px;">Hedge Your Future · Reader modal v1 · last 7 days</p>
+            </div>
+            <a href="widgets.html" class="btn" style="font-size:12px;text-decoration:none;">Open widget →</a>
+          </div>
+          <div style="padding:12px 20px 20px;">
+            <div class="kb-funnel-stats">
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Visits</div><div class="kb-funnel-step__val">3,347</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">3,248</div><div class="kb-funnel-step__rate">97.0% view rate</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">964</div><div class="kb-funnel-step__rate">29.7% block rate</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ads shown</div><div class="kb-funnel-step__val">941</div><div class="kb-funnel-step__rate">97.6% show rate</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks → MAX</div><div class="kb-funnel-step__val">47</div><div class="kb-funnel-step__rate">5.0% ad CTR</div></div>
+            </div>
+            <div class="table-scroll">
+              <table class="table reports-funnel-table">
+                <thead>
+                  <tr>
+                    <th>Keyword</th>
+                    <th class="right">Block clicks</th>
+                    <th class="right">Ad impr.</th>
+                    <th class="right">Ad clicks</th>
+                    <th class="right">Ad CTR</th>
+                    <th>Ad served</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>passive income investing</strong></td>
+                    <td class="right">412</td>
+                    <td class="right">401</td>
+                    <td class="right">24</td>
+                    <td class="right">6.0%</td>
+                    <td class="muted" style="font-size:12px;">E*TRADE® Account Setup</td>
+                  </tr>
+                  <tr>
+                    <td><strong>etf zero fee platform</strong></td>
+                    <td class="right">198</td>
+                    <td class="right">194</td>
+                    <td class="right">11</td>
+                    <td class="right">5.7%</td>
+                    <td class="muted" style="font-size:12px;">Fidelity Zero ETFs</td>
+                  </tr>
+                  <tr>
+                    <td><strong>beginner investing start</strong></td>
+                    <td class="right">186</td>
+                    <td class="right">182</td>
+                    <td class="right">8</td>
+                    <td class="right">4.4%</td>
+                    <td class="muted" style="font-size:12px;">Schwab Beginner Guide</td>
+                  </tr>
+                  <tr>
+                    <td><strong>open brokerage account fast</strong></td>
+                    <td class="right">168</td>
+                    <td class="right">164</td>
+                    <td class="right">4</td>
+                    <td class="right">2.4%</td>
+                    <td class="muted" style="font-size:12px;">Robinhood Sign Up</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
         <div class="card">
           <p class="muted reports-table-hint" style="font-size:12px; margin:0 0 0.65rem; padding: 0.85rem 1rem 0;">Use <strong>Measures</strong> and <strong>Dimensions</strong> on the right to add or remove columns.</p>
           <div class="table-scroll" role="region" aria-label="Reports data">
@@ -80,6 +148,12 @@
               <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_step_complete" /><span>Form step complete</span></label>
               <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_submit" /><span>Form submit</span></label>
               <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_step_abandon" /><span>Form step abandon</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_widget_views" /><span>KB widget views</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_block_clicks" /><span>KB block clicks</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_ad_impressions" /><span>KB ad impressions</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_ad_clicks" /><span>KB ad clicks</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_block_rate" /><span>KB block rate</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_ad_ctr" /><span>KB ad CTR</span></label>
             </div>
           </div>
           <div class="reports-side__block reports-side__block--dimensions">
@@ -115,6 +189,10 @@
               <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="referer" /><span>Referer</span></label>
               <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="cta_id" /><span>CTA_id</span></label>
               <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="linkout" /><span>Linkout</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="keyword" /><span>Keyword</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="slot_index" /><span>Slot index</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="kb_widget_id" /><span>KB widget id</span></label>
+              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="ad_title" /><span>Ad title</span></label>
             </div>
           </div>
         </aside>
@@ -180,8 +258,8 @@
   <script src="app.js"></script>
   <script>
     (function () {
-      var MEASURE_ORDER = ["lander_thumb", "variant_thumb", "visits", "impressions", "impression_rate", "clicks", "ctr", "conversions", "cvr", "score", "form_start", "form_step_complete", "form_submit", "form_step_abandon"];
-      var DIMENSION_ORDER = ["t_created", "t_updated", "t_hour", "t_dow", "t_week", "t_month", "t_year", "workspace", "lander_id", "lander_name", "variant_id", "variant_name", "version_id", "domain", "route", "device", "os", "browser", "webview", "country", "county", "city", "zip", "channel", "utm_source", "utm_medium", "utm_campaign", "referer", "cta_id", "linkout"];
+      var MEASURE_ORDER = ["lander_thumb", "variant_thumb", "visits", "impressions", "impression_rate", "clicks", "ctr", "conversions", "cvr", "score", "form_start", "form_step_complete", "form_submit", "form_step_abandon", "kb_widget_views", "kb_block_clicks", "kb_ad_impressions", "kb_ad_clicks", "kb_block_rate", "kb_ad_ctr"];
+      var DIMENSION_ORDER = ["t_created", "t_updated", "t_hour", "t_dow", "t_week", "t_month", "t_year", "workspace", "lander_id", "lander_name", "variant_id", "variant_name", "version_id", "domain", "route", "device", "os", "browser", "webview", "country", "county", "city", "zip", "channel", "utm_source", "utm_medium", "utm_campaign", "referer", "cta_id", "linkout", "keyword", "slot_index", "kb_widget_id", "ad_title"];
       var MEASURE_LABEL = {
         lander_thumb: "Lander",
         variant_thumb: "Variant",
@@ -196,7 +274,13 @@
         form_start: "Form start",
         form_step_complete: "Form step complete",
         form_submit: "Form submit",
-        form_step_abandon: "Form step abandon"
+        form_step_abandon: "Form step abandon",
+        kb_widget_views: "KB widget views",
+        kb_block_clicks: "KB block clicks",
+        kb_ad_impressions: "KB ad impr.",
+        kb_ad_clicks: "KB ad clicks",
+        kb_block_rate: "KB block rate",
+        kb_ad_ctr: "KB ad CTR"
       };
       var DIMENSION_LABEL = {
         t_created: "Created date",
@@ -228,7 +312,11 @@
         utm_campaign: "UTM campaign",
         referer: "Referer",
         cta_id: "CTA_id",
-        linkout: "Linkout"
+        linkout: "Linkout",
+        keyword: "Keyword",
+        slot_index: "Slot",
+        kb_widget_id: "KB widget",
+        ad_title: "Ad title"
       };
 
       function nf(n) {
@@ -265,13 +353,17 @@
           m: { visits: 17800, impressions: 16951, clicks: 8608, conversions: 4657, score: 0.275, form_start: 15100, form_step_complete: 11200, form_submit: 4657, form_abandon: 13143 },
           days: [{ header: true }, { impressions: 3610, clicks: 1834, conversions: 992, score: 0.275, date: "Apr 21, 2026" }, { impressions: 3401, clicks: 1728, conversions: 935, score: 0.275, date: "Apr 20, 2026" }]
         },
+        { key: "hyf", lander: "Hedge Your Future", variant: "V1 — Reader modal", domain: "hedgeyourfuture.com", expandId: "hyf-days", startOpen: false, vstrong: "Reader modal", hue: 145,
+          m: { visits: 3347, impressions: 3248, clicks: 47, conversions: 12, score: 0.014, form_start: 0, form_step_complete: 0, form_submit: 0, form_abandon: 0, kb_widget_views: 3248, kb_block_clicks: 964, kb_ad_impressions: 941, kb_ad_clicks: 47 },
+          days: [{ header: true }, { impressions: 620, clicks: 9, conversions: 2, score: 0.014, date: "Apr 21, 2026" }, { impressions: 580, clicks: 8, conversions: 2, score: 0.014, date: "Apr 20, 2026" }]
+        },
         { key: "ss", lander: "Summer Sale", variant: "V1 — Main hero", domain: "offers.acme.com", expandId: "ss-days", startOpen: false, vstrong: "Main hero", hue: 18,
           m: { visits: 118420, impressions: 112613, clicks: 75899, conversions: 52164, score: 0.463, form_start: 98200, form_step_complete: 72450, form_submit: 52164, form_abandon: 46036 },
           days: [{ header: true }, { impressions: 24100, clicks: 16243, conversions: 11170, score: 0.463, date: "Apr 21, 2026" }, { impressions: 22800, clicks: 15360, conversions: 10552, score: 0.463, date: "Apr 20, 2026" }]
         }
       ];
 
-      var MOCK_DIM = { t_created: "Apr 1, 2026", t_updated: "Apr 21, 2026", t_hour: "14", t_dow: "Tue", t_week: "W16", t_month: "Apr", t_year: "2026", workspace: "ACME Growth", lander_id: "ldr_mock", variant_id: "var_mock", version_id: "vv_m5n8k3p", route: "/", device: "mobile", os: "iOS 18", browser: "Safari", webview: "no", country: "US", county: "Cuyahoga", city: "Cleveland", zip: "44102", channel: "Paid search", utm_source: "google", utm_medium: "cpc", utm_campaign: "brand_q2", referer: "google.com", cta_id: "cta_primary", linkout: "adv_default" };
+      var MOCK_DIM = { t_created: "Apr 1, 2026", t_updated: "Apr 21, 2026", t_hour: "14", t_dow: "Tue", t_week: "W16", t_month: "Apr", t_year: "2026", workspace: "ACME Growth", lander_id: "ldr_mock", variant_id: "var_mock", version_id: "vv_m5n8k3p", route: "/", device: "mobile", os: "iOS 18", browser: "Safari", webview: "no", country: "US", county: "Cuyahoga", city: "Cleveland", zip: "44102", channel: "Paid search", utm_source: "google", utm_medium: "cpc", utm_campaign: "brand_q2", referer: "google.com", cta_id: "cta_primary", linkout: "adv_default", keyword: "passive income investing", slot_index: "0", kb_widget_id: "kb_passive_investing", ad_title: "E*TRADE® Account Setup" };
 
       // Mock split values for each dimension. When a dimension is selected, each parent row
       // expands into one child row per value — i.e. "group by" that dimension.
@@ -300,7 +392,11 @@
         utm_campaign: ["brand_q2", "spring_promo", "referral_push"],
         referer: ["google.com", "facebook.com", "(direct)"],
         cta_id: ["cta_primary", "cta_secondary", "cta_footer"],
-        linkout: ["adv_default", "adv_partner"]
+        linkout: ["adv_default", "adv_partner"],
+        keyword: ["passive income investing", "etf zero fee platform", "beginner investing start", "open brokerage account fast"],
+        slot_index: ["0", "1", "2", "3"],
+        kb_widget_id: ["kb_passive_investing"],
+        ad_title: ["E*TRADE® Account Setup", "Fidelity Zero ETFs", "Schwab Beginner Guide"]
       };
 
       function weightsForN(n) {
@@ -335,6 +431,12 @@
         if (mid === "form_step_complete") return nf(m.form_step_complete * weight);
         if (mid === "form_submit") return nf(m.form_submit * weight);
         if (mid === "form_step_abandon") return nf(m.form_abandon * weight);
+        if (mid === "kb_widget_views") return nf((m.kb_widget_views || 0) * weight);
+        if (mid === "kb_block_clicks") return nf((m.kb_block_clicks || 0) * weight);
+        if (mid === "kb_ad_impressions") return nf((m.kb_ad_impressions || 0) * weight);
+        if (mid === "kb_ad_clicks") return nf((m.kb_ad_clicks || 0) * weight);
+        if (mid === "kb_block_rate") return pct((m.kb_block_clicks || 0) * weight, (m.kb_widget_views || 0) * weight);
+        if (mid === "kb_ad_ctr") return pct((m.kb_ad_clicks || 0) * weight, (m.kb_ad_impressions || 0) * weight);
         return "—";
       }
 
@@ -369,6 +471,12 @@
         if (mid === "form_step_complete") return nf(m.form_step_complete);
         if (mid === "form_submit") return nf(m.form_submit);
         if (mid === "form_step_abandon") return nf(m.form_abandon);
+        if (mid === "kb_widget_views") return nf(m.kb_widget_views || 0);
+        if (mid === "kb_block_clicks") return nf(m.kb_block_clicks || 0);
+        if (mid === "kb_ad_impressions") return nf(m.kb_ad_impressions || 0);
+        if (mid === "kb_ad_clicks") return nf(m.kb_ad_clicks || 0);
+        if (mid === "kb_block_rate") return pct(m.kb_block_clicks || 0, m.kb_widget_views || 0);
+        if (mid === "kb_ad_ctr") return pct(m.kb_ad_clicks || 0, m.kb_ad_impressions || 0);
         return "—";
       }
 
@@ -384,6 +492,10 @@
         if (did === "domain") return row.domain;
         if (did === "lander_id") return "ldr_" + row.key;
         if (did === "variant_id") return "var_" + row.key;
+        if (did === "kb_widget_id" && row.key === "hyf") return "kb_passive_investing";
+        if (did === "keyword" && row.key === "hyf") return "passive income investing";
+        if (did === "slot_index" && row.key === "hyf") return "0";
+        if (did === "ad_title" && row.key === "hyf") return "E*TRADE® Account Setup";
         if (isDay) return "—";
         return MOCK_DIM[did] != null ? MOCK_DIM[did] : "—";
       }
@@ -680,6 +792,10 @@
         if (typeof applyReportsLanderFilter === "function") applyReportsLanderFilter(value);
         if (value) { noteN.textContent = value; note.classList.add("is-active"); }
         else { note.classList.remove("is-active"); }
+        var kbFunnel = document.getElementById("kb-reports-funnel");
+        if (kbFunnel) {
+          kbFunnel.style.display = (!value || value === "Hedge Your Future") ? "" : "none";
+        }
       }
 
       if (name) { sel.value = name; applyFilter(name); }

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Widgets · nexus</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="keyword-blocks.css" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -48,11 +49,11 @@
                 <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Form</div>
                 <div class="muted" style="font-size:12px;line-height:1.4;">Multi-step lead forms — collect visitor info &amp; redirect to advertiser</div>
               </button>
-              <div class="widget-type-card" style="border:1.5px solid #e5e5e5;border-radius:10px;padding:18px 16px;background:#fafafa;text-align:left;opacity:.55;position:relative;">
-                <div style="font-size:22px;margin-bottom:6px;">💬</div>
-                <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Popup <span class="badge" style="font-size:10px;vertical-align:middle;padding:2px 6px;background:#f0f0f0;color:#888;border-radius:4px;">Soon</span></div>
-                <div class="muted" style="font-size:12px;line-height:1.4;">Exit-intent popups &amp; timed overlays</div>
-              </div>
+              <button type="button" class="widget-type-card widget-type-card--kb" id="wt-keyword-blocks" style="border:1.5px solid #2e7d32;border-radius:10px;padding:18px 16px;background:#f1f8f1;cursor:pointer;text-align:left;transition:box-shadow .15s;">
+                <div style="font-size:22px;margin-bottom:6px;">🔑</div>
+                <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Keyword blocks</div>
+                <div class="muted" style="font-size:12px;line-height:1.4;">Reader questions → server-side ads → MAX tracking (up to 12 slots)</div>
+              </button>
               <div class="widget-type-card" style="border:1.5px solid #e5e5e5;border-radius:10px;padding:18px 16px;background:#fafafa;text-align:left;opacity:.55;">
                 <div style="font-size:22px;margin-bottom:6px;">⏱️</div>
                 <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Countdown <span class="badge" style="font-size:10px;vertical-align:middle;padding:2px 6px;background:#f0f0f0;color:#888;border-radius:4px;">Soon</span></div>
@@ -71,6 +72,7 @@
       <div class="page-body" data-tabs="widgets-page">
         <div class="tabs">
           <button type="button" class="tab is-active" data-tab="widgets-form">All widgets</button>
+          <button type="button" class="tab" data-tab="widgets-kb-funnel">Keyword funnel</button>
           <button type="button" class="tab" data-tab="widgets-responses">Form Responses</button>
         </div>
 
@@ -89,6 +91,27 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <tr>
+                    <td>
+                      <strong>Passive investing — reader questions</strong>
+                      <div class="muted" style="font-size:11px;">4 slots · hedgeyourfuture.com</div>
+                    </td>
+                    <td><span class="badge badge--kb">Keyword blocks</span></td>
+                    <td>
+                      <div style="line-height:1.6;">
+                        <a href="landers.html" style="font-size:13px;text-decoration:none;color:#222;font-weight:500;">Hedge Your Future</a>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">
+                          <a href="editor.html" class="variant-chip" title="Open variant">Reader modal v1</a>
+                        </div>
+                      </div>
+                    </td>
+                    <td><a href="#" class="js-goto-kb-funnel" style="font-weight:600;color:#1b5e20;text-decoration:none;">View funnel →</a></td>
+                    <td class="muted" style="font-size:12px;">3h ago<br/>Kyle</td>
+                    <td class="right"><div class="actions">
+                      <button type="button" class="icon-btn js-kb-edit" data-widget="Passive investing — reader questions" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                      <button type="button" class="icon-btn js-widget-clone" data-widget="Passive investing — reader questions" title="Clone to workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                    </div></td>
+                  </tr>
                   <tr>
                     <td>
                       <strong>Lead — short qualify</strong>
@@ -182,6 +205,77 @@
           </div>
         </section>
 
+        <section data-tab-panel="widgets-kb-funnel" hidden>
+          <div class="card" style="padding:20px 24px;">
+            <p class="muted" style="margin:0 0 16px;font-size:13px;">Four-stage funnel for <strong>Passive investing — reader questions</strong> — widget views, keyword block clicks, ad impressions, ad clicks. Same events flow to <a href="reports.html">Reports</a>.</p>
+            <div class="kb-funnel-stats" id="kb-funnel-summary">
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">3,248</div><div class="kb-funnel-step__rate">97% of visits</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">964</div><div class="kb-funnel-step__rate">29.7% block rate</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ads shown</div><div class="kb-funnel-step__val">941</div><div class="kb-funnel-step__rate">97.6% show rate</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks</div><div class="kb-funnel-step__val">47</div><div class="kb-funnel-step__rate">5.0% ad CTR</div></div>
+              <div class="kb-funnel-step"><div class="kb-funnel-step__label">MAX outbound</div><div class="kb-funnel-step__val">47</div><div class="kb-funnel-step__rate">tracking URLs</div></div>
+            </div>
+            <div class="table-scroll" role="region" aria-label="Keyword funnel by keyword">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Keyword / question</th>
+                    <th class="right">Widget views</th>
+                    <th class="right">Block clicks</th>
+                    <th class="right">Ad impr.</th>
+                    <th class="right">Ad clicks</th>
+                    <th class="right">Block rate</th>
+                    <th class="right">Ad CTR</th>
+                    <th>Top ad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>passive income investing</strong><div class="muted" style="font-size:11px;">How do I start earning passive income from investing?</div></td>
+                    <td class="right">3,248</td>
+                    <td class="right">412</td>
+                    <td class="right">401</td>
+                    <td class="right">24</td>
+                    <td class="right">12.7%</td>
+                    <td class="right">6.0%</td>
+                    <td class="muted" style="font-size:12px;">E*TRADE® Account Setup · us.etrade.com</td>
+                  </tr>
+                  <tr>
+                    <td><strong>etf zero fee platform</strong><div class="muted" style="font-size:11px;">What's the best platform to buy ETFs with zero fees?</div></td>
+                    <td class="right">3,248</td>
+                    <td class="right">198</td>
+                    <td class="right">194</td>
+                    <td class="right">11</td>
+                    <td class="right">6.1%</td>
+                    <td class="right">5.7%</td>
+                    <td class="muted" style="font-size:12px;">Fidelity Zero ETFs · fidelity.com</td>
+                  </tr>
+                  <tr>
+                    <td><strong>beginner investing start</strong><div class="muted" style="font-size:11px;">I'm a beginner — where do I even start?</div></td>
+                    <td class="right">3,248</td>
+                    <td class="right">186</td>
+                    <td class="right">182</td>
+                    <td class="right">8</td>
+                    <td class="right">5.7%</td>
+                    <td class="right">4.4%</td>
+                    <td class="muted" style="font-size:12px;">Schwab Beginner Guide · schwab.com</td>
+                  </tr>
+                  <tr>
+                    <td><strong>open brokerage account fast</strong><div class="muted" style="font-size:11px;">How quickly can I open and fund a brokerage account?</div></td>
+                    <td class="right">3,248</td>
+                    <td class="right">168</td>
+                    <td class="right">164</td>
+                    <td class="right">4</td>
+                    <td class="right">5.2%</td>
+                    <td class="right">2.4%</td>
+                    <td class="muted" style="font-size:12px;">Robinhood Sign Up · robinhood.com</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         <section data-tab-panel="widgets-responses" hidden>
           <div class="card">
             <div class="form-responses-toolbar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;padding:16px 20px;border-bottom:1px solid #eee;">
@@ -248,6 +342,61 @@
       </div>
     </main>
   </div>
+
+  <dialog class="modal modal--kb-editor" id="dialog-widget-keyword-blocks">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 class="modal__title" id="kb-editor-title">Edit Keyword blocks</h2>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <div class="kb-editor">
+        <div class="kb-editor__form">
+          <div class="field">
+            <label for="kb-widget-name">Widget name</label>
+            <input type="text" id="kb-widget-name" value="Passive investing — reader questions" />
+          </div>
+          <div class="field">
+            <label for="kb-team-offer">Team offer (MAX campaign)</label>
+            <select id="kb-team-offer">
+              <option value="to_etrade_passive">E*TRADE Passive Income — MAX-CMP-9912</option>
+              <option value="to_fidelity_etf">Fidelity Zero ETF — MAX-CMP-8840</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="kb-header-title">Modal title</label>
+            <input type="text" id="kb-header-title" value="What would you like to explore first?" />
+          </div>
+          <div class="kb-editor__slots-head">
+            <h3>Keyword slots <span class="muted" id="kb-slot-count">(4 / 12)</span></h3>
+            <button type="button" class="btn" id="kb-add-slot" style="font-size:12px;padding:4px 12px;">+ Add slot</button>
+          </div>
+          <div class="table-scroll">
+            <table class="kb-slots-table" id="kb-slots-table">
+              <thead>
+                <tr><th>#</th><th>Keyword</th><th>Display question</th><th></th></tr>
+              </thead>
+              <tbody id="kb-slots-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="kb-preview-wrap">
+          <p class="kb-preview-label">Live preview · click a block</p>
+          <div class="kb-modal-preview" id="kb-modal-preview">
+            <div class="kb-modal-preview__header">
+              <div class="kb-modal-preview__brand">HEDGEYOURFUTURE · PASSIVE INVESTING</div>
+              <h3 class="kb-modal-preview__title" id="kb-preview-title">What would you like to explore first?</h3>
+              <span class="kb-modal-preview__close" aria-hidden="true">✕</span>
+            </div>
+            <div class="kb-modal-preview__body" id="kb-preview-blocks"></div>
+            <div class="kb-modal-preview__dismiss">I'll continue reading on my own</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal__actions widget-editor__footer">
+        <button type="button" class="btn btn--black" id="kb-editor-save">Save widget</button>
+      </div>
+    </div>
+  </dialog>
 
   <dialog class="modal modal--widget-editor" id="dialog-widget-form">
     <div class="modal__inner modal__inner--widget-editor">
@@ -338,6 +487,151 @@
         refreshCount();
         dlg.showModal();
       });
+
+      /* ── Keyword blocks type + editor ── */
+      var kbCard = document.getElementById("wt-keyword-blocks");
+      var kbDlg = document.getElementById("dialog-widget-keyword-blocks");
+      var kbSlotsBody = document.getElementById("kb-slots-tbody");
+      var kbPreviewBlocks = document.getElementById("kb-preview-blocks");
+      var kbPreviewTitle = document.getElementById("kb-preview-title");
+      var kbHeaderIn = document.getElementById("kb-header-title");
+      var kbSlotCountEl = document.getElementById("kb-slot-count");
+      var kbAddSlotBtn = document.getElementById("kb-add-slot");
+      var kbSaveBtn = document.getElementById("kb-editor-save");
+      var kbEditorTitle = document.getElementById("kb-editor-title");
+      var MOCK_ADS = {
+        "passive income investing": { title: "E*TRADE® - Official Site | E*TRADE® Account Setup", url: "us.etrade.com", desc: "Open an Account with E*TRADE® & Place a Trade Easily With Our Desktop & Mobile Platforms.", cta: "Open Account" },
+        "etf zero fee platform": { title: "Fidelity Zero Expense Ratio ETFs", url: "fidelity.com", desc: "Invest in Fidelity's zero-fee index ETFs with no account minimums.", cta: "Start investing" },
+        "beginner investing start": { title: "Schwab — Investing for Beginners", url: "schwab.com", desc: "Learn the basics and open a brokerage account in minutes.", cta: "Get started" },
+        "open brokerage account fast": { title: "Robinhood — Sign Up in Minutes", url: "robinhood.com", desc: "Open and fund your account from your phone — fast onboarding.", cta: "Sign up" }
+      };
+      var DEFAULT_KB_SLOTS = [
+        { keyword: "passive income investing", question: "How do I start earning passive income from investing?" },
+        { keyword: "etf zero fee platform", question: "What's the best platform to buy ETFs with zero fees?" },
+        { keyword: "beginner investing start", question: "I'm a beginner — where do I even start?" },
+        { keyword: "open brokerage account fast", question: "How quickly can I open and fund a brokerage account?" }
+      ];
+      var kbSlots = DEFAULT_KB_SLOTS.slice();
+      var kbActiveIndex = -1;
+
+      function renderKbSlotsTable() {
+        if (!kbSlotsBody) return;
+        kbSlotsBody.innerHTML = "";
+        kbSlots.forEach(function (slot, i) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td>' + (i + 1) + '</td>' +
+            '<td><input type="text" class="kb-in-keyword" data-idx="' + i + '" value="' + slot.keyword.replace(/"/g, "&quot;") + '" /></td>' +
+            '<td><input type="text" class="kb-in-question" data-idx="' + i + '" value="' + slot.question.replace(/"/g, "&quot;") + '" /></td>' +
+            '<td><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove">✕</button></td>';
+          kbSlotsBody.appendChild(tr);
+        });
+        if (kbSlotCountEl) kbSlotCountEl.textContent = "(" + kbSlots.length + " / 12)";
+        if (kbAddSlotBtn) kbAddSlotBtn.disabled = kbSlots.length >= 12;
+        renderKbPreview();
+      }
+
+      function renderKbPreview() {
+        if (!kbPreviewBlocks) return;
+        if (kbPreviewTitle && kbHeaderIn) kbPreviewTitle.textContent = kbHeaderIn.value || "What would you like to explore first?";
+        kbPreviewBlocks.innerHTML = "";
+        var section = document.createElement("p");
+        section.className = "kb-modal-preview__section";
+        section.textContent = "READER QUESTIONS";
+        kbPreviewBlocks.appendChild(section);
+        kbSlots.forEach(function (slot, i) {
+          var block = document.createElement("div");
+          block.className = "kb-block" + (kbActiveIndex === i ? " is-active" : "");
+          block.setAttribute("data-kb-idx", String(i));
+          block.innerHTML = '<span class="kb-block__play">▶</span><span>' + slot.question + "</span>";
+          kbPreviewBlocks.appendChild(block);
+          if (kbActiveIndex === i) {
+            var ad = MOCK_ADS[slot.keyword] || { title: "Sample ad for “" + slot.keyword + "”", url: "advertiser.com", desc: "Ad resolved server-side from CM.", cta: "Learn more" };
+            var panel = document.createElement("div");
+            panel.className = "kb-ad-panel";
+            panel.innerHTML =
+              '<span class="kb-ad-panel__label">Ad</span>' +
+              '<div class="kb-ad-panel__title">' + ad.title + "</div>" +
+              '<div class="kb-ad-panel__url">' + ad.url + "</div>" +
+              '<p class="kb-ad-panel__desc">' + ad.desc + "</p>" +
+              '<button type="button" class="kb-ad-panel__cta">' + ad.cta + " → MAX</button>";
+            kbPreviewBlocks.appendChild(panel);
+          }
+        });
+      }
+
+      function openKbEditor(mode) {
+        kbEditorTitle.textContent = mode === "new" ? "New Keyword blocks widget" : "Edit Keyword blocks";
+        kbSaveBtn.textContent = mode === "new" ? "Create widget" : "Save widget";
+        kbSlots = DEFAULT_KB_SLOTS.slice();
+        kbActiveIndex = 0;
+        renderKbSlotsTable();
+        kbDlg.showModal();
+      }
+
+      if (kbCard) {
+        kbCard.addEventListener("mouseenter", function () { kbCard.style.boxShadow = "0 2px 12px rgba(27,94,32,.15)"; });
+        kbCard.addEventListener("mouseleave", function () { kbCard.style.boxShadow = "none"; });
+        kbCard.addEventListener("click", function () {
+          newDlg.close();
+          openKbEditor("new");
+        });
+      }
+
+      document.querySelectorAll(".js-kb-edit").forEach(function (btn) {
+        btn.addEventListener("click", function () { openKbEditor("edit"); });
+      });
+
+      document.querySelectorAll(".js-goto-kb-funnel").forEach(function (link) {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          var tab = document.querySelector('[data-tab="widgets-kb-funnel"]');
+          if (tab) tab.click();
+        });
+      });
+
+      if (kbSlotsBody) {
+        kbSlotsBody.addEventListener("input", function (e) {
+          var t = e.target;
+          if (!t.classList.contains("kb-in-keyword") && !t.classList.contains("kb-in-question")) return;
+          var idx = parseInt(t.getAttribute("data-idx"), 10);
+          if (t.classList.contains("kb-in-keyword")) kbSlots[idx].keyword = t.value;
+          else kbSlots[idx].question = t.value;
+          renderKbPreview();
+        });
+        kbSlotsBody.addEventListener("click", function (e) {
+          var del = e.target.closest(".kb-slot-del");
+          if (del) {
+            var idx = parseInt(del.getAttribute("data-idx"), 10);
+            if (kbSlots.length <= 1) return;
+            kbSlots.splice(idx, 1);
+            if (kbActiveIndex >= kbSlots.length) kbActiveIndex = kbSlots.length - 1;
+            renderKbSlotsTable();
+            return;
+          }
+        });
+      }
+
+      if (kbPreviewBlocks) {
+        kbPreviewBlocks.addEventListener("click", function (e) {
+          var block = e.target.closest(".kb-block");
+          if (!block) return;
+          kbActiveIndex = parseInt(block.getAttribute("data-kb-idx"), 10);
+          renderKbPreview();
+        });
+      }
+
+      if (kbHeaderIn) kbHeaderIn.addEventListener("input", renderKbPreview);
+
+      if (kbAddSlotBtn) {
+        kbAddSlotBtn.addEventListener("click", function () {
+          if (kbSlots.length >= 12) return;
+          kbSlots.push({ keyword: "new keyword " + (kbSlots.length + 1), question: "New reader question?" });
+          renderKbSlotsTable();
+        });
+      }
+
+      if (kbSaveBtn) kbSaveBtn.addEventListener("click", function () { kbDlg.close(); });
 
       /* ── Clone button ── */
       document.querySelectorAll(".js-widget-clone").forEach(function (btn) {
