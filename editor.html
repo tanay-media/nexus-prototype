@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Editor · nexus</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="keyword-blocks.css" />
 </head>
 <body class="editor-open">
   <div class="editor-shell" data-editor-domain="offers.acme.com">
@@ -268,6 +269,31 @@
                 <div class="field field--settings">
                   <label for="variant-settings-cta-text">Text</label>
                   <input type="text" id="variant-settings-cta-text" placeholder="Shop Now →" />
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="settings-acc" id="editor-keywords-acc" open>
+            <summary class="settings-acc__head">
+              <span>Keywords</span>
+              <svg class="settings-acc__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="settings-acc__body">
+              <p class="settings-acc__hint muted" id="editor-keywords-hint">Populated by AI when you build a keyword-block lander in chat. Edit keywords and reader questions before publish.</p>
+              <p class="settings-acc__hint muted" id="editor-keywords-empty" style="padding:12px;background:#fafafa;border-radius:8px;border:1px dashed #ddd;">No keywords yet — describe a keyword-block lander in chat (e.g. “reader questions for auto insurance savings”).</p>
+              <div id="editor-keywords-slots-wrap" hidden>
+                <div class="table-scroll" style="margin-bottom:10px;">
+                  <table class="kb-slots-table" id="editor-keywords-table">
+                    <thead>
+                      <tr><th>#</th><th>Keyword (CM)</th><th>Reader question</th><th></th></tr>
+                    </thead>
+                    <tbody id="editor-keywords-tbody"></tbody>
+                  </table>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <button type="button" class="btn" id="editor-keywords-add" style="font-size:12px;padding:4px 12px;">+ Add slot</button>
+                  <span class="muted" id="editor-keywords-count" style="font-size:11px;">0 / 12 slots</span>
                 </div>
               </div>
             </div>
@@ -738,6 +764,9 @@
       addBubble(text.trim(), "user");
       input.value = "";
       setTimeout(function () {
+        if (typeof maybeDetectKeywordsFromChat === "function") {
+          maybeDetectKeywordsFromChat(text.trim());
+        }
         addBubble("Applied by Opus 4.7 — preview updated. Want another pass?", "ai");
       }, 450);
     }
@@ -749,6 +778,106 @@
     document.querySelectorAll(".suggestion-chips button").forEach(function (c) {
       c.addEventListener("click", function () { submitPrompt(c.getAttribute("data-prompt")); });
     });
+
+    // ---- Keywords panel (variant-level; AI fill from chat — not workspace widget library)
+    (function () {
+      var emptyEl = document.getElementById("editor-keywords-empty");
+      var wrapEl = document.getElementById("editor-keywords-slots-wrap");
+      var tbody = document.getElementById("editor-keywords-tbody");
+      var countEl = document.getElementById("editor-keywords-count");
+      var addBtn = document.getElementById("editor-keywords-add");
+      var hintEl = document.getElementById("editor-keywords-hint");
+      var slots = [];
+
+      var PRESETS = {
+        auto: [
+          { keyword: "auto insurance savings", question: "How much can I save on auto insurance in my state?" },
+          { keyword: "compare car insurance quotes", question: "What's the fastest way to compare quotes online?" },
+          { keyword: "cheap full coverage insurance", question: "Who has the cheapest full coverage near me?" },
+          { keyword: "switch auto insurance carrier", question: "How do I switch carriers without a coverage gap?" }
+        ],
+        passive: [
+          { keyword: "passive income investing", question: "How do I start earning passive income from investing?" },
+          { keyword: "etf zero fee platform", question: "What's the best platform to buy ETFs with zero fees?" },
+          { keyword: "beginner investing start", question: "I'm a beginner — where do I even start?" },
+          { keyword: "open brokerage account fast", question: "How quickly can I open and fund a brokerage account?" }
+        ]
+      };
+
+      function renderKeywordsTable() {
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        slots.forEach(function (slot, i) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" + (i + 1) + "</td>" +
+            '<td><input type="text" class="kb-in-keyword" data-idx="' + i + '" value="' + String(slot.keyword).replace(/"/g, "&quot;") + '" /></td>' +
+            '<td><input type="text" class="kb-in-question" data-idx="' + i + '" value="' + String(slot.question).replace(/"/g, "&quot;") + '" /></td>' +
+            '<td><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove">✕</button></td>';
+          tbody.appendChild(tr);
+        });
+        var has = slots.length > 0;
+        if (emptyEl) emptyEl.hidden = has;
+        if (wrapEl) wrapEl.hidden = !has;
+        if (countEl) countEl.textContent = slots.length + " / 12 slots";
+        if (addBtn) addBtn.disabled = slots.length >= 12;
+        if (hintEl && has) hintEl.textContent = "AI detected " + slots.length + " keyword slot(s). Edit below or add more (max 12).";
+      }
+
+      function setKeywordSlots(next) {
+        slots = (next || []).slice(0, 12).map(function (s, i) {
+          return { keyword: s.keyword || "", question: s.question || s.displayQuestion || "" };
+        });
+        renderKeywordsTable();
+      }
+
+      window.maybeDetectKeywordsFromChat = function (promptText) {
+        var t = (promptText || "").toLowerCase();
+        var isKb = /keyword.?block|reader question|reader questions|sponsored link|keyword slot/.test(t);
+        var isAuto = /auto insurance|car insurance|compare.*quote|drivers save/.test(t);
+        var isPassive = /passive income|etf|investing|brokerage/.test(t);
+        if (!isKb && !isAuto && !isPassive) return;
+        if (isAuto) setKeywordSlots(PRESETS.auto);
+        else if (isPassive) setKeywordSlots(PRESETS.passive);
+        else setKeywordSlots(PRESETS.passive.slice(0, 3));
+        if (typeof addBubble === "function") {
+          addBubble("Detected keyword-block lander — filled " + slots.length + " slots in Settings → Keywords (below Call to Action).", "ai");
+        }
+        var acc = document.getElementById("editor-keywords-acc");
+        if (acc && !acc.open) acc.open = true;
+      };
+
+      if (tbody) {
+        tbody.addEventListener("input", function (e) {
+          var t = e.target;
+          if (!t.classList.contains("kb-in-keyword") && !t.classList.contains("kb-in-question")) return;
+          var idx = parseInt(t.getAttribute("data-idx"), 10);
+          if (t.classList.contains("kb-in-keyword")) slots[idx].keyword = t.value;
+          else slots[idx].question = t.value;
+        });
+        tbody.addEventListener("click", function (e) {
+          var del = e.target.closest(".kb-slot-del");
+          if (!del) return;
+          var idx = parseInt(del.getAttribute("data-idx"), 10);
+          if (slots.length <= 1) return;
+          slots.splice(idx, 1);
+          renderKeywordsTable();
+        });
+      }
+
+      if (addBtn) {
+        addBtn.addEventListener("click", function () {
+          if (slots.length >= 12) return;
+          slots.push({ keyword: "new keyword " + (slots.length + 1), question: "New reader question?" });
+          renderKeywordsTable();
+        });
+      }
+
+      var params = new URLSearchParams(window.location.search);
+      if (params.get("keywords") === "1" || params.get("format") === "keyword-block") {
+        setKeywordSlots(PRESETS.auto);
+      }
+    })();
 
     // ---- Insert flow: + opens menu → "Forms" opens dialog with live preview → Add to this variant
     (function () {
