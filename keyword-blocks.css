@@ -12,6 +12,16 @@
   border-color: #2e7d32 !important;
 }
 
+.editor-insert-menu__item--kb:hover,
+.editor-insert-menu__item--kb:focus-visible {
+  background: #f1f8f1;
+}
+
+.editor-insert-menu__icon--kb {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
 .modal--kb-editor .modal__inner {
   max-width: 920px;
   width: calc(100vw - 32px);
@@ -31,7 +41,94 @@
   gap: 14px;
 }
 
-.kb-editor__slots-hint {
+.kb-editor__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 0 4px;
+  border-top: 1px solid #eee;
+}
+
+.kb-editor__section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.kb-editor__section-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #444;
+}
+
+.kb-editor__section-hint {
+  font-size: 12px;
+  margin: -4px 0 0;
+  line-height: 1.45;
+}
+
+.kb-deal-value-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.input--readonly,
+.kb-editor input[readonly] {
+  background: #f5f5f5;
+  color: #666;
+  cursor: default;
+}
+
+/* Insert keyword blocks dialog (mirrors insert-form) */
+.modal--insert-kb::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal--insert-kb {
+  border: none;
+  border-radius: 14px;
+  padding: 0;
+  max-width: 920px;
+  width: calc(100vw - 32px);
+  background: transparent;
+}
+
+.modal--insert-kb .insert-kb-preview .kb-modal-preview {
+  max-height: 420px;
+}
+
+.insert-kb-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: #f8faf8;
+  border: 1px solid #e0e8e0;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.insert-kb-meta dt {
+  color: #666;
+  font-weight: 500;
+}
+
+.insert-kb-meta dd {
+  margin: 0;
+  font-weight: 600;
+  color: #1b5e20;
+}
+
+@media (max-width: 700px) {
+  .insert-kb-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
   font-size: 12px;
   margin: 0 0 10px;
   line-height: 1.45;

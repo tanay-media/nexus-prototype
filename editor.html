@@ -103,6 +103,16 @@
                 </span>
                 <svg class="editor-insert-menu__chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
               </button>
+              <button type="button" class="editor-insert-menu__item editor-insert-menu__item--kb" role="menuitem" data-insert-type="keyword-blocks">
+                <span class="editor-insert-menu__icon editor-insert-menu__icon--kb" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h14"/><circle cx="18" cy="18" r="3" fill="currentColor" stroke="none"/></svg>
+                </span>
+                <span class="editor-insert-menu__text">
+                  <strong>Keyword blocks</strong>
+                  <small>Reader questions → CM ads → MAX</small>
+                </span>
+                <svg class="editor-insert-menu__chev" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
               <button type="button" class="editor-insert-menu__item is-disabled" role="menuitem" disabled>
                 <span class="editor-insert-menu__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="13" rx="2"/><path d="M9 11h6"/></svg>
@@ -280,7 +290,7 @@
               <svg class="settings-acc__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="settings-acc__body">
-              <p class="settings-acc__hint muted" id="editor-keywords-hint">Populated by AI when you build a keyword-block lander in chat. Edit keywords and reader questions before publish.</p>
+              <p class="settings-acc__hint muted" id="editor-keywords-hint">Attach a keyword-blocks widget via <strong>+</strong> below, or let AI fill slots from chat. CSS and layout styling stay in variant HTML.</p>
               <p class="settings-acc__hint muted" id="editor-keywords-empty" style="padding:12px;background:#fafafa;border-radius:8px;border:1px dashed #ddd;">No keywords yet — describe a keyword-block lander in chat (e.g. “reader questions for auto insurance savings”).</p>
               <div id="editor-keywords-slots-wrap" hidden>
                 <div class="table-scroll" style="margin-bottom:10px;">
@@ -338,6 +348,46 @@
         <div class="insert-form__actions">
           <button type="button" class="btn" data-close-dialog>Cancel</button>
           <button type="button" class="btn btn--black" id="insert-form-add" disabled>Add to this variant</button>
+        </div>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog class="modal modal--insert-form modal--insert-kb" id="dialog-insert-kb" aria-labelledby="insert-kb-title">
+    <div class="modal__inner insert-form">
+      <header class="modal__header">
+        <div>
+          <h2 class="modal__title" id="insert-kb-title">Insert keyword blocks</h2>
+          <p class="modal__hint">Pick a workspace widget — advertiser, deal, campaign &amp; slots come from the library. Styling edits stay in variant HTML.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </header>
+
+      <div class="insert-form__body">
+        <aside class="insert-form__list" aria-label="Keyword blocks library">
+          <div class="insert-form__list-head">
+            <p class="insert-form__list-title">Keyword blocks in library</p>
+            <a href="widgets.html" target="_blank" rel="noopener" class="insert-form__manage">Manage →</a>
+          </div>
+          <ul id="insert-kb-list" role="listbox" aria-label="Keyword blocks"></ul>
+        </aside>
+
+        <section class="insert-form__preview insert-kb-preview" id="insert-kb-preview" aria-live="polite">
+          <div class="insert-form__preview-empty" id="insert-kb-preview-empty">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h14"/></svg>
+            <p>Pick a keyword-blocks widget to preview slots and deal metadata.</p>
+          </div>
+        </section>
+      </div>
+
+      <footer class="insert-form__foot">
+        <div class="insert-form__cta-field">
+          <label for="insert-kb-trigger">Trigger / opener text</label>
+          <input type="text" id="insert-kb-trigger" placeholder="e.g. Explore reader questions" autocomplete="off" disabled />
+        </div>
+        <div class="insert-form__actions">
+          <button type="button" class="btn" data-close-dialog>Cancel</button>
+          <button type="button" class="btn btn--black" id="insert-kb-add" disabled>Add to this variant</button>
         </div>
       </footer>
     </div>
@@ -824,12 +874,22 @@
         if (hintEl && has) hintEl.textContent = "AI detected " + slots.length + " keyword slot(s). Edit below or add more (max 12).";
       }
 
-      function setKeywordSlots(next) {
+      function setKeywordSlots(next, hintText) {
         slots = (next || []).slice(0, 12).map(function (s, i) {
           return { keyword: s.keyword || "", question: s.question || s.displayQuestion || "" };
         });
         renderKeywordsTable();
+        if (hintEl && hintText) hintEl.textContent = hintText;
+        else if (hintEl && slots.length) {
+          hintEl.textContent = slots.length + " keyword slot(s). Edit copy below; CSS/styling in variant HTML.";
+        }
       }
+
+      window.setKeywordSlotsFromWidget = function (next, hintText) {
+        setKeywordSlots(next, hintText);
+        var acc = document.getElementById("editor-keywords-acc");
+        if (acc && !acc.open) acc.open = true;
+      };
 
       window.maybeDetectKeywordsFromChat = function (promptText) {
         var t = (promptText || "").toLowerCase();
@@ -1021,6 +1081,9 @@
           if (t === "forms") {
             setMenuOpen(false);
             openInsertFormDialog();
+          } else if (t === "keyword-blocks") {
+            setMenuOpen(false);
+            if (typeof window.openInsertKbDialog === "function") window.openInsertKbDialog();
           }
         });
       });
@@ -1155,6 +1218,233 @@
           showToast("Added “" + addedName + "” with CTA “" + cta + "” to this variant.");
           if (typeof addBubble === "function") {
             addBubble("Added form embed (“" + cta + "”) — " + f.steps.length + "-step " + addedName + ".", "ai");
+          }
+        });
+      }
+    })();
+
+    // ---- Insert flow: + → Keyword blocks → library picker → Add to variant
+    (function () {
+      var dialog = document.getElementById("dialog-insert-kb");
+      var listEl = document.getElementById("insert-kb-list");
+      var previewEl = document.getElementById("insert-kb-preview");
+      var previewEmpty = document.getElementById("insert-kb-preview-empty");
+      var triggerInput = document.getElementById("insert-kb-trigger");
+      var addBtn = document.getElementById("insert-kb-add");
+      var variantHtml = document.getElementById("editor-variant-html");
+      var htmlDrawer = document.querySelector(".editor-html-drawer");
+      var toast = document.getElementById("editor-insert-toast");
+      if (!dialog || !listEl) return;
+
+      var SLOT_PRESETS = {
+        passive: [
+          { keyword: "passive income investing", question: "How do I start earning passive income from investing?" },
+          { keyword: "etf zero fee platform", question: "What's the best platform to buy ETFs with zero fees?" },
+          { keyword: "beginner investing start", question: "I'm a beginner — where do I even start?" },
+          { keyword: "open brokerage account fast", question: "How quickly can I open and fund a brokerage account?" }
+        ],
+        auto: [
+          { keyword: "auto insurance savings", question: "How much can I save on auto insurance in my state?" },
+          { keyword: "compare car insurance quotes", question: "What's the fastest way to compare quotes online?" },
+          { keyword: "cheap full coverage insurance", question: "Who has the cheapest full coverage near me?" },
+          { keyword: "switch auto insurance carrier", question: "How do I switch carriers without a coverage gap?" }
+        ]
+      };
+
+      var KB_WIDGETS = {
+        "kb-passive": {
+          id: "kb-passive",
+          widgetId: "kb_passive_investing",
+          name: "Passive investing — reader questions",
+          sub: "4 keywords · E*TRADE · MAX-CMP-9912",
+          trigger: "Explore reader questions",
+          advertiser: "E*TRADE",
+          entityId: "ENT-KB-ETRADE-01",
+          teamOfferId: "to_etrade_passive",
+          dealId: "DL-88421",
+          dealValue: "$12.50",
+          campaignId: "MAX-CMP-9912",
+          campaignProvider: "MAX",
+          layoutId: "modal_v1",
+          headerTitle: "What would you like to explore first?",
+          sectionLabel: "READER QUESTIONS",
+          dismissLabel: "I'll continue reading on my own",
+          slots: SLOT_PRESETS.passive
+        },
+        "kb-auto": {
+          id: "kb-auto",
+          widgetId: "kb_auto_insurance",
+          name: "Auto insurance — reader questions",
+          sub: "4 keywords · State Farm · MAX-CMP-7721",
+          trigger: "See insurance savings",
+          advertiser: "State Farm",
+          entityId: "ENT-KB-SF-AUTO-02",
+          teamOfferId: "to_auto_insurance",
+          dealId: "DL-77210",
+          dealValue: "$18.00",
+          campaignId: "MAX-CMP-7721",
+          campaignProvider: "MAX",
+          layoutId: "modal_v1",
+          headerTitle: "What would you like to explore first?",
+          sectionLabel: "READER QUESTIONS",
+          dismissLabel: "I'll continue reading on my own",
+          slots: SLOT_PRESETS.auto
+        }
+      };
+      var KB_ORDER = ["kb-passive", "kb-auto"];
+
+      var selectedKbId = "";
+      var kbActivePreviewIdx = 0;
+
+      function escapeHtml(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+
+      function showToast(text) {
+        if (!toast) return;
+        toast.textContent = text;
+        toast.hidden = false;
+        toast.classList.add("is-visible");
+        setTimeout(function () {
+          toast.classList.remove("is-visible");
+          toast.hidden = true;
+        }, 3200);
+      }
+
+      function renderKbList() {
+        listEl.innerHTML = "";
+        KB_ORDER.forEach(function (id) {
+          var w = KB_WIDGETS[id];
+          var li = document.createElement("li");
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "insert-form-pick";
+          btn.setAttribute("role", "option");
+          btn.setAttribute("data-kb-id", id);
+          btn.innerHTML =
+            '<span class="insert-form-pick__head">' +
+              '<strong>' + escapeHtml(w.name) + '</strong>' +
+              '<span class="insert-form-pick__count">' + w.slots.length + ' kw</span>' +
+            '</span>' +
+            '<small>' + escapeHtml(w.sub) + '</small>';
+          btn.addEventListener("click", function () { selectKb(id); });
+          li.appendChild(btn);
+          listEl.appendChild(li);
+        });
+      }
+
+      function renderKbPreview(w) {
+        if (!previewEl) return;
+        if (!w) {
+          previewEl.innerHTML = "";
+          if (previewEmpty) previewEl.appendChild(previewEmpty);
+          return;
+        }
+        var meta =
+          '<dl class="insert-kb-meta">' +
+            '<div><dt>Advertiser</dt><dd>' + escapeHtml(w.advertiser) + '</dd></div>' +
+            '<div><dt>CM entity</dt><dd>' + escapeHtml(w.entityId) + '</dd></div>' +
+            '<div><dt>Deal ID</dt><dd>' + escapeHtml(w.dealId) + '</dd></div>' +
+            '<div><dt>Deal value</dt><dd>' + escapeHtml(w.dealValue) + '</dd></div>' +
+            '<div><dt>Campaign</dt><dd>' + escapeHtml(w.campaignProvider) + ' · ' + escapeHtml(w.campaignId) + '</dd></div>' +
+            '<div><dt>Team offer</dt><dd>' + escapeHtml(w.teamOfferId) + '</dd></div>' +
+          '</dl>';
+        var blocks = "";
+        w.slots.forEach(function (slot, i) {
+          blocks +=
+            '<div class="kb-block' + (kbActivePreviewIdx === i ? " is-active" : "") + '" data-kb-idx="' + i + '">' +
+              '<span class="kb-block__play">▶</span><span>' + escapeHtml(slot.question || slot.keyword) + '</span>' +
+            '</div>';
+        });
+        previewEl.innerHTML =
+          meta +
+          '<div class="kb-modal-preview">' +
+            '<div class="kb-modal-preview__header">' +
+              '<div class="kb-modal-preview__brand">' + escapeHtml(w.advertiser.toUpperCase()) + '</div>' +
+              '<h3 class="kb-modal-preview__title">' + escapeHtml(w.headerTitle) + '</h3>' +
+              '<span class="kb-modal-preview__close" aria-hidden="true">✕</span>' +
+            '</div>' +
+            '<div class="kb-modal-preview__body" id="insert-kb-preview-blocks">' +
+              '<p class="kb-modal-preview__section">' + escapeHtml(w.sectionLabel) + '</p>' +
+              blocks +
+            '</div>' +
+            '<div class="kb-modal-preview__dismiss">' + escapeHtml(w.dismissLabel) + '</div>' +
+          '</div>';
+        var blocksEl = document.getElementById("insert-kb-preview-blocks");
+        if (blocksEl) {
+          blocksEl.addEventListener("click", function (e) {
+            var block = e.target.closest(".kb-block");
+            if (!block) return;
+            kbActivePreviewIdx = parseInt(block.getAttribute("data-kb-idx"), 10);
+            selectKb(selectedKbId);
+          });
+        }
+      }
+
+      function selectKb(id) {
+        selectedKbId = id;
+        var w = KB_WIDGETS[id];
+        kbActivePreviewIdx = 0;
+        renderKbPreview(w);
+        listEl.querySelectorAll(".insert-form-pick").forEach(function (btn) {
+          btn.classList.toggle("is-active", btn.getAttribute("data-kb-id") === id);
+        });
+        if (triggerInput) {
+          triggerInput.disabled = false;
+          triggerInput.value = w.trigger;
+          triggerInput.focus();
+          triggerInput.select();
+        }
+        if (addBtn) addBtn.disabled = false;
+      }
+
+      function openInsertKbDialog() {
+        renderKbList();
+        selectedKbId = "";
+        kbActivePreviewIdx = 0;
+        renderKbPreview(null);
+        if (triggerInput) { triggerInput.value = ""; triggerInput.disabled = true; }
+        if (addBtn) addBtn.disabled = true;
+        if (typeof dialog.showModal === "function") dialog.showModal();
+        else dialog.setAttribute("open", "");
+      }
+
+      window.openInsertKbDialog = openInsertKbDialog;
+
+      dialog.querySelectorAll("[data-close-dialog]").forEach(function (b) {
+        b.addEventListener("click", function () { dialog.close(); });
+      });
+
+      if (addBtn) {
+        addBtn.addEventListener("click", function () {
+          if (!selectedKbId) return;
+          var w = KB_WIDGETS[selectedKbId];
+          var trigger = triggerInput ? triggerInput.value.trim() : "";
+          var triggerEsc = escapeHtml(trigger || w.trigger);
+          var block =
+            "\n<!-- nexus: keyword blocks (" + escapeHtml(w.name) + ") · " + w.slots.length + " slots -->\n" +
+            '<section class="lander-kb-embed" data-kb-widget-id="' + escapeHtml(w.widgetId) + '" data-widget-id="' + escapeHtml(w.widgetId) + '" data-lander-embed="keyword-blocks" data-team-offer-id="' + escapeHtml(w.teamOfferId) + '" data-campaign-id="' + escapeHtml(w.campaignId) + '" data-deal-id="' + escapeHtml(w.dealId) + '" data-entity-id="' + escapeHtml(w.entityId) + '">\n' +
+            '  <button type="button" class="lander-kb-embed__trigger">' + triggerEsc + '</button>\n' +
+            "</section>\n";
+          if (variantHtml) {
+            variantHtml.value = (variantHtml.value || "") + block;
+            if (htmlDrawer) htmlDrawer.open = true;
+          }
+          if (typeof window.setKeywordSlotsFromWidget === "function") {
+            window.setKeywordSlotsFromWidget(
+              w.slots,
+              w.slots.length + " slots from workspace widget \"" + w.name + "\". Advertiser/deal locked to library; edit CSS in variant HTML."
+            );
+          }
+          dialog.close();
+          showToast("Added keyword blocks — " + w.advertiser + " · " + w.campaignId);
+          if (typeof addBubble === "function") {
+            addBubble(
+              "Added keyword blocks widget (“" + w.name + "”) — " + w.advertiser + ", deal " + w.dealId + ", campaign " + w.campaignId + ". Styling in variant HTML.",
+              "ai"
+            );
           }
         });
       }

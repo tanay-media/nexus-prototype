@@ -99,7 +99,7 @@
                   <tr>
                     <td>
                       <strong>Auto insurance — reader questions</strong>
-                      <div class="muted" style="font-size:11px;">4 keywords · modal_v1</div>
+                      <div class="muted" style="font-size:11px;">4 keywords · State Farm · MAX-CMP-7721</div>
                     </td>
                     <td><span class="badge badge--kb">Keyword blocks</span></td>
                     <td>
@@ -120,7 +120,7 @@
                   <tr>
                     <td>
                       <strong>Passive investing — reader questions</strong>
-                      <div class="muted" style="font-size:11px;">4 keywords · hedgeyourfuture.com</div>
+                      <div class="muted" style="font-size:11px;">4 keywords · E*TRADE · MAX-CMP-9912</div>
                     </td>
                     <td><span class="badge badge--kb">Keyword blocks</span></td>
                     <td>
@@ -382,10 +382,76 @@
             <label for="kb-widget-name">Widget name</label>
             <input type="text" id="kb-widget-name" value="Passive investing — reader questions" />
           </div>
-          <div class="field field--inline-pair">
-            <div class="field">
-              <label for="kb-slot-count-select">Number of keywords</label>
-              <select id="kb-slot-count-select" class="select">
+
+          <div class="kb-editor__section">
+            <h3 class="kb-editor__section-title">Advertiser &amp; deal</h3>
+            <p class="muted kb-editor__section-hint">Commercial + CM registration. Inherited when attached to a variant via <strong>+ Insert</strong>.</p>
+            <div class="field field--inline-pair">
+              <div class="field">
+                <label for="kb-advertiser">Advertiser</label>
+                <select id="kb-advertiser" class="select">
+                  <option value="adv-etrade">E*TRADE</option>
+                  <option value="adv-statefarm">State Farm</option>
+                  <option value="adv-quotehub">QuoteHub Insurance</option>
+                  <option value="adv-fidelity">Fidelity</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="kb-team-offer">Team offer</label>
+                <select id="kb-team-offer" class="select">
+                  <option value="to_etrade_passive">E*TRADE Passive Income</option>
+                  <option value="to_auto_insurance">Auto Insurance Savings</option>
+                  <option value="to_fidelity_etf">Fidelity Zero ETF</option>
+                </select>
+              </div>
+            </div>
+            <div class="field field--inline-pair">
+              <div class="field">
+                <label for="kb-entity-id">CM entity ID</label>
+                <input type="text" id="kb-entity-id" value="ENT-KB-ETRADE-01" placeholder="ENT-KB-…" />
+              </div>
+              <div class="field">
+                <label for="kb-team-offer-id">Team offer ID</label>
+                <input type="text" id="kb-team-offer-id" value="to_etrade_passive" readonly class="input--readonly" />
+              </div>
+            </div>
+            <div class="field field--inline-pair">
+              <div class="field">
+                <label for="kb-deal-id">Deal ID</label>
+                <input type="text" id="kb-deal-id" value="DL-88421" placeholder="DL-…" />
+              </div>
+              <div class="field">
+                <label for="kb-deal-value">Deal value</label>
+                <div class="kb-deal-value-row">
+                  <input type="number" id="kb-deal-value" min="0" step="0.01" value="12.50" aria-label="Deal value" />
+                  <select id="kb-deal-currency" class="select" aria-label="Currency">
+                    <option value="USD" selected>USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field field--inline-pair">
+              <div class="field">
+                <label for="kb-campaign-provider">Campaign provider</label>
+                <select id="kb-campaign-provider" class="select">
+                  <option value="max" selected>MAX</option>
+                  <option value="internal">Internal</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="kb-campaign-id">Campaign ID</label>
+                <input type="text" id="kb-campaign-id" value="MAX-CMP-9912" placeholder="MAX-CMP-…" />
+              </div>
+            </div>
+          </div>
+
+          <div class="kb-editor__section">
+            <h3 class="kb-editor__section-title">Modal copy &amp; slots</h3>
+            <div class="field field--inline-pair">
+              <div class="field">
+                <label for="kb-slot-count-select">Number of keywords</label>
+                <select id="kb-slot-count-select" class="select">
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -401,11 +467,10 @@
               </select>
             </div>
             <div class="field">
-              <label for="kb-team-offer">Team offer (MAX campaign)</label>
-              <select id="kb-team-offer" class="select">
-                <option value="to_etrade_passive">E*TRADE Passive Income — MAX-CMP-9912</option>
-                <option value="to_auto_insurance">Auto Insurance Savings — MAX-CMP-7721</option>
-                <option value="to_fidelity_etf">Fidelity Zero ETF — MAX-CMP-8840</option>
+              <label for="kb-layout-id">Layout template</label>
+              <select id="kb-layout-id" class="select">
+                <option value="modal_v1" selected>modal_v1</option>
+                <option value="modal_compact">modal_compact</option>
               </select>
             </div>
           </div>
@@ -440,6 +505,7 @@
             </table>
           </div>
           <button type="button" class="btn" id="kb-add-slot" style="font-size:12px;padding:4px 12px;margin-top:8px;">+ Add keyword slot</button>
+          </div>
         </div>
         <div class="kb-preview-wrap">
           <p class="kb-preview-label">Preview · click a block</p>
@@ -569,6 +635,56 @@
         var kbSaveBtn = document.getElementById("kb-editor-save");
         var kbEditorTitle = document.getElementById("kb-editor-title");
         var kbNameIn = document.getElementById("kb-widget-name");
+        var kbAdvertiserIn = document.getElementById("kb-advertiser");
+        var kbTeamOfferIn = document.getElementById("kb-team-offer");
+        var kbEntityIdIn = document.getElementById("kb-entity-id");
+        var kbTeamOfferIdIn = document.getElementById("kb-team-offer-id");
+        var kbDealIdIn = document.getElementById("kb-deal-id");
+        var kbDealValueIn = document.getElementById("kb-deal-value");
+        var kbDealCurrencyIn = document.getElementById("kb-deal-currency");
+        var kbCampaignProviderIn = document.getElementById("kb-campaign-provider");
+        var kbCampaignIdIn = document.getElementById("kb-campaign-id");
+        var kbLayoutIn = document.getElementById("kb-layout-id");
+        var kbOpenNewTabIn = document.getElementById("kb-open-new-tab");
+
+        var TEAM_OFFERS = {
+          to_etrade_passive: {
+            advertiserId: "adv-etrade",
+            name: "E*TRADE Passive Income",
+            entityId: "ENT-KB-ETRADE-01",
+            teamOfferId: "to_etrade_passive",
+            dealId: "DL-88421",
+            dealValue: "12.50",
+            dealCurrency: "USD",
+            campaignProvider: "max",
+            campaignId: "MAX-CMP-9912",
+            layoutId: "modal_v1"
+          },
+          to_auto_insurance: {
+            advertiserId: "adv-statefarm",
+            name: "Auto Insurance Savings",
+            entityId: "ENT-KB-SF-AUTO-02",
+            teamOfferId: "to_auto_insurance",
+            dealId: "DL-77210",
+            dealValue: "18.00",
+            dealCurrency: "USD",
+            campaignProvider: "max",
+            campaignId: "MAX-CMP-7721",
+            layoutId: "modal_v1"
+          },
+          to_fidelity_etf: {
+            advertiserId: "adv-fidelity",
+            name: "Fidelity Zero ETF",
+            entityId: "ENT-KB-FID-03",
+            teamOfferId: "to_fidelity_etf",
+            dealId: "DL-99012",
+            dealValue: "9.75",
+            dealCurrency: "USD",
+            campaignProvider: "max",
+            campaignId: "MAX-CMP-8840",
+            layoutId: "modal_compact"
+          }
+        };
 
         var PRESETS = {
           passive: [
@@ -597,6 +713,37 @@
 
         var kbSlots = PRESETS.passive.slice();
         var kbActiveIndex = 0;
+
+        function applyTeamOffer(offerKey) {
+          var o = TEAM_OFFERS[offerKey];
+          if (!o) return;
+          if (kbAdvertiserIn) kbAdvertiserIn.value = o.advertiserId;
+          if (kbEntityIdIn) kbEntityIdIn.value = o.entityId;
+          if (kbTeamOfferIdIn) kbTeamOfferIdIn.value = o.teamOfferId;
+          if (kbDealIdIn) kbDealIdIn.value = o.dealId;
+          if (kbDealValueIn) kbDealValueIn.value = o.dealValue;
+          if (kbDealCurrencyIn) kbDealCurrencyIn.value = o.dealCurrency;
+          if (kbCampaignProviderIn) kbCampaignProviderIn.value = o.campaignProvider;
+          if (kbCampaignIdIn) kbCampaignIdIn.value = o.campaignId;
+          if (kbLayoutIn) kbLayoutIn.value = o.layoutId || "modal_v1";
+        }
+
+        function syncTeamOfferFromAdvertiser() {
+          if (!kbAdvertiserIn || !kbTeamOfferIn) return;
+          var adv = kbAdvertiserIn.value;
+          var keys = Object.keys(TEAM_OFFERS).filter(function (k) {
+            return TEAM_OFFERS[k].advertiserId === adv;
+          });
+          kbTeamOfferIn.innerHTML = "";
+          keys.forEach(function (k) {
+            var o = TEAM_OFFERS[k];
+            var opt = document.createElement("option");
+            opt.value = k;
+            opt.textContent = o.name;
+            kbTeamOfferIn.appendChild(opt);
+          });
+          if (keys.length) applyTeamOffer(keys[0]);
+        }
 
         function resizeSlotsToCount(n) {
           n = Math.max(1, Math.min(12, parseInt(n, 10) || 1));
@@ -662,12 +809,18 @@
           if (presetKey === "auto") {
             kbSlots = PRESETS.auto.slice();
             if (kbNameIn) kbNameIn.value = "Auto insurance — reader questions";
+            if (kbTeamOfferIn) kbTeamOfferIn.value = "to_auto_insurance";
+            applyTeamOffer("to_auto_insurance");
           } else if (mode === "new") {
             kbSlots = PRESETS.passive.slice(0, 4);
             if (kbNameIn) kbNameIn.value = "New keyword blocks widget";
+            if (kbTeamOfferIn) kbTeamOfferIn.value = "to_etrade_passive";
+            applyTeamOffer("to_etrade_passive");
           } else {
             kbSlots = PRESETS.passive.slice();
             if (kbNameIn) kbNameIn.value = "Passive investing — reader questions";
+            if (kbTeamOfferIn) kbTeamOfferIn.value = "to_etrade_passive";
+            applyTeamOffer("to_etrade_passive");
           }
           kbActiveIndex = 0;
           if (kbSlotCountSelect) kbSlotCountSelect.value = String(kbSlots.length);
@@ -734,6 +887,22 @@
           if (el) el.addEventListener("input", renderKbPreview);
         });
 
+        if (kbTeamOfferIn) {
+          kbTeamOfferIn.addEventListener("change", function () {
+            applyTeamOffer(kbTeamOfferIn.value);
+          });
+        }
+
+        if (kbAdvertiserIn) {
+          kbAdvertiserIn.addEventListener("change", syncTeamOfferFromAdvertiser);
+        }
+
+        if (kbTeamOfferIdIn && kbTeamOfferIn) {
+          kbTeamOfferIn.addEventListener("change", function () {
+            if (kbTeamOfferIdIn) kbTeamOfferIdIn.value = kbTeamOfferIn.value;
+          });
+        }
+
         if (kbSlotCountSelect) {
           kbSlotCountSelect.addEventListener("change", function () {
             resizeSlotsToCount(kbSlotCountSelect.value);
@@ -751,7 +920,16 @@
 
         if (kbSaveBtn) {
           kbSaveBtn.addEventListener("click", function () {
-            alert("Saved keyword blocks widget with " + kbSlots.length + " slot(s).\n\nAttach in variant editor via data-widget-id.");
+            var adv = kbAdvertiserIn ? kbAdvertiserIn.options[kbAdvertiserIn.selectedIndex].text : "";
+            var camp = kbCampaignIdIn ? kbCampaignIdIn.value : "";
+            alert(
+              "Saved keyword blocks widget.\n\n" +
+              "Advertiser: " + adv + "\n" +
+              "Deal ID: " + (kbDealIdIn ? kbDealIdIn.value : "") + "\n" +
+              "Campaign: " + camp + "\n" +
+              "Slots: " + kbSlots.length + "\n\n" +
+              "Attach in variant editor via + → Keyword blocks."
+            );
             kbDlg.close();
           });
         }
