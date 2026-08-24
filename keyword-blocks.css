@@ -31,11 +31,30 @@
   gap: 14px;
 }
 
+.kb-editor__slots-hint {
+  font-size: 12px;
+  margin: 0 0 10px;
+  line-height: 1.45;
+}
+
+.field--inline-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .field--inline-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
 .kb-editor__slots-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-top: 8px;
 }
 
 .kb-editor__slots-head h3 {
@@ -45,6 +64,11 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #666;
+}
+
+.kb-slots-table .kb-slot-del:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .kb-slots-table {

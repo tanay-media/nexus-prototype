@@ -28,7 +28,7 @@
     <main class="main">
       <div class="page-header">
         <h1>Widgets</h1>
-        <p class="page-header__sub muted" style="margin:2px 0 0;font-size:13px;">Workspace-level widget library for <strong>forms</strong>. Keyword blocks are configured per variant in the <a href="editor.html?format=keyword-block&amp;keywords=1">editor → Keywords panel</a> (AI-filled from chat).</p>
+        <p class="page-header__sub muted" style="margin:2px 0 0;font-size:13px;">Workspace widget library — <strong>forms</strong> and <strong>keyword blocks</strong> (slots, keyword text, reader questions). Attach to variants in the editor; styling per variant.</p>
         <div class="page-header__right">
           <button type="button" class="btn btn--black" id="new-widget-btn">+ New widget</button>
         </div>
@@ -49,10 +49,10 @@
                 <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Form</div>
                 <div class="muted" style="font-size:12px;line-height:1.4;">Multi-step lead forms — collect visitor info &amp; redirect to advertiser</div>
               </button>
-              <button type="button" class="widget-type-card widget-type-card--kb" id="wt-keyword-blocks" disabled style="border:1.5px solid #e5e5e5;border-radius:10px;padding:18px 16px;background:#fafafa;text-align:left;opacity:.65;cursor:not-allowed;">
+              <button type="button" class="widget-type-card widget-type-card--kb" id="wt-keyword-blocks" style="border:1.5px solid #2e7d32;border-radius:10px;padding:18px 16px;background:#f1f8f1;cursor:pointer;text-align:left;transition:box-shadow .15s;">
                 <div style="font-size:22px;margin-bottom:6px;">🔑</div>
-                <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Keyword blocks <span class="badge" style="font-size:10px;vertical-align:middle;padding:2px 6px;background:#e8f5e9;color:#1b5e20;border-radius:4px;">In editor</span></div>
-                <div class="muted" style="font-size:12px;line-height:1.4;">Configure in variant editor → Settings → <strong>Keywords</strong> (AI-filled from chat). Not a workspace library widget.</div>
+                <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Keyword blocks</div>
+                <div class="muted" style="font-size:12px;line-height:1.4;">Reader questions → server-side ads → MAX tracking (up to 12 keywords)</div>
               </button>
               <div class="widget-type-card" style="border:1.5px solid #e5e5e5;border-radius:10px;padding:18px 16px;background:#fafafa;text-align:left;opacity:.55;position:relative;">
                 <div style="font-size:22px;margin-bottom:6px;">💬</div>
@@ -90,12 +90,54 @@
                     <th>Widget</th>
                     <th>Type</th>
                     <th>Used in</th>
-                    <th>Responses</th>
+                    <th>Metrics</th>
                     <th>Updated</th>
                     <th class="right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
+                  <tr>
+                    <td>
+                      <strong>Auto insurance — reader questions</strong>
+                      <div class="muted" style="font-size:11px;">4 keywords · modal_v1</div>
+                    </td>
+                    <td><span class="badge badge--kb">Keyword blocks</span></td>
+                    <td>
+                      <div style="line-height:1.6;">
+                        <a href="landers.html" style="font-size:13px;text-decoration:none;color:#222;font-weight:500;">Auto insurance ZIP</a>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">
+                          <a href="editor.html" class="variant-chip" title="Open variant">Variant 1</a>
+                        </div>
+                      </div>
+                    </td>
+                    <td><a href="#" class="js-goto-kb-funnel" style="font-weight:600;color:#1b5e20;text-decoration:none;">Funnel →</a></td>
+                    <td class="muted" style="font-size:12px;">1h ago<br/>Tanay</td>
+                    <td class="right"><div class="actions">
+                      <button type="button" class="icon-btn js-kb-edit" data-widget="Auto insurance — reader questions" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                      <button type="button" class="icon-btn js-widget-clone" data-widget="Auto insurance — reader questions" title="Clone to workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                    </div></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Passive investing — reader questions</strong>
+                      <div class="muted" style="font-size:11px;">4 keywords · hedgeyourfuture.com</div>
+                    </td>
+                    <td><span class="badge badge--kb">Keyword blocks</span></td>
+                    <td>
+                      <div style="line-height:1.6;">
+                        <a href="landers.html" style="font-size:13px;text-decoration:none;color:#222;font-weight:500;">Hedge Your Future</a>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">
+                          <a href="editor.html" class="variant-chip" title="Open variant">Reader modal v1</a>
+                        </div>
+                      </div>
+                    </td>
+                    <td><a href="#" class="js-goto-kb-funnel" style="font-weight:600;color:#1b5e20;text-decoration:none;">Funnel →</a></td>
+                    <td class="muted" style="font-size:12px;">3h ago<br/>Kyle</td>
+                    <td class="right"><div class="actions">
+                      <button type="button" class="icon-btn js-kb-edit" data-widget="Passive investing — reader questions" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+                      <button type="button" class="icon-btn js-widget-clone" data-widget="Passive investing — reader questions" title="Clone to workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+                    </div></td>
+                  </tr>
                   <tr>
                     <td>
                       <strong>Lead — short qualify</strong>
@@ -191,7 +233,7 @@
 
         <section data-tab-panel="widgets-kb-funnel" hidden>
           <div class="card" style="padding:20px 24px;">
-            <p class="muted" style="margin:0 0 12px;font-size:13px;">Keyword blocks are <strong>not</strong> workspace widgets. Slots live on each <strong>variant</strong> — filled by AI in chat, editable under <strong>Settings → Keywords</strong> (below Call to Action) in the <a href="editor.html?format=keyword-block&amp;keywords=1">variant editor</a>.</p>
+            <p class="muted" style="margin:0 0 12px;font-size:13px;">Funnel metrics for keyword-block widgets in this workspace. Slots are defined in the widget editor; attach via <code>data-widget-id</code> in the variant editor.</p>
             <a href="reports.html" class="btn btn--black" style="font-size:13px;text-decoration:none;display:inline-block;margin-bottom:16px;">View keyword funnel in Reports →</a>
             <div class="kb-funnel-stats" id="kb-funnel-summary">
               <div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">3,248</div><div class="kb-funnel-step__rate">97% of visits</div></div>
@@ -328,6 +370,97 @@
     </main>
   </div>
 
+  <dialog class="modal modal--kb-editor" id="dialog-widget-keyword-blocks">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 class="modal__title" id="kb-editor-title">Keyword blocks widget</h2>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
+      </div>
+      <div class="kb-editor">
+        <div class="kb-editor__form">
+          <div class="field">
+            <label for="kb-widget-name">Widget name</label>
+            <input type="text" id="kb-widget-name" value="Passive investing — reader questions" />
+          </div>
+          <div class="field field--inline-pair">
+            <div class="field">
+              <label for="kb-slot-count-select">Number of keywords</label>
+              <select id="kb-slot-count-select" class="select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="kb-team-offer">Team offer (MAX campaign)</label>
+              <select id="kb-team-offer" class="select">
+                <option value="to_etrade_passive">E*TRADE Passive Income — MAX-CMP-9912</option>
+                <option value="to_auto_insurance">Auto Insurance Savings — MAX-CMP-7721</option>
+                <option value="to_fidelity_etf">Fidelity Zero ETF — MAX-CMP-8840</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="kb-header-title">Modal title</label>
+            <input type="text" id="kb-header-title" value="What would you like to explore first?" />
+          </div>
+          <div class="field field--inline-pair">
+            <div class="field">
+              <label for="kb-section-label">Section label</label>
+              <input type="text" id="kb-section-label" value="READER QUESTIONS" />
+            </div>
+            <div class="field">
+              <label for="kb-dismiss-label">Dismiss link text</label>
+              <input type="text" id="kb-dismiss-label" value="I'll continue reading on my own" />
+            </div>
+          </div>
+          <div class="field field--checkbox">
+            <label><input type="checkbox" id="kb-open-new-tab" checked /> Open ad CTA in new tab</label>
+          </div>
+          <div class="kb-editor__slots-head">
+            <h3>Keyword slots</h3>
+            <span class="muted" id="kb-slot-count-label">4 / 12</span>
+          </div>
+          <p class="muted kb-editor__slots-hint">Each row: <strong>Keyword</strong> (CM fetch key) + <strong>Reader question</strong> (block label on lander).</p>
+          <div class="table-scroll">
+            <table class="kb-slots-table" id="kb-slots-table">
+              <thead>
+                <tr><th>#</th><th>Keyword text</th><th>Reader question</th><th></th></tr>
+              </thead>
+              <tbody id="kb-slots-tbody"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn" id="kb-add-slot" style="font-size:12px;padding:4px 12px;margin-top:8px;">+ Add keyword slot</button>
+        </div>
+        <div class="kb-preview-wrap">
+          <p class="kb-preview-label">Preview · click a block</p>
+          <div class="kb-modal-preview" id="kb-modal-preview">
+            <div class="kb-modal-preview__header">
+              <div class="kb-modal-preview__brand" id="kb-preview-brand">WIDGET PREVIEW</div>
+              <h3 class="kb-modal-preview__title" id="kb-preview-title">What would you like to explore first?</h3>
+              <span class="kb-modal-preview__close" aria-hidden="true">✕</span>
+            </div>
+            <div class="kb-modal-preview__body" id="kb-preview-blocks"></div>
+            <div class="kb-modal-preview__dismiss" id="kb-preview-dismiss">I'll continue reading on my own</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal__actions widget-editor__footer">
+        <button type="button" class="btn" data-close-dialog>Cancel</button>
+        <button type="button" class="btn btn--black" id="kb-editor-save">Save widget</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog class="modal modal--widget-editor" id="dialog-widget-form">
     <div class="modal__inner modal__inner--widget-editor">
       <div class="modal__header widget-editor__modal-head">
@@ -417,6 +550,212 @@
         refreshCount();
         dlg.showModal();
       });
+
+      /* ── Keyword blocks widget editor ── */
+      (function () {
+        var kbCard = document.getElementById("wt-keyword-blocks");
+        var kbDlg = document.getElementById("dialog-widget-keyword-blocks");
+        var kbSlotsBody = document.getElementById("kb-slots-tbody");
+        var kbPreviewBlocks = document.getElementById("kb-preview-blocks");
+        var kbPreviewTitle = document.getElementById("kb-preview-title");
+        var kbPreviewDismiss = document.getElementById("kb-preview-dismiss");
+        var kbPreviewBrand = document.getElementById("kb-preview-brand");
+        var kbHeaderIn = document.getElementById("kb-header-title");
+        var kbSectionIn = document.getElementById("kb-section-label");
+        var kbDismissIn = document.getElementById("kb-dismiss-label");
+        var kbSlotCountSelect = document.getElementById("kb-slot-count-select");
+        var kbSlotCountLabel = document.getElementById("kb-slot-count-label");
+        var kbAddSlotBtn = document.getElementById("kb-add-slot");
+        var kbSaveBtn = document.getElementById("kb-editor-save");
+        var kbEditorTitle = document.getElementById("kb-editor-title");
+        var kbNameIn = document.getElementById("kb-widget-name");
+
+        var PRESETS = {
+          passive: [
+            { keyword: "passive income investing", question: "How do I start earning passive income from investing?" },
+            { keyword: "etf zero fee platform", question: "What's the best platform to buy ETFs with zero fees?" },
+            { keyword: "beginner investing start", question: "I'm a beginner — where do I even start?" },
+            { keyword: "open brokerage account fast", question: "How quickly can I open and fund a brokerage account?" }
+          ],
+          auto: [
+            { keyword: "auto insurance savings", question: "How much can I save on auto insurance in my state?" },
+            { keyword: "compare car insurance quotes", question: "What's the fastest way to compare quotes online?" },
+            { keyword: "cheap full coverage insurance", question: "Who has the cheapest full coverage near me?" },
+            { keyword: "switch auto insurance carrier", question: "How do I switch carriers without a coverage gap?" }
+          ]
+        };
+        var MOCK_ADS = {
+          "passive income investing": { title: "E*TRADE® Account Setup", url: "us.etrade.com", desc: "Open an account and place trades on desktop & mobile.", cta: "Open Account" },
+          "etf zero fee platform": { title: "Fidelity Zero ETFs", url: "fidelity.com", desc: "Zero expense ratio index ETFs.", cta: "Start investing" },
+          "beginner investing start": { title: "Schwab for Beginners", url: "schwab.com", desc: "Learn basics and open an account.", cta: "Get started" },
+          "open brokerage account fast": { title: "Robinhood Sign Up", url: "robinhood.com", desc: "Open and fund from your phone.", cta: "Sign up" },
+          "auto insurance savings": { title: "Compare Auto Rates", url: "quotes.example.com", desc: "See rates from top carriers in 60 seconds.", cta: "Compare My Rates" },
+          "compare car insurance quotes": { title: "Insurance Quote Hub", url: "quotes.example.com", desc: "Side-by-side quotes, no spam calls.", cta: "Get quotes" },
+          "cheap full coverage insurance": { title: "Full Coverage Deals", url: "quotes.example.com", desc: "Licensed carriers in all 50 states.", cta: "See rates" },
+          "switch auto insurance carrier": { title: "Switch & Save", url: "quotes.example.com", desc: "Switch without losing coverage.", cta: "Compare now" }
+        };
+
+        var kbSlots = PRESETS.passive.slice();
+        var kbActiveIndex = 0;
+
+        function resizeSlotsToCount(n) {
+          n = Math.max(1, Math.min(12, parseInt(n, 10) || 1));
+          while (kbSlots.length < n) {
+            kbSlots.push({ keyword: "keyword " + (kbSlots.length + 1), question: "Reader question for slot " + (kbSlots.length + 1) + "?" });
+          }
+          if (kbSlots.length > n) kbSlots = kbSlots.slice(0, n);
+          if (kbSlotCountSelect) kbSlotCountSelect.value = String(n);
+          renderKbSlotsTable();
+        }
+
+        function renderKbSlotsTable() {
+          if (!kbSlotsBody) return;
+          kbSlotsBody.innerHTML = "";
+          kbSlots.forEach(function (slot, i) {
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+              "<td>" + (i + 1) + "</td>" +
+              '<td><input type="text" class="kb-in-keyword" data-idx="' + i + '" value="' + String(slot.keyword).replace(/"/g, "&quot;") + '" placeholder="CM keyword" /></td>' +
+              '<td><input type="text" class="kb-in-question" data-idx="' + i + '" value="' + String(slot.question).replace(/"/g, "&quot;") + '" placeholder="Reader question" /></td>' +
+              '<td><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove" ' + (kbSlots.length <= 1 ? "disabled" : "") + '>✕</button></td>';
+            kbSlotsBody.appendChild(tr);
+          });
+          if (kbSlotCountLabel) kbSlotCountLabel.textContent = kbSlots.length + " / 12";
+          if (kbAddSlotBtn) kbAddSlotBtn.disabled = kbSlots.length >= 12;
+          renderKbPreview();
+        }
+
+        function renderKbPreview() {
+          if (!kbPreviewBlocks) return;
+          if (kbPreviewTitle && kbHeaderIn) kbPreviewTitle.textContent = kbHeaderIn.value || "What would you like to explore first?";
+          if (kbPreviewDismiss && kbDismissIn) kbPreviewDismiss.textContent = kbDismissIn.value || "I'll continue reading on my own";
+          if (kbPreviewBrand && kbNameIn) kbPreviewBrand.textContent = (kbNameIn.value || "WIDGET").toUpperCase().slice(0, 40);
+          kbPreviewBlocks.innerHTML = "";
+          var section = document.createElement("p");
+          section.className = "kb-modal-preview__section";
+          section.textContent = (kbSectionIn && kbSectionIn.value) ? kbSectionIn.value : "READER QUESTIONS";
+          kbPreviewBlocks.appendChild(section);
+          kbSlots.forEach(function (slot, i) {
+            var block = document.createElement("div");
+            block.className = "kb-block" + (kbActiveIndex === i ? " is-active" : "");
+            block.setAttribute("data-kb-idx", String(i));
+            block.innerHTML = '<span class="kb-block__play">▶</span><span>' + (slot.question || slot.keyword) + "</span>";
+            kbPreviewBlocks.appendChild(block);
+            if (kbActiveIndex === i) {
+              var ad = MOCK_ADS[slot.keyword] || { title: "Ad for “" + slot.keyword + "”", url: "advertiser.com", desc: "Resolved server-side from CM.", cta: "Learn more" };
+              var panel = document.createElement("div");
+              panel.className = "kb-ad-panel";
+              panel.innerHTML =
+                '<span class="kb-ad-panel__label">Ad</span>' +
+                '<div class="kb-ad-panel__title">' + ad.title + "</div>" +
+                '<div class="kb-ad-panel__url">' + ad.url + "</div>" +
+                '<p class="kb-ad-panel__desc">' + ad.desc + "</p>" +
+                '<button type="button" class="kb-ad-panel__cta">' + ad.cta + " → MAX</button>";
+              kbPreviewBlocks.appendChild(panel);
+            }
+          });
+        }
+
+        function openKbEditor(mode, presetKey) {
+          kbEditorTitle.textContent = mode === "new" ? "New keyword blocks widget" : "Edit keyword blocks widget";
+          kbSaveBtn.textContent = mode === "new" ? "Create widget" : "Save widget";
+          if (presetKey === "auto") {
+            kbSlots = PRESETS.auto.slice();
+            if (kbNameIn) kbNameIn.value = "Auto insurance — reader questions";
+          } else if (mode === "new") {
+            kbSlots = PRESETS.passive.slice(0, 4);
+            if (kbNameIn) kbNameIn.value = "New keyword blocks widget";
+          } else {
+            kbSlots = PRESETS.passive.slice();
+            if (kbNameIn) kbNameIn.value = "Passive investing — reader questions";
+          }
+          kbActiveIndex = 0;
+          if (kbSlotCountSelect) kbSlotCountSelect.value = String(kbSlots.length);
+          renderKbSlotsTable();
+          kbDlg.showModal();
+        }
+
+        if (kbCard) {
+          kbCard.addEventListener("mouseenter", function () { kbCard.style.boxShadow = "0 2px 12px rgba(27,94,32,.15)"; });
+          kbCard.addEventListener("mouseleave", function () { kbCard.style.boxShadow = "none"; });
+          kbCard.addEventListener("click", function () {
+            newDlg.close();
+            openKbEditor("new");
+          });
+        }
+
+        document.querySelectorAll(".js-kb-edit").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var name = btn.getAttribute("data-widget") || "";
+            openKbEditor("edit", name.indexOf("Auto") >= 0 ? "auto" : "passive");
+            if (kbNameIn && name) kbNameIn.value = name;
+          });
+        });
+
+        document.querySelectorAll(".js-goto-kb-funnel").forEach(function (link) {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            var tab = document.querySelector('[data-tab="widgets-kb-funnel"]');
+            if (tab) tab.click();
+          });
+        });
+
+        if (kbSlotsBody) {
+          kbSlotsBody.addEventListener("input", function (e) {
+            var t = e.target;
+            if (!t.classList.contains("kb-in-keyword") && !t.classList.contains("kb-in-question")) return;
+            var idx = parseInt(t.getAttribute("data-idx"), 10);
+            if (t.classList.contains("kb-in-keyword")) kbSlots[idx].keyword = t.value;
+            else kbSlots[idx].question = t.value;
+            renderKbPreview();
+          });
+          kbSlotsBody.addEventListener("click", function (e) {
+            var del = e.target.closest(".kb-slot-del");
+            if (!del || del.disabled) return;
+            var idx = parseInt(del.getAttribute("data-idx"), 10);
+            if (kbSlots.length <= 1) return;
+            kbSlots.splice(idx, 1);
+            if (kbActiveIndex >= kbSlots.length) kbActiveIndex = kbSlots.length - 1;
+            if (kbSlotCountSelect) kbSlotCountSelect.value = String(kbSlots.length);
+            renderKbSlotsTable();
+          });
+        }
+
+        if (kbPreviewBlocks) {
+          kbPreviewBlocks.addEventListener("click", function (e) {
+            var block = e.target.closest(".kb-block");
+            if (!block) return;
+            kbActiveIndex = parseInt(block.getAttribute("data-kb-idx"), 10);
+            renderKbPreview();
+          });
+        }
+
+        [kbHeaderIn, kbSectionIn, kbDismissIn, kbNameIn].forEach(function (el) {
+          if (el) el.addEventListener("input", renderKbPreview);
+        });
+
+        if (kbSlotCountSelect) {
+          kbSlotCountSelect.addEventListener("change", function () {
+            resizeSlotsToCount(kbSlotCountSelect.value);
+          });
+        }
+
+        if (kbAddSlotBtn) {
+          kbAddSlotBtn.addEventListener("click", function () {
+            if (kbSlots.length >= 12) return;
+            kbSlots.push({ keyword: "keyword " + (kbSlots.length + 1), question: "New reader question?" });
+            if (kbSlotCountSelect) kbSlotCountSelect.value = String(kbSlots.length);
+            renderKbSlotsTable();
+          });
+        }
+
+        if (kbSaveBtn) {
+          kbSaveBtn.addEventListener("click", function () {
+            alert("Saved keyword blocks widget with " + kbSlots.length + " slot(s).\n\nAttach in variant editor via data-widget-id.");
+            kbDlg.close();
+          });
+        }
+      })();
 
       /* ── Clone button ── */
       document.querySelectorAll(".js-widget-clone").forEach(function (btn) {
