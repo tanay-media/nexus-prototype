@@ -37,7 +37,8 @@
 
 /* KB widget detail modal — tabbed like offers */
 .modal--kb-detail {
-  max-width: 680px;
+  max-width: min(880px, calc(100vw - 2rem));
+  width: calc(100% - 2rem);
 }
 
 .modal--kb-detail .modal__inner {
@@ -115,6 +116,12 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  table-layout: fixed;
+}
+
+.kb-detail-pane .table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .kb-slots-table th,
@@ -155,6 +162,16 @@
   text-align: center;
 }
 
+.kb-slots-table .col-keyword-term {
+  width: 44%;
+  min-width: 200px;
+}
+
+.kb-slots-table .col-display-term {
+  width: 36%;
+  min-width: 180px;
+}
+
 .kb-status-btn {
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -181,10 +198,11 @@
 
 .kb-slots-table input[type="text"] {
   width: 100%;
+  min-width: 0;
   padding: 6px 8px;
   border: 1px solid #ddd;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12px;
   box-sizing: border-box;
 }
 
