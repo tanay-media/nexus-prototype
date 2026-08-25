@@ -12,6 +12,19 @@
   border-color: #2e7d32 !important;
 }
 
+/* New widget type picker — ensure cards receive clicks inside <dialog> */
+#dialog-new-widget .modal__inner,
+#dialog-new-widget .modal__body,
+#dialog-new-widget .widget-type-grid {
+  pointer-events: auto;
+}
+#dialog-new-widget .widget-type-card {
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
 .editor-insert-menu__item--kb:hover,
 .editor-insert-menu__item--kb:focus-visible {
   background: #f1f8f1;

@@ -700,10 +700,16 @@
     (function () {
       var newDlg = document.getElementById("dialog-new-widget");
       var newBtn = document.getElementById("new-widget-btn");
-      var formCard = document.getElementById("wt-form");
-
-      /* Form editor refs — defined before type-picker handlers so Form card works even if KB init fails */
       var dlg = document.getElementById("dialog-widget-form");
+      var kbDlg = document.getElementById("dialog-widget-keyword-blocks");
+      var openKbEditorFromPicker = null;
+
+      /* Move dialogs to body — avoids pointer/stacking issues when nested in <main> */
+      [newDlg, dlg, kbDlg].forEach(function (node) {
+        if (node && node.parentElement !== document.body) document.body.appendChild(node);
+      });
+
+      /* Form editor refs */
       var title = document.getElementById("widget-editor-title");
       var list = document.getElementById("widget-field-list");
       var countEl = document.getElementById("widget-field-count");
@@ -723,7 +729,7 @@
       }
 
       function syncPropsFromField(btn) {
-        if (!btn || !typeSel) return;
+        if (!btn || !typeSel || !labelIn || !placeIn || !reqIn) return;
         typeSel.value = btn.getAttribute("data-type") || "Text";
         labelIn.value = btn.getAttribute("data-label") || "";
         placeIn.value = btn.getAttribute("data-placeholder") || "";
@@ -731,7 +737,7 @@
       }
 
       function syncFieldFromProps(btn) {
-        if (!btn || !typeSel) return;
+        if (!btn || !typeSel || !labelIn || !placeIn || !reqIn) return;
         btn.setAttribute("data-type", typeSel.value);
         btn.setAttribute("data-label", labelIn.value.trim());
         btn.setAttribute("data-placeholder", placeIn.value.trim());
@@ -749,40 +755,66 @@
         syncPropsFromField(row);
       }
 
+      function openFormFromPicker() {
+        if (!dlg || !list || !title || !saveBtn) return;
+        if (newDlg && newDlg.open) newDlg.close();
+        title.textContent = "New Form";
+        saveBtn.textContent = "Create Form";
+        list.querySelectorAll(".widget-editor-field").forEach(function (f, i) {
+          if (i > 0) f.remove();
+        });
+        var first = list.querySelector(".widget-editor-field");
+        if (first) {
+          first.setAttribute("data-label", "Full Name");
+          first.setAttribute("data-placeholder", "John Doe");
+          first.setAttribute("data-type", "Text");
+          first.setAttribute("data-required", "1");
+          var nm = first.querySelector(".widget-editor-field__name");
+          if (nm) nm.textContent = "Full Name";
+          selectField(first);
+        }
+        refreshCount();
+        dlg.showModal();
+      }
+
       if (newBtn && newDlg) {
         newBtn.addEventListener("click", function () { newDlg.showModal(); });
       }
 
-      if (formCard) {
-        formCard.addEventListener("mouseenter", function () { formCard.style.boxShadow = "0 2px 8px rgba(0,0,0,.12)"; });
-        formCard.addEventListener("mouseleave", function () { formCard.style.boxShadow = "none"; });
-        formCard.addEventListener("click", function () {
-          if (!dlg || !list) return;
-          newDlg.close();
-          title.textContent = "New Form";
-          saveBtn.textContent = "Create Form";
-          list.querySelectorAll(".widget-editor-field").forEach(function (f, i) {
-            if (i > 0) f.remove();
-          });
-          var first = list.querySelector(".widget-editor-field");
-          if (first) {
-            first.setAttribute("data-label", "Full Name");
-            first.setAttribute("data-placeholder", "John Doe");
-            first.setAttribute("data-type", "Text");
-            first.setAttribute("data-required", "1");
-            var nm = first.querySelector(".widget-editor-field__name");
-            if (nm) nm.textContent = "Full Name";
-            selectField(first);
+      if (newDlg) {
+        newDlg.addEventListener("click", function (e) {
+          if (e.target === newDlg) {
+            newDlg.close();
+            return;
           }
-          refreshCount();
-          dlg.showModal();
+          var formCard = e.target.closest("#wt-form");
+          var kbCard = e.target.closest("#wt-keyword-blocks");
+          if (formCard) {
+            e.preventDefault();
+            openFormFromPicker();
+            return;
+          }
+          if (kbCard) {
+            e.preventDefault();
+            if (newDlg.open) newDlg.close();
+            if (openKbEditorFromPicker) openKbEditorFromPicker("new");
+            else alert("Keyword block editor failed to load. Refresh the page.");
+          }
         });
+        var formCard = document.getElementById("wt-form");
+        var kbCard = document.getElementById("wt-keyword-blocks");
+        if (formCard) {
+          formCard.addEventListener("mouseenter", function () { formCard.style.boxShadow = "0 2px 8px rgba(0,0,0,.12)"; });
+          formCard.addEventListener("mouseleave", function () { formCard.style.boxShadow = "none"; });
+        }
+        if (kbCard) {
+          kbCard.addEventListener("mouseenter", function () { kbCard.style.boxShadow = "0 2px 12px rgba(27,94,32,.15)"; });
+          kbCard.addEventListener("mouseleave", function () { kbCard.style.boxShadow = "none"; });
+        }
       }
 
       /* ── Keyword blocks widget editor ── */
       (function () {
-        var kbCard = document.getElementById("wt-keyword-blocks");
-        var kbDlg = document.getElementById("dialog-widget-keyword-blocks");
         var kbSlotsBody = document.getElementById("kb-slots-tbody");
         var kbPreviewBlocks = document.getElementById("kb-preview-blocks");
         var kbPreviewTitle = document.getElementById("kb-preview-title");
@@ -811,7 +843,12 @@
         var kbStatusIn = document.getElementById("kb-widget-status");
         var kbSlotConfigIn = document.getElementById("kb-slot-config");
         var M = window.KbWidgetModel;
-        if (!M || !M.KEYWORD_PRESETS) return;
+        if (!M || !M.KEYWORD_PRESETS) {
+          openKbEditorFromPicker = function () {
+            alert("Keyword block model failed to load (kb-widget-model.js). Refresh the page.");
+          };
+          return;
+        }
         var TEAM_OFFERS = {
           to_etrade_passive: { advertiserId: "adv-etrade", name: "E*TRADE Passive Income", entityId: "ENT-KB-ETRADE-01", teamOfferId: "to_etrade_passive", dealId: "DL-88421", dealValue: "12.50", dealCurrency: "USD", campaignProvider: "max", campaignId: "MAX-CMP-9912", layoutId: "modal_v1" },
           to_auto_insurance: { advertiserId: "adv-statefarm", name: "Auto Insurance Savings", entityId: "ENT-KB-SF-AUTO-02", teamOfferId: "to_auto_insurance", dealId: "DL-77210", dealValue: "18.00", dealCurrency: "USD", campaignProvider: "max", campaignId: "MAX-CMP-7721", layoutId: "modal_v1" },
@@ -953,8 +990,9 @@
         }
 
         function openKbEditor(mode, presetKey) {
-          kbEditorTitle.textContent = mode === "new" ? "New keyword blocks widget" : "Edit keyword blocks widget";
-          kbSaveBtn.textContent = mode === "new" ? "Create widget" : "Save widget";
+          if (!kbDlg) return;
+          if (kbEditorTitle) kbEditorTitle.textContent = mode === "new" ? "New keyword blocks widget" : "Edit keyword blocks widget";
+          if (kbSaveBtn) kbSaveBtn.textContent = mode === "new" ? "Create widget" : "Save widget";
           if (mode === "new") {
             kbWidgetId = "new-" + Date.now();
             kbKeywords = cloneKeywords(M.KEYWORD_PRESETS.passive.slice(0, 4));
@@ -977,14 +1015,9 @@
           kbDlg.showModal();
         }
 
-        if (kbCard) {
-          kbCard.addEventListener("mouseenter", function () { kbCard.style.boxShadow = "0 2px 12px rgba(27,94,32,.15)"; });
-          kbCard.addEventListener("mouseleave", function () { kbCard.style.boxShadow = "none"; });
-          kbCard.addEventListener("click", function () {
-            newDlg.close();
-            openKbEditor("new");
-          });
-        }
+        openKbEditorFromPicker = function (mode, presetKey) {
+          openKbEditor(mode || "new", presetKey);
+        };
 
         document.querySelectorAll(".js-kb-edit").forEach(function (btn) {
           btn.addEventListener("click", function () {
@@ -1143,27 +1176,29 @@
         });
       });
 
-      list.addEventListener("click", function (e) {
-        if (e.target.closest(".widget-editor-field__del")) {
-          e.preventDefault();
-          e.stopPropagation();
-          var row = e.target.closest(".widget-editor-field");
-          if (!row || fieldCount() <= 1) return;
-          var wasSel = row.classList.contains("is-selected");
-          row.remove();
-          refreshCount();
-          if (wasSel) {
-            var next = list.querySelector(".widget-editor-field");
-            if (next) selectField(next);
+      if (list) {
+        list.addEventListener("click", function (e) {
+          if (e.target.closest(".widget-editor-field__del")) {
+            e.preventDefault();
+            e.stopPropagation();
+            var row = e.target.closest(".widget-editor-field");
+            if (!row || fieldCount() <= 1) return;
+            var wasSel = row.classList.contains("is-selected");
+            row.remove();
+            refreshCount();
+            if (wasSel) {
+              var next = list.querySelector(".widget-editor-field");
+              if (next) selectField(next);
+            }
+            return;
           }
-          return;
-        }
-        var row = e.target.closest(".widget-editor-field");
-        if (!row) return;
-        selectField(row);
-      });
+          var row = e.target.closest(".widget-editor-field");
+          if (!row) return;
+          selectField(row);
+        });
+      }
 
-      if (addBtn) {
+      if (addBtn && list) {
         addBtn.addEventListener("click", function () {
           var n = fieldCount() + 1;
           var row = document.createElement("button");
@@ -1183,22 +1218,26 @@
         });
       }
 
-      [typeSel, labelIn, placeIn, reqIn].forEach(function (el) {
+      [typeSel, labelIn, placeIn, reqIn].filter(Boolean).forEach(function (el) {
         el.addEventListener("change", function () {
+          if (!list) return;
           var sel = list.querySelector(".widget-editor-field.is-selected");
           syncFieldFromProps(sel);
         });
         el.addEventListener("input", function () {
+          if (!list) return;
           var sel = list.querySelector(".widget-editor-field.is-selected");
           syncFieldFromProps(sel);
         });
       });
 
-      saveBtn.addEventListener("click", function () {
-        var sel = list.querySelector(".widget-editor-field.is-selected");
-        syncFieldFromProps(sel);
-        dlg.close();
-      });
+      if (saveBtn && dlg && list) {
+        saveBtn.addEventListener("click", function () {
+          var sel = list.querySelector(".widget-editor-field.is-selected");
+          syncFieldFromProps(sel);
+          dlg.close();
+        });
+      }
     })();
 
     (function () {
