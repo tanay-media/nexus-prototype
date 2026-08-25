@@ -496,33 +496,10 @@
       </section>
 
       <section class="offer-detail-pane kb-detail-pane" data-tab-panel="kb-keywords" hidden>
-        <div class="field field--inline-pair">
-          <div class="field">
-            <label for="kb-slot-count-select">Number of keyword slots</label>
-            <select id="kb-slot-count-select" class="select">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4" selected>4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Slot count</label>
-            <p class="kb-slot-count-display muted" id="kb-slot-count-label" style="margin:0;padding:10px 0;font-size:13px;">4 / 12 slots</p>
-          </div>
-        </div>
-        <p class="muted kb-field-hint">Slot index defines position when <code>slot_config: static</code> (no stored <code>keyword_slot_id</code>). Toggle <code>status</code> <strong>on/off</strong> per keyword. <strong>display_term</strong> can be shorter than <code>keyword_term</code>. <strong>In use</strong> is derived on API read.</p>
+        <p class="muted kb-field-hint" style="margin-top:0;">The <code>keywords</code> array is the source of truth — slot position is array index + 1 when <code>slot_config: static</code> (no <code>keyword_slot_id</code>). Add or remove rows below (max 12).</p>
         <div class="kb-editor__slots-head">
-          <h3>keywords[]</h3>
-          <button type="button" class="btn" id="kb-add-slot" style="font-size:12px;padding:4px 12px;">+ Add slot</button>
+          <h3>keywords[] <span class="muted kb-slot-count-display" id="kb-slot-count-label" style="font-size:12px;font-weight:400;">4 on</span></h3>
+          <button type="button" class="btn" id="kb-add-slot" style="font-size:12px;padding:4px 12px;">+ Add keyword</button>
         </div>
         <div class="table-scroll">
           <table class="kb-slots-table" id="kb-slots-table">
@@ -739,7 +716,6 @@
         var kbPreviewTitle = document.getElementById("kb-preview-title");
         var kbPreviewDismiss = document.getElementById("kb-preview-dismiss");
         var kbPreviewBrand = document.getElementById("kb-preview-brand");
-        var kbSlotCountSelect = document.getElementById("kb-slot-count-select");
         var kbSlotCountLabel = document.getElementById("kb-slot-count-label");
         var kbAddSlotBtn = document.getElementById("kb-add-slot");
         var kbSaveBtn = document.getElementById("kb-editor-save");
@@ -788,17 +764,6 @@
           if (kbAdvertiserIn) kbAdvertiserIn.value = w.ad_provider_config.advertiser_id;
         }
 
-        function resizeSlotsToCount(n) {
-          n = Math.max(1, Math.min(12, parseInt(n, 10) || 1));
-          while (kbKeywords.length < n) {
-            var idx = kbKeywords.length;
-            kbKeywords.push(M.makeKeyword("keyword " + (idx + 1), "keyword " + (idx + 1), "on"));
-          }
-          if (kbKeywords.length > n) kbKeywords = kbKeywords.slice(0, n);
-          if (kbSlotCountSelect) kbSlotCountSelect.value = String(n);
-          renderKbSlotsTable();
-        }
-
         function renderKbSlotsTable() {
           if (!kbSlotsBody) return;
           kbSlotsBody.innerHTML = "";
@@ -813,7 +778,7 @@
               '<td><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove" ' + (kbKeywords.length <= 1 ? "disabled" : "") + '>✕</button></td>';
             kbSlotsBody.appendChild(tr);
           });
-          if (kbSlotCountLabel) kbSlotCountLabel.textContent = onCount + " on / " + kbKeywords.length + " keywords";
+          if (kbSlotCountLabel) kbSlotCountLabel.textContent = onCount + " on · " + kbKeywords.length + " rows (max 12)";
           if (kbAddSlotBtn) kbAddSlotBtn.disabled = kbKeywords.length >= 12;
           renderKbPreview();
         }
@@ -868,7 +833,6 @@
             loadWidgetPreset(presetKey || "passive");
           }
           kbActiveIndex = 0;
-          if (kbSlotCountSelect) kbSlotCountSelect.value = String(kbKeywords.length);
           renderKbSlotsTable();
           var kbTabGroup = document.querySelector("[data-tabs=\"kb-widget-detail\"]");
           if (kbTabGroup) {
@@ -925,7 +889,6 @@
             if (kbKeywords.length <= 1) return;
             kbKeywords.splice(idx, 1);
             if (kbActiveIndex >= kbKeywords.length) kbActiveIndex = kbKeywords.length - 1;
-            if (kbSlotCountSelect) kbSlotCountSelect.value = String(kbKeywords.length);
             renderKbSlotsTable();
           });
         }
@@ -941,17 +904,10 @@
 
         if (kbNameIn) kbNameIn.addEventListener("input", renderKbPreview);
 
-        if (kbSlotCountSelect) {
-          kbSlotCountSelect.addEventListener("change", function () {
-            resizeSlotsToCount(kbSlotCountSelect.value);
-          });
-        }
-
         if (kbAddSlotBtn) {
           kbAddSlotBtn.addEventListener("click", function () {
             if (kbKeywords.length >= 12) return;
             kbKeywords.push(M.makeKeyword("keyword " + (kbKeywords.length + 1), "keyword " + (kbKeywords.length + 1), "on"));
-            if (kbSlotCountSelect) kbSlotCountSelect.value = String(kbKeywords.length);
             renderKbSlotsTable();
           });
         }
