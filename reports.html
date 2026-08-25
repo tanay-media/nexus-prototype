@@ -363,7 +363,7 @@
         }
       ];
 
-      var MOCK_DIM = { t_created: "Apr 1, 2026", t_updated: "Apr 21, 2026", t_hour: "14", t_dow: "Tue", t_week: "W16", t_month: "Apr", t_year: "2026", workspace: "ACME Growth", lander_id: "ldr_mock", variant_id: "var_mock", version_id: "vv_m5n8k3p", route: "/", device: "mobile", os: "iOS 18", browser: "Safari", webview: "no", country: "US", county: "Cuyahoga", city: "Cleveland", zip: "44102", channel: "Paid search", utm_source: "google", utm_medium: "cpc", utm_campaign: "brand_q2", referer: "google.com", cta_id: "cta_primary", linkout: "adv_default", keyword: "passive income investing", slot_index: "0", kb_widget_id: "kb_passive_investing", ad_title: "E*TRADE® Account Setup" };
+      var MOCK_DIM = { t_created: "Apr 1, 2026", t_updated: "Apr 21, 2026", t_hour: "14", t_dow: "Tue", t_week: "W16", t_month: "Apr", t_year: "2026", workspace: "ACME Growth", lander_id: "ldr_mock", variant_id: "var_mock", version_id: "vv_m5n8k3p", route: "/", device: "mobile", os: "iOS 18", browser: "Safari", webview: "no", country: "US", county: "Cuyahoga", city: "Cleveland", zip: "44102", channel: "Paid search", utm_source: "google", utm_medium: "cpc", utm_campaign: "brand_q2", referer: "google.com", cta_id: "cta_primary", linkout: "adv_default", keyword: "passive income investing", slot_index: "0", kb_widget_id: "7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8", ad_title: "E*TRADE® Account Setup" };
 
       // Mock split values for each dimension. When a dimension is selected, each parent row
       // expands into one child row per value — i.e. "group by" that dimension.
@@ -395,7 +395,7 @@
         linkout: ["adv_default", "adv_partner"],
         keyword: ["passive income investing", "etf zero fee platform", "beginner investing start", "open brokerage account fast"],
         slot_index: ["0", "1", "2", "3"],
-        kb_widget_id: ["kb_passive_investing"],
+        kb_widget_id: ["7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8"],
         ad_title: ["E*TRADE® Account Setup", "Fidelity Zero ETFs", "Schwab Beginner Guide"]
       };
 
@@ -492,7 +492,7 @@
         if (did === "domain") return row.domain;
         if (did === "lander_id") return "ldr_" + row.key;
         if (did === "variant_id") return "var_" + row.key;
-        if (did === "kb_widget_id" && row.key === "hyf") return "kb_passive_investing";
+        if (did === "kb_widget_id" && row.key === "hyf") return "7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8";
         if (did === "keyword" && row.key === "hyf") return "passive income investing";
         if (did === "slot_index" && row.key === "hyf") return "0";
         if (did === "ad_title" && row.key === "hyf") return "E*TRADE® Account Setup";

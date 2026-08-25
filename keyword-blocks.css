@@ -129,10 +129,17 @@
   box-sizing: border-box;
 }
 
-.kb-slots-table select.kb-in-status {
+.kb-slots-table .kb-slot-enabled {
   font-size: 12px;
-  padding: 5px 8px;
-  min-width: 88px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.kb-slots-table .kb-in-enabled {
+  width: 16px;
+  height: 16px;
 }
 
 .kb-slots-table .kb-slot-del {
