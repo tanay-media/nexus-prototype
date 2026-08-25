@@ -296,7 +296,7 @@
                 <div class="table-scroll" style="margin-bottom:10px;">
                   <table class="kb-slots-table" id="editor-keywords-table">
                     <thead>
-                      <tr><th>#</th><th>Keyword (CM)</th><th>Reader question</th><th></th></tr>
+                      <tr><th>#</th><th>keyword_term</th><th>Reader question (variant HTML)</th><th></th></tr>
                     </thead>
                     <tbody id="editor-keywords-tbody"></tbody>
                   </table>
@@ -715,6 +715,7 @@
     </div>
   </dialog>
 
+  <script src="kb-widget-model.js"></script>
   <script src="integrations-catalog.js"></script>
   <script src="macro-enriched-lander-urls.js"></script>
   <script src="site-shell.js"></script>
@@ -839,19 +840,14 @@
       var hintEl = document.getElementById("editor-keywords-hint");
       var slots = [];
 
+      var M = window.KbWidgetModel;
       var PRESETS = {
-        auto: [
-          { keyword: "auto insurance savings", question: "How much can I save on auto insurance in my state?" },
-          { keyword: "compare car insurance quotes", question: "What's the fastest way to compare quotes online?" },
-          { keyword: "cheap full coverage insurance", question: "Who has the cheapest full coverage near me?" },
-          { keyword: "switch auto insurance carrier", question: "How do I switch carriers without a coverage gap?" }
-        ],
-        passive: [
-          { keyword: "passive income investing", question: "How do I start earning passive income from investing?" },
-          { keyword: "etf zero fee platform", question: "What's the best platform to buy ETFs with zero fees?" },
-          { keyword: "beginner investing start", question: "I'm a beginner — where do I even start?" },
-          { keyword: "open brokerage account fast", question: "How quickly can I open and fund a brokerage account?" }
-        ]
+        auto: M ? M.KEYWORD_PRESETS.auto.map(function (k) {
+          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
+        }) : [],
+        passive: M ? M.KEYWORD_PRESETS.passive.map(function (k) {
+          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
+        }) : []
       };
 
       function renderKeywordsTable() {
@@ -861,7 +857,7 @@
           var tr = document.createElement("tr");
           tr.innerHTML =
             "<td>" + (i + 1) + "</td>" +
-            '<td><input type="text" class="kb-in-keyword" data-idx="' + i + '" value="' + String(slot.keyword).replace(/"/g, "&quot;") + '" /></td>' +
+            '<td><input type="text" class="kb-in-keyword-term" data-idx="' + i + '" value="' + String(slot.keyword_term || slot.keyword || "").replace(/"/g, "&quot;") + '" /></td>' +
             '<td><input type="text" class="kb-in-question" data-idx="' + i + '" value="' + String(slot.question).replace(/"/g, "&quot;") + '" /></td>' +
             '<td><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove">✕</button></td>';
           tbody.appendChild(tr);
@@ -875,8 +871,11 @@
       }
 
       function setKeywordSlots(next, hintText) {
-        slots = (next || []).slice(0, 12).map(function (s, i) {
-          return { keyword: s.keyword || "", question: s.question || s.displayQuestion || "" };
+        slots = (next || []).slice(0, 12).map(function (s) {
+          return {
+            keyword_term: s.keyword_term || s.keyword || "",
+            question: s.question || s.displayQuestion || ""
+          };
         });
         renderKeywordsTable();
         if (hintEl && hintText) hintEl.textContent = hintText;
@@ -910,9 +909,9 @@
       if (tbody) {
         tbody.addEventListener("input", function (e) {
           var t = e.target;
-          if (!t.classList.contains("kb-in-keyword") && !t.classList.contains("kb-in-question")) return;
+          if (!t.classList.contains("kb-in-keyword-term") && !t.classList.contains("kb-in-question")) return;
           var idx = parseInt(t.getAttribute("data-idx"), 10);
-          if (t.classList.contains("kb-in-keyword")) slots[idx].keyword = t.value;
+          if (t.classList.contains("kb-in-keyword-term")) slots[idx].keyword_term = t.value;
           else slots[idx].question = t.value;
         });
         tbody.addEventListener("click", function (e) {
@@ -928,7 +927,7 @@
       if (addBtn) {
         addBtn.addEventListener("click", function () {
           if (slots.length >= 12) return;
-          slots.push({ keyword: "new keyword " + (slots.length + 1), question: "New reader question?" });
+          slots.push({ keyword_term: "new keyword " + (slots.length + 1), question: "New reader question?" });
           renderKeywordsTable();
         });
       }
@@ -1234,67 +1233,11 @@
       var variantHtml = document.getElementById("editor-variant-html");
       var htmlDrawer = document.querySelector(".editor-html-drawer");
       var toast = document.getElementById("editor-insert-toast");
-      if (!dialog || !listEl) return;
+      var M = window.KbWidgetModel;
+      if (!dialog || !listEl || !M) return;
 
-      var SLOT_PRESETS = {
-        passive: [
-          { keyword: "passive income investing", question: "How do I start earning passive income from investing?" },
-          { keyword: "etf zero fee platform", question: "What's the best platform to buy ETFs with zero fees?" },
-          { keyword: "beginner investing start", question: "I'm a beginner — where do I even start?" },
-          { keyword: "open brokerage account fast", question: "How quickly can I open and fund a brokerage account?" }
-        ],
-        auto: [
-          { keyword: "auto insurance savings", question: "How much can I save on auto insurance in my state?" },
-          { keyword: "compare car insurance quotes", question: "What's the fastest way to compare quotes online?" },
-          { keyword: "cheap full coverage insurance", question: "Who has the cheapest full coverage near me?" },
-          { keyword: "switch auto insurance carrier", question: "How do I switch carriers without a coverage gap?" }
-        ]
-      };
-
-      var KB_WIDGET_PASSIVE = "7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8";
-      var KB_WIDGET_AUTO = "8e4b9c3d-5e6f-7081-9203-b4c5d6e7f809";
-
-      var KB_WIDGETS = {
-        "kb-passive": {
-          id: "kb-passive",
-          widgetId: KB_WIDGET_PASSIVE,
-          name: "Passive investing — reader questions",
-          sub: "4 keywords · E*TRADE · MAX-CMP-9912",
-          trigger: "Explore reader questions",
-          advertiser: "E*TRADE",
-          entityId: "ENT-KB-ETRADE-01",
-          teamOfferId: "to_etrade_passive",
-          dealId: "DL-88421",
-          dealValue: "$12.50",
-          campaignId: "MAX-CMP-9912",
-          campaignProvider: "MAX",
-          layoutId: "modal_v1",
-          headerTitle: "What would you like to explore first?",
-          sectionLabel: "READER QUESTIONS",
-          dismissLabel: "I'll continue reading on my own",
-          slots: SLOT_PRESETS.passive
-        },
-        "kb-auto": {
-          id: "kb-auto",
-          widgetId: KB_WIDGET_AUTO,
-          name: "Auto insurance — reader questions",
-          sub: "4 keywords · State Farm · MAX-CMP-7721",
-          trigger: "See insurance savings",
-          advertiser: "State Farm",
-          entityId: "ENT-KB-SF-AUTO-02",
-          teamOfferId: "to_auto_insurance",
-          dealId: "DL-77210",
-          dealValue: "$18.00",
-          campaignId: "MAX-CMP-7721",
-          campaignProvider: "MAX",
-          layoutId: "modal_v1",
-          headerTitle: "What would you like to explore first?",
-          sectionLabel: "READER QUESTIONS",
-          dismissLabel: "I'll continue reading on my own",
-          slots: SLOT_PRESETS.auto
-        }
-      };
-      var KB_ORDER = ["kb-passive", "kb-auto"];
+      var KB_WIDGETS = M.WIDGET_REGISTRY;
+      var KB_ORDER = ["passive", "auto"];
 
       var selectedKbId = "";
       var kbActivePreviewIdx = 0;
@@ -1316,6 +1259,11 @@
         }, 3200);
       }
 
+      function widgetSub(w) {
+        var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
+        return M.onKeywordCount(w.keywords) + " on · " + (adv ? adv.label : w.ad_provider_config.advertiser_id) + " · " + w.slot_config;
+      }
+
       function renderKbList() {
         listEl.innerHTML = "";
         KB_ORDER.forEach(function (id) {
@@ -1328,10 +1276,10 @@
           btn.setAttribute("data-kb-id", id);
           btn.innerHTML =
             '<span class="insert-form-pick__head">' +
-              '<strong>' + escapeHtml(w.name) + '</strong>' +
-              '<span class="insert-form-pick__count">' + w.slots.length + ' kw</span>' +
+              '<strong>' + escapeHtml(w.widget_name) + '</strong>' +
+              '<span class="insert-form-pick__count">' + w.keywords.length + ' kw</span>' +
             '</span>' +
-            '<small>' + escapeHtml(w.sub) + '</small>';
+            '<small>' + escapeHtml(widgetSub(w)) + '</small>';
           btn.addEventListener("click", function () { selectKb(id); });
           li.appendChild(btn);
           listEl.appendChild(li);
@@ -1345,35 +1293,41 @@
           if (previewEmpty) previewEl.appendChild(previewEmpty);
           return;
         }
+        var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
+        var serving = M.buildServingSync(w);
         var meta =
           '<dl class="insert-kb-meta">' +
-            '<div><dt>Advertiser</dt><dd>' + escapeHtml(w.advertiser) + '</dd></div>' +
-            '<div><dt>CM entity</dt><dd>' + escapeHtml(w.entityId) + '</dd></div>' +
-            '<div><dt>Deal ID</dt><dd>' + escapeHtml(w.dealId) + '</dd></div>' +
-            '<div><dt>Deal value</dt><dd>' + escapeHtml(w.dealValue) + '</dd></div>' +
-            '<div><dt>Campaign</dt><dd>' + escapeHtml(w.campaignProvider) + ' · ' + escapeHtml(w.campaignId) + '</dd></div>' +
-            '<div><dt>Team offer</dt><dd>' + escapeHtml(w.teamOfferId) + '</dd></div>' +
+            '<div><dt>widget_id</dt><dd style="font-family:monospace;font-size:11px;">' + escapeHtml(w.widget_id) + '</dd></div>' +
+            '<div><dt>advertiser_id</dt><dd>' + escapeHtml(w.ad_provider_config.advertiser_id) + '</dd></div>' +
+            '<div><dt>slot_config</dt><dd>' + escapeHtml(w.slot_config) + '</dd></div>' +
+            '<div><dt>Serving sync keywords</dt><dd>' + (serving ? serving.keywords.length : 0) + ' rows (on only)</dd></div>' +
+            '<div><dt>Team offer (context)</dt><dd>' + escapeHtml(adv ? adv.teamOfferId : "") + ' · ' + escapeHtml(adv ? adv.campaignId : "") + '</dd></div>' +
           '</dl>';
         var blocks = "";
-        w.slots.forEach(function (slot, i) {
+        var onIdx = 0;
+        w.keywords.forEach(function (kw, i) {
+          if (kw.status !== "on") return;
+          var active = kbActivePreviewIdx === onIdx;
           blocks +=
-            '<div class="kb-block' + (kbActivePreviewIdx === i ? " is-active" : "") + '" data-kb-idx="' + i + '">' +
-              '<span class="kb-block__play">▶</span><span>' + escapeHtml(slot.question || slot.keyword) + '</span>' +
+            '<div class="kb-block' + (active ? " is-active" : "") + '" data-kb-idx="' + onIdx + '">' +
+              '<span class="kb-block__play">▶</span><span>' + escapeHtml(M.readerQuestionFor(kw.keyword_term)) + '</span>' +
+              '<small class="muted" style="display:block;font-size:10px;">' + escapeHtml(kw.display_term) + ' · ' + escapeHtml(kw.keyword_term) + '</small>' +
             '</div>';
+          onIdx += 1;
         });
         previewEl.innerHTML =
           meta +
           '<div class="kb-modal-preview">' +
             '<div class="kb-modal-preview__header">' +
-              '<div class="kb-modal-preview__brand">' + escapeHtml(w.advertiser.toUpperCase()) + '</div>' +
-              '<h3 class="kb-modal-preview__title">' + escapeHtml(w.headerTitle) + '</h3>' +
+              '<div class="kb-modal-preview__brand">' + escapeHtml((adv ? adv.label : "WIDGET").toUpperCase()) + '</div>' +
+              '<h3 class="kb-modal-preview__title">What would you like to explore first?</h3>' +
               '<span class="kb-modal-preview__close" aria-hidden="true">✕</span>' +
             '</div>' +
             '<div class="kb-modal-preview__body" id="insert-kb-preview-blocks">' +
-              '<p class="kb-modal-preview__section">' + escapeHtml(w.sectionLabel) + '</p>' +
+              '<p class="kb-modal-preview__section">READER QUESTIONS</p>' +
               blocks +
             '</div>' +
-            '<div class="kb-modal-preview__dismiss">' + escapeHtml(w.dismissLabel) + '</div>' +
+            '<div class="kb-modal-preview__dismiss">I\'ll continue reading on my own</div>' +
           '</div>';
         var blocksEl = document.getElementById("insert-kb-preview-blocks");
         if (blocksEl) {
@@ -1396,7 +1350,7 @@
         });
         if (triggerInput) {
           triggerInput.disabled = false;
-          triggerInput.value = w.trigger;
+          triggerInput.value = w.trigger || "Explore reader questions";
           triggerInput.focus();
           triggerInput.select();
         }
@@ -1427,8 +1381,8 @@
           var trigger = triggerInput ? triggerInput.value.trim() : "";
           var triggerEsc = escapeHtml(trigger || w.trigger);
           var block =
-            "\n<!-- nexus: keyword blocks (" + escapeHtml(w.name) + ") · " + w.slots.length + " slots -->\n" +
-            '<section class="lander-kb-embed" data-kb-widget-id="' + escapeHtml(w.widgetId) + '" data-widget-id="' + escapeHtml(w.widgetId) + '" data-lander-embed="keyword-blocks" data-team-offer-id="' + escapeHtml(w.teamOfferId) + '" data-campaign-id="' + escapeHtml(w.campaignId) + '" data-deal-id="' + escapeHtml(w.dealId) + '" data-entity-id="' + escapeHtml(w.entityId) + '">\n' +
+            "\n<!-- nexus: keyword_block (" + escapeHtml(w.widget_name) + ") · " + w.keywords.length + " keywords -->\n" +
+            '<section class="lander-kb-embed" data-widget-id="' + escapeHtml(w.widget_id) + '" data-lander-embed="keyword-block">\n' +
             '  <button type="button" class="lander-kb-embed__trigger">' + triggerEsc + '</button>\n' +
             "</section>\n";
           if (variantHtml) {
@@ -1436,16 +1390,20 @@
             if (htmlDrawer) htmlDrawer.open = true;
           }
           if (typeof window.setKeywordSlotsFromWidget === "function") {
+            var readerSlots = w.keywords.filter(function (k) { return k.status === "on"; }).map(function (k) {
+              return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
+            });
             window.setKeywordSlotsFromWidget(
-              w.slots,
-              w.slots.length + " slots from workspace widget \"" + w.name + "\". Advertiser/deal locked to library; edit CSS in variant HTML."
+              readerSlots,
+              readerSlots.length + " keywords from widget \"" + w.widget_name + "\". Reader questions below are variant HTML only."
             );
           }
           dialog.close();
-          showToast("Added keyword blocks — " + w.advertiser + " · " + w.campaignId);
+          var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
+          showToast("Added keyword block · " + (adv ? adv.label : w.ad_provider_config.advertiser_id));
           if (typeof addBubble === "function") {
             addBubble(
-              "Added keyword blocks widget (“" + w.name + "”) — " + w.advertiser + ", deal " + w.dealId + ", campaign " + w.campaignId + ". Styling in variant HTML.",
+              "Attached keyword_block widget \"" + w.widget_name + "\" (widget_id " + w.widget_id + "). Base stores KeywordBlockWidget; Serving gets KeywordBlockServingSync on sync.",
               "ai"
             );
           }
