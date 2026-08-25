@@ -26,29 +26,29 @@
 
     <main class="main">
       <div class="page-header">
-        <h1 id="page-main-title">Offers</h1>
+        <h1 id="page-main-title">Deals</h1>
         <div class="page-header__right">
           <button type="button" class="btn" id="offers-alerts-btn" title="Governance alerts">Alerts <span class="badge badge--archived" id="offers-alerts-count" style="display:none;margin-left:.25rem;">0</span></button>
-          <button type="button" class="btn btn--black" id="team-offer-add-btn">+ New team offer</button>
-          <button type="button" class="btn btn--black" id="parent-offer-add-btn" style="display:none;">+ New parent offer</button>
+          <button type="button" class="btn btn--black" id="team-offer-add-btn">+ New deal</button>
+          <button type="button" class="btn btn--black" id="parent-offer-add-btn" style="display:none;">+ New offer</button>
           <button type="button" class="btn btn--black" id="adv-add-btn" style="display:none;">+ New advertiser</button>
         </div>
       </div>
 
       <div class="tabs page-level-tabs" role="tablist" data-tabs="page-level">
-        <button type="button" class="tab is-active" data-page-tab="team-offers" role="tab" aria-selected="true">Team Offers</button>
-        <button type="button" class="tab" data-page-tab="parent-offers" role="tab" aria-selected="false">Parent offers</button>
+        <button type="button" class="tab is-active" data-page-tab="team-offers" role="tab" aria-selected="true">Deals</button>
+        <button type="button" class="tab" data-page-tab="parent-offers" role="tab" aria-selected="false">Offers</button>
         <button type="button" class="tab" data-page-tab="advertisers" role="tab" aria-selected="false">Advertisers</button>
       </div>
 
       <!-- ===== TEAM OFFERS PANEL ===== -->
       <div class="page-body" id="panel-team-offers">
-        <p class="offers-intro muted">Team: <strong id="offers-team-label">ACME Media</strong> · <strong>team_offer</strong> deployments — parent catalog fields are inherited; team controls deal value, campaign ID, CTA, buy sources &amp; workspaces.</p>
+        <p class="offers-intro muted">Team: <strong id="offers-team-label">ACME Media</strong> · <strong>deal</strong> deployments — offer catalog fields are inherited; team controls deal value, campaign ID, CTA, buy sources &amp; workspaces.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-            <input class="input" type="search" id="offers-search" placeholder="Search by offer or advertiser" />
+            <input class="input" type="search" id="offers-search" placeholder="Search by deal or advertiser" />
           </div>
           <select class="select" id="offers-status-filter" aria-label="Status filter">
             <option value="">All statuses</option>
@@ -61,17 +61,17 @@
         </div>
 
         <div class="card">
-          <div class="table-scroll" role="region" aria-label="Team offers">
+          <div class="table-scroll" role="region" aria-label="Deals">
             <table class="table" id="offers-table">
               <thead>
                 <tr>
                   <th style="width:34px"></th>
-                  <th>Advertiser &gt; Team offer</th>
-                  <th>Parent offer name</th>
+                  <th>Advertiser &gt; Deal</th>
+                  <th>Offer name</th>
                   <th>Cat. 2</th>
                   <th class="right">Deal</th>
                   <th>Status</th>
-                  <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this offer can be used on landers"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this team offer can be used on landers. Inactive if the team offer, parent offer, advertiser, or team mapping is inactive.</span></span></th>
+                  <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this deal can be used on landers"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this deal can be used on landers. Inactive if the deal, offer, advertiser, or team mapping is inactive.</span></span></th>
                   <th>Created by</th>
                   <th>Last updated</th>
                   <th class="offer-ws-col">Workspaces</th>
@@ -86,12 +86,12 @@
 
       <!-- ===== PARENT OFFERS PANEL ===== -->
       <div class="page-body" id="panel-parent-offers" style="display:none;">
-        <p class="offers-intro muted">Super-admin · <strong>parent_offer</strong> catalog — General, Deal &amp; Teams. Map teams to spawn <strong>team_offer</strong> instances.</p>
+        <p class="offers-intro muted">Super-admin · <strong>offer</strong> catalog — General, Deal &amp; Teams. Map teams to spawn <strong>deal</strong> instances.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-            <input class="input" type="search" id="parent-offers-search" placeholder="Search parent offers" />
+            <input class="input" type="search" id="parent-offers-search" placeholder="Search offers" />
           </div>
           <select class="select" id="parent-offers-status-filter" aria-label="Status filter">
             <option value="">All statuses</option>
@@ -104,18 +104,18 @@
         </div>
 
         <div class="card">
-          <div class="table-scroll" role="region" aria-label="Parent offers">
+          <div class="table-scroll" role="region" aria-label="Offers">
             <table class="table" id="parent-offers-table">
               <thead>
                 <tr>
                   <th style="width:34px"></th>
-                  <th>Advertiser &gt; Parent offer</th>
+                  <th>Advertiser &gt; Offer</th>
                   <th>Cat. 2</th>
                   <th>Deal type</th>
                   <th>Target type</th>
                   <th class="right">Target value</th>
                   <th>Status</th>
-                  <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this parent offer is available for team deployments"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this parent offer is available for team deployments. Inactive if the parent offer or its advertiser is inactive.</span></span></th>
+                  <th>Effective status <span class="info-tip info-tip--sm offer-th-tip" tabindex="0" aria-label="Whether this offer is available for team deployments"><span class="info-tip__icon">i</span><span class="info-tip__body">Whether this offer is available for team deployments. Inactive if the offer or its advertiser is inactive.</span></span></th>
                   <th>Created by</th>
                   <th>Last updated</th>
                   <th>Teams</th>
@@ -130,7 +130,7 @@
 
       <!-- ===== ADVERTISERS PANEL ===== -->
       <div class="page-body" id="panel-advertisers" style="display:none;">
-        <p class="offers-intro muted">Super-admin · Advertisers mapped to teams. Each advertiser owns parent offers.</p>
+        <p class="offers-intro muted">Super-admin · Advertisers mapped to teams. Each advertiser owns offers.</p>
 
         <div class="toolbar">
           <div class="search-wrap">
@@ -153,7 +153,7 @@
                   <th>Status</th>
                   <th>Created by</th>
                   <th>Last updated</th>
-                  <th class="right">Parent offers</th>
+                  <th class="right">Offers</th>
                   <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
               </thead>
@@ -215,13 +215,13 @@
   </dialog>
   </div>
 
-  <!-- Team offer detail -->
+  <!-- Deal detail -->
   <dialog class="modal modal--settings modal--offer-detail" id="dialog-team-offer-detail">
     <form method="dialog" class="modal__inner">
       <div class="modal__header">
         <div>
-          <h2 class="modal__title" id="team-offer-detail-title">Team offer</h2>
-          <p class="modal__hint" id="team-offer-detail-sub">team_offer · parent fields inherited; team owns deal value, campaign ID, CTA &amp; workspaces</p>
+          <h2 class="modal__title" id="team-offer-detail-title">Deal</h2>
+          <p class="modal__hint" id="team-offer-detail-sub">deal · offer fields inherited; team owns deal value, campaign ID, CTA &amp; workspaces</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
@@ -234,37 +234,37 @@
         <button type="button" class="tab" data-tab="workspaces" role="tab" aria-selected="false">Workspaces</button>
       </div>
 
-      <!-- Parent offer + team general -->
+      <!-- Offer + team general -->
       <section class="offer-detail-pane" data-tab-panel="parent-offer">
         <div id="team-parent-picker-wrap" hidden>
           <div class="field">
-            <label for="team-parent-search">Parent offer name</label>
+            <label for="team-parent-search">Offer name</label>
             <p class="settings-section__hint muted">Search and select a catalog offer mapped to this team.</p>
             <div class="offer-parent-picker" id="team-parent-picker">
               <div class="search-wrap offer-parent-picker__search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
                 <input class="input" type="search" id="team-parent-search" placeholder="Search advertiser or offer…" autocomplete="off" aria-controls="team-parent-options" aria-expanded="false" />
               </div>
-              <ul class="offer-parent-picker__list" id="team-parent-options" role="listbox" aria-label="Parent offers"></ul>
+              <ul class="offer-parent-picker__list" id="team-parent-options" role="listbox" aria-label="Offers"></ul>
             </div>
           </div>
         </div>
 
         <div id="team-general-locked" hidden>
-          <p class="settings-section__hint muted" style="margin-top:0;">Inherited from <strong>parent_offer</strong> — contact super-admin to change.</p>
+          <p class="settings-section__hint muted" style="margin-top:0;">Inherited from <strong>offer</strong> — contact super-admin to change.</p>
           <div class="offer-locked-pane" style="margin-bottom:1rem;">
             <div class="offer-locked-grid" id="team-parent-readonly"></div>
           </div>
         </div>
 
         <div class="settings-section" id="team-offer-general-wrap">
-          <p class="settings-section__title">Team offer</p>
+          <p class="settings-section__title">Deal</p>
           <div class="field">
-            <label for="team-offer-name">Team offer name</label>
+            <label for="team-offer-name">Deal name</label>
             <input type="text" id="team-offer-name" placeholder="e.g. VIN Search — ACME Q1" />
           </div>
           <div class="field">
-            <label for="team-offer-description">Offer description</label>
+            <label for="team-offer-description">Deal description</label>
             <textarea id="team-offer-description" rows="2" placeholder="Internal notes for this team…"></textarea>
           </div>
           <div class="field">
@@ -341,18 +341,18 @@
 
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="submit" class="btn btn--black">Save team offer</button>
+        <button type="submit" class="btn btn--black">Save deal</button>
       </div>
     </form>
   </dialog>
 
-  <!-- Parent offer detail -->
+  <!-- Offer detail -->
   <dialog class="modal modal--settings modal--offer-detail" id="dialog-parent-offer-detail">
     <form method="dialog" class="modal__inner">
       <div class="modal__header">
         <div>
-          <h2 class="modal__title" id="parent-offer-detail-title">Parent offer</h2>
-          <p class="modal__hint" id="parent-offer-detail-sub">parent_offer · super-admin catalog</p>
+          <h2 class="modal__title" id="parent-offer-detail-title">Offer</h2>
+          <p class="modal__hint" id="parent-offer-detail-sub">offer · super-admin catalog</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
@@ -364,7 +364,7 @@
       </div>
 
       <section class="offer-detail-pane" data-tab-panel="general">
-        <div class="field"><label for="po-name">Parent offer name</label><input type="text" id="po-name" /></div>
+        <div class="field"><label for="po-name">Offer name</label><input type="text" id="po-name" /></div>
         <div class="field-row">
           <div class="field">
             <label for="po-advertiser-select">Advertiser</label>
@@ -441,32 +441,32 @@
       </section>
 
       <section class="offer-detail-pane" data-tab-panel="teams" hidden>
-        <p class="settings-section__hint muted">Mapped teams get a <strong>team_offer</strong> instance spawned automatically.</p>
+        <p class="settings-section__hint muted">Mapped teams get a <strong>deal</strong> instance spawned automatically.</p>
         <p class="offer-pane-summary" id="po-teams-summary"></p>
         <ul class="offer-ws-list" id="po-teams-list"></ul>
       </section>
 
       <div class="modal__actions">
         <button type="button" class="btn" data-close-dialog>Cancel</button>
-        <button type="submit" class="btn btn--black">Save parent offer</button>
+        <button type="submit" class="btn btn--black">Save offer</button>
       </div>
     </form>
   </dialog>
 
-  <!-- Clone parent offer -->
+  <!-- Clone offer -->
   <dialog class="modal modal--settings" id="dialog-parent-offer-clone">
     <div class="modal__inner">
       <input type="hidden" id="parent-clone-source-id" value="" />
       <div class="modal__header">
         <div>
-          <h2 class="modal__title">Duplicate parent offer</h2>
+          <h2 class="modal__title">Duplicate offer</h2>
           <p class="modal__hint" style="margin-bottom:0;">Copy catalog fields (General, Deal, CTA URL). Pick teams to map on the duplicate.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <div class="modal__body">
         <div class="field">
-          <label for="parent-clone-name">New parent offer name</label>
+          <label for="parent-clone-name">New offer name</label>
           <input type="text" id="parent-clone-name" class="input" placeholder="e.g. Walk-in showers (copy)" required autofocus />
         </div>
         <div class="field">
@@ -505,20 +505,20 @@
     </div>
   </dialog>
 
-  <!-- Duplicate team offer -->
+  <!-- Duplicate deal -->
   <dialog class="modal modal--settings" id="dialog-team-offer-clone">
     <div class="modal__inner">
       <input type="hidden" id="team-clone-source-id" value="" />
       <div class="modal__header">
         <div>
-          <h2 class="modal__title">Duplicate team offer</h2>
+          <h2 class="modal__title">Duplicate deal</h2>
           <p class="modal__hint" style="margin-bottom:0;">Copy deployment settings (deal, CTA, buy sources, MAX). Pick workspaces to map on the duplicate.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <div class="modal__body">
         <div class="field">
-          <label for="team-clone-name">New team offer name</label>
+          <label for="team-clone-name">New deal name</label>
           <input type="text" id="team-clone-name" class="input" placeholder="e.g. VIN Search (copy)" required autofocus />
         </div>
         <div class="field">
@@ -723,7 +723,7 @@
     function parentName(p) { return p ? p.name : ""; }
     function teamOfferLabel(to) {
       var p = parentById(to.parentOfferId);
-      return (to.displayName && to.displayName.trim()) || (p ? p.name : "Team offer");
+      return (to.displayName && to.displayName.trim()) || (p ? p.name : "Deal");
     }
     function resolvedDealType(to) {
       var p = parentById(to.parentOfferId);
@@ -1107,7 +1107,7 @@
       var groups = groupTeamOffersByAdvertiser(rows);
       tbody.innerHTML = "";
       if (!groups.length) {
-        tbody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No team offers for this team.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No deals for this team.</td></tr>';
         return;
       }
       groups.forEach(function (g) {
@@ -1120,7 +1120,7 @@
             '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button>' +
           '</td>' +
           '<td colspan="10"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
-            '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' team offer' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
+            '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' deal' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
         tbody.appendChild(tr);
         g.offers.forEach(function (to) {
           var p = parentById(to.parentOfferId);
@@ -1140,8 +1140,8 @@
             '<td>' + fmtUpdatedAt(to) + '</td>' +
             '<td class="offer-ws-col">' + wsNamesCompact(getWorkspaceIds(to)) + '</td>' +
             '<td class="right"><div class="actions">' +
-              '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Duplicate team offer">' + ICON.clone + '</button>' +
-              '<button type="button" class="icon-btn js-team-offer-settings" data-team-offer-id="' + escapeHtml(to.id) + '" title="Edit team offer">' + ICON.edit + '</button>' +
+              '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Duplicate deal">' + ICON.clone + '</button>' +
+              '<button type="button" class="icon-btn js-team-offer-settings" data-team-offer-id="' + escapeHtml(to.id) + '" title="Edit deal">' + ICON.edit + '</button>' +
             '</div></td>';
           tbody.appendChild(orow);
         });
@@ -1162,7 +1162,7 @@
       });
       parentBody.innerHTML = "";
       if (!groupList.length) {
-        parentBody.innerHTML = '<tr><td colspan="12" class="muted" style="padding:1.5rem;text-align:center;">No parent offers found.</td></tr>';
+        parentBody.innerHTML = '<tr><td colspan="12" class="muted" style="padding:1.5rem;text-align:center;">No offers found.</td></tr>';
         return;
       }
       groupList.forEach(function (g) {
@@ -1191,8 +1191,8 @@
             '<td>' + fmtUpdatedAt(p) + '</td>' +
             '<td class="muted" style="font-size:12px;">' + teamNames(p.teamIds) + '</td>' +
             '<td class="right"><div class="actions">' +
-              '<button type="button" class="icon-btn js-parent-offer-clone" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Duplicate parent offer">' + ICON.clone + '</button>' +
-              '<button type="button" class="icon-btn js-parent-offer-settings" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Edit parent offer">' + ICON.edit + '</button>' +
+              '<button type="button" class="icon-btn js-parent-offer-clone" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Duplicate offer">' + ICON.clone + '</button>' +
+              '<button type="button" class="icon-btn js-parent-offer-settings" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Edit offer">' + ICON.edit + '</button>' +
             '</div></td>';
           parentBody.appendChild(orow);
         });
@@ -1529,13 +1529,13 @@
       var el = document.getElementById("team-offer-inherited-deal");
       if (!el) return;
       if (!p) {
-        el.innerHTML = '<p class="muted" style="margin:0;">Select a parent offer to view inherited deal fields.</p>';
+        el.innerHTML = '<p class="muted" style="margin:0;">Select an offer to view inherited deal fields.</p>';
         return;
       }
       var targetType = p.targetType || "cpa";
       var targetVal = fmtTargetParent(p);
       el.innerHTML =
-        '<p class="settings-section__hint muted" style="margin:0 0 0.65rem;">Inherited from parent offer (read-only)</p>' +
+        '<p class="settings-section__hint muted" style="margin:0 0 0.65rem;">Inherited from offer (read-only)</p>' +
         '<div class="offer-locked-grid">' +
           '<div class="offer-locked-field"><span class="offer-locked-label">Deal type</span><span class="offer-locked-value">' + escapeHtml((p.dealType || "cpa").toUpperCase()) + '</span></div>' +
           '<div class="offer-locked-field"><span class="offer-locked-label">Target type</span><span class="offer-locked-value">' + escapeHtml(targetType.toUpperCase()) + '</span></div>' +
@@ -1572,7 +1572,7 @@
         }).filter(Boolean);
       }
       if (!groupList.length) {
-        list.innerHTML = '<li class="offer-parent-picker__empty muted">No parent offers mapped to this team. Ask super-admin to map a parent offer.</li>';
+        list.innerHTML = '<li class="offer-parent-picker__empty muted">No offers mapped to this team. Ask super-admin to map an offer.</li>';
         return;
       }
       list.innerHTML = groupList.map(function (g) {
@@ -1604,8 +1604,8 @@
       loadTeamOfferDealFields(to, p);
       renderOfferWorkspaces(to);
       refreshEnrichedPreview();
-      document.getElementById("team-offer-detail-title").textContent = document.getElementById("team-offer-name").value.trim() || (p ? p.name : "New team offer");
-      document.getElementById("team-offer-detail-sub").textContent = (p ? parentPickerLabel(p) : "Choose a parent offer") + " · " + CURRENT_TEAM.name;
+      document.getElementById("team-offer-detail-title").textContent = document.getElementById("team-offer-name").value.trim() || (p ? p.name : "New deal");
+      document.getElementById("team-offer-detail-sub").textContent = (p ? parentPickerLabel(p) : "Choose an offer") + " · " + CURRENT_TEAM.name;
       setTeamOfferTabsEnabled(!!p);
     }
 
@@ -1613,11 +1613,11 @@
       var el = document.getElementById("team-parent-readonly");
       if (!el) return;
       if (!p) {
-        el.innerHTML = '<p class="muted">Select a parent offer above.</p>';
+        el.innerHTML = '<p class="muted">Select an offer above.</p>';
         return;
       }
       el.innerHTML =
-        '<div class="offer-locked-field"><span class="offer-locked-label">Parent offer name</span><span class="offer-locked-value">' + escapeHtml(p.name) + '</span></div>' +
+        '<div class="offer-locked-field"><span class="offer-locked-label">Offer name</span><span class="offer-locked-value">' + escapeHtml(p.name) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Advertiser</span><span class="offer-locked-value">' + escapeHtml(advName(p.advertiserId)) + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L1</span><span class="offer-locked-value">' + escapeHtml(catL1FromParent(p) || "—") + '</span></div>' +
         '<div class="offer-locked-field"><span class="offer-locked-label">Category L2</span><span class="offer-locked-value">' + escapeHtml(p.categoryLevel2 || "—") + '</span></div>' +
@@ -1650,7 +1650,7 @@
       document.getElementById("team-offer-description").value = to.description || "";
       document.getElementById("team-offer-status").value = to.status || "active";
       document.getElementById("team-offer-detail-title").textContent = teamOfferLabel(to);
-      document.getElementById("team-offer-detail-sub").textContent = (p ? parentPickerLabel(p) : "Choose a parent offer") + " · " + CURRENT_TEAM.name;
+      document.getElementById("team-offer-detail-sub").textContent = (p ? parentPickerLabel(p) : "Choose an offer") + " · " + CURRENT_TEAM.name;
 
       var pickerWrap = document.getElementById("team-parent-picker-wrap");
       var generalWrap = document.getElementById("team-offer-general-wrap");
@@ -1693,12 +1693,12 @@
       if (!to) return;
       var prevStatus = to.status;
       if (!to.parentOfferId) {
-        alert("Please select a parent offer before saving.");
+        alert("Please select an offer before saving.");
         return;
       }
       var p = parentById(to.parentOfferId);
       var name = document.getElementById("team-offer-name").value.trim();
-      if (!name) { alert("Team offer name is required."); return; }
+      if (!name) { alert("Deal name is required."); return; }
       var campaignId = document.getElementById("offer-campaign-id").value.trim();
       if (!campaignId) { alert("Campaign ID is required."); return; }
       to.displayName = name;
@@ -1730,7 +1730,7 @@
       if (!to.buySources.length) { alert("Select at least one buy source."); return; }
       if (prevStatus !== to.status) {
         Gov.notifyGovernanceEvent("effective_status_changed", {
-          message: "Team offer \"" + to.displayName + "\" status changed to " + to.status + ". Effective: " + teamOfferEffectiveStatus(to) + ".",
+          message: "Deal \"" + to.displayName + "\" status changed to " + to.status + ". Effective: " + teamOfferEffectiveStatus(to) + ".",
           teamOfferId: to.id,
           email: true
         });
@@ -1802,7 +1802,7 @@
       var p = parentById(id);
       if (!p || !parentDetailDlg) return;
       activeParentOfferId = id;
-      document.getElementById("parent-offer-detail-title").textContent = p.name || "New parent offer";
+      document.getElementById("parent-offer-detail-title").textContent = p.name || "New offer";
       document.getElementById("parent-offer-detail-sub").textContent = advName(p.advertiserId) || "Select advertiser";
       document.getElementById("po-name").value = p.name || "";
       document.getElementById("po-description").value = p.description || "";
@@ -1836,10 +1836,10 @@
       p.categoryLevel2 = document.getElementById("po-category-l2").value;
       p.categoryLevel3 = document.getElementById("po-category-l3").value;
       if (!p.name || !p.advertiserId || !p.categoryLevel1 || !p.categoryLevel2 || !p.categoryLevel3) {
-        alert("All parent offer critical fields are required.");
+        alert("All offer critical fields are required.");
         return;
       }
-      if (!validateRequiredDescription(p.description, "Parent offer description")) return;
+      if (!validateRequiredDescription(p.description, "Offer description")) return;
       p.vertical = p.categoryLevel1;
       p.dealType = document.getElementById("po-deal-type").value;
       delete p.dealValue;
@@ -1864,7 +1864,7 @@
       syncTeamOffersOnParentTeamChange(p, prevTeamIds);
       spawnTeamOffersForParent(p);
       if (p.status === "inactive" && prevStatus !== "inactive") {
-        Gov.cascadeSoftDeleteTeamOffersForParent(p, "parent offer set inactive");
+        Gov.cascadeSoftDeleteTeamOffersForParent(p, "offer set inactive");
       }
       touchEntity(p);
       renderAlertsBadge();
@@ -2415,7 +2415,7 @@
 
     // ---- Page-level tabs ----
     var pageTabs = document.querySelectorAll("[data-page-tab]");
-    var pageTitles = { "team-offers": "Offers", "parent-offers": "Parent offers", "advertisers": "Advertisers" };
+    var pageTitles = { "team-offers": "Deals", "parent-offers": "Offers", "advertisers": "Advertisers" };
     pageTabs.forEach(function (tab) {
       tab.addEventListener("click", function () {
         var target = tab.getAttribute("data-page-tab");
@@ -2428,7 +2428,7 @@
         document.getElementById("team-offer-add-btn").style.display = target === "team-offers" ? "" : "none";
         document.getElementById("parent-offer-add-btn").style.display = target === "parent-offers" ? "" : "none";
         document.getElementById("adv-add-btn").style.display = target === "advertisers" ? "" : "none";
-        document.getElementById("page-main-title").textContent = pageTitles[target] || "Offers";
+        document.getElementById("page-main-title").textContent = pageTitles[target] || "Deals";
         if (target === "advertisers") renderAdvTable();
       });
     });

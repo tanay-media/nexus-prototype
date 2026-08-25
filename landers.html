@@ -465,7 +465,7 @@
     ];
 
     // --------------------------------------------------------------------
-    // Team offer effective status (from Offers Wall governance store)
+    // Deal effective status (from Offers Wall governance store)
     // --------------------------------------------------------------------
     function landerTeamOfferEffectiveStatus(l) {
       if (!l.teamOfferId || !window.NexusOffersGov) return "active";
@@ -478,7 +478,7 @@
       var eff = landerTeamOfferEffectiveStatus(l);
       var name = escapeHtml(l.offerName || "—");
       if (eff === "active") return '<span class="muted">' + name + '</span>';
-      return '<span class="muted">' + name + '</span> <span class="badge badge--archived" title="Linked team offer is inactive or soft-deleted">Inactive offer</span>';
+      return '<span class="muted">' + name + '</span> <span class="badge badge--archived" title="Linked deal is inactive or soft-deleted">Inactive deal</span>';
     }
 
     function updateInactiveOfferBanner(rows) {
@@ -490,7 +490,7 @@
         return;
       }
       banner.style.display = "";
-      banner.textContent = bad.length + " lander" + (bad.length === 1 ? " uses an" : "s use") + " inactive or soft-deleted team offer — review Offers before publishing traffic.";
+      banner.textContent = bad.length + " lander" + (bad.length === 1 ? " uses an" : "s use") + " inactive or soft-deleted deal — review Offers before publishing traffic.";
     }
 
     // --------------------------------------------------------------------

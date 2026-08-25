@@ -258,8 +258,8 @@
     to.deletedAt = new Date().toISOString();
     to.deletedBy = CURRENT_USER.email;
     touchEntity(to);
-    notifyGovernanceEvent("team_offer_soft_deleted", {
-      message: "Team offer \"" + (to.displayName || to.id) + "\" was soft-deleted" + (reason ? " (" + reason + ")" : "") + ".",
+    notifyGovernanceEvent("deal_soft_deleted", {
+      message: "Deal \"" + (to.displayName || to.id) + "\" was soft-deleted" + (reason ? " (" + reason + ")" : "") + ".",
       teamOfferId: to.id,
       reason: reason,
       email: true,
@@ -282,8 +282,8 @@
     to.deletedBy = null;
     touchEntity(to);
     var eff = teamOfferEffectiveStatus(to);
-    notifyGovernanceEvent("team_offer_restored", {
-      message: "Team offer \"" + (to.displayName || to.id) + "\" was restored. Effective status: " + eff + ".",
+    notifyGovernanceEvent("deal_restored", {
+      message: "Deal \"" + (to.displayName || to.id) + "\" was restored. Effective status: " + eff + ".",
       teamOfferId: to.id
     });
     saveState();
@@ -301,8 +301,8 @@
       m.deletedAt = new Date().toISOString();
       m.deletedBy = CURRENT_USER.email;
       touchEntity(m);
-      notifyGovernanceEvent("parent_offer_team_soft_deleted", {
-        message: "Parent↔team mapping removed (soft-deleted) for parent " + parentId + " / team " + teamId + ".",
+      notifyGovernanceEvent("offer_team_soft_deleted", {
+        message: "Offer↔team mapping removed (soft-deleted) for offer " + parentId + " / team " + teamId + ".",
         parentOfferId: parentId,
         teamId: teamId,
         reason: reason,
@@ -312,7 +312,7 @@
     state.teamOffers.filter(function (to) {
       return to.parentOfferId === parentId && to.teamId === teamId && !to.deletedAt;
     }).forEach(function (to) {
-      softDeleteTeamOffer(to, reason || "parent_offer_team unmapped");
+      softDeleteTeamOffer(to, reason || "offer_team unmapped");
     });
     saveState();
   }
@@ -329,8 +329,8 @@
       m.deletedAt = null;
       m.deletedBy = null;
       touchEntity(m);
-      notifyGovernanceEvent("parent_offer_team_restored", {
-        message: "Parent↔team mapping restored for parent " + parentId + " / team " + teamId + ".",
+      notifyGovernanceEvent("offer_team_restored", {
+        message: "Offer↔team mapping restored for offer " + parentId + " / team " + teamId + ".",
         parentOfferId: parentId,
         teamId: teamId
       });
@@ -377,7 +377,7 @@
     state.teamOffers.filter(function (to) {
       return to.parentOfferId === parent.id && !to.deletedAt;
     }).forEach(function (to) {
-      softDeleteTeamOffer(to, reason || "parent offer inactive/deleted");
+      softDeleteTeamOffer(to, reason || "offer inactive/deleted");
     });
   }
 
@@ -386,9 +386,9 @@
     parent.deletedAt = new Date().toISOString();
     parent.deletedBy = CURRENT_USER.email;
     touchEntity(parent);
-    cascadeSoftDeleteTeamOffersForParent(parent, reason || "parent offer deleted");
-    notifyGovernanceEvent("parent_offer_deleted", {
-      message: "Parent offer \"" + (parent.name || parent.id) + "\" was soft-deleted. Child team offers soft-deleted; hard purge after 90 days.",
+    cascadeSoftDeleteTeamOffersForParent(parent, reason || "offer deleted");
+    notifyGovernanceEvent("offer_deleted", {
+      message: "Offer \"" + (parent.name || parent.id) + "\" was soft-deleted. Child deals soft-deleted; hard purge after 90 days.",
       parentOfferId: parent.id,
       email: true
     });
@@ -413,7 +413,7 @@
       softDeleteTeamOffer(to, "A360 team deleted");
     });
     notifyGovernanceEvent("a360_team_deleted", {
-      message: "A360 team " + (team.name || teamId) + " was deleted. Dependent team offers soft-deleted.",
+      message: "A360 team " + (team.name || teamId) + " was deleted. Dependent deals soft-deleted.",
       teamId: teamId,
       email: true
     });

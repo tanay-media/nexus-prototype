@@ -248,18 +248,18 @@
                 <label for="editor-offer-dest-trigger">Destination URL</label>
                 <div class="offer-dest-picker" id="editor-offer-dest-picker">
                   <button type="button" class="offer-dest-picker__trigger" id="editor-offer-dest-trigger" aria-haspopup="listbox" aria-expanded="false">
-                    <span class="offer-dest-picker__label" id="editor-offer-dest-label">Select team offer…</span>
+                    <span class="offer-dest-picker__label" id="editor-offer-dest-label">Select deal…</span>
                     <svg class="offer-dest-picker__caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                   </button>
                   <div class="offer-dest-picker__panel" id="editor-offer-dest-panel" hidden>
                     <div class="offer-dest-picker__panel-head">
-                      <p class="offer-dest-picker__panel-title">Select team offer</p>
-                      <p class="offer-dest-picker__panel-sub muted">Advertiser → parent offer · sets CTA URL</p>
+                      <p class="offer-dest-picker__panel-title">Select deal</p>
+                      <p class="offer-dest-picker__panel-sub muted">Advertiser → Offer · sets CTA URL</p>
                     </div>
                     <div class="search-wrap offer-dest-picker__search">
                       <input type="search" class="input" id="editor-offer-dest-search" placeholder="Search advertiser or offer…" autocomplete="off" />
                     </div>
-                    <ul class="offer-parent-picker__list" id="editor-offer-dest-list" role="listbox" aria-label="Team offers"></ul>
+                    <ul class="offer-parent-picker__list" id="editor-offer-dest-list" role="listbox" aria-label="Deals"></ul>
                   </div>
                 </div>
               </div>
@@ -272,7 +272,7 @@
                   <a class="btn btn--sm" id="editor-offer-dest-view" href="#" target="_blank" rel="noopener">View</a>
                 </div>
               </div>
-              <p class="settings-acc__hint muted" id="editor-offer-dest-empty">Select a team offer to load its CTA URL.</p>
+              <p class="settings-acc__hint muted" id="editor-offer-dest-empty">Select a deal to load its CTA URL.</p>
 
               <div class="settings-cta-card">
                 <p class="settings-cta-card__label">CTA 1</p>
@@ -1301,7 +1301,7 @@
             '<div><dt>advertiser_id</dt><dd>' + escapeHtml(w.ad_provider_config.advertiser_id) + '</dd></div>' +
             '<div><dt>slot_config</dt><dd>' + escapeHtml(w.slot_config) + '</dd></div>' +
             '<div><dt>Serving sync keywords</dt><dd>' + (serving ? serving.keywords.length : 0) + ' rows (on only)</dd></div>' +
-            '<div><dt>Team offer (context)</dt><dd>' + escapeHtml(adv ? adv.teamOfferId : "") + ' · ' + escapeHtml(adv ? adv.campaignId : "") + '</dd></div>' +
+            '<div><dt>Deal (context)</dt><dd>' + escapeHtml(adv ? adv.teamOfferId : "") + ' · ' + escapeHtml(adv ? adv.campaignId : "") + '</dd></div>' +
           '</dl>';
         var blocks = "";
         var onIdx = 0;
@@ -1522,7 +1522,7 @@
       if (window.nexusSyncEditorSettingsRail) window.nexusSyncEditorSettingsRail();
     });
 
-    // ---- Variant settings rail (variant name + team offer CTA)
+    // ---- Variant settings rail (variant name + deal CTA)
     (function () {
       var settingsToggle = document.getElementById("editor-settings-toggle");
       var settingsRail = document.getElementById("editor-settings-rail");
@@ -1634,7 +1634,7 @@
         });
         var advNames = Object.keys(groups).sort();
         if (!advNames.length) {
-          destList.innerHTML = '<li class="offer-parent-picker__empty muted">No team offers match your search.</li>';
+          destList.innerHTML = '<li class="offer-parent-picker__empty muted">No deals match your search.</li>';
           return;
         }
         var picked = currentTeamOfferId();
@@ -1667,7 +1667,7 @@
           if (destUrlBox) destUrlBox.hidden = false;
           if (destEmpty) destEmpty.hidden = true;
         } else {
-          if (destLabel) destLabel.textContent = "Select team offer…";
+          if (destLabel) destLabel.textContent = "Select deal…";
           if (destUrlBox) destUrlBox.hidden = true;
           if (destEmpty) destEmpty.hidden = false;
         }
