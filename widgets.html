@@ -504,7 +504,7 @@
         <div class="table-scroll">
           <table class="kb-slots-table" id="kb-slots-table">
             <thead>
-              <tr><th>Slot</th><th>keyword_term</th><th>display_term</th><th>status</th><th></th></tr>
+              <tr><th class="col-slot">#</th><th>keyword_term</th><th>display_term</th><th class="col-status">on</th><th class="col-del"></th></tr>
             </thead>
             <tbody id="kb-slots-tbody"></tbody>
           </table>
@@ -771,11 +771,11 @@
           kbKeywords.forEach(function (slot, i) {
             var tr = document.createElement("tr");
             tr.innerHTML =
-              "<td>" + (i + 1) + "</td>" +
+              '<td class="col-slot">' + (i + 1) + "</td>" +
               '<td><input type="text" class="kb-in-keyword-term" data-idx="' + i + '" value="' + String(slot.keyword_term).replace(/"/g, "&quot;") + '" placeholder="keyword_term" /></td>' +
               '<td><input type="text" class="kb-in-display-term" data-idx="' + i + '" value="' + String(slot.display_term).replace(/"/g, "&quot;") + '" placeholder="display_term" /></td>' +
-              '<td><select class="kb-in-status select" data-idx="' + i + '"><option value="on"' + (slot.status === "on" ? " selected" : "") + '>on</option><option value="off"' + (slot.status === "off" ? " selected" : "") + '>off</option></select></td>' +
-              '<td><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove" ' + (kbKeywords.length <= 1 ? "disabled" : "") + '>✕</button></td>';
+              '<td class="col-status"><button type="button" class="kb-status-btn' + (slot.status === "on" ? " is-on" : " is-off") + '" data-idx="' + i + '" aria-label="Toggle on/off">' + slot.status + "</button></td>" +
+              '<td class="col-del"><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove" ' + (kbKeywords.length <= 1 ? "disabled" : "") + ">✕</button></td>";
             kbSlotsBody.appendChild(tr);
           });
           if (kbSlotCountLabel) kbSlotCountLabel.textContent = onCount + " on · " + kbKeywords.length + " rows (max 12)";
@@ -875,14 +875,14 @@
             }
             renderKbPreview();
           });
-          kbSlotsBody.addEventListener("change", function (e) {
-            var t = e.target;
-            if (!t.classList.contains("kb-in-status")) return;
-            var idx = parseInt(t.getAttribute("data-idx"), 10);
-            kbKeywords[idx].status = t.value;
-            renderKbSlotsTable();
-          });
           kbSlotsBody.addEventListener("click", function (e) {
+            var statusBtn = e.target.closest(".kb-status-btn");
+            if (statusBtn) {
+              var idx = parseInt(statusBtn.getAttribute("data-idx"), 10);
+              kbKeywords[idx].status = kbKeywords[idx].status === "on" ? "off" : "on";
+              renderKbSlotsTable();
+              return;
+            }
             var del = e.target.closest(".kb-slot-del");
             if (!del || del.disabled) return;
             var idx = parseInt(del.getAttribute("data-idx"), 10);
