@@ -7,7 +7,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Widgets · nexus</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="keyword-blocks.css?v=20260826i" />
+  <link rel="stylesheet" href="keyword-blocks.css?v=20260826j" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -523,8 +523,7 @@
             </h3>
             <button type="button" class="btn btn--sm" id="kb-add-slot">+ Add keyword</button>
           </div>
-          <p class="field__hint kb-info-hint" id="kb-terms-info-text" hidden><strong>Bold line</strong> = display term (readers see on the lander). <strong>Smaller line</strong> = keyword term (sent to the ad provider, e.g. MAX).</p>
-          <p class="muted kb-field-hint">Grab the <strong>⋮⋮</strong> handle and drag to reorder.</p>
+          <p class="field__hint kb-info-hint" id="kb-terms-info-text" hidden>Bold = display term (readers see). Grey = keyword term (ad provider).</p>
           <div class="kb-keyword-list" id="kb-keywords-active-list" aria-label="Active keywords"></div>
         </div>
 
@@ -532,7 +531,6 @@
           <div class="kb-editor__slots-head">
             <h3>Past keywords <span class="kb-section-count" id="kb-past-count-label">0</span></h3>
           </div>
-          <p class="muted kb-field-hint">Restore to add back to the active list.</p>
           <div class="kb-keyword-list kb-keyword-list--past" id="kb-keywords-past-list" aria-label="Past keywords"></div>
           <p class="kb-past-empty muted" id="kb-past-empty" hidden>No past keywords yet.</p>
         </div>
@@ -616,7 +614,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js?v=20260826i"></script>
+  <script src="kb-widget-model.js?v=20260826j"></script>
   <script src="app.js"></script>
   <script>
     /* ── New Widget button → type picker → form editor ── */
@@ -986,8 +984,8 @@
                     "</svg>" +
                   "</div>" +
                   '<div class="kb-keyword-card__summary">' +
-                    '<input type="text" class="kb-in-display-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="Display term" aria-label="Display term" />' +
-                    '<input type="text" class="kb-in-keyword-term kb-keyword-card__subtitle-input input kb-input--mono" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="Keyword term" aria-label="Keyword term" />' +
+                    '<input type="text" class="kb-in-display-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="" aria-label="Display term" />' +
+                    '<input type="text" class="kb-in-keyword-term kb-keyword-card__subtitle-input input kb-input--mono" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="" aria-label="Keyword term" />' +
                   "</div>" +
                   '<div class="kb-keyword-card__actions">' +
                     '<button type="button" class="kb-details-toggle' + (expanded ? " is-open" : "") + '" data-idx="' + globalIdx + '">' + (expanded ? "Hide" : "Details") + "</button>" +

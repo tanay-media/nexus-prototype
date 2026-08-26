@@ -469,7 +469,14 @@
 }
 
 .kb-keyword-card__main--past {
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
+}
+
+.kb-keyword-card--past .kb-keyword-card__actions {
+  justify-content: flex-end;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .kb-drag-handle {
