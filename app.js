@@ -412,6 +412,7 @@
 
   applyHashTab();
   window.addEventListener("hashchange", applyHashTab);
+  window.nexusActivateTabGroup = activateTabGroup;
 
   // Chrome dialog tabs (Header / Footer / CMP)
   document.querySelectorAll(".chrome-tabs").forEach(function (tabs) {
@@ -679,6 +680,13 @@
           desc:  "Pre-filtered lander view · " + EX_TUB,
           hint:  "Analyse",
           action: function () { window.location.href = "reports.html?lander=" + encodeURIComponent(l.name); }
+        });
+        analyseRows.push({
+          icon: "◎",
+          title: "User behaviour — " + (q && includes(l.name, q) ? wrapMatch(l.name, q) : "<strong>" + escapeHtml(l.name) + "</strong>"),
+          desc:  "Scroll, time on page, heatmap · " + EX_TUB,
+          hint:  "Behaviour",
+          action: function () { window.location.href = "reports.html?lander=" + encodeURIComponent(l.name) + "&view=behaviour"; }
         });
       }
     });

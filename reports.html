@@ -6,6 +6,7 @@
   <title>Reports · nexus</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="keyword-blocks.css" />
+  <link rel="stylesheet" href="reports-analytics.css" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -50,6 +51,14 @@
         <button type="button" id="filter-note-clear">Clear filter</button>
       </div>
 
+      <div class="reports-page-body" data-tabs="reports-view">
+        <div class="tabs reports-view-tabs" role="tablist" aria-label="Reports views">
+          <button type="button" class="tab is-active" data-tab="performance" role="tab" aria-selected="true">Performance</button>
+          <button type="button" class="tab" data-tab="behaviour" role="tab" aria-selected="false">User behaviour</button>
+          <button type="button" class="tab" data-tab="forms" role="tab" aria-selected="false">Forms</button>
+        </div>
+
+        <section class="reports-view-panel" data-tab-panel="performance">
       <div class="reports-layout">
         <div class="reports-main-stack">
         <div class="card reports-funnel-card" id="kb-reports-funnel">
@@ -196,6 +205,229 @@
             </div>
           </div>
         </aside>
+      </div>
+        </section>
+
+        <!-- User behaviour — engagement metrics, charts, visit-level table -->
+        <section class="reports-view-panel" data-tab-panel="behaviour" hidden>
+          <div class="behaviour-kpis" id="behaviour-kpis">
+            <div class="behaviour-kpi">
+              <div class="behaviour-kpi__label">Time on page</div>
+              <div class="behaviour-kpi__primary" id="beh-kpi-time-avg">42s</div>
+              <div class="behaviour-kpi__secondary"><span id="beh-kpi-time-cum">3,347</span> visits tracked</div>
+              <span class="behaviour-kpi__delta">↑ 8% vs prior period</span>
+            </div>
+            <div class="behaviour-kpi">
+              <div class="behaviour-kpi__label">Scroll depth</div>
+              <div class="behaviour-kpi__primary" id="beh-kpi-scroll-avg">68%</div>
+              <div class="behaviour-kpi__secondary">median <span id="beh-kpi-scroll-med">72%</span></div>
+              <span class="behaviour-kpi__delta">↑ 3% vs prior period</span>
+            </div>
+            <div class="behaviour-kpi">
+              <div class="behaviour-kpi__label">Quick exit</div>
+              <div class="behaviour-kpi__primary" id="beh-kpi-exit-rate">26.6%</div>
+              <div class="behaviour-kpi__secondary"><span id="beh-kpi-exit-cum">892</span> exits &lt;10s</div>
+              <span class="behaviour-kpi__delta is-down">↓ 2% vs prior period</span>
+            </div>
+            <div class="behaviour-kpi">
+              <div class="behaviour-kpi__label">CTA engagement</div>
+              <div class="behaviour-kpi__primary" id="beh-kpi-cta-rate">38.2%</div>
+              <div class="behaviour-kpi__secondary"><span id="beh-kpi-cta-cum">1,278</span> clicks from visits</div>
+              <span class="behaviour-kpi__delta">↑ 1.1% vs prior period</span>
+            </div>
+          </div>
+
+          <div class="behaviour-charts">
+            <div class="behaviour-chart-card">
+              <div class="behaviour-chart-card__head">
+                <div>
+                  <h3 class="behaviour-chart-card__title">Scroll depth (cumulative)</h3>
+                  <p class="behaviour-chart-card__sub">% of visits reaching each depth · last 7 days</p>
+                </div>
+                <div class="behaviour-chart-legend"><span class="leg-bar">Reached depth</span></div>
+              </div>
+              <div class="scroll-depth-chart" id="scroll-depth-chart">
+                <div class="scroll-depth-row"><span class="scroll-depth-row__label">25%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:94%"></div></div><span class="scroll-depth-row__pct">94%</span></div>
+                <div class="scroll-depth-row"><span class="scroll-depth-row__label">50%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:81%"></div></div><span class="scroll-depth-row__pct">81%</span></div>
+                <div class="scroll-depth-row"><span class="scroll-depth-row__label">75%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:58%"></div></div><span class="scroll-depth-row__pct">58%</span></div>
+                <div class="scroll-depth-row"><span class="scroll-depth-row__label">100%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:31%"></div></div><span class="scroll-depth-row__pct">31%</span></div>
+              </div>
+            </div>
+            <div class="behaviour-chart-card">
+              <div class="behaviour-chart-card__head">
+                <div>
+                  <h3 class="behaviour-chart-card__title">Time on page distribution</h3>
+                  <p class="behaviour-chart-card__sub">Visit count by bucket · avg <strong id="beh-chart-time-avg">42s</strong></p>
+                </div>
+                <div class="behaviour-chart-legend"><span class="leg-bar">Visits</span></div>
+              </div>
+              <div class="time-histogram" id="time-histogram" aria-hidden="true">
+                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:28%"></div><span class="time-histogram__label">0–10s</span></div>
+                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:52%"></div><span class="time-histogram__label">10–30s</span></div>
+                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar is-avg" style="height:88%"></div><span class="time-histogram__label">30–60s</span></div>
+                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:64%"></div><span class="time-histogram__label">1–2m</span></div>
+                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:38%"></div><span class="time-histogram__label">2–5m</span></div>
+                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:18%"></div><span class="time-histogram__label">5m+</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="behaviour-heatmap-row">
+            <div class="behaviour-heatmap-preview">
+              <div class="behaviour-heatmap-preview__chrome">
+                <div class="behaviour-heatmap-preview__bar"></div>
+                <div class="behaviour-heatmap-preview__screen">
+                  <div class="behaviour-heatmap-preview__screen-inner">
+                    <div class="behaviour-heatmap-preview__hero">
+                      <p class="muted" style="font-size:9px;margin:0 0 4px;">Limited time</p>
+                      <h3>Refresh your space for spring</h3>
+                      <p class="muted" style="margin:0;font-size:10px;">See pricing for your zip in under a minute.</p>
+                      <span class="behaviour-heatmap-preview__cta">Get my quote →</span>
+                    </div>
+                    <div class="behaviour-heatmap-preview__block"><strong>Why homeowners choose us</strong><p class="muted" style="margin:4px 0 0;font-size:10px;">Transparent quotes, clear timelines.</p></div>
+                    <div class="behaviour-heatmap-preview__block"><strong>How it works</strong><p class="muted" style="margin:4px 0 0;font-size:10px;">1. Tell us · 2. Compare · 3. Book</p></div>
+                  </div>
+                  <div class="heatmap-overlay" aria-hidden="true"></div>
+                </div>
+              </div>
+            </div>
+            <div class="behaviour-heatmap-meta">
+              <h3>Click heatmap</h3>
+              <p class="muted" style="font-size:12px;margin:0;">Aggregated click positions overlaid on variant preview.</p>
+              <div class="behaviour-heatmap-filters">
+                <select class="select" id="beh-heatmap-variant" aria-label="Variant">
+                  <option>V1 — Main hero</option>
+                  <option>V2 — Urgency countdown</option>
+                  <option>V1 — Single-field</option>
+                </select>
+                <select class="select" id="beh-heatmap-device" aria-label="Device">
+                  <option value="">All devices</option>
+                  <option selected>Mobile</option>
+                  <option>Desktop</option>
+                  <option>Tablet</option>
+                </select>
+              </div>
+              <div class="behaviour-heatmap-stats">
+                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Total clicks</div><div class="behaviour-heatmap-stat__val" id="beh-hm-clicks">1,278</div></div>
+                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Hot zone (hero CTA)</div><div class="behaviour-heatmap-stat__val">64%</div></div>
+                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Avg click Y</div><div class="behaviour-heatmap-stat__val">312px</div></div>
+                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Rage clicks</div><div class="behaviour-heatmap-stat__val">0.4%</div></div>
+              </div>
+              <div class="behaviour-heatmap-legend">
+                <span>Low</span>
+                <div class="behaviour-heatmap-legend__gradient"></div>
+                <span>High</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card behaviour-visits-card">
+            <div class="card-head">
+              <div>
+                <h3>Visits</h3>
+                <p>One row per visit — drill into Logs for the full event trail.</p>
+              </div>
+              <button type="button" class="btn" id="beh-visits-export">↓ Export CSV</button>
+            </div>
+            <div class="table-scroll" role="region" aria-label="Visit-level behaviour">
+              <table class="table table--behaviour-visits" id="behaviour-visits-table">
+                <thead>
+                  <tr>
+                    <th>visit_id</th>
+                    <th>Time</th>
+                    <th>Lander / variant</th>
+                    <th>Device</th>
+                    <th class="right">Time on page</th>
+                    <th class="right">Scroll %</th>
+                    <th>Clicked</th>
+                    <th>Form</th>
+                    <th>KB keyword</th>
+                    <th class="right"></th>
+                  </tr>
+                </thead>
+                <tbody id="behaviour-visits-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Forms — funnel analytics (responses live in Widgets) -->
+        <section class="reports-view-panel" data-tab-panel="forms" hidden>
+          <div class="forms-analytics-stack">
+            <div class="forms-funnel-card">
+              <div class="forms-funnel-head">
+                <div>
+                  <h3>Form funnel</h3>
+                  <p class="muted">Cumulative counts and step conversion rates · <span id="forms-funnel-lander-label">all landers</span></p>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+                  <div>
+                    <label class="muted" style="font-size:11px;font-weight:600;text-transform:uppercase;display:block;margin-bottom:4px;">Form widget</label>
+                    <select class="select" id="forms-widget-select" aria-label="Form widget">
+                      <option value="lead-qualify">Lead — short qualify</option>
+                      <option value="quote-request">Quote request</option>
+                      <option value="newsletter-sms">Newsletter + SMS opt-in</option>
+                      <option value="home-service">Home service quote</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="forms-step-funnel" id="forms-step-funnel">
+                <div class="forms-step"><div class="forms-step__label">Visits</div><div class="forms-step__cum" id="forms-visits">118,420</div><div class="forms-step__avg">100%</div></div>
+                <div class="forms-step"><div class="forms-step__label">Form start</div><div class="forms-step__cum" id="forms-start">98,200</div><div class="forms-step__rate" id="forms-start-rate">82.9% of visits</div></div>
+                <div class="forms-step"><div class="forms-step__label">Step 1 complete</div><div class="forms-step__cum" id="forms-s1">86,400</div><div class="forms-step__rate" id="forms-s1-rate">88.0% of starts</div></div>
+                <div class="forms-step"><div class="forms-step__label">Step 2 complete</div><div class="forms-step__cum" id="forms-s2">72,450</div><div class="forms-step__rate" id="forms-s2-rate">73.8% of starts</div></div>
+                <div class="forms-step"><div class="forms-step__label">Submit</div><div class="forms-step__cum" id="forms-submit">52,164</div><div class="forms-step__rate" id="forms-submit-rate">53.1% of starts</div></div>
+              </div>
+              <div class="forms-cross-links" style="margin-top:16px;">
+                <a href="widgets.html" class="btn" style="font-size:12px;text-decoration:none;" id="forms-link-responses">View form responses in Widgets →</a>
+                <span class="muted" style="font-size:12px;align-self:center;">PII &amp; field values stay in Widgets · not duplicated here</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <p class="muted" style="font-size:12px;margin:0;padding:14px 20px 0;">Step-level drop-off — cumulative abandon vs avg time per step.</p>
+              <div class="table-scroll" role="region" aria-label="Form step analytics">
+                <table class="table forms-drop-table" id="forms-drop-table">
+                  <thead>
+                    <tr>
+                      <th>Step</th>
+                      <th class="right">Reached (cum.)</th>
+                      <th class="right">Drop-off</th>
+                      <th class="right">Step CVR</th>
+                      <th class="right">Avg time on step</th>
+                      <th>Top abandon field</th>
+                    </tr>
+                  </thead>
+                  <tbody id="forms-drop-tbody">
+                    <tr><td><strong>ZIP code</strong></td><td class="right num">98,200</td><td class="right num">11,800</td><td class="right">88.0%</td><td class="right">8s</td><td class="muted">—</td></tr>
+                    <tr><td><strong>Age range</strong></td><td class="right num">86,400</td><td class="right num">13,950</td><td class="right">86.1%</td><td class="right">12s</td><td class="muted">Age (4.2%)</td></tr>
+                    <tr><td><strong>Email</strong></td><td class="right num">72,450</td><td class="right num">20,286</td><td class="right">72.0%</td><td class="right">18s</td><td class="muted">Email (9.1%)</td></tr>
+                    <tr><td><strong>Submit</strong></td><td class="right num">52,164</td><td class="right num">—</td><td class="right">53.1%</td><td class="right">3s</td><td class="muted">—</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card reports-funnel-card" id="forms-kb-card">
+              <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div>
+                  <h3 class="settings-section__title" style="margin:0;">Keyword blocks funnel</h3>
+                  <p class="muted" style="margin:4px 0 0;font-size:12px;">Widget-level engagement · also in <a href="widgets.html">Widgets → Keyword funnel</a></p>
+                </div>
+                <a href="widgets.html" class="btn" style="font-size:12px;text-decoration:none;">Open widget →</a>
+              </div>
+              <div style="padding:12px 20px 20px;">
+                <div class="kb-funnel-stats">
+                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">3,248</div><div class="kb-funnel-step__rate">97% of visits</div></div>
+                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">964</div><div class="kb-funnel-step__rate">29.7% block rate</div></div>
+                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ads shown</div><div class="kb-funnel-step__val">941</div><div class="kb-funnel-step__rate">97.6% show rate</div></div>
+                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks</div><div class="kb-funnel-step__val">47</div><div class="kb-funnel-step__rate">5.0% ad CTR</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   </div>
@@ -779,14 +1011,120 @@
     scrim.addEventListener("click", closeDrawer);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
 
-    // Honor ?lander=<name> — pre-select filter and hide other lander rows.
+    // Honor ?lander=<name> and ?view=<tab> — pre-select filter and tab.
     (function applyLanderFilter() {
       var params = new URLSearchParams(window.location.search);
       var name   = params.get("lander");
+      var view   = params.get("view");
       var sel    = document.getElementById("lander-filter");
       var note   = document.getElementById("filter-note");
       var noteN  = document.getElementById("filter-note-name");
       var clearBtn = document.getElementById("filter-note-clear");
+      var tabGroup = document.querySelector('[data-tabs="reports-view"]');
+
+      var VISITS = [
+        { id: "v_a10ec9aa", ts: "Apr 21, 14:32", lander: "Summer Sale", variant: "Main hero", device: "mobile", time: "58s", scroll: 84, clicked: true, form: "Submitted", keyword: "—" },
+        { id: "v_1f105248", ts: "Apr 21, 14:28", lander: "Summer Sale", variant: "Main hero", device: "desktop", time: "1m 12s", scroll: 91, clicked: true, form: "Step 2", keyword: "—" },
+        { id: "v_54bde6b4", ts: "Apr 21, 14:19", lander: "Referral Q2", variant: "Single-field", device: "mobile", time: "34s", scroll: 62, clicked: false, form: "Abandoned", keyword: "—" },
+        { id: "v_adaca551", ts: "Apr 21, 13:55", lander: "Founder Letter", variant: "Long form", device: "tablet", time: "2m 04s", scroll: 100, clicked: true, form: "Submitted", keyword: "—" },
+        { id: "v_458ad589", ts: "Apr 21, 13:41", lander: "Summer Sale", variant: "Urgency countdown", device: "mobile", time: "6s", scroll: 12, clicked: false, form: "—", keyword: "—" },
+        { id: "v_f500d9d0", ts: "Apr 21, 13:22", lander: "Referral Q2", variant: "Single-field", device: "mobile", time: "47s", scroll: 71, clicked: true, form: "Submitted", keyword: "—" },
+        { id: "v_c460c944", ts: "Apr 21, 12:58", lander: "Founder Letter", variant: "Long form", device: "desktop", time: "1m 38s", scroll: 88, clicked: false, form: "Started", keyword: "—" },
+        { id: "v_8e2b1c3d", ts: "Apr 21, 12:34", lander: "Hedge Your Future", variant: "Reader modal", device: "mobile", time: "1m 05s", scroll: 76, clicked: true, form: "—", keyword: "passive income investing" },
+        { id: "v_7d9e4f2a", ts: "Apr 21, 11:47", lander: "Hedge Your Future", variant: "Reader modal", device: "mobile", time: "22s", scroll: 45, clicked: false, form: "—", keyword: "etf zero fee platform" },
+        { id: "v_3c8b5e1f", ts: "Apr 21, 11:12", lander: "Summer Sale", variant: "Main hero", device: "mobile", time: "39s", scroll: 55, clicked: true, form: "Step 1", keyword: "—" }
+      ];
+
+      var LANDER_BEHAVIOUR = {
+        "Summer Sale": { visits: 118420, timeAvg: "44s", scrollAvg: "71%", scrollMed: "74%", exitRate: "24.1%", exitCum: "28,536", ctaRate: "64.1%", ctaCum: 75899 },
+        "Referral Q2": { visits: 17800, timeAvg: "38s", scrollAvg: "65%", scrollMed: "68%", exitRate: "28.4%", exitCum: "5,055", ctaRate: "48.4%", ctaCum: 8608 },
+        "Founder Letter": { visits: 15420, timeAvg: "52s", scrollAvg: "82%", scrollMed: "85%", exitRate: "19.2%", exitCum: "2,961", ctaRate: "42.8%", ctaCum: 6601 },
+        "Hedge Your Future": { visits: 3347, timeAvg: "48s", scrollAvg: "62%", scrollMed: "58%", exitRate: "31.0%", exitCum: "1,038", ctaRate: "1.4%", ctaCum: 47 },
+        "": { visits: 163447, timeAvg: "43s", scrollAvg: "70%", scrollMed: "73%", exitRate: "25.8%", exitCum: "42,169", ctaRate: "52.3%", ctaCum: 85412 }
+      };
+
+      function setText(id, text) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = text;
+      }
+
+      function nfLocal(n) {
+        return Number(n).toLocaleString();
+      }
+
+      function renderVisits(landerFilter) {
+        var tbody = document.getElementById("behaviour-visits-tbody");
+        if (!tbody) return;
+        var rows = VISITS.filter(function (v) {
+          return !landerFilter || v.lander === landerFilter;
+        });
+        tbody.innerHTML = rows.map(function (v) {
+          var clickPill = v.clicked
+            ? '<span class="behaviour-pill behaviour-pill--yes">Yes</span>'
+            : '<span class="behaviour-pill behaviour-pill--no">No</span>';
+          var logsHref = "logs.html?visit_id=" + encodeURIComponent(v.id);
+          return (
+            "<tr data-visit-lander=\"" + v.lander + "\">" +
+            "<td class=\"mono\"><a class=\"behaviour-visit-link\" href=\"" + logsHref + "\">" + v.id + "</a></td>" +
+            "<td class=\"muted\">" + v.ts + "</td>" +
+            "<td><strong>" + v.variant + "</strong><br><span class=\"muted\" style=\"font-size:11px;\">" + v.lander + "</span></td>" +
+            "<td><span class=\"behaviour-pill behaviour-pill--device\">" + v.device + "</span></td>" +
+            "<td class=\"right num\">" + v.time + "</td>" +
+            "<td class=\"right num\">" + v.scroll + "%</td>" +
+            "<td>" + clickPill + "</td>" +
+            "<td class=\"muted\">" + v.form + "</td>" +
+            "<td class=\"muted\" style=\"font-size:12px;\">" + v.keyword + "</td>" +
+            "<td class=\"right\"><a class=\"icon-btn\" href=\"" + logsHref + "\" title=\"Open in Logs\" aria-label=\"Open in Logs\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" width=\"16\" height=\"16\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></a></td>" +
+            "</tr>"
+          );
+        }).join("");
+      }
+
+      function updateBehaviourKpis(landerFilter) {
+        var b = LANDER_BEHAVIOUR[landerFilter || ""] || LANDER_BEHAVIOUR[""];
+        setText("beh-kpi-time-avg", b.timeAvg);
+        setText("beh-kpi-time-cum", nfLocal(b.visits));
+        setText("beh-kpi-scroll-avg", b.scrollAvg);
+        setText("beh-kpi-scroll-med", b.scrollMed);
+        setText("beh-kpi-exit-rate", b.exitRate);
+        setText("beh-kpi-exit-cum", b.exitCum);
+        setText("beh-kpi-cta-rate", b.ctaRate);
+        setText("beh-kpi-cta-cum", nfLocal(b.ctaCum));
+        setText("beh-chart-time-avg", b.timeAvg);
+        setText("beh-hm-clicks", nfLocal(Math.min(b.ctaCum, Math.round(b.visits * 0.38))));
+      }
+
+      function activateReportsTab(key) {
+        if (!tabGroup || !key) return;
+        if (typeof window.nexusActivateTabGroup === "function") {
+          window.nexusActivateTabGroup(tabGroup, key);
+        } else {
+          tabGroup.querySelectorAll(".tab").forEach(function (btn) {
+            var on = btn.getAttribute("data-tab") === key;
+            btn.classList.toggle("is-active", on);
+            btn.setAttribute("aria-selected", on ? "true" : "false");
+          });
+          tabGroup.querySelectorAll("[data-tab-panel]").forEach(function (p) {
+            p.hidden = p.getAttribute("data-tab-panel") !== key;
+          });
+        }
+      }
+
+      function syncViewParam(key) {
+        var url = new URL(window.location.href);
+        if (key && key !== "performance") url.searchParams.set("view", key);
+        else url.searchParams.delete("view");
+        window.history.replaceState({}, "", url.toString());
+      }
+
+      if (tabGroup) {
+        tabGroup.querySelectorAll(".tab").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var key = btn.getAttribute("data-tab");
+            syncViewParam(key);
+          });
+        });
+      }
 
       function applyFilter(value) {
         if (typeof applyReportsLanderFilter === "function") applyReportsLanderFilter(value);
@@ -796,18 +1134,40 @@
         if (kbFunnel) {
           kbFunnel.style.display = (!value || value === "Hedge Your Future") ? "" : "none";
         }
+        var formsKb = document.getElementById("forms-kb-card");
+        if (formsKb) {
+          formsKb.style.display = (!value || value === "Hedge Your Future") ? "" : "none";
+        }
+        var formsLabel = document.getElementById("forms-funnel-lander-label");
+        if (formsLabel) formsLabel.textContent = value || "all landers";
+        renderVisits(value);
+        updateBehaviourKpis(value);
       }
 
       if (name) { sel.value = name; applyFilter(name); }
+      else { renderVisits(""); updateBehaviourKpis(""); }
+
+      if (view && ["performance", "behaviour", "forms"].indexOf(view) !== -1) {
+        activateReportsTab(view);
+      }
+
       sel.addEventListener("change", function () { applyFilter(sel.value); });
       clearBtn.addEventListener("click", function () {
         sel.value = "";
         applyFilter("");
-        // also strip ?lander= from URL without reloading
         var url = new URL(window.location.href);
         url.searchParams.delete("lander");
         window.history.replaceState({}, "", url.toString());
       });
+
+      var formsLink = document.getElementById("forms-link-responses");
+      var formsSelect = document.getElementById("forms-widget-select");
+      if (formsLink && formsSelect) {
+        formsSelect.addEventListener("change", function () {
+          formsLink.href = "widgets.html#responses-" + formsSelect.value;
+        });
+        formsLink.href = "widgets.html#responses-" + formsSelect.value;
+      }
     })();
   </script>
 </body>

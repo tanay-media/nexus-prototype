@@ -1260,6 +1260,17 @@
 
         function handleWidgetsHash() {
           var h = (location.hash || "").replace("#", "").trim();
+          if (h.indexOf("responses-") === 0) {
+            var formKey = h.slice("responses-".length);
+            var respTab = document.querySelector('[data-tab="widgets-responses"]');
+            if (respTab) respTab.click();
+            var formSel = document.getElementById("widget-response-form");
+            if (formSel && formKey) {
+              formSel.value = formKey;
+              formSel.dispatchEvent(new Event("change"));
+            }
+            return;
+          }
           var m = h.match(/^kb-keywords(?:\/([a-z0-9-]+))?$/i);
           if (m) {
             var preset = m[1] || "passive";
