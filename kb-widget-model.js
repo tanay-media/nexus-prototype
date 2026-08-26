@@ -80,16 +80,102 @@
     "index fund beginner": "Best index funds for beginners?"
   };
 
-  var MOCK_ADS = {
-    "passive income investing": { title: "E*TRADE® Account Setup", url: "us.etrade.com", desc: "Open an account and place trades on desktop & mobile.", cta: "Open Account" },
-    "etf zero fee platform": { title: "Fidelity Zero ETFs", url: "fidelity.com", desc: "Zero expense ratio index ETFs.", cta: "Start investing" },
-    "beginner investing start": { title: "Schwab for Beginners", url: "schwab.com", desc: "Learn basics and open an account.", cta: "Get started" },
-    "open brokerage account fast": { title: "Robinhood Sign Up", url: "robinhood.com", desc: "Open and fund from your phone.", cta: "Sign up" },
-    "auto insurance savings": { title: "Compare Auto Rates", url: "quotes.example.com", desc: "See rates from top carriers in 60 seconds.", cta: "Compare My Rates" },
-    "compare car insurance quotes": { title: "Insurance Quote Hub", url: "quotes.example.com", desc: "Side-by-side quotes, no spam calls.", cta: "Get quotes" },
-    "cheap full coverage insurance": { title: "Full Coverage Deals", url: "quotes.example.com", desc: "Licensed carriers in all 50 states.", cta: "See rates" },
-    "switch auto insurance carrier": { title: "Switch & Save", url: "quotes.example.com", desc: "Switch without losing coverage.", cta: "Compare now" }
+  var SAMPLE_ADS = {
+    "passive income investing": { ad_title: "E*TRADE® Account Setup", display_url: "us.etrade.com", ad_description: "Open an account and place trades on desktop & mobile.", cta_label: "Open Account" },
+    "etf zero fee platform": { ad_title: "Fidelity Zero ETFs", display_url: "fidelity.com", ad_description: "Zero expense ratio index ETFs.", cta_label: "Start investing" },
+    "beginner investing start": { ad_title: "Schwab for Beginners", display_url: "schwab.com", ad_description: "Learn basics and open an account.", cta_label: "Get started" },
+    "open brokerage account fast": { ad_title: "Robinhood Sign Up", display_url: "robinhood.com", ad_description: "Open and fund from your phone.", cta_label: "Sign up" },
+    "auto insurance savings": { ad_title: "Compare Auto Rates", display_url: "quotes.example.com", ad_description: "See rates from top carriers in 60 seconds.", cta_label: "Compare My Rates" },
+    "compare car insurance quotes": { ad_title: "Insurance Quote Hub", display_url: "quotes.example.com", ad_description: "Side-by-side quotes, no spam calls.", cta_label: "Get quotes" },
+    "cheap full coverage insurance": { ad_title: "Full Coverage Deals", display_url: "quotes.example.com", ad_description: "Licensed carriers in all 50 states.", cta_label: "See rates" },
+    "switch auto insurance carrier": { ad_title: "Switch & Save", display_url: "quotes.example.com", ad_description: "Switch without losing coverage.", cta_label: "Compare now" },
+    "zero fee etf platform": { ad_title: "Fidelity Zero ETFs", display_url: "fidelity.com", ad_description: "Trade zero-fee index ETFs.", cta_label: "Start investing" },
+    "index fund beginner": { ad_title: "Fidelity Index Funds", display_url: "fidelity.com", ad_description: "Low-cost index funds for new investors.", cta_label: "Explore funds" }
   };
+
+  function macroPrefix(slotIndex, adIndex) {
+    return "slot" + slotIndex + "_ad" + (adIndex || 1);
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  /** Prototype: simulates Serving preview → CM fetch for one keyword slot. */
+  function fetchServingPreviewAd(opts) {
+    var keyword_term = opts && opts.keyword_term ? opts.keyword_term : "";
+    var slotIndex = opts && opts.slotIndex ? opts.slotIndex : 1;
+    var adIndex = opts && opts.adIndex ? opts.adIndex : 1;
+    var advertiserId = opts && opts.advertiser_id ? opts.advertiser_id : "";
+    var delay = opts && opts.delay != null ? opts.delay : 420;
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        var sample = SAMPLE_ADS[keyword_term];
+        var macro = macroPrefix(slotIndex, adIndex);
+        var adv = ADVERTISERS[advertiserId];
+        var trackingBase = sample ? sample.display_url : "advertiser.com";
+        var ad = sample
+          ? {
+              macro: macro,
+              keyword_term: keyword_term,
+              keyword_slot_id: slotIndex,
+              ad_index: adIndex,
+              ad_title: sample.ad_title,
+              display_url: sample.display_url,
+              ad_description: sample.ad_description,
+              tracking_url: "https://preview.max.example/click?macro=" + macro + "&cmp=" + (adv ? adv.campaignId : "preview"),
+              cta_label: sample.cta_label,
+              fetch_status: "ok"
+            }
+          : {
+              macro: macro,
+              keyword_term: keyword_term,
+              keyword_slot_id: slotIndex,
+              ad_index: adIndex,
+              ad_title: "Ad for “" + keyword_term + "”",
+              display_url: trackingBase,
+              ad_description: "Resolved from CM via Serving preview.",
+              tracking_url: "https://preview.max.example/click?macro=" + macro + "&term=" + encodeURIComponent(keyword_term),
+              cta_label: "Learn more",
+              fetch_status: "ok"
+            };
+        resolve(ad);
+      }, delay);
+    });
+  }
+
+  function renderServingAdPanelHtml(ad, opts) {
+    if (!ad) return "";
+    var loading = opts && opts.loading;
+    if (loading) {
+      return (
+        '<div class="kb-ad-panel kb-ad-panel--loading" aria-busy="true">' +
+          '<span class="kb-ad-panel__label kb-ad-panel__label--live">Serving</span>' +
+          '<p class="kb-ad-panel__fetching">Fetching ad from CM…</p>' +
+        '</div>'
+      );
+    }
+    if (ad.fetch_status === "empty" || ad.fetch_status === "error") {
+      return (
+        '<div class="kb-ad-panel kb-ad-panel--empty">' +
+          '<span class="kb-ad-panel__label">Serving</span>' +
+          '<p class="kb-ad-panel__fetching">No ad returned (' + escapeHtml(ad.fetch_status) + ').</p>' +
+        '</div>'
+      );
+    }
+    return (
+      '<div class="kb-ad-panel" data-macro="' + escapeHtml(ad.macro) + '">' +
+        '<span class="kb-ad-panel__label kb-ad-panel__label--live">Live · Serving</span>' +
+        '<div class="kb-ad-panel__macro muted" style="font-size:10px;margin-bottom:4px;">{{' + escapeHtml(ad.macro + ".ad_title") + '}}</div>' +
+        '<div class="kb-ad-panel__title">' + escapeHtml(ad.ad_title) + '</div>' +
+        '<div class="kb-ad-panel__url">' + escapeHtml(ad.display_url) + '</div>' +
+        '<p class="kb-ad-panel__desc">' + escapeHtml(ad.ad_description) + '</p>' +
+        '<button type="button" class="kb-ad-panel__cta" disabled>' + escapeHtml(ad.cta_label) + ' → preview MAX</button>' +
+      '</div>'
+    );
+  }
 
   var KB_WIDGET_PASSIVE = "7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8";
   var KB_WIDGET_AUTO = "8e4b9c3d-5e6f-7081-9203-b4c5d6e7f809";
@@ -171,7 +257,11 @@
     buildBaseWidget: buildBaseWidget,
     buildServingSync: buildServingSync,
     READER_QUESTIONS: READER_QUESTIONS,
-    MOCK_ADS: MOCK_ADS,
+    SAMPLE_ADS: SAMPLE_ADS,
+    macroPrefix: macroPrefix,
+    escapeHtml: escapeHtml,
+    fetchServingPreviewAd: fetchServingPreviewAd,
+    renderServingAdPanelHtml: renderServingAdPanelHtml,
     ADVERTISERS: ADVERTISERS,
     WIDGET_REGISTRY: WIDGET_REGISTRY,
     KEYWORD_PRESETS: KEYWORD_PRESETS,

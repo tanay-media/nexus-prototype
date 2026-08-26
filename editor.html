@@ -375,7 +375,7 @@
         <section class="insert-form__preview insert-kb-preview" id="insert-kb-preview" aria-live="polite">
           <div class="insert-form__preview-empty" id="insert-kb-preview-empty">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h14"/></svg>
-            <p>Pick a keyword-blocks widget to preview slots and deal metadata.</p>
+            <p>Pick a keyword-blocks widget — click a question to preview a <strong>live ad</strong> from Serving.</p>
           </div>
         </section>
       </div>
@@ -1241,6 +1241,7 @@
 
       var selectedKbId = "";
       var kbActivePreviewIdx = 0;
+      var kbPreviewFetchToken = 0;
 
       function escapeHtml(str) {
         return String(str == null ? "" : str)
@@ -1286,13 +1287,12 @@
         });
       }
 
-      function renderKbPreview(w) {
-        if (!previewEl) return;
-        if (!w) {
-          previewEl.innerHTML = "";
-          if (previewEmpty) previewEl.appendChild(previewEmpty);
-          return;
-        }
+      function onKeywordsForPreview(w) {
+        return (w.keywords || []).filter(function (k) { return k.status === "on"; });
+      }
+
+      function renderKbPreviewBlocks(w) {
+        if (!previewEl || !w) return null;
         var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
         var serving = M.buildServingSync(w);
         var meta =
@@ -1301,19 +1301,20 @@
             '<div><dt>advertiser_id</dt><dd>' + escapeHtml(w.ad_provider_config.advertiser_id) + '</dd></div>' +
             '<div><dt>slot_config</dt><dd>' + escapeHtml(w.slot_config) + '</dd></div>' +
             '<div><dt>Serving sync keywords</dt><dd>' + (serving ? serving.keywords.length : 0) + ' rows (on only)</dd></div>' +
-            '<div><dt>Deal (context)</dt><dd>' + escapeHtml(adv ? adv.teamOfferId : "") + ' · ' + escapeHtml(adv ? adv.campaignId : "") + '</dd></div>' +
+            '<div><dt>Preview</dt><dd>Serving → CM live ad on block click</dd></div>' +
           '</dl>';
         var blocks = "";
-        var onIdx = 0;
-        w.keywords.forEach(function (kw, i) {
-          if (kw.status !== "on") return;
+        var onKeywords = onKeywordsForPreview(w);
+        onKeywords.forEach(function (kw, onIdx) {
           var active = kbActivePreviewIdx === onIdx;
           blocks +=
             '<div class="kb-block' + (active ? " is-active" : "") + '" data-kb-idx="' + onIdx + '">' +
               '<span class="kb-block__play">▶</span><span>' + escapeHtml(M.readerQuestionFor(kw.keyword_term)) + '</span>' +
               '<small class="muted" style="display:block;font-size:10px;">' + escapeHtml(kw.display_term) + ' · ' + escapeHtml(kw.keyword_term) + '</small>' +
             '</div>';
-          onIdx += 1;
+          if (active) {
+            blocks += '<div class="kb-ad-panel-wrap">' + M.renderServingAdPanelHtml(null, { loading: true }) + '</div>';
+          }
         });
         previewEl.innerHTML =
           meta +
@@ -1324,26 +1325,59 @@
               '<span class="kb-modal-preview__close" aria-hidden="true">✕</span>' +
             '</div>' +
             '<div class="kb-modal-preview__body" id="insert-kb-preview-blocks">' +
+              '<p class="kb-preview-serving-hint">Select a question — Serving fetches a live CM ad for that keyword.</p>' +
               '<p class="kb-modal-preview__section">READER QUESTIONS</p>' +
               blocks +
             '</div>' +
             '<div class="kb-modal-preview__dismiss">I\'ll continue reading on my own</div>' +
           '</div>';
+        return previewEl.querySelector("#insert-kb-preview-blocks");
+      }
+
+      function fetchInsertKbPreviewAd(w) {
+        if (!w) return;
+        var onKeywords = onKeywordsForPreview(w);
+        var slot = onKeywords[kbActivePreviewIdx];
+        if (!slot) return;
+        var token = ++kbPreviewFetchToken;
         var blocksEl = document.getElementById("insert-kb-preview-blocks");
+        var panelWrap = blocksEl ? blocksEl.querySelector(".kb-ad-panel-wrap") : null;
+        if (panelWrap) panelWrap.innerHTML = M.renderServingAdPanelHtml(null, { loading: true });
+        M.fetchServingPreviewAd({
+          keyword_term: slot.keyword_term,
+          slotIndex: kbActivePreviewIdx + 1,
+          advertiser_id: w.ad_provider_config.advertiser_id,
+          delay: 380
+        }).then(function (ad) {
+          if (token !== kbPreviewFetchToken) return;
+          if (!panelWrap) return;
+          panelWrap.innerHTML = M.renderServingAdPanelHtml(ad);
+        });
+      }
+
+      function renderKbPreview(w) {
+        if (!previewEl) return;
+        if (!w) {
+          previewEl.innerHTML = "";
+          if (previewEmpty) previewEl.appendChild(previewEmpty);
+          return;
+        }
+        var blocksEl = renderKbPreviewBlocks(w);
         if (blocksEl) {
           blocksEl.addEventListener("click", function (e) {
             var block = e.target.closest(".kb-block");
             if (!block) return;
             kbActivePreviewIdx = parseInt(block.getAttribute("data-kb-idx"), 10);
-            selectKb(selectedKbId);
+            selectKb(selectedKbId, true);
           });
         }
+        fetchInsertKbPreviewAd(w);
       }
 
-      function selectKb(id) {
+      function selectKb(id, keepActiveIdx) {
         selectedKbId = id;
         var w = KB_WIDGETS[id];
-        kbActivePreviewIdx = 0;
+        if (!keepActiveIdx) kbActivePreviewIdx = 0;
         renderKbPreview(w);
         listEl.querySelectorAll(".insert-form-pick").forEach(function (btn) {
           btn.classList.toggle("is-active", btn.getAttribute("data-kb-id") === id);

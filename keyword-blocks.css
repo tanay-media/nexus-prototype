@@ -427,6 +427,36 @@
   font-size: 11px;
 }
 
+.kb-ad-panel--loading,
+.kb-ad-panel--empty {
+  background: #f8faf8;
+}
+
+.kb-ad-panel__fetching {
+  margin: 0;
+  color: #666;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.kb-ad-panel__label--live {
+  color: #1b5e20;
+  border-color: #a5d6a7;
+  background: #e8f5e9;
+  font-weight: 600;
+}
+
+.kb-ad-panel__macro {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.kb-preview-serving-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #555;
+  line-height: 1.45;
+}
+
 .kb-ad-panel__label {
   float: right;
   font-size: 10px;

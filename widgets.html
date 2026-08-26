@@ -512,7 +512,7 @@
       </section>
 
       <section class="offer-detail-pane kb-detail-pane kb-detail-pane--preview" data-tab-panel="kb-preview" hidden>
-        <p class="muted kb-field-hint">Prototype mock — modal shell only. Reader question labels come from variant HTML when attached.</p>
+        <p class="muted kb-field-hint">Serving preview — click a reader question; Base calls Serving to fetch a <strong>live CM ad</strong> for that <code>keyword_term</code> (prototype simulates the API).</p>
         <div class="kb-preview-wrap kb-preview-wrap--tab">
           <div class="kb-modal-preview kb-modal-preview--editor" id="kb-modal-preview">
             <div class="kb-modal-preview__header">
@@ -731,10 +731,10 @@
           };
           return;
         }
-        var MOCK_ADS = M.MOCK_ADS;
         var kbKeywords = M.KEYWORD_PRESETS.passive.slice();
         var kbWidgetId = M.KB_WIDGET_PASSIVE;
         var kbActiveIndex = 0;
+        var kbPreviewFetchToken = 0;
 
         function cloneKeywords(list) {
           return (list || []).map(function (k) {
@@ -783,19 +783,26 @@
           renderKbPreview();
         }
 
-        function renderKbPreview() {
+        function onKeywordsForPreview() {
+          return kbKeywords.filter(function (k) { return k.status === "on"; });
+        }
+
+        function renderKbPreviewBlocks() {
           if (!kbPreviewBlocks) return;
           if (kbPreviewTitle) kbPreviewTitle.textContent = "What would you like to explore first?";
           if (kbPreviewDismiss) kbPreviewDismiss.textContent = "I'll continue reading on my own";
           if (kbPreviewBrand && kbNameIn) kbPreviewBrand.textContent = (kbNameIn.value || "WIDGET").toUpperCase().slice(0, 40);
           kbPreviewBlocks.innerHTML = "";
+          var hint = document.createElement("p");
+          hint.className = "kb-preview-serving-hint";
+          hint.textContent = "Select a question — Serving fetches slot{n}_ad1 from CM for that keyword.";
+          kbPreviewBlocks.appendChild(hint);
           var section = document.createElement("p");
           section.className = "kb-modal-preview__section";
           section.textContent = "READER QUESTIONS";
           kbPreviewBlocks.appendChild(section);
-          var previewIdx = 0;
-          kbKeywords.forEach(function (slot, i) {
-            if (slot.status !== "on") return;
+          var onKeywords = onKeywordsForPreview();
+          onKeywords.forEach(function (slot, previewIdx) {
             var block = document.createElement("div");
             block.className = "kb-block" + (kbActiveIndex === previewIdx ? " is-active" : "");
             block.setAttribute("data-kb-idx", String(previewIdx));
@@ -803,19 +810,36 @@
             block.innerHTML = '<span class="kb-block__play">▶</span><span>' + label + '</span><small class="muted" style="display:block;font-size:10px;margin-top:2px;">' + slot.display_term + "</small>";
             kbPreviewBlocks.appendChild(block);
             if (kbActiveIndex === previewIdx) {
-              var ad = MOCK_ADS[slot.keyword_term] || { title: "Ad for “" + slot.keyword_term + "”", url: "advertiser.com", desc: "Resolved server-side from CM.", cta: "Learn more" };
-              var panel = document.createElement("div");
-              panel.className = "kb-ad-panel";
-              panel.innerHTML =
-                '<span class="kb-ad-panel__label">Ad</span>' +
-                '<div class="kb-ad-panel__title">' + ad.title + "</div>" +
-                '<div class="kb-ad-panel__url">' + ad.url + "</div>" +
-                '<p class="kb-ad-panel__desc">' + ad.desc + "</p>" +
-                '<button type="button" class="kb-ad-panel__cta">' + ad.cta + " → MAX</button>";
-              kbPreviewBlocks.appendChild(panel);
+              var panelWrap = document.createElement("div");
+              panelWrap.className = "kb-ad-panel-wrap";
+              panelWrap.innerHTML = M.renderServingAdPanelHtml(null, { loading: true });
+              kbPreviewBlocks.appendChild(panelWrap);
             }
-            previewIdx += 1;
           });
+        }
+
+        function fetchKbPreviewAd() {
+          var onKeywords = onKeywordsForPreview();
+          var slot = onKeywords[kbActiveIndex];
+          if (!slot || !kbPreviewBlocks) return;
+          var token = ++kbPreviewFetchToken;
+          var panelWrap = kbPreviewBlocks.querySelector(".kb-ad-panel-wrap");
+          if (panelWrap) panelWrap.innerHTML = M.renderServingAdPanelHtml(null, { loading: true });
+          M.fetchServingPreviewAd({
+            keyword_term: slot.keyword_term,
+            slotIndex: kbActiveIndex + 1,
+            advertiser_id: kbAdvertiserIn ? kbAdvertiserIn.value : "",
+            delay: 380
+          }).then(function (ad) {
+            if (token !== kbPreviewFetchToken) return;
+            if (!panelWrap) return;
+            panelWrap.innerHTML = M.renderServingAdPanelHtml(ad);
+          });
+        }
+
+        function renderKbPreview() {
+          renderKbPreviewBlocks();
+          fetchKbPreviewAd();
         }
 
         function openKbEditor(mode, presetKey) {
@@ -870,10 +894,13 @@
               if (kbKeywords[idx].display_term === "" || kbKeywords[idx].display_term === kbKeywords[idx].keyword_term) {
                 kbKeywords[idx].display_term = t.value;
               }
+              renderKbPreviewBlocks();
+              fetchKbPreviewAd();
             } else if (t.classList.contains("kb-in-display-term")) {
               kbKeywords[idx].display_term = t.value;
             }
-            renderKbPreview();
+            renderKbPreviewBlocks();
+            fetchKbPreviewAd();
           });
           kbSlotsBody.addEventListener("click", function (e) {
             var statusBtn = e.target.closest(".kb-status-btn");
@@ -898,11 +925,12 @@
             var block = e.target.closest(".kb-block");
             if (!block) return;
             kbActiveIndex = parseInt(block.getAttribute("data-kb-idx"), 10);
-            renderKbPreview();
+            renderKbPreviewBlocks();
+            fetchKbPreviewAd();
           });
         }
 
-        if (kbNameIn) kbNameIn.addEventListener("input", renderKbPreview);
+        if (kbNameIn) kbNameIn.addEventListener("input", renderKbPreviewBlocks);
 
         if (kbAddSlotBtn) {
           kbAddSlotBtn.addEventListener("click", function () {
