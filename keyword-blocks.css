@@ -168,8 +168,85 @@
 }
 
 .kb-slots-table .col-display-term {
-  width: 36%;
-  min-width: 180px;
+  width: 28%;
+  min-width: 140px;
+}
+
+.kb-slots-table .col-max-ads {
+  width: 72px;
+  min-width: 72px;
+}
+
+.kb-slots-table .col-max-ads input {
+  width: 56px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.kb-slots-table .col-details {
+  width: 64px;
+  text-align: center;
+}
+
+.kb-details-toggle {
+  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.kb-details-toggle.is-open {
+  border-color: var(--kb-green);
+  color: var(--kb-green);
+}
+
+.kb-slot-details-row td {
+  background: #f9faf9;
+  padding: 0 !important;
+  border-top: none;
+}
+
+.kb-slot-details {
+  padding: 12px 14px 14px;
+  border-top: 1px dashed #ddd;
+}
+
+.kb-slot-details textarea,
+.kb-slot-details input[type="url"] {
+  width: 100%;
+  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.kb-keyword-meta {
+  margin: 6px 0 8px 4px;
+  padding: 10px;
+  background: #f3f6f3;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.kb-keyword-meta__macro {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.kb-keyword-meta__img img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.kb-ad-panel-wrap .kb-ad-panel + .kb-ad-panel {
+  margin-top: 8px;
 }
 
 .kb-status-btn {

@@ -1301,7 +1301,8 @@
             '<div><dt>advertiser_id</dt><dd>' + escapeHtml(w.ad_provider_config.advertiser_id) + '</dd></div>' +
             '<div><dt>slot_config</dt><dd>' + escapeHtml(w.slot_config) + '</dd></div>' +
             '<div><dt>Serving sync keywords</dt><dd>' + (serving ? serving.keywords.length : 0) + ' rows (on only)</dd></div>' +
-            '<div><dt>Preview</dt><dd>Serving → CM live ad on block click</dd></div>' +
+            '<div><dt>max_ads_per_keyword</dt><dd>' + escapeHtml(String(w.max_ads_per_keyword != null ? w.max_ads_per_keyword : M.defaultMaxAdsPerKeyword())) + '</dd></div>' +
+            '<div><dt>Preview</dt><dd>Serving → CM live ads (slot[n]_ad[m])</dd></div>' +
           '</dl>';
         var blocks = "";
         var onKeywords = onKeywordsForPreview(w);
@@ -1313,7 +1314,8 @@
               '<small class="muted" style="display:block;font-size:10px;">' + escapeHtml(kw.display_term) + ' · ' + escapeHtml(kw.keyword_term) + '</small>' +
             '</div>';
           if (active) {
-            blocks += '<div class="kb-ad-panel-wrap">' + M.renderServingAdPanelHtml(null, { loading: true }) + '</div>';
+            blocks += M.renderKeywordMetaPreviewHtml(kw, onIdx + 1);
+            blocks += '<div class="kb-ad-panel-wrap">' + M.renderServingAdPanelsHtml(null, { loading: true }) + '</div>';
           }
         });
         previewEl.innerHTML =
@@ -1325,7 +1327,7 @@
               '<span class="kb-modal-preview__close" aria-hidden="true">✕</span>' +
             '</div>' +
             '<div class="kb-modal-preview__body" id="insert-kb-preview-blocks">' +
-              '<p class="kb-preview-serving-hint">Select a question — Serving fetches a live CM ad for that keyword.</p>' +
+              '<p class="kb-preview-serving-hint">Select a question — Serving fetches up to max_ads CM ads per keyword.</p>' +
               '<p class="kb-modal-preview__section">READER QUESTIONS</p>' +
               blocks +
             '</div>' +
@@ -1342,16 +1344,18 @@
         var token = ++kbPreviewFetchToken;
         var blocksEl = document.getElementById("insert-kb-preview-blocks");
         var panelWrap = blocksEl ? blocksEl.querySelector(".kb-ad-panel-wrap") : null;
-        if (panelWrap) panelWrap.innerHTML = M.renderServingAdPanelHtml(null, { loading: true });
-        M.fetchServingPreviewAd({
+        var maxAds = M.resolveMaxAdsForKeyword(w, slot);
+        if (panelWrap) panelWrap.innerHTML = M.renderServingAdPanelsHtml(null, { loading: true });
+        M.fetchServingPreviewAds({
           keyword_term: slot.keyword_term,
           slotIndex: kbActivePreviewIdx + 1,
+          maxAds: maxAds,
           advertiser_id: w.ad_provider_config.advertiser_id,
           delay: 380
-        }).then(function (ad) {
+        }).then(function (ads) {
           if (token !== kbPreviewFetchToken) return;
           if (!panelWrap) return;
-          panelWrap.innerHTML = M.renderServingAdPanelHtml(ad);
+          panelWrap.innerHTML = M.renderServingAdPanelsHtml(ads);
         });
       }
 

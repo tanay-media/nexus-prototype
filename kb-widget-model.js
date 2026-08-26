@@ -1,15 +1,36 @@
 /* Keyword block widget model — aligns with Keyword Blocks PRD (Base + Serving sync). */
 (function (global) {
   function defaultMetadata() {
-    return { image_urls: [], options: [] };
+    return {
+      description: "",
+      image_urls: [],
+      video_urls: [],
+      options: [],
+      max_ads: null
+    };
+  }
+
+  function defaultMaxAdsPerKeyword() {
+    return 2;
+  }
+
+  function resolveMaxAdsForKeyword(widget, keyword) {
+    var widgetMax = widget.max_ads_per_keyword != null ? widget.max_ads_per_keyword : defaultMaxAdsPerKeyword();
+    var meta = keyword && keyword.metadata ? keyword.metadata : {};
+    if (meta.max_ads != null && meta.max_ads !== "") {
+      var n = parseInt(meta.max_ads, 10);
+      if (!isNaN(n) && n > 0) return n;
+    }
+    return widgetMax;
   }
 
   function makeKeyword(keyword_term, display_term, status, metadata) {
+    var meta = metadata || defaultMetadata();
     return {
       keyword_term: keyword_term,
       display_term: display_term || keyword_term,
       status: status || "on",
-      metadata: metadata || defaultMetadata()
+      metadata: meta
     };
   }
 
@@ -18,6 +39,7 @@
       widget_type: "keyword_block",
       widget_name: widget.widget_name,
       slot_config: widget.slot_config || "static",
+      max_ads_per_keyword: widget.max_ads_per_keyword != null ? widget.max_ads_per_keyword : defaultMaxAdsPerKeyword(),
       keywords: (widget.keywords || []).map(function (k) {
         return {
           keyword_term: k.keyword_term,
@@ -42,6 +64,7 @@
           : widget.advertiser_id || ""
       },
       slot_config: widget.slot_config || "static",
+      max_ads_per_keyword: widget.max_ads_per_keyword != null ? widget.max_ads_per_keyword : defaultMaxAdsPerKeyword(),
       keywords: widget.keywords || []
     };
   }
@@ -55,6 +78,7 @@
       widget_type: base.widget_type,
       ad_provider_config: base.ad_provider_config,
       slot_config: base.slot_config,
+      max_ads_per_keyword: base.max_ads_per_keyword,
       keywords: base.keywords
         .filter(function (k) { return k.status === "on"; })
         .map(function (k) {
@@ -93,6 +117,11 @@
     "index fund beginner": { ad_title: "Fidelity Index Funds", display_url: "fidelity.com", ad_description: "Low-cost index funds for new investors.", cta_label: "Explore funds" }
   };
 
+  var SAMPLE_ADS_ALT = {
+    "passive income investing": { ad_title: "Fidelity® Investing — Zero account fees", display_url: "fidelity.com", ad_description: "Commission-free ETFs and research tools.", cta_label: "Open Account" },
+    "auto insurance savings": { ad_title: "Geico — 15 minutes could save you 15%", display_url: "geico.com", ad_description: "Get a fast auto insurance quote online.", cta_label: "Get quote" }
+  };
+
   function macroPrefix(slotIndex, adIndex) {
     return "slot" + slotIndex + "_ad" + (adIndex || 1);
   }
@@ -103,47 +132,92 @@
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  /** Prototype: simulates Serving preview → CM fetch for one keyword slot. */
-  function fetchServingPreviewAd(opts) {
+  /** Prototype: simulates Serving preview → CM fetch for one or more ads on a keyword slot. */
+  function fetchServingPreviewAds(opts) {
     var keyword_term = opts && opts.keyword_term ? opts.keyword_term : "";
     var slotIndex = opts && opts.slotIndex ? opts.slotIndex : 1;
-    var adIndex = opts && opts.adIndex ? opts.adIndex : 1;
+    var maxAds = opts && opts.maxAds ? opts.maxAds : 1;
     var advertiserId = opts && opts.advertiser_id ? opts.advertiser_id : "";
     var delay = opts && opts.delay != null ? opts.delay : 420;
+    var count = Math.max(1, Math.min(maxAds, 5));
     return new Promise(function (resolve) {
       setTimeout(function () {
-        var sample = SAMPLE_ADS[keyword_term];
-        var macro = macroPrefix(slotIndex, adIndex);
-        var adv = ADVERTISERS[advertiserId];
-        var trackingBase = sample ? sample.display_url : "advertiser.com";
-        var ad = sample
-          ? {
-              macro: macro,
-              keyword_term: keyword_term,
-              keyword_slot_id: slotIndex,
-              ad_index: adIndex,
-              ad_title: sample.ad_title,
-              display_url: sample.display_url,
-              ad_description: sample.ad_description,
-              tracking_url: "https://preview.max.example/click?macro=" + macro + "&cmp=" + (adv ? adv.campaignId : "preview"),
-              cta_label: sample.cta_label,
-              fetch_status: "ok"
-            }
-          : {
-              macro: macro,
-              keyword_term: keyword_term,
-              keyword_slot_id: slotIndex,
-              ad_index: adIndex,
-              ad_title: "Ad for “" + keyword_term + "”",
-              display_url: trackingBase,
-              ad_description: "Resolved from CM via Serving preview.",
-              tracking_url: "https://preview.max.example/click?macro=" + macro + "&term=" + encodeURIComponent(keyword_term),
-              cta_label: "Learn more",
-              fetch_status: "ok"
-            };
-        resolve(ad);
+        var ads = [];
+        for (var m = 1; m <= count; m += 1) {
+          var sample = m === 1 ? SAMPLE_ADS[keyword_term] : SAMPLE_ADS_ALT[keyword_term];
+          if (!sample && m > 1) break;
+          var macro = macroPrefix(slotIndex, m);
+          var adv = ADVERTISERS[advertiserId];
+          var trackingBase = sample ? sample.display_url : "advertiser.com";
+          ads.push(sample
+            ? {
+                macro: macro,
+                keyword_term: keyword_term,
+                keyword_slot_id: slotIndex,
+                ad_index: m,
+                ad_title: sample.ad_title,
+                display_url: sample.display_url,
+                ad_description: sample.ad_description,
+                tracking_url: "https://preview.max.example/click?macro=" + macro + "&cmp=" + (adv ? adv.campaignId : "preview"),
+                cta_label: sample.cta_label,
+                fetch_status: "ok"
+              }
+            : {
+                macro: macro,
+                keyword_term: keyword_term,
+                keyword_slot_id: slotIndex,
+                ad_index: m,
+                ad_title: "Ad " + m + " for “" + keyword_term + "”",
+                display_url: trackingBase,
+                ad_description: "Resolved from CM via Serving preview.",
+                tracking_url: "https://preview.max.example/click?macro=" + macro + "&term=" + encodeURIComponent(keyword_term),
+                cta_label: "Learn more",
+                fetch_status: "ok"
+              });
+        }
+        resolve(ads);
       }, delay);
     });
+  }
+
+  function fetchServingPreviewAd(opts) {
+    return fetchServingPreviewAds(opts).then(function (ads) { return ads[0] || null; });
+  }
+
+  function keywordSlotMacroExamples(slotIndex) {
+    var n = slotIndex || 1;
+    return {
+      description: "{{slot" + n + ".keyword_description}}",
+      image: "{{slot" + n + ".keyword_image_url}}",
+      video: "{{slot" + n + ".keyword_video_url}}",
+      adTitle: "{{slot" + n + "_ad1.ad_title}}"
+    };
+  }
+
+  function renderKeywordMetaPreviewHtml(slot, slotIndex) {
+    if (!slot || !slot.metadata) return "";
+    var meta = slot.metadata;
+    var macros = keywordSlotMacroExamples(slotIndex);
+    var img = meta.image_urls && meta.image_urls[0];
+    var vid = meta.video_urls && meta.video_urls[0];
+    var parts = [];
+    if (meta.description) {
+      parts.push('<p class="kb-keyword-meta__desc"><span class="kb-keyword-meta__macro">' + escapeHtml(macros.description) + '</span>' + escapeHtml(meta.description) + "</p>");
+    }
+    if (img) {
+      parts.push('<div class="kb-keyword-meta__img"><img src="' + escapeHtml(img) + '" alt="" /><span class="kb-keyword-meta__macro">' + escapeHtml(macros.image) + "</span></div>");
+    }
+    if (vid) {
+      parts.push('<p class="kb-keyword-meta__video muted" style="font-size:10px;">Video: ' + escapeHtml(vid) + ' <span class="kb-keyword-meta__macro">' + escapeHtml(macros.video) + "</span></p>");
+    }
+    if (!parts.length) return "";
+    return '<div class="kb-keyword-meta">' + parts.join("") + "</div>";
+  }
+
+  function renderServingAdPanelsHtml(ads, opts) {
+    if (!ads || !ads.length) return renderServingAdPanelHtml(null, opts);
+    if (opts && opts.loading) return renderServingAdPanelHtml(null, { loading: true });
+    return ads.map(function (ad) { return renderServingAdPanelHtml(ad); }).join("");
   }
 
   function renderServingAdPanelHtml(ad, opts) {
@@ -183,7 +257,13 @@
 
   var KEYWORD_PRESETS = {
     passive: [
-      makeKeyword("passive income investing", "passive income investing", "on"),
+      makeKeyword("passive income investing", "passive income investing", "on", {
+        description: "Long-term passive income strategies for retail investors.",
+        image_urls: ["https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=320&h=180&fit=crop"],
+        video_urls: [],
+        options: [],
+        max_ads: 2
+      }),
       makeKeyword("etf zero fee platform", "zero fee ETFs", "on"),
       makeKeyword("beginner investing start", "beginner investing", "on"),
       makeKeyword("open brokerage account fast", "open brokerage fast", "on")
@@ -214,6 +294,7 @@
       used_in: ["c2d3e4f5-a6b7-4890-1cde-f23456789001"],
       ad_provider_config: { advertiser_id: "adv-etrade" },
       slot_config: "static",
+      max_ads_per_keyword: 2,
       keywords: KEYWORD_PRESETS.passive.slice(),
       trigger: "Explore reader questions",
       layoutId: "modal_v1"
@@ -225,6 +306,7 @@
       used_in: ["d3e4f5a6-b7c8-4901-2def-345678901234"],
       ad_provider_config: { advertiser_id: "adv-statefarm" },
       slot_config: "static",
+      max_ads_per_keyword: 2,
       keywords: KEYWORD_PRESETS.auto.slice(),
       trigger: "See insurance savings",
       layoutId: "modal_v1"
@@ -236,6 +318,7 @@
       used_in: [],
       ad_provider_config: { advertiser_id: "adv-fidelity" },
       slot_config: "static",
+      max_ads_per_keyword: 1,
       keywords: KEYWORD_PRESETS.fidelity.slice(),
       trigger: "Explore ETFs",
       layoutId: "modal_compact"
@@ -253,6 +336,8 @@
   global.KbWidgetModel = {
     makeKeyword: makeKeyword,
     defaultMetadata: defaultMetadata,
+    defaultMaxAdsPerKeyword: defaultMaxAdsPerKeyword,
+    resolveMaxAdsForKeyword: resolveMaxAdsForKeyword,
     buildGenPayload: buildGenPayload,
     buildBaseWidget: buildBaseWidget,
     buildServingSync: buildServingSync,
@@ -261,6 +346,10 @@
     macroPrefix: macroPrefix,
     escapeHtml: escapeHtml,
     fetchServingPreviewAd: fetchServingPreviewAd,
+    fetchServingPreviewAds: fetchServingPreviewAds,
+    renderServingAdPanelsHtml: renderServingAdPanelsHtml,
+    renderKeywordMetaPreviewHtml: renderKeywordMetaPreviewHtml,
+    keywordSlotMacroExamples: keywordSlotMacroExamples,
     renderServingAdPanelHtml: renderServingAdPanelHtml,
     ADVERTISERS: ADVERTISERS,
     WIDGET_REGISTRY: WIDGET_REGISTRY,
