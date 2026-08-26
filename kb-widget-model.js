@@ -208,7 +208,14 @@
       parts.push('<div class="kb-keyword-meta__img"><img src="' + escapeHtml(img) + '" alt="" /><span class="kb-keyword-meta__macro">' + escapeHtml(macros.image) + "</span></div>");
     }
     if (vid) {
-      parts.push('<p class="kb-keyword-meta__video muted" style="font-size:10px;">Video: ' + escapeHtml(vid) + ' <span class="kb-keyword-meta__macro">' + escapeHtml(macros.video) + "</span></p>");
+      var isDataVid = vid.indexOf("data:") === 0;
+      parts.push(
+        '<div class="kb-keyword-meta__video">' +
+          (isDataVid
+            ? '<video src="' + escapeHtml(vid) + '" controls muted playsinline class="kb-keyword-meta__video-el"></video>'
+            : '<p class="muted" style="font-size:10px;margin:0;">Video attached</p>') +
+          '<span class="kb-keyword-meta__macro">' + escapeHtml(macros.video) + "</span></div>"
+      );
     }
     if (!parts.length) return "";
     return '<div class="kb-keyword-meta">' + parts.join("") + "</div>";
@@ -280,6 +287,62 @@
     ]
   };
 
+  var PAST_KEYWORD_SAMPLES = {
+    passive: [
+      makeKeyword("dividend growth stocks", "dividend growth", "off", {
+        description: "Dividend-focused equity strategies for long-term holders.",
+        image_urls: ["https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=320&h=180&fit=crop"],
+        video_urls: [],
+        options: [],
+        max_ads: null
+      }),
+      makeKeyword("roth ira contribution limits", "roth ira limits", "off", {
+        description: "Annual Roth IRA contribution rules and eligibility.",
+        image_urls: [],
+        video_urls: [],
+        options: [],
+        max_ads: null
+      }),
+      makeKeyword("tax loss harvesting guide", "tax loss harvesting", "off", {
+        description: "Offset portfolio gains with strategic loss harvesting.",
+        image_urls: ["https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=320&h=180&fit=crop"],
+        video_urls: [],
+        options: [],
+        max_ads: null
+      }),
+      makeKeyword("retirement withdrawal strategy", "retirement withdrawals", "off", {
+        description: "Sustainable withdrawal rates for retirement portfolios.",
+        image_urls: [],
+        video_urls: [],
+        options: [],
+        max_ads: null
+      })
+    ],
+    auto: [
+      makeKeyword("teen driver insurance rates", "teen driver rates", "off", {
+        description: "Coverage options when adding a teen to your policy.",
+        image_urls: ["https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=320&h=180&fit=crop"],
+        video_urls: [],
+        options: [],
+        max_ads: null
+      }),
+      makeKeyword("bundled home auto discount", "bundle discount", "off", {
+        description: "Save by bundling home and auto with one carrier.",
+        image_urls: [],
+        video_urls: [],
+        options: [],
+        max_ads: null
+      }),
+      makeKeyword("sr22 insurance filing", "sr22 filing", "off", {
+        description: "What SR-22 means and how to get reinsured.",
+        image_urls: [],
+        video_urls: [],
+        options: [],
+        max_ads: null
+      })
+    ]
+  };
+
   var ADVERTISERS = {
     "adv-etrade": { label: "E*TRADE", teamOfferId: "to_etrade_passive", campaignId: "MAX-CMP-9912", dealValue: "$12.50" },
     "adv-statefarm": { label: "State Farm", teamOfferId: "to_auto_insurance", campaignId: "MAX-CMP-7721", dealValue: "$18.00" },
@@ -295,9 +358,7 @@
       ad_provider_config: { advertiser_id: "adv-etrade" },
       slot_config: "static",
       max_ads_per_keyword: 1,
-      keywords: KEYWORD_PRESETS.passive.concat([
-        makeKeyword("dividend growth stocks", "dividend growth", "off")
-      ]),
+      keywords: KEYWORD_PRESETS.passive.concat(PAST_KEYWORD_SAMPLES.passive),
       trigger: "Explore reader questions",
       layoutId: "modal_v1"
     },
@@ -309,7 +370,7 @@
       ad_provider_config: { advertiser_id: "adv-statefarm" },
       slot_config: "static",
       max_ads_per_keyword: 1,
-      keywords: KEYWORD_PRESETS.auto.slice(),
+      keywords: KEYWORD_PRESETS.auto.concat(PAST_KEYWORD_SAMPLES.auto),
       trigger: "See insurance savings",
       layoutId: "modal_v1"
     },
@@ -356,6 +417,7 @@
     ADVERTISERS: ADVERTISERS,
     WIDGET_REGISTRY: WIDGET_REGISTRY,
     KEYWORD_PRESETS: KEYWORD_PRESETS,
+    PAST_KEYWORD_SAMPLES: PAST_KEYWORD_SAMPLES,
     readerQuestionFor: readerQuestionFor,
     onKeywordCount: onKeywordCount,
     KB_WIDGET_PASSIVE: KB_WIDGET_PASSIVE,

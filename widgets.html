@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Widgets · nexus</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="keyword-blocks.css" />
+  <link rel="stylesheet" href="keyword-blocks.css?v=20260826d" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -518,7 +520,7 @@
             <h3>Keywords <span class="kb-section-count" id="kb-slot-count-label">4</span></h3>
             <button type="button" class="btn btn--sm" id="kb-add-slot">+ Add keyword</button>
           </div>
-          <p class="muted kb-field-hint">Drag the <strong>⋮⋮</strong> handle to reorder. Reader questions in the lander still come from variant HTML.</p>
+          <p class="muted kb-field-hint">Grab the <strong>⋮⋮</strong> handle and drag — numbered rows show keyword order.</p>
           <div class="kb-keyword-list" id="kb-keywords-active-list" aria-label="Active keywords"></div>
         </div>
 
@@ -610,7 +612,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js"></script>
+  <script src="kb-widget-model.js?v=20260826d"></script>
   <script src="app.js"></script>
   <script>
     /* ── New Widget button → type picker → form editor ── */
@@ -893,17 +895,72 @@
           var img = meta.image_urls && meta.image_urls[0];
           var hasImg = img && img.length > 0;
           return (
-            '<div class="kb-img-upload' + (hasImg ? " has-image" : "") + '" data-idx="' + globalIdx + '">' +
-              '<div class="kb-img-upload__preview" aria-hidden="true">' +
-                (hasImg ? '<img src="' + M.escapeHtml(img) + '" alt="" />' : '<span class="kb-img-upload__placeholder">IMG</span>') +
+            '<div class="kb-media-upload kb-img-upload' + (hasImg ? " has-media" : "") + '" data-idx="' + globalIdx + '">' +
+              '<div class="kb-media-upload__preview" aria-hidden="true">' +
+                (hasImg ? '<img src="' + M.escapeHtml(img) + '" alt="" />' : '<span class="kb-media-upload__placeholder">IMG</span>') +
               "</div>" +
-              '<div class="kb-img-upload__meta">' +
-                '<span class="kb-img-upload__name">' + (hasImg ? "Image attached" : "No image") + "</span>" +
-                '<span class="kb-img-upload__hint">JPG, PNG or WebP · max 2 MB</span>' +
+              '<div class="kb-media-upload__meta">' +
+                '<span class="kb-media-upload__name">' + (hasImg ? "Image attached" : "No image") + "</span>" +
+                '<span class="kb-media-upload__hint">JPG, PNG or WebP</span>' +
               "</div>" +
-              '<div class="kb-img-upload__actions">' +
-                '<label class="btn btn--sm"><input type="file" class="kb-in-meta-image-file" data-idx="' + globalIdx + '" accept="image/*" hidden />Upload</label>' +
-                (hasImg ? '<button type="button" class="btn btn--sm kb-img-remove" data-idx="' + globalIdx + '">Remove</button>' : "") +
+              '<div class="kb-media-upload__actions">' +
+                '<label class="btn btn--xs"><input type="file" class="kb-in-meta-image-file" data-idx="' + globalIdx + '" accept="image/*" hidden />Upload</label>' +
+                (hasImg ? '<button type="button" class="btn btn--xs kb-img-remove" data-idx="' + globalIdx + '">Remove</button>' : "") +
+              "</div>" +
+            "</div>"
+          );
+        }
+
+        function videoUploadHtml(globalIdx, meta) {
+          var vid = meta.video_urls && meta.video_urls[0];
+          var hasVid = vid && vid.length > 0;
+          var isData = hasVid && vid.indexOf("data:") === 0;
+          return (
+            '<div class="kb-media-upload kb-vid-upload' + (hasVid ? " has-media" : "") + '" data-idx="' + globalIdx + '">' +
+              '<div class="kb-media-upload__preview kb-media-upload__preview--video" aria-hidden="true">' +
+                (hasVid && isData
+                  ? '<video src="' + M.escapeHtml(vid) + '" muted playsinline></video>'
+                  : (hasVid ? '<span class="kb-media-upload__placeholder">MP4</span>' : '<span class="kb-media-upload__placeholder">VID</span>')) +
+              "</div>" +
+              '<div class="kb-media-upload__meta">' +
+                '<span class="kb-media-upload__name">' + (hasVid ? "Video attached" : "No video") + "</span>" +
+                '<span class="kb-media-upload__hint">MP4 or WebM · max 10 MB</span>' +
+              "</div>" +
+              '<div class="kb-media-upload__actions">' +
+                '<label class="btn btn--xs"><input type="file" class="kb-in-meta-video-file" data-idx="' + globalIdx + '" accept="video/*" hidden />Upload</label>' +
+                (hasVid ? '<button type="button" class="btn btn--xs kb-vid-remove" data-idx="' + globalIdx + '">Remove</button>' : "") +
+              "</div>" +
+            "</div>"
+          );
+        }
+
+        function renderPastKeywordCard(globalIdx) {
+          var slot = kbKeywords[globalIdx];
+          var meta = slot.metadata || M.defaultMetadata();
+          var img = meta.image_urls && meta.image_urls[0];
+          var vid = meta.video_urls && meta.video_urls[0];
+          var thumb = img
+            ? '<img src="' + M.escapeHtml(img) + '" alt="" />'
+            : '<span class="kb-keyword-card__thumb-ph" aria-hidden="true"></span>';
+          var badges = [];
+          if (meta.description) badges.push("Description");
+          if (img) badges.push("Image");
+          if (vid) badges.push("Video");
+          return (
+            '<div class="kb-keyword-card kb-keyword-card--past" data-global-idx="' + globalIdx + '">' +
+              '<div class="kb-past-card__layout">' +
+                '<div class="kb-keyword-card__thumb kb-past-card__thumb">' + thumb + "</div>" +
+                '<div class="kb-past-card__info">' +
+                  '<strong class="kb-past-card__term">' + M.escapeHtml(slot.keyword_term) + "</strong>" +
+                  '<span class="kb-past-card__display">' + M.escapeHtml(slot.display_term) + "</span>" +
+                  (meta.description ? '<p class="kb-past-card__desc">' + M.escapeHtml(meta.description) + "</p>" : "") +
+                  (badges.length
+                    ? '<div class="kb-past-card__badges">' + badges.map(function (b) {
+                        return '<span class="kb-past-card__badge">' + b + "</span>";
+                      }).join("") + "</div>"
+                    : "") +
+                "</div>" +
+                '<button type="button" class="kb-restore-link" data-idx="' + globalIdx + '">Restore</button>' +
               "</div>" +
             "</div>"
           );
@@ -921,15 +978,15 @@
           return (
             '<div class="kb-reorder-row" data-global-idx="' + globalIdx + '">' +
               '<span class="kb-reorder-row__index">' + position + ".</span>" +
-              '<div class="kb-keyword-card kb-keyword-card--draggable" draggable="true" data-global-idx="' + globalIdx + '">' +
+              '<div class="kb-keyword-card kb-keyword-card--draggable" data-global-idx="' + globalIdx + '">' +
                 '<div class="kb-keyword-card__main">' +
-                  '<button type="button" class="kb-drag-handle" aria-label="Drag to reorder" title="Drag to reorder">' +
+                  '<div class="kb-drag-handle" role="button" tabindex="0" aria-label="Drag to reorder" title="Drag to reorder">' +
                     '<svg class="kb-drag-handle__icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">' +
                       '<circle cx="5" cy="4" r="1.25" fill="currentColor" /><circle cx="11" cy="4" r="1.25" fill="currentColor" />' +
                       '<circle cx="5" cy="8" r="1.25" fill="currentColor" /><circle cx="11" cy="8" r="1.25" fill="currentColor" />' +
                       '<circle cx="5" cy="12" r="1.25" fill="currentColor" /><circle cx="11" cy="12" r="1.25" fill="currentColor" />' +
                     "</svg>" +
-                  "</button>" +
+                  "</div>" +
                   '<div class="kb-keyword-card__thumb">' + thumbHtml + "</div>" +
                   '<div class="kb-keyword-card__summary">' +
                     '<input type="text" class="kb-in-keyword-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="Keyword" />' +
@@ -945,8 +1002,7 @@
                       '<div class="field"><label>Description</label>' +
                         '<textarea class="kb-in-meta-desc input" data-idx="' + globalIdx + '" rows="2" placeholder="Optional context for this keyword">' + M.escapeHtml(meta.description || "") + "</textarea></div>" +
                       '<div class="field"><label>Image</label>' + imageUploadHtml(globalIdx, meta) + "</div>" +
-                      '<div class="field"><label>Video URL <span class="muted">(optional)</span></label>' +
-                        '<input type="url" class="kb-in-meta-video input" data-idx="' + globalIdx + '" value="' + M.escapeHtml((meta.video_urls && meta.video_urls[0]) || "") + '" placeholder="https://…" /></div>' +
+                      '<div class="field"><label>Video</label>' + videoUploadHtml(globalIdx, meta) + "</div>" +
                     "</div>"
                   : "") +
               "</div>" +
@@ -955,24 +1011,7 @@
         }
 
         function renderKeywordCard(globalIdx, mode) {
-          var slot = kbKeywords[globalIdx];
-          var meta = slot.metadata || M.defaultMetadata();
-          var expanded = kbExpandedRows[globalIdx];
-
-          if (mode === "past") {
-            return (
-              '<div class="kb-keyword-card kb-keyword-card--past" data-global-idx="' + globalIdx + '">' +
-                '<div class="kb-keyword-card__main">' +
-                  '<div class="kb-keyword-card__text">' +
-                    '<strong class="kb-keyword-card__term">' + M.escapeHtml(slot.keyword_term) + "</strong>" +
-                    '<span class="kb-keyword-card__display">' + M.escapeHtml(slot.display_term) + "</span>" +
-                  "</div>" +
-                  '<button type="button" class="btn btn--sm kb-restore-keyword" data-idx="' + globalIdx + '">Restore</button>' +
-                "</div>" +
-              "</div>"
-            );
-          }
-
+          if (mode === "past") return renderPastKeywordCard(globalIdx);
           return renderActiveKeywordCard(globalIdx, activeIndices().indexOf(globalIdx) + 1);
         }
 
@@ -992,72 +1031,68 @@
           renderKbKeywordsUI();
         }
 
-        var kbDragState = { fromGlobalIdx: null, placeholder: null };
+        var kbDragState = { card: null, row: null, placeholder: null };
 
         function initKbKeywordDragDrop() {
           if (!kbActiveList || kbActiveList.getAttribute("data-kb-dnd-init")) return;
           kbActiveList.setAttribute("data-kb-dnd-init", "1");
 
-          kbActiveList.addEventListener("dragstart", function (e) {
-            var card = e.target.closest(".kb-keyword-card--draggable");
-            if (!card || !e.target.closest(".kb-drag-handle")) {
-              e.preventDefault();
-              return;
-            }
-            var row = card.closest(".kb-reorder-row");
-            kbDragState.fromGlobalIdx = parseInt(card.getAttribute("data-global-idx"), 10);
+          kbActiveList.addEventListener("pointerdown", function (e) {
+            var handle = e.target.closest(".kb-drag-handle");
+            if (!handle) return;
+            var card = handle.closest(".kb-keyword-card--draggable");
+            var row = card && card.closest(".kb-reorder-row");
+            if (!card || !row) return;
+            e.preventDefault();
+            kbDragState.card = card;
+            kbDragState.row = row;
             card.classList.add("is-dragging");
-            if (row) row.classList.add("is-drag-source");
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", String(kbDragState.fromGlobalIdx));
+            row.classList.add("is-drag-source");
             kbDragState.placeholder = document.createElement("div");
             kbDragState.placeholder.className = "kb-reorder-placeholder";
             kbDragState.placeholder.innerHTML = '<div class="kb-reorder-placeholder__inner"></div>';
-            if (row) kbActiveList.insertBefore(kbDragState.placeholder, row);
+            kbActiveList.insertBefore(kbDragState.placeholder, row);
+            if (handle.setPointerCapture) handle.setPointerCapture(e.pointerId);
           });
 
-          kbActiveList.addEventListener("dragend", function () {
-            kbActiveList.querySelectorAll(".kb-keyword-card--draggable").forEach(function (c) {
-              c.classList.remove("is-dragging");
-            });
-            kbActiveList.querySelectorAll(".kb-reorder-row").forEach(function (r) {
-              r.classList.remove("is-drag-source");
-            });
-            if (kbDragState.placeholder) {
-              kbDragState.placeholder.remove();
-              kbDragState.placeholder = null;
-            }
-            kbDragState.fromGlobalIdx = null;
-          });
-
-          kbActiveList.addEventListener("dragover", function (e) {
-            if (kbDragState.fromGlobalIdx == null || !kbDragState.placeholder) return;
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "move";
-            var row = e.target.closest(".kb-reorder-row");
-            if (!row || row.classList.contains("is-drag-source")) return;
-            var rect = row.getBoundingClientRect();
-            var before = e.clientY < rect.top + rect.height / 2;
-            if (before) {
-              kbActiveList.insertBefore(kbDragState.placeholder, row);
-            } else {
-              kbActiveList.insertBefore(kbDragState.placeholder, row.nextSibling);
-            }
-          });
-
-          kbActiveList.addEventListener("drop", function (e) {
-            e.preventDefault();
-            if (kbDragState.fromGlobalIdx == null || !kbDragState.placeholder) return;
-            var insertPos = 0;
-            var children = kbActiveList.children;
-            for (var i = 0; i < children.length; i++) {
-              if (children[i] === kbDragState.placeholder) break;
-              if (children[i].classList.contains("kb-reorder-row") && !children[i].classList.contains("is-drag-source")) {
-                insertPos += 1;
+          kbActiveList.addEventListener("pointermove", function (e) {
+            if (!kbDragState.card || !kbDragState.placeholder) return;
+            var rows = kbActiveList.querySelectorAll(".kb-reorder-row:not(.is-drag-source)");
+            var placed = false;
+            rows.forEach(function (row) {
+              var rect = row.getBoundingClientRect();
+              if (e.clientY < rect.top + rect.height / 2) {
+                kbActiveList.insertBefore(kbDragState.placeholder, row);
+                placed = true;
               }
-            }
-            reorderActiveToPosition(kbDragState.fromGlobalIdx, insertPos);
+            });
+            if (!placed && rows.length) kbActiveList.appendChild(kbDragState.placeholder);
           });
+
+          function endDrag() {
+            if (!kbDragState.card) return;
+            var fromGlobalIdx = parseInt(kbDragState.card.getAttribute("data-global-idx"), 10);
+            kbDragState.card.classList.remove("is-dragging");
+            if (kbDragState.row) kbDragState.row.classList.remove("is-drag-source");
+            if (kbDragState.placeholder) {
+              var insertPos = 0;
+              var children = kbActiveList.children;
+              for (var i = 0; i < children.length; i++) {
+                if (children[i] === kbDragState.placeholder) break;
+                if (children[i].classList.contains("kb-reorder-row") && !children[i].classList.contains("is-drag-source")) {
+                  insertPos += 1;
+                }
+              }
+              kbDragState.placeholder.remove();
+              reorderActiveToPosition(fromGlobalIdx, insertPos);
+            }
+            kbDragState.card = null;
+            kbDragState.row = null;
+            kbDragState.placeholder = null;
+          }
+
+          kbActiveList.addEventListener("pointerup", endDrag);
+          kbActiveList.addEventListener("pointercancel", endDrag);
         }
 
         function renderKbKeywordsUI() {
@@ -1179,25 +1214,34 @@
               if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
               kbKeywords[idx].metadata.description = t.value;
               renderKbPreviewBlocks();
-            } else if (t.classList.contains("kb-in-meta-video")) {
-              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
-              kbKeywords[idx].metadata.video_urls = t.value.trim() ? [t.value.trim()] : [];
-              renderKbPreviewBlocks();
             }
           });
           listEl.addEventListener("change", function (e) {
             var t = e.target;
-            if (!t.classList.contains("kb-in-meta-image-file")) return;
             var idx = parseInt(t.getAttribute("data-idx"), 10);
-            var file = t.files && t.files[0];
-            if (!file) return;
-            if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
-            var reader = new FileReader();
-            reader.onload = function () {
-              kbKeywords[idx].metadata.image_urls = [reader.result];
-              renderKbKeywordsUI();
-            };
-            reader.readAsDataURL(file);
+            if (t.classList.contains("kb-in-meta-image-file")) {
+              var file = t.files && t.files[0];
+              if (!file) return;
+              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
+              var reader = new FileReader();
+              reader.onload = function () {
+                kbKeywords[idx].metadata.image_urls = [reader.result];
+                renderKbKeywordsUI();
+              };
+              reader.readAsDataURL(file);
+              return;
+            }
+            if (t.classList.contains("kb-in-meta-video-file")) {
+              var vfile = t.files && t.files[0];
+              if (!vfile) return;
+              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
+              var vreader = new FileReader();
+              vreader.onload = function () {
+                kbKeywords[idx].metadata.video_urls = [vreader.result];
+                renderKbKeywordsUI();
+              };
+              vreader.readAsDataURL(vfile);
+            }
           });
           listEl.addEventListener("click", function (e) {
             var detailsBtn = e.target.closest(".kb-details-toggle");
@@ -1212,7 +1256,7 @@
               archiveKeyword(parseInt(archiveBtn.getAttribute("data-idx"), 10));
               return;
             }
-            var restoreBtn = e.target.closest(".kb-restore-keyword");
+            var restoreBtn = e.target.closest(".kb-restore-link");
             if (restoreBtn) {
               restoreKeyword(parseInt(restoreBtn.getAttribute("data-idx"), 10));
               return;
@@ -1222,6 +1266,14 @@
               var ri = parseInt(imgRemove.getAttribute("data-idx"), 10);
               if (!kbKeywords[ri].metadata) kbKeywords[ri].metadata = M.defaultMetadata();
               kbKeywords[ri].metadata.image_urls = [];
+              renderKbKeywordsUI();
+              return;
+            }
+            var vidRemove = e.target.closest(".kb-vid-remove");
+            if (vidRemove) {
+              var vi = parseInt(vidRemove.getAttribute("data-idx"), 10);
+              if (!kbKeywords[vi].metadata) kbKeywords[vi].metadata = M.defaultMetadata();
+              kbKeywords[vi].metadata.video_urls = [];
               renderKbKeywordsUI();
             }
           });
@@ -1238,7 +1290,9 @@
           if (mode === "new") {
             kbWidgetId = "new-" + Date.now();
             kbKeywords = cloneKeywords(M.KEYWORD_PRESETS.passive.slice(0, 4));
-            kbKeywords.push(M.makeKeyword("retired keyword sample", "retired sample", "off"));
+            if (M.PAST_KEYWORD_SAMPLES && M.PAST_KEYWORD_SAMPLES.passive) {
+              kbKeywords = kbKeywords.concat(cloneKeywords(M.PAST_KEYWORD_SAMPLES.passive.slice(0, 2)));
+            }
             if (kbNameIn) kbNameIn.value = "New keyword blocks widget";
             setUiSelectValue("kb-widget-status", "active");
             setUiSelectValue("kb-slot-config", "static");
