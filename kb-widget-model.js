@@ -11,7 +11,7 @@
   }
 
   function defaultMaxAdsPerKeyword() {
-    return 2;
+    return 1;
   }
 
   function resolveMaxAdsForKeyword(widget, keyword) {
@@ -262,7 +262,7 @@
         image_urls: ["https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=320&h=180&fit=crop"],
         video_urls: [],
         options: [],
-        max_ads: 2
+        max_ads: null
       }),
       makeKeyword("etf zero fee platform", "zero fee ETFs", "on"),
       makeKeyword("beginner investing start", "beginner investing", "on"),
@@ -294,8 +294,10 @@
       used_in: ["c2d3e4f5-a6b7-4890-1cde-f23456789001"],
       ad_provider_config: { advertiser_id: "adv-etrade" },
       slot_config: "static",
-      max_ads_per_keyword: 2,
-      keywords: KEYWORD_PRESETS.passive.slice(),
+      max_ads_per_keyword: 1,
+      keywords: KEYWORD_PRESETS.passive.concat([
+        makeKeyword("dividend growth stocks", "dividend growth", "off")
+      ]),
       trigger: "Explore reader questions",
       layoutId: "modal_v1"
     },
@@ -306,7 +308,7 @@
       used_in: ["d3e4f5a6-b7c8-4901-2def-345678901234"],
       ad_provider_config: { advertiser_id: "adv-statefarm" },
       slot_config: "static",
-      max_ads_per_keyword: 2,
+      max_ads_per_keyword: 1,
       keywords: KEYWORD_PRESETS.auto.slice(),
       trigger: "See insurance savings",
       layoutId: "modal_v1"

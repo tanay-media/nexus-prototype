@@ -450,7 +450,7 @@
       <div class="modal__header">
         <div>
           <h2 class="modal__title" id="kb-editor-title">Keyword blocks widget</h2>
-          <p class="modal__hint muted" id="kb-editor-sub">keyword_block · KeywordBlockWidget (Base) → KeywordBlockServingSync (Serving)</p>
+          <p class="modal__hint muted" id="kb-editor-sub">Configure keywords and ad settings for this widget library item.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </div>
@@ -462,70 +462,78 @@
       </div>
 
       <section class="offer-detail-pane kb-detail-pane" data-tab-panel="kb-general">
-        <p class="muted kb-field-hint" style="margin-top:0;">Fields stored on the <strong>KeywordBlockWidget</strong> Base row. Reader questions and modal styling live in variant HTML.</p>
         <div class="field">
-          <label for="kb-widget-name">widget_name</label>
-          <input type="text" id="kb-widget-name" value="Passive investing - keywords" />
+          <label for="kb-widget-name">Widget name</label>
+          <input type="text" id="kb-widget-name" class="input" value="Passive investing - keywords" placeholder="e.g. Auto insurance keywords" />
         </div>
-        <div class="field field--inline-pair">
-          <div class="field">
-            <label for="kb-widget-status">status</label>
-            <select id="kb-widget-status" class="select">
-              <option value="active" selected>active</option>
-              <option value="inactive">inactive</option>
-            </select>
+        <div class="field">
+          <label>Status</label>
+          <div class="kb-ui-select" data-kb-ui-select data-kb-select-id="kb-widget-status" data-value="active">
+            <button type="button" class="kb-ui-select__btn" aria-haspopup="listbox" aria-expanded="false">
+              <span class="kb-ui-select__label">Active</span>
+              <span class="kb-ui-select__caret" aria-hidden="true"></span>
+            </button>
+            <ul class="kb-ui-select__menu" role="listbox" hidden>
+              <li role="option" data-value="active" class="is-selected">Active</li>
+              <li role="option" data-value="inactive">Inactive</li>
+            </ul>
           </div>
-          <div class="field">
-            <label for="kb-slot-config">slot_config</label>
-            <select id="kb-slot-config" class="select">
-              <option value="static" selected>static</option>
-              <option value="top_clicks">top_clicks</option>
-              <option value="split">split</option>
-            </select>
+          <input type="hidden" id="kb-widget-status" value="active" />
+        </div>
+        <div class="field">
+          <label for="kb-advertiser-id">Advertiser ID</label>
+          <div class="field__control-row">
+            <input type="text" id="kb-advertiser-id" class="input" value="adv-etrade" placeholder="e.g. adv-etrade" />
+            <button type="button" class="chrome-info-btn kb-info-btn" id="kb-advertiser-info" aria-expanded="false" aria-controls="kb-advertiser-info-text" title="What is advertiser ID?">i</button>
           </div>
-        </div>
-        <div class="field">
-          <label for="kb-advertiser">ad_provider_config.advertiser_id</label>
-          <select id="kb-advertiser" class="select">
-            <option value="adv-etrade">adv-etrade · E*TRADE</option>
-            <option value="adv-statefarm">adv-statefarm · State Farm</option>
-            <option value="adv-quotehub">adv-quotehub · QuoteHub Insurance</option>
-            <option value="adv-fidelity">adv-fidelity · Fidelity</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="kb-max-ads">max_ads_per_keyword <span class="muted" style="font-weight:400;">(widget default)</span></label>
-          <input type="number" id="kb-max-ads" class="input" min="1" max="5" value="2" />
-          <p class="muted kb-field-hint" style="margin-top:6px;">Default CM ads requested per keyword. Override per row via <code>metadata.max_ads</code>.</p>
+          <p class="field__hint kb-info-hint" id="kb-advertiser-info-text" hidden>It's the advertiser's ID on the ad provider like MAX.</p>
         </div>
       </section>
 
       <section class="offer-detail-pane kb-detail-pane" data-tab-panel="kb-keywords" hidden>
-        <p class="muted kb-field-hint" style="margin-top:0;">Each row stores <code>keyword_term</code>, <code>display_term</code>, optional <code>metadata.max_ads</code>, and publisher keyword details (description, images, video). Macros: <code>{{slot[n].keyword_description}}</code>, <code>{{slot[n]_ad[m].ad_title}}</code>, etc.</p>
-        <div class="kb-editor__slots-head">
-          <h3>keywords[] <span class="muted kb-slot-count-display" id="kb-slot-count-label" style="font-size:12px;font-weight:400;">4 on</span></h3>
-          <button type="button" class="btn" id="kb-add-slot" style="font-size:12px;padding:4px 12px;">+ Add keyword</button>
+        <div class="field field--inline-pair kb-keywords-settings">
+          <div class="field">
+            <label for="kb-max-ads">Max ads per keyword</label>
+            <input type="number" id="kb-max-ads" class="input kb-input--sm" min="1" max="5" value="1" />
+          </div>
+          <div class="field">
+            <label>Keyword ranking</label>
+            <div class="kb-ui-select" data-kb-ui-select data-kb-select-id="kb-slot-config" data-value="static">
+              <button type="button" class="kb-ui-select__btn" aria-haspopup="listbox" aria-expanded="false">
+                <span class="kb-ui-select__label">Manual</span>
+                <span class="kb-ui-select__caret" aria-hidden="true"></span>
+              </button>
+              <ul class="kb-ui-select__menu" role="listbox" hidden>
+                <li role="option" data-value="static" class="is-selected">Manual</li>
+                <li role="option" data-value="top_clicks" class="is-disabled" aria-disabled="true">Based on top clicks <span class="kb-ui-select__soon">Coming soon</span></li>
+                <li role="option" data-value="top_conversions" class="is-disabled" aria-disabled="true">Based on top conversions <span class="kb-ui-select__soon">Coming soon</span></li>
+              </ul>
+            </div>
+            <input type="hidden" id="kb-slot-config" value="static" />
+          </div>
         </div>
-        <div class="table-scroll">
-          <table class="kb-slots-table" id="kb-slots-table">
-            <thead>
-              <tr>
-                <th class="col-slot">#</th>
-                <th class="col-keyword-term">keyword_term</th>
-                <th class="col-display-term">display_term</th>
-                <th class="col-max-ads">max_ads</th>
-                <th class="col-details">details</th>
-                <th class="col-status">on</th>
-                <th class="col-del"></th>
-              </tr>
-            </thead>
-            <tbody id="kb-slots-tbody"></tbody>
-          </table>
+
+        <div class="kb-keywords-section">
+          <div class="kb-editor__slots-head">
+            <h3>Keywords <span class="kb-section-count" id="kb-slot-count-label">4</span></h3>
+            <button type="button" class="btn btn--sm" id="kb-add-slot">+ Add keyword</button>
+          </div>
+          <p class="muted kb-field-hint">Drag order with arrows. Reader questions in the lander still come from variant HTML.</p>
+          <div class="kb-keyword-list" id="kb-keywords-active-list" aria-label="Active keywords"></div>
+        </div>
+
+        <div class="kb-keywords-section kb-keywords-section--past">
+          <div class="kb-editor__slots-head">
+            <h3>Past keywords <span class="kb-section-count" id="kb-past-count-label">0</span></h3>
+          </div>
+          <p class="muted kb-field-hint">Previously removed keywords. Restore to add them back to the active list.</p>
+          <div class="kb-keyword-list kb-keyword-list--past" id="kb-keywords-past-list" aria-label="Past keywords"></div>
+          <p class="kb-past-empty muted" id="kb-past-empty" hidden>No past keywords yet.</p>
         </div>
       </section>
 
       <section class="offer-detail-pane kb-detail-pane kb-detail-pane--preview" data-tab-panel="kb-preview" hidden>
-        <p class="muted kb-field-hint">Serving preview — click a reader question; Base calls Serving to fetch a <strong>live CM ad</strong> for that <code>keyword_term</code> (prototype simulates the API).</p>
+        <p class="muted kb-field-hint">Click a reader question to preview live ads from Serving (prototype simulation).</p>
         <div class="kb-preview-wrap kb-preview-wrap--tab">
           <div class="kb-modal-preview kb-modal-preview--editor" id="kb-modal-preview">
             <div class="kb-modal-preview__header">
@@ -724,20 +732,25 @@
 
       /* ── Keyword blocks widget editor ── */
       (function () {
-        var kbSlotsBody = document.getElementById("kb-slots-tbody");
+        var kbActiveList = document.getElementById("kb-keywords-active-list");
+        var kbPastList = document.getElementById("kb-keywords-past-list");
+        var kbPastEmpty = document.getElementById("kb-past-empty");
         var kbPreviewBlocks = document.getElementById("kb-preview-blocks");
         var kbPreviewTitle = document.getElementById("kb-preview-title");
         var kbPreviewDismiss = document.getElementById("kb-preview-dismiss");
         var kbPreviewBrand = document.getElementById("kb-preview-brand");
         var kbSlotCountLabel = document.getElementById("kb-slot-count-label");
+        var kbPastCountLabel = document.getElementById("kb-past-count-label");
         var kbAddSlotBtn = document.getElementById("kb-add-slot");
         var kbSaveBtn = document.getElementById("kb-editor-save");
         var kbEditorTitle = document.getElementById("kb-editor-title");
         var kbNameIn = document.getElementById("kb-widget-name");
-        var kbAdvertiserIn = document.getElementById("kb-advertiser");
+        var kbAdvertiserIn = document.getElementById("kb-advertiser-id");
         var kbStatusIn = document.getElementById("kb-widget-status");
         var kbSlotConfigIn = document.getElementById("kb-slot-config");
         var kbMaxAdsIn = document.getElementById("kb-max-ads");
+        var kbAdvertiserInfo = document.getElementById("kb-advertiser-info");
+        var kbAdvertiserInfoText = document.getElementById("kb-advertiser-info-text");
         var M = window.KbWidgetModel;
         if (!M || !M.KEYWORD_PRESETS) {
           openKbEditorFromPicker = function () {
@@ -745,6 +758,14 @@
           };
           return;
         }
+
+        var RANKING_LABELS = {
+          static: "Manual",
+          top_clicks: "Based on top clicks",
+          top_conversions: "Based on top conversions",
+          split: "Split traffic"
+        };
+
         var kbKeywords = M.KEYWORD_PRESETS.passive.slice();
         var kbWidgetId = M.KB_WIDGET_PASSIVE;
         var kbActiveIndex = 0;
@@ -763,6 +784,22 @@
           });
         }
 
+        function activeIndices() {
+          var out = [];
+          kbKeywords.forEach(function (k, i) {
+            if (k.status === "on") out.push(i);
+          });
+          return out;
+        }
+
+        function pastIndices() {
+          var out = [];
+          kbKeywords.forEach(function (k, i) {
+            if (k.status !== "on") out.push(i);
+          });
+          return out;
+        }
+
         function collectWidgetFromForm() {
           return M.buildBaseWidget({
             widget_id: kbWidgetId,
@@ -770,8 +807,72 @@
             status: kbStatusIn ? kbStatusIn.value : "active",
             slot_config: kbSlotConfigIn ? kbSlotConfigIn.value : "static",
             max_ads_per_keyword: widgetMaxAdsDefault(),
-            ad_provider_config: { advertiser_id: kbAdvertiserIn ? kbAdvertiserIn.value : "" },
+            ad_provider_config: { advertiser_id: kbAdvertiserIn ? kbAdvertiserIn.value.trim() : "" },
             keywords: kbKeywords
+          });
+        }
+
+        function setUiSelectValue(selectId, value) {
+          var hidden = document.getElementById(selectId);
+          if (hidden) hidden.value = value;
+          var wrap = document.querySelector("[data-kb-select-id=\"" + selectId + "\"]");
+          if (!wrap) return;
+          wrap.setAttribute("data-value", value);
+          var label = wrap.querySelector(".kb-ui-select__label");
+          var opt = wrap.querySelector("[data-value=\"" + value + "\"]");
+          if (label && opt) label.textContent = opt.textContent.replace(/\s*Coming soon\s*/i, "").trim();
+          wrap.querySelectorAll("[role=option]").forEach(function (o) {
+            o.classList.toggle("is-selected", o.getAttribute("data-value") === value);
+          });
+        }
+
+        function initKbUiSelects(root) {
+          (root || document).querySelectorAll("[data-kb-ui-select]").forEach(function (wrap) {
+            if (wrap.getAttribute("data-kb-select-init")) return;
+            wrap.setAttribute("data-kb-select-init", "1");
+            var btn = wrap.querySelector(".kb-ui-select__btn");
+            var menu = wrap.querySelector(".kb-ui-select__menu");
+            var selectId = wrap.getAttribute("data-kb-select-id");
+            var hidden = selectId ? document.getElementById(selectId) : null;
+            if (!btn || !menu) return;
+            btn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              var open = !menu.hidden;
+              document.querySelectorAll(".kb-ui-select__menu").forEach(function (m) { m.hidden = true; });
+              document.querySelectorAll(".kb-ui-select__btn").forEach(function (b) { b.setAttribute("aria-expanded", "false"); });
+              if (!open) {
+                menu.hidden = false;
+                btn.setAttribute("aria-expanded", "true");
+              }
+            });
+            menu.querySelectorAll("[role=option]").forEach(function (opt) {
+              opt.addEventListener("click", function () {
+                if (opt.classList.contains("is-disabled")) return;
+                var val = opt.getAttribute("data-value");
+                if (hidden) hidden.value = val;
+                wrap.setAttribute("data-value", val);
+                var lab = wrap.querySelector(".kb-ui-select__label");
+                if (lab) lab.textContent = opt.textContent.replace(/\s*Coming soon\s*/i, "").trim();
+                menu.querySelectorAll("[role=option]").forEach(function (o) {
+                  o.classList.toggle("is-selected", o === opt);
+                });
+                menu.hidden = true;
+                btn.setAttribute("aria-expanded", "false");
+              });
+            });
+          });
+        }
+
+        document.addEventListener("click", function () {
+          document.querySelectorAll(".kb-ui-select__menu").forEach(function (m) { m.hidden = true; });
+          document.querySelectorAll(".kb-ui-select__btn").forEach(function (b) { b.setAttribute("aria-expanded", "false"); });
+        });
+
+        if (kbAdvertiserInfo && kbAdvertiserInfoText) {
+          kbAdvertiserInfo.addEventListener("click", function () {
+            var show = kbAdvertiserInfoText.hidden;
+            kbAdvertiserInfoText.hidden = !show;
+            kbAdvertiserInfo.setAttribute("aria-expanded", show ? "true" : "false");
           });
         }
 
@@ -782,56 +883,132 @@
           kbKeywords = cloneKeywords(w.keywords);
           kbExpandedRows = {};
           if (kbNameIn) kbNameIn.value = w.widget_name;
-          if (kbStatusIn) kbStatusIn.value = w.status || "active";
-          if (kbSlotConfigIn) kbSlotConfigIn.value = w.slot_config || "static";
+          setUiSelectValue("kb-widget-status", w.status || "active");
+          setUiSelectValue("kb-slot-config", w.slot_config || "static");
           if (kbMaxAdsIn) kbMaxAdsIn.value = w.max_ads_per_keyword != null ? w.max_ads_per_keyword : M.defaultMaxAdsPerKeyword();
-          if (kbAdvertiserIn) kbAdvertiserIn.value = w.ad_provider_config.advertiser_id;
+          if (kbAdvertiserIn) kbAdvertiserIn.value = w.ad_provider_config.advertiser_id || "";
         }
 
-        function renderKbSlotsTable() {
-          if (!kbSlotsBody) return;
-          kbSlotsBody.innerHTML = "";
-          var onCount = M.onKeywordCount(kbKeywords);
-          var widgetDefault = widgetMaxAdsDefault();
-          kbKeywords.forEach(function (slot, i) {
-            var meta = slot.metadata || M.defaultMetadata();
-            var maxAdsVal = meta.max_ads != null && meta.max_ads !== "" ? meta.max_ads : "";
-            var expanded = kbExpandedRows[i];
-            var macros = M.keywordSlotMacroExamples(i + 1);
-            var tr = document.createElement("tr");
-            tr.className = "kb-slot-row";
-            tr.innerHTML =
-              '<td class="col-slot">' + (i + 1) + "</td>" +
-              '<td><input type="text" class="kb-in-keyword-term" data-idx="' + i + '" value="' + String(slot.keyword_term).replace(/"/g, "&quot;") + '" placeholder="keyword_term" /></td>' +
-              '<td><input type="text" class="kb-in-display-term" data-idx="' + i + '" value="' + String(slot.display_term).replace(/"/g, "&quot;") + '" placeholder="display_term" /></td>' +
-              '<td class="col-max-ads"><input type="number" class="kb-in-max-ads" data-idx="' + i + '" min="1" max="5" placeholder="' + widgetDefault + '" value="' + maxAdsVal + '" title="Override widget default" /></td>' +
-              '<td class="col-details"><button type="button" class="kb-details-toggle' + (expanded ? " is-open" : "") + '" data-idx="' + i + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + (expanded ? "Hide" : "Edit") + '</button></td>' +
-              '<td class="col-status"><button type="button" class="kb-status-btn' + (slot.status === "on" ? " is-on" : " is-off") + '" data-idx="' + i + '" aria-label="Toggle on/off">' + slot.status + "</button></td>" +
-              '<td class="col-del"><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove" ' + (kbKeywords.length <= 1 ? "disabled" : "") + ">✕</button></td>";
-            kbSlotsBody.appendChild(tr);
-            var detailsTr = document.createElement("tr");
-            detailsTr.className = "kb-slot-details-row" + (expanded ? " is-open" : "");
-            detailsTr.setAttribute("data-details-idx", String(i));
-            if (!expanded) detailsTr.hidden = true;
-            detailsTr.innerHTML =
-              '<td colspan="7" class="kb-slot-details-cell">' +
-                '<div class="kb-slot-details">' +
-                  '<div class="field"><label>metadata.description <span class="muted">→ ' + macros.description + '</span></label>' +
-                    '<textarea class="kb-in-meta-desc" data-idx="' + i + '" rows="2" placeholder="Keyword context for templates">' + M.escapeHtml(meta.description || "") + "</textarea></div>" +
-                  '<div class="field field--inline-pair">' +
-                    '<div class="field"><label>metadata.image_urls[0] <span class="muted">→ ' + macros.image + '</span></label>' +
-                      '<input type="url" class="kb-in-meta-image" data-idx="' + i + '" value="' + M.escapeHtml((meta.image_urls && meta.image_urls[0]) || "") + '" placeholder="https://…" /></div>' +
-                    '<div class="field"><label>metadata.video_urls[0] <span class="muted">→ ' + macros.video + '</span></label>' +
-                      '<input type="url" class="kb-in-meta-video" data-idx="' + i + '" value="' + M.escapeHtml((meta.video_urls && meta.video_urls[0]) || "") + '" placeholder="https://…" /></div>' +
+        function imageUploadHtml(globalIdx, meta) {
+          var img = meta.image_urls && meta.image_urls[0];
+          var hasImg = img && img.length > 0;
+          return (
+            '<div class="kb-img-upload' + (hasImg ? " has-image" : "") + '" data-idx="' + globalIdx + '">' +
+              '<div class="kb-img-upload__preview" aria-hidden="true">' +
+                (hasImg ? '<img src="' + M.escapeHtml(img) + '" alt="" />' : '<span class="kb-img-upload__placeholder">IMG</span>') +
+              "</div>" +
+              '<div class="kb-img-upload__meta">' +
+                '<span class="kb-img-upload__name">' + (hasImg ? "Image attached" : "No image") + "</span>" +
+                '<span class="kb-img-upload__hint">JPG, PNG or WebP · max 2 MB</span>' +
+              "</div>" +
+              '<div class="kb-img-upload__actions">' +
+                '<label class="btn btn--sm"><input type="file" class="kb-in-meta-image-file" data-idx="' + globalIdx + '" accept="image/*" hidden />Upload</label>' +
+                (hasImg ? '<button type="button" class="btn btn--sm kb-img-remove" data-idx="' + globalIdx + '">Remove</button>' : "") +
+              "</div>" +
+            "</div>"
+          );
+        }
+
+        function renderKeywordCard(globalIdx, mode) {
+          var slot = kbKeywords[globalIdx];
+          var meta = slot.metadata || M.defaultMetadata();
+          var expanded = kbExpandedRows[globalIdx];
+          var macros = M.keywordSlotMacroExamples(activeIndices().indexOf(globalIdx) + 1);
+
+          if (mode === "past") {
+            return (
+              '<div class="kb-keyword-card kb-keyword-card--past" data-global-idx="' + globalIdx + '">' +
+                '<div class="kb-keyword-card__main">' +
+                  '<div class="kb-keyword-card__text">' +
+                    '<strong class="kb-keyword-card__term">' + M.escapeHtml(slot.keyword_term) + "</strong>" +
+                    '<span class="kb-keyword-card__display">' + M.escapeHtml(slot.display_term) + "</span>" +
                   "</div>" +
-                  '<p class="muted kb-field-hint" style="margin:0;">Ad macros: <code>' + macros.adTitle + '</code>, <code>{{slot' + (i + 1) + '_ad2.ad_title}}</code> when max_ads ≥ 2.</p>' +
+                  '<button type="button" class="btn btn--sm kb-restore-keyword" data-idx="' + globalIdx + '">Restore</button>' +
                 "</div>" +
-              "</td>";
-            kbSlotsBody.appendChild(detailsTr);
-          });
-          if (kbSlotCountLabel) kbSlotCountLabel.textContent = onCount + " on · " + kbKeywords.length + " rows (max 12)";
-          if (kbAddSlotBtn) kbAddSlotBtn.disabled = kbKeywords.length >= 12;
+              "</div>"
+            );
+          }
+
+          var actives = activeIndices();
+          var posInActive = actives.indexOf(globalIdx);
+          var canUp = posInActive > 0;
+          var canDown = posInActive < actives.length - 1;
+
+          return (
+            '<div class="kb-keyword-card" data-global-idx="' + globalIdx + '">' +
+              '<div class="kb-keyword-card__main">' +
+                '<div class="kb-keyword-card__order">' +
+                  '<button type="button" class="kb-order-btn" data-action="up" data-idx="' + globalIdx + '" ' + (canUp ? "" : "disabled") + ' aria-label="Move up">↑</button>' +
+                  '<button type="button" class="kb-order-btn" data-action="down" data-idx="' + globalIdx + '" ' + (canDown ? "" : "disabled") + ' aria-label="Move down">↓</button>' +
+                "</div>" +
+                '<div class="kb-keyword-card__fields">' +
+                  '<label class="kb-keyword-card__label">Keyword</label>' +
+                  '<input type="text" class="kb-in-keyword-term input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="e.g. auto insurance savings" />' +
+                  '<label class="kb-keyword-card__label">Display label</label>' +
+                  '<input type="text" class="kb-in-display-term input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="Short label in widget UI" />' +
+                "</div>" +
+                '<div class="kb-keyword-card__actions">' +
+                  '<button type="button" class="kb-details-toggle' + (expanded ? " is-open" : "") + '" data-idx="' + globalIdx + '">' + (expanded ? "Hide details" : "Details") + "</button>" +
+                  '<button type="button" class="kb-archive-keyword" data-idx="' + globalIdx + '" title="Move to past keywords" aria-label="Move to past">✕</button>' +
+                "</div>" +
+              "</div>" +
+              (expanded
+                ? '<div class="kb-keyword-card__details">' +
+                    '<div class="field"><label>Description</label>' +
+                      '<textarea class="kb-in-meta-desc input" data-idx="' + globalIdx + '" rows="2" placeholder="Optional context for this keyword">' + M.escapeHtml(meta.description || "") + "</textarea></div>" +
+                    '<div class="field"><label>Image</label>' + imageUploadHtml(globalIdx, meta) + "</div>" +
+                    '<div class="field"><label>Video URL <span class="muted">(optional)</span></label>' +
+                      '<input type="url" class="kb-in-meta-video input" data-idx="' + globalIdx + '" value="' + M.escapeHtml((meta.video_urls && meta.video_urls[0]) || "") + '" placeholder="https://…" /></div>' +
+                  "</div>"
+                : "") +
+            "</div>"
+          );
+        }
+
+        function renderKbKeywordsUI() {
+          if (!kbActiveList || !kbPastList) return;
+          var actives = activeIndices();
+          var pasts = pastIndices();
+          kbActiveList.innerHTML = actives.map(function (gi) { return renderKeywordCard(gi, "active"); }).join("");
+          kbPastList.innerHTML = pasts.map(function (gi) { return renderKeywordCard(gi, "past"); }).join("");
+          if (kbSlotCountLabel) kbSlotCountLabel.textContent = String(actives.length);
+          if (kbPastCountLabel) kbPastCountLabel.textContent = String(pasts.length);
+          if (kbPastEmpty) kbPastEmpty.hidden = pasts.length > 0;
+          if (kbAddSlotBtn) kbAddSlotBtn.disabled = actives.length >= 12;
           renderKbPreview();
+        }
+
+        function moveActiveKeyword(globalIdx, direction) {
+          var actives = activeIndices();
+          var pos = actives.indexOf(globalIdx);
+          if (pos < 0) return;
+          var swapPos = pos + direction;
+          if (swapPos < 0 || swapPos >= actives.length) return;
+          var a = actives[pos];
+          var b = actives[swapPos];
+          var tmp = kbKeywords[a];
+          kbKeywords[a] = kbKeywords[b];
+          kbKeywords[b] = tmp;
+          renderKbKeywordsUI();
+        }
+
+        function archiveKeyword(globalIdx) {
+          if (activeIndices().length <= 1) return;
+          kbKeywords[globalIdx].status = "off";
+          delete kbExpandedRows[globalIdx];
+          if (kbActiveIndex >= activeIndices().length) kbActiveIndex = Math.max(0, activeIndices().length - 1);
+          renderKbKeywordsUI();
+        }
+
+        function restoreKeyword(globalIdx) {
+          kbKeywords[globalIdx].status = "on";
+          var kw = kbKeywords.splice(globalIdx, 1)[0];
+          var lastActive = -1;
+          kbKeywords.forEach(function (k, i) {
+            if (k.status === "on") lastActive = i;
+          });
+          kbKeywords.splice(lastActive + 1, 0, kw);
+          renderKbKeywordsUI();
         }
 
         function onKeywordsForPreview() {
@@ -846,7 +1023,7 @@
           kbPreviewBlocks.innerHTML = "";
           var hint = document.createElement("p");
           hint.className = "kb-preview-serving-hint";
-          hint.textContent = "Select a question — Serving fetches up to max_ads CM ads (slot{n}_ad1, slot{n}_ad2, …).";
+          hint.textContent = "Select a question to preview live ads for that keyword.";
           kbPreviewBlocks.appendChild(hint);
           var section = document.createElement("p");
           section.className = "kb-modal-preview__section";
@@ -888,7 +1065,7 @@
             keyword_term: slot.keyword_term,
             slotIndex: kbActiveIndex + 1,
             maxAds: maxAds,
-            advertiser_id: kbAdvertiserIn ? kbAdvertiserIn.value : "",
+            advertiser_id: kbAdvertiserIn ? kbAdvertiserIn.value.trim() : "",
             delay: 380
           }).then(function (ads) {
             if (token !== kbPreviewFetchToken) return;
@@ -902,23 +1079,101 @@
           fetchKbPreviewAd();
         }
 
+        function bindKeywordListEvents(listEl) {
+          if (!listEl) return;
+          listEl.addEventListener("input", function (e) {
+            var t = e.target;
+            var idx = parseInt(t.getAttribute("data-idx"), 10);
+            if (t.classList.contains("kb-in-keyword-term")) {
+              kbKeywords[idx].keyword_term = t.value;
+              if (kbKeywords[idx].display_term === "" || kbKeywords[idx].display_term === kbKeywords[idx].keyword_term) {
+                kbKeywords[idx].display_term = t.value;
+              }
+              renderKbPreviewBlocks();
+              fetchKbPreviewAd();
+            } else if (t.classList.contains("kb-in-display-term")) {
+              kbKeywords[idx].display_term = t.value;
+              renderKbPreviewBlocks();
+            } else if (t.classList.contains("kb-in-meta-desc")) {
+              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
+              kbKeywords[idx].metadata.description = t.value;
+              renderKbPreviewBlocks();
+            } else if (t.classList.contains("kb-in-meta-video")) {
+              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
+              kbKeywords[idx].metadata.video_urls = t.value.trim() ? [t.value.trim()] : [];
+              renderKbPreviewBlocks();
+            }
+          });
+          listEl.addEventListener("change", function (e) {
+            var t = e.target;
+            if (!t.classList.contains("kb-in-meta-image-file")) return;
+            var idx = parseInt(t.getAttribute("data-idx"), 10);
+            var file = t.files && t.files[0];
+            if (!file) return;
+            if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
+            var reader = new FileReader();
+            reader.onload = function () {
+              kbKeywords[idx].metadata.image_urls = [reader.result];
+              renderKbKeywordsUI();
+            };
+            reader.readAsDataURL(file);
+          });
+          listEl.addEventListener("click", function (e) {
+            var detailsBtn = e.target.closest(".kb-details-toggle");
+            if (detailsBtn) {
+              var idx = parseInt(detailsBtn.getAttribute("data-idx"), 10);
+              kbExpandedRows[idx] = !kbExpandedRows[idx];
+              renderKbKeywordsUI();
+              return;
+            }
+            var orderBtn = e.target.closest(".kb-order-btn");
+            if (orderBtn && !orderBtn.disabled) {
+              moveActiveKeyword(parseInt(orderBtn.getAttribute("data-idx"), 10), orderBtn.getAttribute("data-action") === "up" ? -1 : 1);
+              return;
+            }
+            var archiveBtn = e.target.closest(".kb-archive-keyword");
+            if (archiveBtn) {
+              archiveKeyword(parseInt(archiveBtn.getAttribute("data-idx"), 10));
+              return;
+            }
+            var restoreBtn = e.target.closest(".kb-restore-keyword");
+            if (restoreBtn) {
+              restoreKeyword(parseInt(restoreBtn.getAttribute("data-idx"), 10));
+              return;
+            }
+            var imgRemove = e.target.closest(".kb-img-remove");
+            if (imgRemove) {
+              var ri = parseInt(imgRemove.getAttribute("data-idx"), 10);
+              if (!kbKeywords[ri].metadata) kbKeywords[ri].metadata = M.defaultMetadata();
+              kbKeywords[ri].metadata.image_urls = [];
+              renderKbKeywordsUI();
+            }
+          });
+        }
+
+        bindKeywordListEvents(kbActiveList);
+        bindKeywordListEvents(kbPastList);
+
         function openKbEditor(mode, presetKey) {
           if (!kbDlg) return;
-          if (kbEditorTitle) kbEditorTitle.textContent = mode === "new" ? "New keyword blocks widget" : "Edit keyword blocks widget";
+          if (kbEditorTitle) kbEditorTitle.textContent = mode === "new" ? "Create keyword blocks widget" : "Edit keyword blocks widget";
           if (kbSaveBtn) kbSaveBtn.textContent = mode === "new" ? "Create widget" : "Save widget";
           if (mode === "new") {
             kbWidgetId = "new-" + Date.now();
             kbKeywords = cloneKeywords(M.KEYWORD_PRESETS.passive.slice(0, 4));
+            kbKeywords.push(M.makeKeyword("retired keyword sample", "retired sample", "off"));
             if (kbNameIn) kbNameIn.value = "New keyword blocks widget";
-            if (kbStatusIn) kbStatusIn.value = "active";
-            if (kbSlotConfigIn) kbSlotConfigIn.value = "static";
+            setUiSelectValue("kb-widget-status", "active");
+            setUiSelectValue("kb-slot-config", "static");
             if (kbMaxAdsIn) kbMaxAdsIn.value = M.defaultMaxAdsPerKeyword();
             if (kbAdvertiserIn) kbAdvertiserIn.value = "adv-etrade";
           } else {
             loadWidgetPreset(presetKey || "passive");
           }
           kbActiveIndex = 0;
-          renderKbSlotsTable();
+          kbExpandedRows = {};
+          initKbUiSelects(kbDlg);
+          renderKbKeywordsUI();
           var kbTabGroup = document.querySelector("[data-tabs=\"kb-widget-detail\"]");
           if (kbTabGroup) {
             var genTab = kbTabGroup.querySelector("[data-tab=\"kb-general\"]");
@@ -946,68 +1201,8 @@
           });
         });
 
-        if (kbSlotsBody) {
-          kbSlotsBody.addEventListener("input", function (e) {
-            var t = e.target;
-            var idx = parseInt(t.getAttribute("data-idx"), 10);
-            if (t.classList.contains("kb-in-keyword-term")) {
-              kbKeywords[idx].keyword_term = t.value;
-              if (kbKeywords[idx].display_term === "" || kbKeywords[idx].display_term === kbKeywords[idx].keyword_term) {
-                kbKeywords[idx].display_term = t.value;
-              }
-              renderKbPreviewBlocks();
-              fetchKbPreviewAd();
-            } else if (t.classList.contains("kb-in-display-term")) {
-              kbKeywords[idx].display_term = t.value;
-              renderKbPreviewBlocks();
-            } else if (t.classList.contains("kb-in-max-ads")) {
-              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
-              var raw = t.value.trim();
-              kbKeywords[idx].metadata.max_ads = raw === "" ? null : parseInt(raw, 10);
-              fetchKbPreviewAd();
-            } else if (t.classList.contains("kb-in-meta-desc")) {
-              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
-              kbKeywords[idx].metadata.description = t.value;
-              renderKbPreviewBlocks();
-            } else if (t.classList.contains("kb-in-meta-image")) {
-              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
-              kbKeywords[idx].metadata.image_urls = t.value.trim() ? [t.value.trim()] : [];
-              renderKbPreviewBlocks();
-            } else if (t.classList.contains("kb-in-meta-video")) {
-              if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
-              kbKeywords[idx].metadata.video_urls = t.value.trim() ? [t.value.trim()] : [];
-              renderKbPreviewBlocks();
-            }
-          });
-          kbSlotsBody.addEventListener("click", function (e) {
-            var detailsBtn = e.target.closest(".kb-details-toggle");
-            if (detailsBtn) {
-              var idx = parseInt(detailsBtn.getAttribute("data-idx"), 10);
-              kbExpandedRows[idx] = !kbExpandedRows[idx];
-              renderKbSlotsTable();
-              return;
-            }
-            var statusBtn = e.target.closest(".kb-status-btn");
-            if (statusBtn) {
-              var idx = parseInt(statusBtn.getAttribute("data-idx"), 10);
-              kbKeywords[idx].status = kbKeywords[idx].status === "on" ? "off" : "on";
-              renderKbSlotsTable();
-              return;
-            }
-            var del = e.target.closest(".kb-slot-del");
-            if (!del || del.disabled) return;
-            var idx = parseInt(del.getAttribute("data-idx"), 10);
-            if (kbKeywords.length <= 1) return;
-            kbKeywords.splice(idx, 1);
-            kbExpandedRows = {};
-            if (kbActiveIndex >= kbKeywords.length) kbActiveIndex = kbKeywords.length - 1;
-            renderKbSlotsTable();
-          });
-        }
-
         if (kbMaxAdsIn) {
           kbMaxAdsIn.addEventListener("change", function () {
-            renderKbSlotsTable();
             fetchKbPreviewAd();
           });
         }
@@ -1026,9 +1221,10 @@
 
         if (kbAddSlotBtn) {
           kbAddSlotBtn.addEventListener("click", function () {
-            if (kbKeywords.length >= 12) return;
-            kbKeywords.push(M.makeKeyword("keyword " + (kbKeywords.length + 1), "keyword " + (kbKeywords.length + 1), "on"));
-            renderKbSlotsTable();
+            if (activeIndices().length >= 12) return;
+            var n = kbKeywords.length + 1;
+            kbKeywords.push(M.makeKeyword("keyword " + n, "keyword " + n, "on"));
+            renderKbKeywordsUI();
           });
         }
 
@@ -1038,13 +1234,13 @@
             var genPayload = M.buildGenPayload(baseWidget);
             var servingSync = M.buildServingSync(baseWidget);
             alert(
-              "KeywordBlockWidget (Base):\n" + JSON.stringify(baseWidget, null, 2) + "\n\n" +
-              "KeywordBlockServingSync:\n" + JSON.stringify(servingSync, null, 2) + "\n\n" +
-              "Gen → Base payload:\n" + JSON.stringify(genPayload, null, 2)
+              "Saved (prototype):\n" + baseWidget.widget_name + " · " + activeIndices().length + " active keywords"
             );
             kbDlg.close();
           });
         }
+
+        initKbUiSelects(kbDlg);
       })();
 
       /* ── Clone button ── */
