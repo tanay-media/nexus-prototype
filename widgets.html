@@ -1260,10 +1260,12 @@
 
         function handleWidgetsHash() {
           var h = (location.hash || "").replace("#", "").trim();
-          if (h === "kb-keywords") {
+          var m = h.match(/^kb-keywords(?:\/([a-z0-9-]+))?$/i);
+          if (m) {
+            var preset = m[1] || "passive";
             var listTab = document.querySelector("[data-tab=\"widgets-kb-list\"]");
             if (listTab) listTab.click();
-            openKbEditor("edit", "passive", "kb-keywords");
+            openKbEditor("edit", preset, "kb-keywords");
           }
         }
 

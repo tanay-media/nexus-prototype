@@ -5174,6 +5174,123 @@ body.editor-open .editor-shell .editor-chat {
 }
 .suggestion-chips button:hover { background: var(--brand-soft); border-color: #9cbceb; }
 
+.compose-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.compose-attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #c8dcc8;
+  border-radius: 8px;
+  background: #f4faf4;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.compose-attachment--kb {
+  border-color: #b8d4b8;
+}
+
+.compose-attachment__icon {
+  color: #2e7d32;
+  font-size: 11px;
+}
+
+.compose-attachment__name {
+  font-weight: 600;
+  color: #1b5e20;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.compose-attachment__manage {
+  color: var(--brand);
+  font-size: 11px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.compose-attachment__manage:hover {
+  text-decoration: underline;
+}
+
+.compose-attachment__remove {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.compose-attachment__remove:hover {
+  color: #333;
+}
+
+.chat-bubble.user {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.chat-bubble__attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(46, 125, 50, 0.12);
+  border: 1px solid rgba(46, 125, 50, 0.25);
+  font-size: 11px;
+  color: #1b5e20;
+}
+
+.chat-bubble__attach-icon {
+  font-size: 10px;
+}
+
+.chat-bubble__attach-name {
+  font-weight: 600;
+}
+
+.chat-bubble.user .chat-bubble__attach {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.chat-bubble__text {
+  display: block;
+}
+
+.insert-kb-summary {
+  padding: 4px 0;
+}
+
+.insert-kb-summary__name {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1b5e20;
+}
+
+.insert-kb-summary__hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+}
+
 .compose-row {
   display: flex;
   gap: 0.4rem;

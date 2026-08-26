@@ -80,10 +80,9 @@
         </div>
         <div class="editor-compose">
           <div class="suggestion-chips suggestion-chips--kb" id="editor-kb-chips" hidden>
-            <button type="button" data-prompt="Make the keyword modal header and trigger button dark green with softer rounded corners">Style modal green</button>
-            <button type="button" data-prompt="Change keyword modal title to something shorter and friendlier">Edit modal title</button>
-            <button type="button" data-prompt="Make reader question cards larger with more padding and 16px rounded corners">Round question cards</button>
-            <button type="button" data-kb-action="open-html">Open variant HTML</button>
+            <button type="button" data-prompt="Place the keyword block below the hero section">Below hero</button>
+            <button type="button" data-prompt="Style the keyword modal dark green with softer rounded corners">Dark green modal</button>
+            <button type="button" data-prompt="Put it after the feature cards with more top spacing">After features</button>
           </div>
           <div class="suggestion-chips">
             <button type="button" data-prompt="Give me a stronger, punchier headline">Stronger headline</button>
@@ -152,6 +151,7 @@
               <a class="editor-insert-menu__foot" href="widgets.html" target="_blank" rel="noopener">Manage library in Widgets →</a>
             </div>
             <div class="editor-insert-toast" id="editor-insert-toast" role="status" aria-live="polite" hidden></div>
+            <div class="compose-attachments" id="editor-compose-attachments" hidden aria-label="Attachments"></div>
             <div class="compose-row">
               <button type="button" class="compose-add-btn" id="editor-insert-open" title="Insert into variant" aria-label="Insert into variant" aria-expanded="false" aria-controls="editor-insert-menu" aria-haspopup="menu">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -315,60 +315,11 @@
                   <p class="editor-kb-widget-card__name" id="editor-kb-widget-name"></p>
                   <p class="editor-kb-widget-card__meta" id="editor-kb-widget-meta"></p>
                   <div class="editor-kb-widget-card__links">
-                    <a href="widgets.html" target="_blank" rel="noopener">Edit keywords in Widgets →</a>
+                    <a href="widgets.html#kb-keywords/passive" id="editor-kb-manage-keywords" target="_blank" rel="noopener">Manage keywords →</a>
                     <a href="#" id="editor-kb-reinsert-link">Change widget</a>
                   </div>
                 </div>
-                <div id="editor-keywords-slots-wrap">
-                  <p class="settings-acc__hint muted" style="margin:12px 0 8px;">Reader questions (variant HTML)</p>
-                  <div class="table-scroll" style="margin-bottom:10px;">
-                    <table class="kb-slots-table editor-kb-slots-table" id="editor-keywords-table">
-                      <thead>
-                        <tr><th class="col-slot">#</th><th class="col-display-term">Reader question</th><th class="col-keyword-term">Keyword</th></tr>
-                      </thead>
-                      <tbody id="editor-keywords-tbody"></tbody>
-                    </table>
-                  </div>
-                  <span class="muted" id="editor-keywords-count" style="font-size:11px;">0 questions</span>
-                </div>
-                <div class="editor-kb-style-panel" id="editor-kb-style-panel">
-                  <div class="editor-kb-style-panel__head">
-                    <strong>Block layout &amp; style</strong>
-                    <span class="muted" style="font-size:10px;">Updates preview live</span>
-                  </div>
-                  <div class="editor-kb-style-grid">
-                    <div class="field field--settings">
-                      <label for="editor-kb-header-color">Modal header</label>
-                      <input type="color" id="editor-kb-header-color" value="#1a5276" />
-                    </div>
-                    <div class="field field--settings">
-                      <label for="editor-kb-trigger-color">Trigger button</label>
-                      <input type="color" id="editor-kb-trigger-color" value="#1a5276" />
-                    </div>
-                    <div class="field field--settings">
-                      <label for="editor-kb-radius">Corner radius <span id="editor-kb-radius-val" class="muted">8px</span></label>
-                      <input type="range" id="editor-kb-radius" min="0" max="24" value="8" />
-                    </div>
-                    <div class="field field--settings">
-                      <label for="editor-kb-width">Block width</label>
-                      <select id="editor-kb-width" class="input">
-                        <option value="full">Full width</option>
-                        <option value="centered">Centered (320px)</option>
-                      </select>
-                    </div>
-                    <div class="field field--settings">
-                      <label for="editor-kb-margin-top">Top spacing <span id="editor-kb-margin-top-val" class="muted">16px</span></label>
-                      <input type="range" id="editor-kb-margin-top" min="0" max="48" value="16" />
-                    </div>
-                    <div class="field field--settings">
-                      <label for="editor-kb-margin-bottom">Bottom spacing <span id="editor-kb-margin-bottom-val" class="muted">16px</span></label>
-                      <input type="range" id="editor-kb-margin-bottom" min="0" max="48" value="16" />
-                    </div>
-                  </div>
-                  <div class="editor-kb-style-panel__foot">
-                    <button type="button" class="btn btn--sm btn--ghost" id="editor-kb-open-html">Advanced: variant HTML</button>
-                  </div>
-                </div>
+                <p class="settings-acc__hint muted" style="margin-top:10px;">Placement and modal styling via Nexus chat. Reader questions live in variant HTML after placement. Commercial keyword text: Manage keywords.</p>
               </div>
               <p class="settings-acc__hint muted" id="editor-keywords-empty" hidden>Reader questions appear after attach.</p>
             </div>
@@ -423,7 +374,7 @@
       <header class="modal__header">
         <div>
           <h2 class="modal__title" id="insert-kb-title">Insert keyword blocks</h2>
-          <p class="modal__hint">Pick a workspace widget. Keywords and ads come from the library; reader questions and modal CSS stay in this variant’s HTML.</p>
+          <p class="modal__hint">Pick a widget from the library. After add, tell Nexus where to place it and how to style the modal.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </header>
@@ -432,7 +383,7 @@
         <aside class="insert-form__list" aria-label="Keyword blocks library">
           <div class="insert-form__list-head">
             <p class="insert-form__list-title">Keyword blocks in library</p>
-            <a href="widgets.html" target="_blank" rel="noopener" class="insert-form__manage">Manage →</a>
+            <a href="widgets.html#kb-keywords" id="insert-kb-manage" target="_blank" rel="noopener" class="insert-form__manage">Manage →</a>
           </div>
           <ul id="insert-kb-list" role="listbox" aria-label="Keyword blocks"></ul>
         </aside>
@@ -440,7 +391,12 @@
         <section class="insert-form__preview insert-kb-preview" id="insert-kb-preview" aria-live="polite">
           <div class="insert-form__preview-empty" id="insert-kb-preview-empty">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h14"/></svg>
-            <p>Pick a keyword-blocks widget — click a question to preview a <strong>live ad</strong> from Serving.</p>
+            <p>Pick a keyword-blocks widget on the left.</p>
+          </div>
+          <div class="insert-kb-summary" id="insert-kb-summary" hidden>
+            <h3 class="insert-kb-summary__name" id="insert-kb-summary-name"></h3>
+            <dl class="insert-kb-meta" id="insert-kb-summary-meta"></dl>
+            <p class="insert-kb-summary__hint muted">Commercial keywords and ads stay in the widget. After add, use chat to place and style the block on this variant.</p>
           </div>
         </section>
       </div>
@@ -780,7 +736,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js?v=20260826h"></script>
+  <script src="kb-widget-model.js?v=20260826n"></script>
   <script src="integrations-catalog.js"></script>
   <script src="macro-enriched-lander-urls.js"></script>
   <script src="site-shell.js"></script>
@@ -866,10 +822,15 @@
     var input = document.getElementById("editor-input");
     var send  = document.getElementById("editor-send");
 
-    function addBubble(text, who) {
+    function addBubble(text, who, opts) {
+      opts = opts || {};
       var b = document.createElement("div");
       b.className = "chat-bubble" + (who === "user" ? " user" : "");
-      b.textContent = text;
+      if (opts.html) {
+        b.innerHTML = opts.html;
+      } else {
+        b.textContent = text;
+      }
       chat.appendChild(b);
       chat.scrollTop = chat.scrollHeight;
       return b;
@@ -878,19 +839,41 @@
     function submitPrompt(text) {
       if (!text || !text.trim()) return;
       var trimmed = text.trim();
-      addBubble(trimmed, "user");
+      var kbAttach = typeof window.getKbComposeAttachment === "function" ? window.getKbComposeAttachment() : null;
+      if (kbAttach && kbAttach.widget) {
+        var attachHtml =
+          '<span class="chat-bubble__attach chat-bubble__attach--kb">' +
+            '<span class="chat-bubble__attach-icon" aria-hidden="true">▣</span>' +
+            '<span class="chat-bubble__attach-name">' + escapeChatHtml(kbAttach.widget.widget_name) + "</span>" +
+          "</span>" +
+          '<span class="chat-bubble__text">' + escapeChatHtml(trimmed) + "</span>";
+        addBubble(trimmed, "user", { html: attachHtml });
+      } else {
+        addBubble(trimmed, "user");
+      }
       input.value = "";
       setTimeout(function () {
-        var kbStyled = typeof maybeApplyKbStyleFromChat === "function" && maybeApplyKbStyleFromChat(trimmed);
+        var kbPlaced = typeof maybePlaceAndStyleKbFromChat === "function" && maybePlaceAndStyleKbFromChat(trimmed);
+        var kbStyled = !kbPlaced && typeof maybeApplyKbStyleFromChat === "function" && maybeApplyKbStyleFromChat(trimmed);
         if (typeof maybeDetectKeywordsFromChat === "function") {
           maybeDetectKeywordsFromChat(trimmed);
         }
-        if (kbStyled) {
-          addBubble("Updated keyword block CSS in variant HTML — check the mobile preview and Variant HTML drawer.", "ai");
+        if (kbPlaced) {
+          addBubble("Placed and styled the keyword block — check the mobile preview.", "ai");
+        } else if (kbStyled) {
+          addBubble("Updated keyword block styling in variant HTML — check the mobile preview.", "ai");
+        } else if (kbAttach && !kbPlaced) {
+          addBubble("Tell me where on the page to place it (e.g. below the hero) and how to style the modal.", "ai");
         } else {
           addBubble("Applied by Opus 4.7 — preview updated. Want another pass?", "ai");
         }
       }, 450);
+    }
+
+    function escapeChatHtml(str) {
+      return String(str == null ? "" : str)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
     send.addEventListener("click", function () { submitPrompt(input.value); });
@@ -899,60 +882,49 @@
     });
     document.querySelectorAll(".suggestion-chips button").forEach(function (c) {
       c.addEventListener("click", function () {
-        if (c.getAttribute("data-kb-action") === "open-html") {
-          if (typeof openEditorHtmlDrawer === "function") openEditorHtmlDrawer();
-          return;
-        }
         var p = c.getAttribute("data-prompt");
         if (p) submitPrompt(p);
       });
     });
 
-    // ---- Keyword block: attach, reader questions, layout & CSS (variant editor)
+    // ---- Keyword block: chat attachment, placement & styling (variant editor)
     (function () {
       var M = window.KbWidgetModel;
       if (!M) return;
 
-      var emptyEl = document.getElementById("editor-keywords-empty");
       var emptyWrap = document.getElementById("editor-kb-empty-wrap");
       var attachedWrap = document.getElementById("editor-kb-attached-wrap");
-      var wrapEl = document.getElementById("editor-keywords-slots-wrap");
-      var tbody = document.getElementById("editor-keywords-tbody");
-      var countEl = document.getElementById("editor-keywords-count");
       var hintEl = document.getElementById("editor-keywords-hint");
       var widgetCard = document.getElementById("editor-keywords-widget-card");
       var widgetNameEl = document.getElementById("editor-kb-widget-name");
       var widgetMetaEl = document.getElementById("editor-kb-widget-meta");
+      var manageKeywordsLink = document.getElementById("editor-kb-manage-keywords");
       var embedSlot = document.getElementById("editor-kb-embed-slot");
       var embedPreview = document.getElementById("editor-kb-embed-preview");
       var kbChips = document.getElementById("editor-kb-chips");
+      var composeAttachments = document.getElementById("editor-compose-attachments");
       var variantHtml = document.getElementById("editor-variant-html");
       var htmlDrawer = document.getElementById("editor-html-drawer");
       var insertCta = document.getElementById("editor-kb-insert-cta");
-      var openHtmlBtn = document.getElementById("editor-kb-open-html");
       var reinsertLink = document.getElementById("editor-kb-reinsert-link");
-      var headerColorIn = document.getElementById("editor-kb-header-color");
-      var triggerColorIn = document.getElementById("editor-kb-trigger-color");
-      var radiusIn = document.getElementById("editor-kb-radius");
-      var radiusVal = document.getElementById("editor-kb-radius-val");
-      var widthIn = document.getElementById("editor-kb-width");
-      var marginTopIn = document.getElementById("editor-kb-margin-top");
-      var marginTopVal = document.getElementById("editor-kb-margin-top-val");
-      var marginBottomIn = document.getElementById("editor-kb-margin-bottom");
-      var marginBottomVal = document.getElementById("editor-kb-margin-bottom-val");
 
       var slots = [];
       var attachedWidget = null;
       var attachedRegistryKey = "";
-
-      var PRESETS = {
-        auto: M.KEYWORD_PRESETS.auto.map(function (k) {
-          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
-        }),
-        passive: M.KEYWORD_PRESETS.passive.map(function (k) {
-          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
-        })
+      var kbComposeAttachment = null;
+      var kbPlacement = "below-hero";
+      var kbStyleState = {
+        headerColor: "#1a5276",
+        triggerColor: "#1a5276",
+        radius: 8,
+        width: "full",
+        marginTop: 16,
+        marginBottom: 16
       };
+
+      function kbManageKeywordsUrl(registryKey) {
+        return "widgets.html#kb-keywords/" + (registryKey || "passive");
+      }
 
       function escapeAttr(str) {
         return String(str == null ? "" : str).replace(/"/g, "&quot;");
@@ -963,23 +935,49 @@
       }
 
       function syncKbPanelsVisibility() {
-        var attached = attachedWidget != null && variantHtml && variantHtml.value.includes("lander-kb-embed");
-        if (emptyWrap) emptyWrap.hidden = attached;
-        if (attachedWrap) attachedWrap.hidden = !attached;
-        if (kbChips) kbChips.hidden = !attached;
-        if (embedSlot && attached) embedSlot.classList.add("is-selected");
+        var hasWidget = attachedWidget != null || kbComposeAttachment != null;
+        var embedded = variantHtml && variantHtml.value.includes("lander-kb-embed");
+        if (emptyWrap) emptyWrap.hidden = hasWidget;
+        if (attachedWrap) attachedWrap.hidden = !hasWidget;
+        if (kbChips) kbChips.hidden = !hasWidget;
+        if (embedSlot && embedded) embedSlot.classList.add("is-selected");
       }
 
-      function getKbStyleProp(className, prop) {
-        if (!variantHtml) return null;
-        var html = variantHtml.value || "";
-        var ruleRe = new RegExp("\\." + className + "\\s*\\{([^}]*)\\}", "i");
-        var m = html.match(ruleRe);
-        if (!m) return null;
-        var propRe = new RegExp(prop.replace(/-/g, "\\-") + "\\s*:\\s*([^;]+)", "i");
-        var pm = m[1].match(propRe);
-        return pm ? pm[1].trim() : null;
+      function escapeHtmlLocal(str) {
+        return String(str == null ? "" : str)
+          .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       }
+
+      function showKbComposeAttachment(w, registryKey) {
+        if (!composeAttachments || !w) return;
+        composeAttachments.hidden = false;
+        composeAttachments.innerHTML =
+          '<div class="compose-attachment compose-attachment--kb" data-kb-compose-attach>' +
+            '<span class="compose-attachment__icon" aria-hidden="true">▣</span>' +
+            '<span class="compose-attachment__name">' + escapeHtmlLocal(w.widget_name) + "</span>" +
+            '<a class="compose-attachment__manage" href="' + kbManageKeywordsUrl(registryKey) + '" target="_blank" rel="noopener">Keywords</a>' +
+            '<button type="button" class="compose-attachment__remove" id="kb-compose-attach-remove" aria-label="Remove attachment">×</button>' +
+          "</div>";
+        var removeBtn = document.getElementById("kb-compose-attach-remove");
+        if (removeBtn) {
+          removeBtn.addEventListener("click", function () {
+            clearKbComposeAttachment();
+          });
+        }
+      }
+
+      function clearKbComposeAttachment() {
+        kbComposeAttachment = null;
+        if (composeAttachments) {
+          composeAttachments.innerHTML = "";
+          composeAttachments.hidden = true;
+        }
+        syncKbPanelsVisibility();
+      }
+
+      window.getKbComposeAttachment = function () {
+        return kbComposeAttachment;
+      };
 
       function patchKbStyleRules(rules) {
         if (!variantHtml) return;
@@ -1006,76 +1004,12 @@
         refreshEditorKbPreviewFromHtml();
       }
 
-      function hexFromCssColor(str) {
-        if (!str) return "#1a5276";
-        var s = str.trim();
-        if (s.indexOf("#") === 0 && s.length >= 4) return s.slice(0, 7);
-        var rgb = s.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
-        if (rgb) {
-          var h = function (n) { var v = parseInt(n, 10).toString(16); return v.length === 1 ? "0" + v : v; };
-          return "#" + h(rgb[1]) + h(rgb[2]) + h(rgb[3]);
-        }
-        return "#1a5276";
-      }
-
-      function parseMarginPx(val, fallback) {
-        if (!val) return fallback;
-        var m = String(val).match(/(\d+)/);
-        return m ? parseInt(m[1], 10) : fallback;
-      }
-
-      function syncStyleControlsFromHtml() {
-        if (!attachedWidget) return;
-        var headerBg = getKbStyleProp("lander-kb-modal__header", "background");
-        var triggerBg = getKbStyleProp("lander-kb-embed__trigger", "background");
-        var modalRadius = getKbStyleProp("lander-kb-modal", "border-radius");
-        var embedMargin = getKbStyleProp("lander-kb-embed", "margin");
-        var maxW = getKbStyleProp("lander-kb-embed", "max-width");
-        if (headerColorIn && headerBg) headerColorIn.value = hexFromCssColor(headerBg);
-        if (triggerColorIn && triggerBg) triggerColorIn.value = hexFromCssColor(triggerBg);
-        var radiusPx = parseMarginPx(modalRadius, 12);
-        if (radiusIn) {
-          radiusIn.value = String(Math.min(24, radiusPx));
-          if (radiusVal) radiusVal.textContent = radiusPx + "px";
-        }
-        if (widthIn) {
-          widthIn.value = maxW && maxW !== "none" && maxW.indexOf("320") >= 0 ? "centered" : "full";
-        }
-        var topPx = 16;
-        var bottomPx = 16;
-        if (embedMargin) {
-          var parts = embedMargin.replace(/px/g, "").split(/\s+/).filter(Boolean);
-          if (parts.length === 1) topPx = bottomPx = parseInt(parts[0], 10) || 16;
-          else if (parts.length >= 2) {
-            topPx = parseInt(parts[0], 10) || 16;
-            bottomPx = parseInt(parts[2] != null ? parts[2] : parts[1], 10) || 16;
-          }
-        }
-        var mt = getKbStyleProp("lander-kb-embed", "margin-top");
-        var mb = getKbStyleProp("lander-kb-embed", "margin-bottom");
-        if (mt) topPx = parseMarginPx(mt, topPx);
-        if (mb) bottomPx = parseMarginPx(mb, bottomPx);
-        if (marginTopIn) {
-          marginTopIn.value = String(topPx);
-          if (marginTopVal) marginTopVal.textContent = topPx + "px";
-        }
-        if (marginBottomIn) {
-          marginBottomIn.value = String(bottomPx);
-          if (marginBottomVal) marginBottomVal.textContent = bottomPx + "px";
-        }
-      }
-
-      function applyKbStylesFromControls() {
-        if (!attachedWidget) return;
-        var radius = radiusIn ? parseInt(radiusIn.value, 10) : 8;
-        var top = marginTopIn ? parseInt(marginTopIn.value, 10) : 16;
-        var bottom = marginBottomIn ? parseInt(marginBottomIn.value, 10) : 16;
-        var headerColor = headerColorIn ? headerColorIn.value : "#1a5276";
-        var triggerColor = triggerColorIn ? triggerColorIn.value : "#1a5276";
-        var centered = widthIn && widthIn.value === "centered";
-        if (radiusVal) radiusVal.textContent = radius + "px";
-        if (marginTopVal) marginTopVal.textContent = top + "px";
-        if (marginBottomVal) marginBottomVal.textContent = bottom + "px";
+      function applyKbStylesFromState() {
+        if (!attachedWidget && !kbComposeAttachment) return;
+        var top = kbStyleState.marginTop;
+        var bottom = kbStyleState.marginBottom;
+        var centered = kbStyleState.width === "centered";
+        var radius = kbStyleState.radius;
         patchKbStyleRules({
           "lander-kb-embed": {
             margin: centered ? top + "px auto " + bottom + "px" : top + "px 0 " + bottom + "px",
@@ -1083,14 +1017,14 @@
             width: centered ? "100%" : "auto"
           },
           "lander-kb-embed__trigger": {
-            background: triggerColor,
+            background: kbStyleState.triggerColor,
             "border-radius": radius + "px"
           },
           "lander-kb-modal": {
             "border-radius": radius + "px"
           },
           "lander-kb-modal__header": {
-            background: headerColor
+            background: kbStyleState.headerColor
           },
           "lander-kb-modal__question": {
             "border-radius": radius + "px"
@@ -1115,32 +1049,17 @@
             (adv ? adv.label : w.ad_provider_config.advertiser_id) +
             " · " + M.onKeywordCount(w.keywords) + " keywords";
         }
+        if (manageKeywordsLink) manageKeywordsLink.href = kbManageKeywordsUrl(attachedRegistryKey);
       }
 
-      function renderKeywordsTable() {
-        if (!tbody) return;
-        tbody.innerHTML = "";
-        slots.forEach(function (slot, i) {
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            "<td>" + (i + 1) + "</td>" +
-            '<td><input type="text" class="kb-in-question" data-idx="' + i + '" value="' + escapeAttr(slot.question) + '" /></td>' +
-            '<td class="col-keyword-term"><span class="mono">' + escapeAttr(slot.keyword_term || slot.keyword || "") + "</span></td>";
-          tbody.appendChild(tr);
-        });
-        if (countEl) countEl.textContent = slots.length + " reader question" + (slots.length === 1 ? "" : "s");
-        syncKbPanelsVisibility();
-      }
-
-      function setKeywordSlots(next, hintText) {
+      function setKeywordSlots(next) {
         slots = (next || []).slice(0, 12).map(function (s) {
           return {
             keyword_term: s.keyword_term || s.keyword || "",
             question: s.question || s.displayQuestion || ""
           };
         });
-        renderKeywordsTable();
-        if (hintEl && hintText) hintEl.textContent = hintText;
+        syncKbPanelsVisibility();
       }
 
       function syncReaderQuestionsToVariantHtml() {
@@ -1161,6 +1080,88 @@
 
       window.syncReaderQuestionsToVariantHtml = syncReaderQuestionsToVariantHtml;
 
+      function applyKbPlacementInPreview(placement) {
+        if (!embedSlot) return;
+        var frame = document.getElementById("mobile-frame");
+        if (!frame) return;
+        kbPlacement = placement || kbPlacement;
+        var hero = frame.querySelector(".preview-hero");
+        var trust = frame.querySelector(".preview-trust");
+        var features = frame.querySelectorAll(".feature-card");
+        var lastFeature = features.length ? features[features.length - 1] : null;
+        var cmpSlot = frame.querySelector(".editor-chrome-slot--cmp");
+        var anchor = null;
+        if (kbPlacement === "above-hero" && hero) anchor = hero;
+        else if (kbPlacement === "below-hero" && hero) anchor = hero.nextSibling;
+        else if (kbPlacement === "below-trust" && trust) anchor = trust.nextSibling;
+        else if (kbPlacement === "after-features" && lastFeature) anchor = lastFeature.nextSibling;
+        else if (kbPlacement === "above-footer" && cmpSlot) anchor = cmpSlot;
+        else if (hero) anchor = hero.nextSibling;
+        if (anchor) {
+          frame.insertBefore(embedSlot, anchor);
+        } else {
+          frame.appendChild(embedSlot);
+        }
+      }
+
+      function detectKbPlacement(text) {
+        var t = (text || "").toLowerCase();
+        if (/above.{0,12}hero|top of page|before hero/.test(t)) return "above-hero";
+        if (/after feature|below feature|after cards|feature card/.test(t)) return "after-features";
+        if (/above footer|before footer/.test(t)) return "above-footer";
+        if (/trust badge|below trust/.test(t)) return "below-trust";
+        if (/below cta|after cta|under cta/.test(t)) return "below-hero";
+        if (/below hero|under hero|after hero|place|put|add|insert/.test(t)) return "below-hero";
+        return null;
+      }
+
+      function parseKbStyleFromChat(text) {
+        var t = (text || "").toLowerCase();
+        var changed = false;
+        if (/dark green|forest green/.test(t)) {
+          kbStyleState.headerColor = "#1a5c2e";
+          kbStyleState.triggerColor = "#1a5c2e";
+          changed = true;
+        } else if (/green/.test(t)) {
+          kbStyleState.headerColor = "#1f7c41";
+          kbStyleState.triggerColor = "#1f7c41";
+          changed = true;
+        }
+        if (/round|corner|softer/.test(t)) {
+          kbStyleState.radius = 16;
+          changed = true;
+        }
+        if (/more spacing|more top|extra space/.test(t)) {
+          kbStyleState.marginTop = 24;
+          kbStyleState.marginBottom = 24;
+          changed = true;
+        }
+        if (/centered|narrow|320/.test(t)) {
+          kbStyleState.width = "centered";
+          changed = true;
+        }
+        if (/full width/.test(t)) {
+          kbStyleState.width = "full";
+          changed = true;
+        }
+        if (/modal|keyword|style|color|css|spacing|width/.test(t)) changed = true;
+        return changed;
+      }
+
+      function ensureKbEmbedded() {
+        if (!variantHtml || variantHtml.value.includes("lander-kb-embed")) return true;
+        var src = kbComposeAttachment || { widget: attachedWidget, trigger: "Explore reader questions", registryKey: attachedRegistryKey };
+        if (!src.widget) return false;
+        var block = M.buildVariantKbEmbedHtml(src.widget, src.trigger || src.widget.trigger);
+        variantHtml.value = (variantHtml.value || "") + block;
+        if (htmlDrawer) htmlDrawer.open = true;
+        syncReaderQuestionsToVariantHtml();
+        refreshEditorKbPreviewFromHtml();
+        applyKbStylesFromState();
+        if (kbComposeAttachment) kbComposeAttachment.placed = true;
+        return true;
+      }
+
       function refreshEditorKbPreviewFromHtml() {
         if (!embedPreview || !embedSlot) return;
         var html = variantHtml ? variantHtml.value || "" : "";
@@ -1169,15 +1170,13 @@
         if (!sectionMatch) {
           embedSlot.hidden = true;
           embedPreview.innerHTML = "";
-          attachedWidget = null;
-          attachedRegistryKey = "";
           syncKbPanelsVisibility();
           return;
         }
         embedSlot.hidden = false;
         embedPreview.innerHTML = (styleMatch ? styleMatch[0] : "") + sectionMatch[0];
+        applyKbPlacementInPreview(kbPlacement);
         syncKbPanelsVisibility();
-        syncStyleControlsFromHtml();
         if (window.nexusAlignEditorChromeRail) {
           requestAnimationFrame(window.nexusAlignEditorChromeRail);
         }
@@ -1185,55 +1184,67 @@
 
       window.refreshEditorKbPreviewFromHtml = refreshEditorKbPreviewFromHtml;
 
-      function parseSlotsFromVariantHtml() {
-        if (!variantHtml) return [];
-        var html = variantHtml.value || "";
-        var found = [];
-        var re = /<button[^>]*class="lander-kb-modal__question"[^>]*data-keyword-term="([^"]*)"[^>]*>([^<]*)</gi;
-        var m;
-        while ((m = re.exec(html)) !== null) {
-          found.push({ keyword_term: m[1], question: m[2] });
-        }
-        return found;
-      }
-
       window.onEditorKbAttached = function (registryKey, w) {
         attachedRegistryKey = registryKey || "";
         attachedWidget = w || null;
         if (w) renderWidgetCard(w);
         refreshEditorKbPreviewFromHtml();
-        syncStyleControlsFromHtml();
         var acc = document.getElementById("editor-keywords-acc");
         if (acc && !acc.open) acc.open = true;
       };
 
-      window.setKeywordSlotsFromWidget = function (next, hintText, registryKey, widget) {
+      window.setKeywordSlotsFromWidget = function (next, _hintText, registryKey, widget) {
         if (widget) window.onEditorKbAttached(registryKey, widget);
-        setKeywordSlots(next, hintText);
+        setKeywordSlots(next);
+      };
+
+      window.queueKbWidgetAttachment = function (registryKey, widget, trigger) {
+        kbComposeAttachment = {
+          registryKey: registryKey || "",
+          widget: widget,
+          trigger: trigger || widget.trigger || "Explore reader questions",
+          placed: false
+        };
+        showKbComposeAttachment(widget, registryKey);
+        var readerSlots = (widget.keywords || []).filter(function (k) { return k.status === "on"; }).map(function (k) {
+          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
+        });
+        setKeywordSlots(readerSlots);
+        onEditorKbAttached(registryKey, widget);
+        if (kbChips) kbChips.hidden = false;
+        if (typeof addBubble === "function") {
+          addBubble(
+            "Attached \"" + widget.widget_name + "\". Tell me where on the page to place it and how to style the modal — e.g. \"below the hero, dark green with rounded corners.\" To edit commercial keyword text, use Manage → Keywords.",
+            "ai"
+          );
+        }
+      };
+
+      window.maybePlaceAndStyleKbFromChat = function (promptText) {
+        if (!kbComposeAttachment && !attachedWidget) return false;
+        var placement = detectKbPlacement(promptText);
+        var styleChange = parseKbStyleFromChat(promptText);
+        if (!placement && !styleChange && kbComposeAttachment && !kbComposeAttachment.placed) return false;
+        if (!ensureKbEmbedded()) return false;
+        if (placement) applyKbPlacementInPreview(placement);
+        if (styleChange || variantHtml.value.includes("lander-kb-embed")) applyKbStylesFromState();
+        return placement || styleChange;
       };
 
       window.maybeApplyKbStyleFromChat = function (promptText) {
         if (!variantHtml || !variantHtml.value.includes("lander-kb-embed")) return false;
-        var t = (promptText || "").toLowerCase();
-        if (!/modal|keyword|green|corner|round|css|style|color|spacing|position/.test(t)) return false;
-        if (/green/.test(t)) {
-          if (headerColorIn) headerColorIn.value = "#1f7c41";
-          if (triggerColorIn) triggerColorIn.value = "#1f7c41";
-        }
-        if (/round|corner/.test(t) && radiusIn) radiusIn.value = "16";
-        applyKbStylesFromControls();
+        if (!parseKbStyleFromChat(promptText)) return false;
+        applyKbStylesFromState();
         return true;
       };
 
       window.maybeDetectKeywordsFromChat = function (promptText) {
         var t = (promptText || "").toLowerCase();
         var isKb = /keyword.?block|reader question|reader questions|sponsored link|keyword slot/.test(t);
-        var isAuto = /auto insurance|car insurance|compare.*quote|drivers save/.test(t);
-        var isPassive = /passive income|etf|investing|brokerage/.test(t);
-        if (!isKb && !isAuto && !isPassive) return;
-        if (attachedWidget) {
+        if (!isKb) return;
+        if (attachedWidget || kbComposeAttachment) {
           if (typeof addBubble === "function") {
-            addBubble("Keyword block attached — use Settings → Keyword blocks to edit questions and style.", "ai");
+            addBubble("Keyword block is attached — tell me placement and styling in chat, or Manage → Keywords for commercial keyword text.", "ai");
           }
           return;
         }
@@ -1244,32 +1255,11 @@
         if (acc && !acc.open) acc.open = true;
       };
 
-      if (tbody) {
-        tbody.addEventListener("input", function (e) {
-          var t = e.target;
-          if (!t.classList.contains("kb-in-question")) return;
-          var idx = parseInt(t.getAttribute("data-idx"), 10);
-          slots[idx].question = t.value;
-          syncReaderQuestionsToVariantHtml();
-        });
-      }
-
       if (variantHtml) {
         variantHtml.addEventListener("input", function () {
           refreshEditorKbPreviewFromHtml();
-          var parsed = parseSlotsFromVariantHtml();
-          if (parsed.length) {
-            slots = parsed;
-            renderKeywordsTable();
-          }
         });
       }
-
-      [headerColorIn, triggerColorIn, radiusIn, widthIn, marginTopIn, marginBottomIn].forEach(function (el) {
-        if (!el) return;
-        el.addEventListener("input", applyKbStylesFromControls);
-        el.addEventListener("change", applyKbStylesFromControls);
-      });
 
       if (embedSlot) {
         embedSlot.addEventListener("click", function () {
@@ -1284,17 +1274,11 @@
           if (typeof window.openInsertKbDialog === "function") window.openInsertKbDialog();
         });
       }
-      if (openHtmlBtn) openHtmlBtn.addEventListener("click", openEditorHtmlDrawer);
       if (reinsertLink) {
         reinsertLink.addEventListener("click", function (e) {
           e.preventDefault();
           if (typeof window.openInsertKbDialog === "function") window.openInsertKbDialog();
         });
-      }
-
-      var params = new URLSearchParams(window.location.search);
-      if (params.get("keywords") === "1" || params.get("format") === "keyword-block") {
-        setKeywordSlots(PRESETS.auto);
       }
 
       syncKbPanelsVisibility();
@@ -1588,27 +1572,29 @@
     (function () {
       var dialog = document.getElementById("dialog-insert-kb");
       var listEl = document.getElementById("insert-kb-list");
-      var previewEl = document.getElementById("insert-kb-preview");
       var previewEmpty = document.getElementById("insert-kb-preview-empty");
+      var summaryEl = document.getElementById("insert-kb-summary");
+      var summaryName = document.getElementById("insert-kb-summary-name");
+      var summaryMeta = document.getElementById("insert-kb-summary-meta");
+      var manageLink = document.getElementById("insert-kb-manage");
       var triggerInput = document.getElementById("insert-kb-trigger");
       var addBtn = document.getElementById("insert-kb-add");
-      var variantHtml = document.getElementById("editor-variant-html");
-      var htmlDrawer = document.querySelector(".editor-html-drawer");
       var toast = document.getElementById("editor-insert-toast");
       var M = window.KbWidgetModel;
       if (!dialog || !listEl || !M) return;
 
       var KB_WIDGETS = M.WIDGET_REGISTRY;
       var KB_ORDER = ["passive", "auto"];
-
       var selectedKbId = "";
-      var kbActivePreviewIdx = 0;
-      var kbPreviewFetchToken = 0;
 
       function escapeHtml(str) {
         return String(str == null ? "" : str)
           .replace(/&/g, "&amp;").replace(/</g, "&lt;")
           .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+
+      function kbManageUrl(id) {
+        return "widgets.html#kb-keywords/" + (id || "passive");
       }
 
       function showToast(text) {
@@ -1649,102 +1635,30 @@
         });
       }
 
-      function onKeywordsForPreview(w) {
-        return (w.keywords || []).filter(function (k) { return k.status === "on"; });
-      }
-
-      function renderKbPreviewBlocks(w) {
-        if (!previewEl || !w) return null;
-        var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
-        var serving = M.buildServingSync(w);
-        var meta =
-          '<dl class="insert-kb-meta">' +
-            '<div><dt>widget_id</dt><dd style="font-family:monospace;font-size:11px;">' + escapeHtml(w.widget_id) + '</dd></div>' +
-            '<div><dt>advertiser_id</dt><dd>' + escapeHtml(w.ad_provider_config.advertiser_id) + '</dd></div>' +
-            '<div><dt>slot_config</dt><dd>' + escapeHtml(w.slot_config) + '</dd></div>' +
-            '<div><dt>Serving sync keywords</dt><dd>' + (serving ? serving.keywords.length : 0) + ' rows (on only)</dd></div>' +
-            '<div><dt>max_ads_per_keyword</dt><dd>' + escapeHtml(String(w.max_ads_per_keyword != null ? w.max_ads_per_keyword : M.defaultMaxAdsPerKeyword())) + '</dd></div>' +
-            '<div><dt>Preview</dt><dd>Serving → CM live ads (slot[n]_ad[m])</dd></div>' +
-          '</dl>';
-        var blocks = "";
-        var onKeywords = onKeywordsForPreview(w);
-        onKeywords.forEach(function (kw, onIdx) {
-          var active = kbActivePreviewIdx === onIdx;
-          blocks +=
-            '<div class="kb-block' + (active ? " is-active" : "") + '" data-kb-idx="' + onIdx + '">' +
-              '<span class="kb-block__play">▶</span><span>' + escapeHtml(M.readerQuestionFor(kw.keyword_term)) + '</span>' +
-              '<small class="muted" style="display:block;font-size:10px;">' + escapeHtml(kw.display_term) + ' · ' + escapeHtml(kw.keyword_term) + '</small>' +
-            '</div>';
-          if (active) {
-            blocks += M.renderKeywordMetaPreviewHtml(kw, onIdx + 1);
-            blocks += '<div class="kb-ad-panel-wrap">' + M.renderServingAdPanelsHtml(null, { loading: true }) + '</div>';
-          }
-        });
-        previewEl.innerHTML =
-          meta +
-          '<div class="kb-modal-preview">' +
-            '<div class="kb-modal-preview__header">' +
-              '<div class="kb-modal-preview__brand">' + escapeHtml((adv ? adv.label : "WIDGET").toUpperCase()) + '</div>' +
-              '<h3 class="kb-modal-preview__title">What would you like to explore first?</h3>' +
-              '<span class="kb-modal-preview__close" aria-hidden="true">✕</span>' +
-            '</div>' +
-            '<div class="kb-modal-preview__body" id="insert-kb-preview-blocks">' +
-              '<p class="kb-preview-serving-hint">Select a question — Serving fetches up to max_ads CM ads per keyword.</p>' +
-              '<p class="kb-modal-preview__section">READER QUESTIONS</p>' +
-              blocks +
-            '</div>' +
-            '<div class="kb-modal-preview__dismiss">I\'ll continue reading on my own</div>' +
-          '</div>';
-        return previewEl.querySelector("#insert-kb-preview-blocks");
-      }
-
-      function fetchInsertKbPreviewAd(w) {
-        if (!w) return;
-        var onKeywords = onKeywordsForPreview(w);
-        var slot = onKeywords[kbActivePreviewIdx];
-        if (!slot) return;
-        var token = ++kbPreviewFetchToken;
-        var blocksEl = document.getElementById("insert-kb-preview-blocks");
-        var panelWrap = blocksEl ? blocksEl.querySelector(".kb-ad-panel-wrap") : null;
-        var maxAds = M.resolveMaxAdsForKeyword(w, slot);
-        if (panelWrap) panelWrap.innerHTML = M.renderServingAdPanelsHtml(null, { loading: true });
-        M.fetchServingPreviewAds({
-          keyword_term: slot.keyword_term,
-          slotIndex: kbActivePreviewIdx + 1,
-          maxAds: maxAds,
-          advertiser_id: w.ad_provider_config.advertiser_id,
-          delay: 380
-        }).then(function (ads) {
-          if (token !== kbPreviewFetchToken) return;
-          if (!panelWrap) return;
-          panelWrap.innerHTML = M.renderServingAdPanelsHtml(ads);
-        });
-      }
-
-      function renderKbPreview(w) {
-        if (!previewEl) return;
+      function renderKbSummary(w) {
+        if (!summaryEl || !summaryName || !summaryMeta) return;
         if (!w) {
-          previewEl.innerHTML = "";
-          if (previewEmpty) previewEl.appendChild(previewEmpty);
+          summaryEl.hidden = true;
+          if (previewEmpty) previewEmpty.hidden = false;
           return;
         }
-        var blocksEl = renderKbPreviewBlocks(w);
-        if (blocksEl) {
-          blocksEl.addEventListener("click", function (e) {
-            var block = e.target.closest(".kb-block");
-            if (!block) return;
-            kbActivePreviewIdx = parseInt(block.getAttribute("data-kb-idx"), 10);
-            selectKb(selectedKbId, true);
-          });
-        }
-        fetchInsertKbPreviewAd(w);
+        if (previewEmpty) previewEmpty.hidden = true;
+        summaryEl.hidden = false;
+        summaryName.textContent = w.widget_name;
+        var serving = M.buildServingSync(w);
+        summaryMeta.innerHTML =
+          '<div><dt>Advertiser</dt><dd>' + escapeHtml(M.ADVERTISERS[w.ad_provider_config.advertiser_id] ? M.ADVERTISERS[w.ad_provider_config.advertiser_id].label : w.ad_provider_config.advertiser_id) + '</dd></div>' +
+          '<div><dt>Active keywords</dt><dd>' + M.onKeywordCount(w.keywords) + '</dd></div>' +
+          '<div><dt>Slot config</dt><dd>' + escapeHtml(w.slot_config) + '</dd></div>' +
+          '<div><dt>Serving sync</dt><dd>' + (serving ? serving.keywords.length : 0) + ' rows</dd></div>' +
+          '<div><dt>max_ads_per_keyword</dt><dd>' + escapeHtml(String(w.max_ads_per_keyword != null ? w.max_ads_per_keyword : M.defaultMaxAdsPerKeyword())) + '</dd></div>';
       }
 
-      function selectKb(id, keepActiveIdx) {
+      function selectKb(id) {
         selectedKbId = id;
         var w = KB_WIDGETS[id];
-        if (!keepActiveIdx) kbActivePreviewIdx = 0;
-        renderKbPreview(w);
+        renderKbSummary(w);
+        if (manageLink) manageLink.href = kbManageUrl(id);
         listEl.querySelectorAll(".insert-form-pick").forEach(function (btn) {
           btn.classList.toggle("is-active", btn.getAttribute("data-kb-id") === id);
         });
@@ -1760,8 +1674,8 @@
       function openInsertKbDialog() {
         renderKbList();
         selectedKbId = "";
-        kbActivePreviewIdx = 0;
-        renderKbPreview(null);
+        renderKbSummary(null);
+        if (manageLink) manageLink.href = kbManageUrl("passive");
         if (triggerInput) { triggerInput.value = ""; triggerInput.disabled = true; }
         if (addBtn) addBtn.disabled = true;
         if (typeof dialog.showModal === "function") dialog.showModal();
@@ -1779,33 +1693,15 @@
           if (!selectedKbId) return;
           var w = KB_WIDGETS[selectedKbId];
           var trigger = triggerInput ? triggerInput.value.trim() : "";
-          var block = M.buildVariantKbEmbedHtml(w, trigger || w.trigger);
-          if (variantHtml) {
-            variantHtml.value = (variantHtml.value || "") + block;
-            if (htmlDrawer) htmlDrawer.open = true;
-          }
-          var readerSlots = w.keywords.filter(function (k) { return k.status === "on"; }).map(function (k) {
-            return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
-          });
-          if (typeof window.setKeywordSlotsFromWidget === "function") {
-            window.setKeywordSlotsFromWidget(
-              readerSlots,
-              readerSlots.length + " reader questions from \"" + w.widget_name + "\". Step 2: edit below. Step 3: style via chat or Variant HTML.",
-              selectedKbId,
-              w
-            );
-          }
-          if (typeof window.refreshEditorKbPreviewFromHtml === "function") {
-            window.refreshEditorKbPreviewFromHtml();
+          if (typeof window.queueKbWidgetAttachment === "function") {
+            window.queueKbWidgetAttachment(selectedKbId, w, trigger || w.trigger);
           }
           dialog.close();
-          var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
-          showToast("Added keyword block · next: edit reader questions or CSS");
-          if (typeof addBubble === "function") {
-            addBubble(
-              "Attached \"" + w.widget_name + "\". Reader questions are in Settings → Keyword blocks (step 2). Modal CSS is in Variant HTML or ask me to style it (step 3).",
-              "ai"
-            );
+          showToast("Attached \"" + w.widget_name + "\" — tell Nexus where to place it");
+          var inputEl = document.getElementById("editor-input");
+          if (inputEl) {
+            inputEl.focus();
+            inputEl.placeholder = "e.g. below the hero, dark green modal…";
           }
         });
       }
