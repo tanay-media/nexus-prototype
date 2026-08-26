@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Editor · nexus</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="keyword-blocks.css" />
+  <link rel="stylesheet" href="keyword-blocks.css?v=20260826e" />
 </head>
 <body class="editor-open">
   <div class="editor-shell" data-editor-domain="offers.acme.com">
@@ -79,6 +79,12 @@
           </div>
         </div>
         <div class="editor-compose">
+          <div class="suggestion-chips suggestion-chips--kb" id="editor-kb-chips" hidden>
+            <button type="button" data-prompt="Make the keyword modal header and trigger button dark green with softer rounded corners">Style modal green</button>
+            <button type="button" data-prompt="Change keyword modal title to something shorter and friendlier">Edit modal title</button>
+            <button type="button" data-prompt="Make reader question cards larger with more padding and 16px rounded corners">Round question cards</button>
+            <button type="button" data-kb-action="open-html">Open variant HTML</button>
+          </div>
           <div class="suggestion-chips">
             <button type="button" data-prompt="Give me a stronger, punchier headline">Stronger headline</button>
             <button type="button" data-prompt="Change the CTA copy to something more action-oriented">Change CTA</button>
@@ -155,6 +161,11 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </button>
             </div>
+            <details class="editor-html-drawer" id="editor-html-drawer">
+              <summary>Variant HTML</summary>
+              <p class="editor-html-drawer__hint muted">Keyword block trigger, reader questions, modal title, and all CSS live here. Commercial keywords stay in <a href="widgets.html" target="_blank" rel="noopener">Widgets</a>.</p>
+              <textarea id="editor-variant-html" class="code-editor" rows="10" spellcheck="false" placeholder="<!-- Keyword block embed and &lt;style&gt; block appear here after you insert from + → Keyword blocks -->"></textarea>
+            </details>
           </div>
         </div>
       </aside>
@@ -174,6 +185,11 @@
               Limited time. Shop the biggest deals of the season before they're gone.
             </p>
             <button class="preview-cta" id="preview-cta">Shop Now →</button>
+          </section>
+
+          <section class="editor-kb-preview-slot" id="editor-kb-embed-slot" hidden>
+            <p class="editor-kb-preview-slot__label">Keyword block on this variant</p>
+            <div id="editor-kb-embed-preview"></div>
           </section>
 
           <div class="preview-trust">
@@ -286,25 +302,55 @@
 
           <details class="settings-acc" id="editor-keywords-acc" open>
             <summary class="settings-acc__head">
-              <span>Keywords</span>
+              <span>Keyword blocks</span>
               <svg class="settings-acc__chev" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="settings-acc__body">
-              <p class="settings-acc__hint muted" id="editor-keywords-hint">Attach a keyword-blocks widget via <strong>+</strong> below, or let AI fill slots from chat. CSS and layout styling stay in variant HTML.</p>
-              <p class="settings-acc__hint muted" id="editor-keywords-empty" style="padding:12px;background:#fafafa;border-radius:8px;border:1px dashed #ddd;">No keywords yet — describe a keyword-block lander in chat (e.g. “reader questions for auto insurance savings”).</p>
+              <ol class="editor-kb-flow" id="editor-kb-flow" aria-label="Keyword block setup steps">
+                <li class="editor-kb-flow__step is-active" data-step="attach" id="editor-kb-step-attach">
+                  <span class="editor-kb-flow__num">1</span>
+                  <div class="editor-kb-flow__body">
+                    <strong>Add keyword block</strong>
+                    <p>Tap <strong>+</strong> below the chat → <strong>Keyword blocks</strong> → pick a library widget → <strong>Add to this variant</strong>.</p>
+                    <button type="button" class="btn btn--sm" id="editor-kb-insert-cta">Insert keyword blocks</button>
+                  </div>
+                </li>
+                <li class="editor-kb-flow__step" data-step="questions" id="editor-kb-step-questions">
+                  <span class="editor-kb-flow__num">2</span>
+                  <div class="editor-kb-flow__body">
+                    <strong>Edit reader questions</strong>
+                    <p>Change the questions readers see in the modal. Commercial <code>keyword_term</code> values come from the widget library.</p>
+                  </div>
+                </li>
+                <li class="editor-kb-flow__step" data-step="css" id="editor-kb-step-css">
+                  <span class="editor-kb-flow__num">3</span>
+                  <div class="editor-kb-flow__body">
+                    <strong>Style modal &amp; CSS</strong>
+                    <p>Ask Nexus AI (e.g. “make modal green”) or edit the <code>&lt;style&gt;</code> block in variant HTML.</p>
+                    <button type="button" class="btn btn--sm btn--ghost" id="editor-kb-open-html">Open variant HTML</button>
+                  </div>
+                </li>
+              </ol>
+              <p class="settings-acc__hint muted" id="editor-keywords-hint">No keyword block on this variant yet. Use step 1 or describe a keyword-block lander in chat.</p>
+              <div class="editor-kb-widget-card" id="editor-keywords-widget-card" hidden>
+                <p class="editor-kb-widget-card__name" id="editor-kb-widget-name"></p>
+                <p class="editor-kb-widget-card__meta" id="editor-kb-widget-meta"></p>
+                <div class="editor-kb-widget-card__links">
+                  <a href="widgets.html" target="_blank" rel="noopener">Edit keywords in Widgets →</a>
+                  <a href="#" id="editor-kb-reinsert-link">Change widget</a>
+                </div>
+              </div>
+              <p class="settings-acc__hint muted" id="editor-keywords-empty" style="padding:12px;background:#fafafa;border-radius:8px;border:1px dashed #ddd;">Reader questions appear here after you attach a keyword block.</p>
               <div id="editor-keywords-slots-wrap" hidden>
                 <div class="table-scroll" style="margin-bottom:10px;">
-                  <table class="kb-slots-table" id="editor-keywords-table">
+                  <table class="kb-slots-table editor-kb-slots-table" id="editor-keywords-table">
                     <thead>
-                      <tr><th class="col-slot">#</th><th class="col-keyword-term">keyword_term</th><th class="col-display-term">Reader question (variant HTML)</th><th class="col-del"></th></tr>
+                      <tr><th class="col-slot">#</th><th class="col-display-term">Reader question</th><th class="col-keyword-term">Keyword (from widget)</th></tr>
                     </thead>
                     <tbody id="editor-keywords-tbody"></tbody>
                   </table>
                 </div>
-                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                  <button type="button" class="btn" id="editor-keywords-add" style="font-size:12px;padding:4px 12px;">+ Add slot</button>
-                  <span class="muted" id="editor-keywords-count" style="font-size:11px;">0 / 12 slots</span>
-                </div>
+                <span class="muted" id="editor-keywords-count" style="font-size:11px;">0 questions</span>
               </div>
             </div>
           </details>
@@ -358,7 +404,7 @@
       <header class="modal__header">
         <div>
           <h2 class="modal__title" id="insert-kb-title">Insert keyword blocks</h2>
-          <p class="modal__hint">Pick a workspace widget — advertiser, deal, campaign &amp; slots come from the library. Styling edits stay in variant HTML.</p>
+          <p class="modal__hint">Pick a workspace widget. Keywords and ads come from the library; reader questions and modal CSS stay in this variant’s HTML.</p>
         </div>
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">✕</button>
       </header>
@@ -715,7 +761,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js"></script>
+  <script src="kb-widget-model.js?v=20260826e"></script>
   <script src="integrations-catalog.js"></script>
   <script src="macro-enriched-lander-urls.js"></script>
   <script src="site-shell.js"></script>
@@ -812,13 +858,19 @@
 
     function submitPrompt(text) {
       if (!text || !text.trim()) return;
-      addBubble(text.trim(), "user");
+      var trimmed = text.trim();
+      addBubble(trimmed, "user");
       input.value = "";
       setTimeout(function () {
+        var kbStyled = typeof maybeApplyKbStyleFromChat === "function" && maybeApplyKbStyleFromChat(trimmed);
         if (typeof maybeDetectKeywordsFromChat === "function") {
-          maybeDetectKeywordsFromChat(text.trim());
+          maybeDetectKeywordsFromChat(trimmed);
         }
-        addBubble("Applied by Opus 4.7 — preview updated. Want another pass?", "ai");
+        if (kbStyled) {
+          addBubble("Updated keyword block CSS in variant HTML — check the mobile preview and Variant HTML drawer.", "ai");
+        } else {
+          addBubble("Applied by Opus 4.7 — preview updated. Want another pass?", "ai");
+        }
       }, 450);
     }
 
@@ -827,28 +879,112 @@
       if (e.key === "Enter") { e.preventDefault(); submitPrompt(input.value); }
     });
     document.querySelectorAll(".suggestion-chips button").forEach(function (c) {
-      c.addEventListener("click", function () { submitPrompt(c.getAttribute("data-prompt")); });
+      c.addEventListener("click", function () {
+        if (c.getAttribute("data-kb-action") === "open-html") {
+          if (typeof openEditorHtmlDrawer === "function") openEditorHtmlDrawer();
+          return;
+        }
+        var p = c.getAttribute("data-prompt");
+        if (p) submitPrompt(p);
+      });
     });
 
-    // ---- Keywords panel (variant-level; AI fill from chat — not workspace widget library)
+    // ---- Keyword block flow: attach → reader questions → CSS (variant editor)
     (function () {
+      var M = window.KbWidgetModel;
+      if (!M) return;
+
       var emptyEl = document.getElementById("editor-keywords-empty");
       var wrapEl = document.getElementById("editor-keywords-slots-wrap");
       var tbody = document.getElementById("editor-keywords-tbody");
       var countEl = document.getElementById("editor-keywords-count");
-      var addBtn = document.getElementById("editor-keywords-add");
       var hintEl = document.getElementById("editor-keywords-hint");
-      var slots = [];
-
-      var M = window.KbWidgetModel;
-      var PRESETS = {
-        auto: M ? M.KEYWORD_PRESETS.auto.map(function (k) {
-          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
-        }) : [],
-        passive: M ? M.KEYWORD_PRESETS.passive.map(function (k) {
-          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
-        }) : []
+      var widgetCard = document.getElementById("editor-keywords-widget-card");
+      var widgetNameEl = document.getElementById("editor-kb-widget-name");
+      var widgetMetaEl = document.getElementById("editor-kb-widget-meta");
+      var embedSlot = document.getElementById("editor-kb-embed-slot");
+      var embedPreview = document.getElementById("editor-kb-embed-preview");
+      var kbChips = document.getElementById("editor-kb-chips");
+      var variantHtml = document.getElementById("editor-variant-html");
+      var htmlDrawer = document.getElementById("editor-html-drawer");
+      var insertCta = document.getElementById("editor-kb-insert-cta");
+      var openHtmlBtn = document.getElementById("editor-kb-open-html");
+      var reinsertLink = document.getElementById("editor-kb-reinsert-link");
+      var flowSteps = {
+        attach: document.getElementById("editor-kb-step-attach"),
+        questions: document.getElementById("editor-kb-step-questions"),
+        css: document.getElementById("editor-kb-step-css")
       };
+
+      var slots = [];
+      var attachedWidget = null;
+      var attachedRegistryKey = "";
+      var cssEdited = false;
+
+      var PRESETS = {
+        auto: M.KEYWORD_PRESETS.auto.map(function (k) {
+          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
+        }),
+        passive: M.KEYWORD_PRESETS.passive.map(function (k) {
+          return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
+        })
+      };
+
+      function escapeAttr(str) {
+        return String(str == null ? "" : str).replace(/"/g, "&quot;");
+      }
+
+      function escapeRegex(str) {
+        return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+
+      window.openEditorHtmlDrawer = function () {
+        if (htmlDrawer) {
+          htmlDrawer.open = true;
+          htmlDrawer.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+        if (variantHtml) variantHtml.focus();
+        cssEdited = true;
+        updateEditorKbFlowSteps();
+      };
+
+      function updateEditorKbFlowSteps() {
+        var attached = attachedWidget != null;
+        Object.keys(flowSteps).forEach(function (key) {
+          var el = flowSteps[key];
+          if (!el) return;
+          el.classList.remove("is-done", "is-active");
+        });
+        if (!attached) {
+          if (flowSteps.attach) flowSteps.attach.classList.add("is-active");
+          return;
+        }
+        if (flowSteps.attach) flowSteps.attach.classList.add("is-done");
+        if (flowSteps.questions) {
+          flowSteps.questions.classList.add(slots.length ? "is-done" : "is-active");
+        }
+        if (flowSteps.css) {
+          if (cssEdited || (htmlDrawer && htmlDrawer.open)) {
+            flowSteps.css.classList.add("is-done");
+          } else {
+            flowSteps.css.classList.add("is-active");
+          }
+        }
+      }
+
+      window.updateEditorKbFlowSteps = updateEditorKbFlowSteps;
+
+      function renderWidgetCard(w) {
+        if (!widgetCard || !w) return;
+        var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
+        if (widgetNameEl) widgetNameEl.textContent = w.widget_name;
+        if (widgetMetaEl) {
+          widgetMetaEl.textContent =
+            (adv ? adv.label : w.ad_provider_config.advertiser_id) +
+            " · " + M.onKeywordCount(w.keywords) + " active keywords · widget_id " + w.widget_id;
+        }
+        widgetCard.hidden = false;
+      }
 
       function renderKeywordsTable() {
         if (!tbody) return;
@@ -857,17 +993,26 @@
           var tr = document.createElement("tr");
           tr.innerHTML =
             "<td>" + (i + 1) + "</td>" +
-            '<td><input type="text" class="kb-in-keyword-term" data-idx="' + i + '" value="' + String(slot.keyword_term || slot.keyword || "").replace(/"/g, "&quot;") + '" /></td>' +
-            '<td><input type="text" class="kb-in-question" data-idx="' + i + '" value="' + String(slot.question).replace(/"/g, "&quot;") + '" /></td>' +
-            '<td><button type="button" class="kb-slot-del" data-idx="' + i + '" title="Remove">✕</button></td>';
+            '<td><input type="text" class="kb-in-question" data-idx="' + i + '" value="' + escapeAttr(slot.question) + '" /></td>' +
+            '<td class="col-keyword-term"><span class="mono">' + escapeAttr(slot.keyword_term || slot.keyword || "") + "</span></td>";
           tbody.appendChild(tr);
         });
         var has = slots.length > 0;
         if (emptyEl) emptyEl.hidden = has;
         if (wrapEl) wrapEl.hidden = !has;
-        if (countEl) countEl.textContent = slots.length + " / 12 slots";
-        if (addBtn) addBtn.disabled = slots.length >= 12;
-        if (hintEl && has) hintEl.textContent = "AI detected " + slots.length + " keyword slot(s). Edit below or add more (max 12).";
+        if (countEl) countEl.textContent = slots.length + " reader question" + (slots.length === 1 ? "" : "s");
+        if (hintEl) {
+          if (has && attachedWidget) {
+            hintEl.textContent = "Edit reader questions below. To change commercial keywords, use Widgets library.";
+            hintEl.hidden = false;
+          } else if (!has) {
+            hintEl.hidden = false;
+          } else {
+            hintEl.hidden = true;
+          }
+        }
+        if (kbChips) kbChips.hidden = !attachedWidget;
+        updateEditorKbFlowSteps();
       }
 
       function setKeywordSlots(next, hintText) {
@@ -879,15 +1024,123 @@
         });
         renderKeywordsTable();
         if (hintEl && hintText) hintEl.textContent = hintText;
-        else if (hintEl && slots.length) {
-          hintEl.textContent = slots.length + " keyword slot(s). Edit copy below; CSS/styling in variant HTML.";
+      }
+
+      function syncReaderQuestionsToVariantHtml() {
+        if (!variantHtml || !slots.length) return;
+        var html = variantHtml.value || "";
+        if (!html.includes("lander-kb-embed")) return;
+        slots.forEach(function (slot) {
+          if (!slot.keyword_term) return;
+          var term = escapeRegex(slot.keyword_term);
+          html = html.replace(
+            new RegExp("(<button[^>]*data-keyword-term=\"" + term + "\"[^>]*>)([^<]*)(</button>)", "i"),
+            "$1" + slot.question.replace(/</g, "") + "$3"
+          );
+        });
+        variantHtml.value = html;
+        refreshEditorKbPreviewFromHtml();
+        updateEditorKbFlowSteps();
+      }
+
+      window.syncReaderQuestionsToVariantHtml = syncReaderQuestionsToVariantHtml;
+
+      function refreshEditorKbPreviewFromHtml() {
+        if (!embedPreview || !embedSlot) return;
+        var html = variantHtml ? variantHtml.value || "" : "";
+        var styleMatch = html.match(/<style[^>]*class="lander-kb-styles"[^>]*>[\s\S]*?<\/style>/i);
+        var sectionMatch = html.match(/<section[^>]*class="lander-kb-embed"[\s\S]*?<\/section>/i);
+        if (!sectionMatch) {
+          embedSlot.hidden = true;
+          embedPreview.innerHTML = "";
+          attachedWidget = null;
+          attachedRegistryKey = "";
+          if (widgetCard) widgetCard.hidden = true;
+          if (kbChips) kbChips.hidden = true;
+          updateEditorKbFlowSteps();
+          return;
+        }
+        embedSlot.hidden = false;
+        embedPreview.innerHTML = (styleMatch ? styleMatch[0] : "") + sectionMatch[0];
+        if (window.nexusAlignEditorChromeRail) {
+          requestAnimationFrame(window.nexusAlignEditorChromeRail);
         }
       }
 
-      window.setKeywordSlotsFromWidget = function (next, hintText) {
-        setKeywordSlots(next, hintText);
+      window.refreshEditorKbPreviewFromHtml = refreshEditorKbPreviewFromHtml;
+
+      function parseSlotsFromVariantHtml() {
+        if (!variantHtml) return [];
+        var html = variantHtml.value || "";
+        var found = [];
+        var re = /<button[^>]*class="lander-kb-modal__question"[^>]*data-keyword-term="([^"]*)"[^>]*>([^<]*)</gi;
+        var m;
+        while ((m = re.exec(html)) !== null) {
+          found.push({ keyword_term: m[1], question: m[2] });
+        }
+        return found;
+      }
+
+      window.onEditorKbAttached = function (registryKey, w) {
+        attachedRegistryKey = registryKey || "";
+        attachedWidget = w || null;
+        cssEdited = false;
+        if (w) renderWidgetCard(w);
+        refreshEditorKbPreviewFromHtml();
         var acc = document.getElementById("editor-keywords-acc");
         if (acc && !acc.open) acc.open = true;
+        updateEditorKbFlowSteps();
+      };
+
+      window.setKeywordSlotsFromWidget = function (next, hintText, registryKey, widget) {
+        if (widget) window.onEditorKbAttached(registryKey, widget);
+        setKeywordSlots(next, hintText);
+      };
+
+      window.maybeApplyKbStyleFromChat = function (promptText) {
+        if (!variantHtml || !variantHtml.value.includes("lander-kb-embed")) return false;
+        var t = (promptText || "").toLowerCase();
+        if (!/modal|keyword|reader question|green|corner|round|css|style|color|padding|header|trigger/.test(t)) return false;
+        var html = variantHtml.value;
+        var changed = false;
+
+        if (/green/.test(t)) {
+          html = html.replace(
+            /\.lander-kb-modal__header\s*\{[^}]*\}/,
+            ".lander-kb-modal__header { background: #1f7c41; color: #fff; padding: 12px 14px; }"
+          );
+          html = html.replace(
+            /\.lander-kb-embed__trigger\s*\{[^}]*\}/,
+            ".lander-kb-embed__trigger { display: block; width: 100%; padding: 12px 16px; background: #1f7c41; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }"
+          );
+          changed = true;
+        }
+        if (/round|corner/.test(t)) {
+          html = html.replace(/\.lander-kb-modal\s*\{[^}]*\}/, ".lander-kb-modal { border-radius: 16px; border: 1px solid #e0e0e0; overflow: hidden; margin-top: 8px; font-family: Arial, sans-serif; }");
+          html = html.replace(/border-radius:\s*\d+px/g, "border-radius: 16px");
+          changed = true;
+        }
+        if (/padding|larger|bigger/.test(t) && /question|card/.test(t)) {
+          html = html.replace(
+            /\.lander-kb-modal__question\s*\{[^}]*\}/,
+            ".lander-kb-modal__question { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 8px; background: #fff; border: 1px solid #ddd; border-radius: 16px; font-size: 14px; line-height: 1.4; cursor: pointer; }"
+          );
+          changed = true;
+        }
+        if (/title|friendlier|shorter/.test(t) && /modal|keyword/.test(t)) {
+          html = html.replace(
+            /(<h3 class="lander-kb-modal__title">)([^<]*)(<\/h3>)/i,
+            "$1What interests you today?$3"
+          );
+          changed = true;
+        }
+
+        if (!changed) return false;
+        variantHtml.value = html;
+        cssEdited = true;
+        refreshEditorKbPreviewFromHtml();
+        updateEditorKbFlowSteps();
+        return true;
       };
 
       window.maybeDetectKeywordsFromChat = function (promptText) {
@@ -896,11 +1149,17 @@
         var isAuto = /auto insurance|car insurance|compare.*quote|drivers save/.test(t);
         var isPassive = /passive income|etf|investing|brokerage/.test(t);
         if (!isKb && !isAuto && !isPassive) return;
+        if (attachedWidget) {
+          if (typeof addBubble === "function") {
+            addBubble("Keyword block already attached — edit reader questions in Settings → Keyword blocks, or ask me to style the modal.", "ai");
+          }
+          return;
+        }
         if (isAuto) setKeywordSlots(PRESETS.auto);
         else if (isPassive) setKeywordSlots(PRESETS.passive);
         else setKeywordSlots(PRESETS.passive.slice(0, 3));
         if (typeof addBubble === "function") {
-          addBubble("Detected keyword-block lander — filled " + slots.length + " slots in Settings → Keywords (below Call to Action).", "ai");
+          addBubble("Detected keyword-block intent — use + → Keyword blocks to attach a widget, or I can fill sample reader questions in Settings.", "ai");
         }
         var acc = document.getElementById("editor-keywords-acc");
         if (acc && !acc.open) acc.open = true;
@@ -909,26 +1168,36 @@
       if (tbody) {
         tbody.addEventListener("input", function (e) {
           var t = e.target;
-          if (!t.classList.contains("kb-in-keyword-term") && !t.classList.contains("kb-in-question")) return;
+          if (!t.classList.contains("kb-in-question")) return;
           var idx = parseInt(t.getAttribute("data-idx"), 10);
-          if (t.classList.contains("kb-in-keyword-term")) slots[idx].keyword_term = t.value;
-          else slots[idx].question = t.value;
-        });
-        tbody.addEventListener("click", function (e) {
-          var del = e.target.closest(".kb-slot-del");
-          if (!del) return;
-          var idx = parseInt(del.getAttribute("data-idx"), 10);
-          if (slots.length <= 1) return;
-          slots.splice(idx, 1);
-          renderKeywordsTable();
+          slots[idx].question = t.value;
+          syncReaderQuestionsToVariantHtml();
         });
       }
 
-      if (addBtn) {
-        addBtn.addEventListener("click", function () {
-          if (slots.length >= 12) return;
-          slots.push({ keyword_term: "new keyword " + (slots.length + 1), question: "New reader question?" });
-          renderKeywordsTable();
+      if (variantHtml) {
+        variantHtml.addEventListener("input", function () {
+          refreshEditorKbPreviewFromHtml();
+          var parsed = parseSlotsFromVariantHtml();
+          if (parsed.length) {
+            slots = parsed;
+            renderKeywordsTable();
+          }
+          if (variantHtml.value.includes("lander-kb-styles")) cssEdited = true;
+          updateEditorKbFlowSteps();
+        });
+      }
+
+      if (insertCta) {
+        insertCta.addEventListener("click", function () {
+          if (typeof window.openInsertKbDialog === "function") window.openInsertKbDialog();
+        });
+      }
+      if (openHtmlBtn) openHtmlBtn.addEventListener("click", openEditorHtmlDrawer);
+      if (reinsertLink) {
+        reinsertLink.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (typeof window.openInsertKbDialog === "function") window.openInsertKbDialog();
         });
       }
 
@@ -936,6 +1205,8 @@
       if (params.get("keywords") === "1" || params.get("format") === "keyword-block") {
         setKeywordSlots(PRESETS.auto);
       }
+
+      updateEditorKbFlowSteps();
     })();
 
     // ---- Insert flow: + opens menu → "Forms" opens dialog with live preview → Add to this variant
@@ -1417,31 +1688,31 @@
           if (!selectedKbId) return;
           var w = KB_WIDGETS[selectedKbId];
           var trigger = triggerInput ? triggerInput.value.trim() : "";
-          var triggerEsc = escapeHtml(trigger || w.trigger);
-          var block =
-            "\n<!-- nexus: keyword_block (" + escapeHtml(w.widget_name) + ") · " + w.keywords.length + " keywords -->\n" +
-            '<section class="lander-kb-embed" data-widget-id="' + escapeHtml(w.widget_id) + '" data-lander-embed="keyword-block">\n' +
-            '  <button type="button" class="lander-kb-embed__trigger">' + triggerEsc + '</button>\n' +
-            "</section>\n";
+          var block = M.buildVariantKbEmbedHtml(w, trigger || w.trigger);
           if (variantHtml) {
             variantHtml.value = (variantHtml.value || "") + block;
             if (htmlDrawer) htmlDrawer.open = true;
           }
+          var readerSlots = w.keywords.filter(function (k) { return k.status === "on"; }).map(function (k) {
+            return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
+          });
           if (typeof window.setKeywordSlotsFromWidget === "function") {
-            var readerSlots = w.keywords.filter(function (k) { return k.status === "on"; }).map(function (k) {
-              return { keyword_term: k.keyword_term, question: M.readerQuestionFor(k.keyword_term) };
-            });
             window.setKeywordSlotsFromWidget(
               readerSlots,
-              readerSlots.length + " keywords from widget \"" + w.widget_name + "\". Reader questions below are variant HTML only."
+              readerSlots.length + " reader questions from \"" + w.widget_name + "\". Step 2: edit below. Step 3: style via chat or Variant HTML.",
+              selectedKbId,
+              w
             );
+          }
+          if (typeof window.refreshEditorKbPreviewFromHtml === "function") {
+            window.refreshEditorKbPreviewFromHtml();
           }
           dialog.close();
           var adv = M.ADVERTISERS[w.ad_provider_config.advertiser_id];
-          showToast("Added keyword block · " + (adv ? adv.label : w.ad_provider_config.advertiser_id));
+          showToast("Added keyword block · next: edit reader questions or CSS");
           if (typeof addBubble === "function") {
             addBubble(
-              "Attached keyword_block widget \"" + w.widget_name + "\" (widget_id " + w.widget_id + "). Base stores KeywordBlockWidget; Serving gets KeywordBlockServingSync on sync.",
+              "Attached \"" + w.widget_name + "\". Reader questions are in Settings → Keyword blocks (step 2). Modal CSS is in Variant HTML or ask me to style it (step 3).",
               "ai"
             );
           }

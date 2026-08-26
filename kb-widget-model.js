@@ -392,6 +392,48 @@
     return READER_QUESTIONS[keyword_term] || "Reader question in variant HTML";
   }
 
+  /** Default variant HTML scaffold: trigger, modal shell, reader questions, and editable CSS block. */
+  function buildVariantKbEmbedHtml(widget, triggerText) {
+    var adv = ADVERTISERS[widget.ad_provider_config.advertiser_id];
+    var brand = adv ? adv.label : "SPONSORED";
+    var trigger = triggerText || widget.trigger || "Explore reader questions";
+    var onKw = (widget.keywords || []).filter(function (k) { return k.status === "on"; });
+    var questionsHtml = onKw.map(function (kw, i) {
+      var q = readerQuestionFor(kw.keyword_term);
+      return (
+        '      <button type="button" class="lander-kb-modal__question" data-keyword-term="' +
+        escapeHtml(kw.keyword_term) + '" data-slot="' + (i + 1) + '">' + escapeHtml(q) + "</button>"
+      );
+    }).join("\n");
+    return (
+      "\n<!-- nexus: keyword_block (" + escapeHtml(widget.widget_name) + ") · widget_id " + widget.widget_id + " -->\n" +
+      "<style class=\"lander-kb-styles\">\n" +
+      "/* Keyword block — edit modal colors, corners, spacing here or ask Nexus AI */\n" +
+      ".lander-kb-embed { margin: 1rem 0; }\n" +
+      ".lander-kb-embed__trigger { display: block; width: 100%; padding: 12px 16px; background: #1a5276; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }\n" +
+      ".lander-kb-modal { border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; margin-top: 8px; font-family: Arial, sans-serif; }\n" +
+      ".lander-kb-modal__header { background: #1a5276; color: #fff; padding: 12px 14px; }\n" +
+      ".lander-kb-modal__brand { font-size: 10px; letter-spacing: 0.06em; opacity: 0.9; }\n" +
+      ".lander-kb-modal__title { font-size: 14px; margin: 4px 0 0; font-weight: 700; }\n" +
+      ".lander-kb-modal__body { padding: 10px; background: #fafafa; }\n" +
+      ".lander-kb-modal__question { display: block; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 6px; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; line-height: 1.35; cursor: pointer; }\n" +
+      ".lander-kb-modal__question:last-child { margin-bottom: 0; }\n" +
+      "</style>\n" +
+      "<section class=\"lander-kb-embed\" data-widget-id=\"" + escapeHtml(widget.widget_id) + "\" data-lander-embed=\"keyword-block\">\n" +
+      "  <button type=\"button\" class=\"lander-kb-embed__trigger\">" + escapeHtml(trigger) + "</button>\n" +
+      "  <div class=\"lander-kb-modal\" data-kb-modal>\n" +
+      "    <div class=\"lander-kb-modal__header\">\n" +
+      "      <div class=\"lander-kb-modal__brand\">" + escapeHtml(brand.toUpperCase()) + "</div>\n" +
+      "      <h3 class=\"lander-kb-modal__title\">What would you like to explore first?</h3>\n" +
+      "    </div>\n" +
+      "    <div class=\"lander-kb-modal__body\">\n" +
+      questionsHtml + "\n" +
+      "    </div>\n" +
+      "  </div>\n" +
+      "</section>\n"
+    );
+  }
+
   function onKeywordCount(keywords) {
     return (keywords || []).filter(function (k) { return k.status === "on"; }).length;
   }
@@ -419,6 +461,7 @@
     KEYWORD_PRESETS: KEYWORD_PRESETS,
     PAST_KEYWORD_SAMPLES: PAST_KEYWORD_SAMPLES,
     readerQuestionFor: readerQuestionFor,
+    buildVariantKbEmbedHtml: buildVariantKbEmbedHtml,
     onKeywordCount: onKeywordCount,
     KB_WIDGET_PASSIVE: KB_WIDGET_PASSIVE,
     KB_WIDGET_AUTO: KB_WIDGET_AUTO,

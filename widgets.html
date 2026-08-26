@@ -7,7 +7,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Widgets · nexus</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="keyword-blocks.css?v=20260826d" />
+  <link rel="stylesheet" href="keyword-blocks.css?v=20260826g" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -520,6 +520,7 @@
             <h3>Keywords <span class="kb-section-count" id="kb-slot-count-label">4</span></h3>
             <button type="button" class="btn btn--sm" id="kb-add-slot">+ Add keyword</button>
           </div>
+          <p class="muted kb-field-hint kb-field-hint--terms">Bold line = <strong>display term</strong> (readers see on the lander). Smaller line below = <strong>keyword term</strong> (sent to the ad provider, e.g. MAX).</p>
           <p class="muted kb-field-hint">Grab the <strong>⋮⋮</strong> handle and drag — numbered rows show keyword order.</p>
           <div class="kb-keyword-list" id="kb-keywords-active-list" aria-label="Active keywords"></div>
         </div>
@@ -528,7 +529,7 @@
           <div class="kb-editor__slots-head">
             <h3>Past keywords <span class="kb-section-count" id="kb-past-count-label">0</span></h3>
           </div>
-          <p class="muted kb-field-hint">Previously removed keywords. Restore to add them back to the active list.</p>
+          <p class="muted kb-field-hint">Previously removed keywords. Same labels as above — restore to add back to the active list.</p>
           <div class="kb-keyword-list kb-keyword-list--past" id="kb-keywords-past-list" aria-label="Past keywords"></div>
           <p class="kb-past-empty muted" id="kb-past-empty" hidden>No past keywords yet.</p>
         </div>
@@ -612,7 +613,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js?v=20260826d"></script>
+  <script src="kb-widget-model.js?v=20260826g"></script>
   <script src="app.js"></script>
   <script>
     /* ── New Widget button → type picker → form editor ── */
@@ -936,31 +937,25 @@
 
         function renderPastKeywordCard(globalIdx) {
           var slot = kbKeywords[globalIdx];
-          var meta = slot.metadata || M.defaultMetadata();
-          var img = meta.image_urls && meta.image_urls[0];
-          var vid = meta.video_urls && meta.video_urls[0];
-          var thumb = img
-            ? '<img src="' + M.escapeHtml(img) + '" alt="" />'
-            : '<span class="kb-keyword-card__thumb-ph" aria-hidden="true"></span>';
-          var badges = [];
-          if (meta.description) badges.push("Description");
-          if (img) badges.push("Image");
-          if (vid) badges.push("Video");
           return (
-            '<div class="kb-keyword-card kb-keyword-card--past" data-global-idx="' + globalIdx + '">' +
-              '<div class="kb-past-card__layout">' +
-                '<div class="kb-keyword-card__thumb kb-past-card__thumb">' + thumb + "</div>" +
-                '<div class="kb-past-card__info">' +
-                  '<strong class="kb-past-card__term">' + M.escapeHtml(slot.keyword_term) + "</strong>" +
-                  '<span class="kb-past-card__display">' + M.escapeHtml(slot.display_term) + "</span>" +
-                  (meta.description ? '<p class="kb-past-card__desc">' + M.escapeHtml(meta.description) + "</p>" : "") +
-                  (badges.length
-                    ? '<div class="kb-past-card__badges">' + badges.map(function (b) {
-                        return '<span class="kb-past-card__badge">' + b + "</span>";
-                      }).join("") + "</div>"
-                    : "") +
+            '<div class="kb-reorder-row kb-reorder-row--past">' +
+              '<span class="kb-reorder-row__index kb-reorder-row__index--past" aria-hidden="true">·</span>' +
+              '<div class="kb-keyword-card kb-keyword-card--past" data-global-idx="' + globalIdx + '">' +
+                '<div class="kb-keyword-card__main kb-keyword-card__main--past">' +
+                  '<div class="kb-keyword-card__summary">' +
+                    '<div class="kb-keyword-card__field">' +
+                      '<span class="kb-field-micro">Display term <em>readers see</em></span>' +
+                      '<span class="kb-keyword-card__display-read">' + M.escapeHtml(slot.display_term) + "</span>" +
+                    "</div>" +
+                    '<div class="kb-keyword-card__field">' +
+                      '<span class="kb-field-micro">Keyword term <em>ad provider</em></span>' +
+                      '<span class="kb-keyword-card__provider-read">' + M.escapeHtml(slot.keyword_term) + "</span>" +
+                    "</div>" +
+                  "</div>" +
+                  '<div class="kb-keyword-card__actions">' +
+                    '<button type="button" class="kb-restore-link" data-idx="' + globalIdx + '">Restore</button>' +
+                  "</div>" +
                 "</div>" +
-                '<button type="button" class="kb-restore-link" data-idx="' + globalIdx + '">Restore</button>' +
               "</div>" +
             "</div>"
           );
@@ -970,10 +965,6 @@
           var slot = kbKeywords[globalIdx];
           var meta = slot.metadata || M.defaultMetadata();
           var expanded = kbExpandedRows[globalIdx];
-          var img = meta.image_urls && meta.image_urls[0];
-          var thumbHtml = img
-            ? '<img src="' + M.escapeHtml(img) + '" alt="" />'
-            : '<span class="kb-keyword-card__thumb-ph" aria-hidden="true"></span>';
 
           return (
             '<div class="kb-reorder-row" data-global-idx="' + globalIdx + '">' +
@@ -987,10 +978,15 @@
                       '<circle cx="5" cy="12" r="1.25" fill="currentColor" /><circle cx="11" cy="12" r="1.25" fill="currentColor" />' +
                     "</svg>" +
                   "</div>" +
-                  '<div class="kb-keyword-card__thumb">' + thumbHtml + "</div>" +
                   '<div class="kb-keyword-card__summary">' +
-                    '<input type="text" class="kb-in-keyword-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="Keyword" />' +
-                    '<input type="text" class="kb-in-display-term kb-keyword-card__subtitle-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="Display label" />' +
+                    '<div class="kb-keyword-card__field">' +
+                      '<span class="kb-field-micro">Display term <em>readers see</em></span>' +
+                      '<input type="text" class="kb-in-display-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="e.g. zero fee ETFs" />' +
+                    "</div>" +
+                    '<div class="kb-keyword-card__field">' +
+                      '<span class="kb-field-micro">Keyword term <em>ad provider</em></span>' +
+                      '<input type="text" class="kb-in-keyword-term kb-keyword-card__subtitle-input input kb-input--mono" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="e.g. etf zero fee platform" />' +
+                    "</div>" +
                   "</div>" +
                   '<div class="kb-keyword-card__actions">' +
                     '<button type="button" class="kb-details-toggle' + (expanded ? " is-open" : "") + '" data-idx="' + globalIdx + '">' + (expanded ? "Hide" : "Details") + "</button>" +
@@ -1001,7 +997,6 @@
                   ? '<div class="kb-keyword-card__details">' +
                       '<div class="field"><label>Description</label>' +
                         '<textarea class="kb-in-meta-desc input" data-idx="' + globalIdx + '" rows="2" placeholder="Optional context for this keyword">' + M.escapeHtml(meta.description || "") + "</textarea></div>" +
-                      '<div class="field"><label>Image</label>' + imageUploadHtml(globalIdx, meta) + "</div>" +
                       '<div class="field"><label>Video</label>' + videoUploadHtml(globalIdx, meta) + "</div>" +
                     "</div>"
                   : "") +
