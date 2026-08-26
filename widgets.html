@@ -518,7 +518,7 @@
             <h3>Keywords <span class="kb-section-count" id="kb-slot-count-label">4</span></h3>
             <button type="button" class="btn btn--sm" id="kb-add-slot">+ Add keyword</button>
           </div>
-          <p class="muted kb-field-hint">Drag order with arrows. Reader questions in the lander still come from variant HTML.</p>
+          <p class="muted kb-field-hint">Drag the <strong>⋮⋮</strong> handle to reorder. Reader questions in the lander still come from variant HTML.</p>
           <div class="kb-keyword-list" id="kb-keywords-active-list" aria-label="Active keywords"></div>
         </div>
 
@@ -909,11 +909,55 @@
           );
         }
 
+        function renderActiveKeywordCard(globalIdx, position) {
+          var slot = kbKeywords[globalIdx];
+          var meta = slot.metadata || M.defaultMetadata();
+          var expanded = kbExpandedRows[globalIdx];
+          var img = meta.image_urls && meta.image_urls[0];
+          var thumbHtml = img
+            ? '<img src="' + M.escapeHtml(img) + '" alt="" />'
+            : '<span class="kb-keyword-card__thumb-ph" aria-hidden="true"></span>';
+
+          return (
+            '<div class="kb-reorder-row" data-global-idx="' + globalIdx + '">' +
+              '<span class="kb-reorder-row__index">' + position + ".</span>" +
+              '<div class="kb-keyword-card kb-keyword-card--draggable" draggable="true" data-global-idx="' + globalIdx + '">' +
+                '<div class="kb-keyword-card__main">' +
+                  '<button type="button" class="kb-drag-handle" aria-label="Drag to reorder" title="Drag to reorder">' +
+                    '<svg class="kb-drag-handle__icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">' +
+                      '<circle cx="5" cy="4" r="1.25" fill="currentColor" /><circle cx="11" cy="4" r="1.25" fill="currentColor" />' +
+                      '<circle cx="5" cy="8" r="1.25" fill="currentColor" /><circle cx="11" cy="8" r="1.25" fill="currentColor" />' +
+                      '<circle cx="5" cy="12" r="1.25" fill="currentColor" /><circle cx="11" cy="12" r="1.25" fill="currentColor" />' +
+                    "</svg>" +
+                  "</button>" +
+                  '<div class="kb-keyword-card__thumb">' + thumbHtml + "</div>" +
+                  '<div class="kb-keyword-card__summary">' +
+                    '<input type="text" class="kb-in-keyword-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="Keyword" />' +
+                    '<input type="text" class="kb-in-display-term kb-keyword-card__subtitle-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="Display label" />' +
+                  "</div>" +
+                  '<div class="kb-keyword-card__actions">' +
+                    '<button type="button" class="kb-details-toggle' + (expanded ? " is-open" : "") + '" data-idx="' + globalIdx + '">' + (expanded ? "Hide" : "Details") + "</button>" +
+                    '<button type="button" class="kb-archive-keyword" data-idx="' + globalIdx + '" title="Move to past keywords" aria-label="Move to past">✕</button>' +
+                  "</div>" +
+                "</div>" +
+                (expanded
+                  ? '<div class="kb-keyword-card__details">' +
+                      '<div class="field"><label>Description</label>' +
+                        '<textarea class="kb-in-meta-desc input" data-idx="' + globalIdx + '" rows="2" placeholder="Optional context for this keyword">' + M.escapeHtml(meta.description || "") + "</textarea></div>" +
+                      '<div class="field"><label>Image</label>' + imageUploadHtml(globalIdx, meta) + "</div>" +
+                      '<div class="field"><label>Video URL <span class="muted">(optional)</span></label>' +
+                        '<input type="url" class="kb-in-meta-video input" data-idx="' + globalIdx + '" value="' + M.escapeHtml((meta.video_urls && meta.video_urls[0]) || "") + '" placeholder="https://…" /></div>' +
+                    "</div>"
+                  : "") +
+              "</div>" +
+            "</div>"
+          );
+        }
+
         function renderKeywordCard(globalIdx, mode) {
           var slot = kbKeywords[globalIdx];
           var meta = slot.metadata || M.defaultMetadata();
           var expanded = kbExpandedRows[globalIdx];
-          var macros = M.keywordSlotMacroExamples(activeIndices().indexOf(globalIdx) + 1);
 
           if (mode === "past") {
             return (
@@ -929,67 +973,104 @@
             );
           }
 
-          var actives = activeIndices();
-          var posInActive = actives.indexOf(globalIdx);
-          var canUp = posInActive > 0;
-          var canDown = posInActive < actives.length - 1;
+          return renderActiveKeywordCard(globalIdx, activeIndices().indexOf(globalIdx) + 1);
+        }
 
-          return (
-            '<div class="kb-keyword-card" data-global-idx="' + globalIdx + '">' +
-              '<div class="kb-keyword-card__main">' +
-                '<div class="kb-keyword-card__order">' +
-                  '<button type="button" class="kb-order-btn" data-action="up" data-idx="' + globalIdx + '" ' + (canUp ? "" : "disabled") + ' aria-label="Move up">↑</button>' +
-                  '<button type="button" class="kb-order-btn" data-action="down" data-idx="' + globalIdx + '" ' + (canDown ? "" : "disabled") + ' aria-label="Move down">↓</button>' +
-                "</div>" +
-                '<div class="kb-keyword-card__fields">' +
-                  '<label class="kb-keyword-card__label">Keyword</label>' +
-                  '<input type="text" class="kb-in-keyword-term input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="e.g. auto insurance savings" />' +
-                  '<label class="kb-keyword-card__label">Display label</label>' +
-                  '<input type="text" class="kb-in-display-term input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="Short label in widget UI" />' +
-                "</div>" +
-                '<div class="kb-keyword-card__actions">' +
-                  '<button type="button" class="kb-details-toggle' + (expanded ? " is-open" : "") + '" data-idx="' + globalIdx + '">' + (expanded ? "Hide details" : "Details") + "</button>" +
-                  '<button type="button" class="kb-archive-keyword" data-idx="' + globalIdx + '" title="Move to past keywords" aria-label="Move to past">✕</button>' +
-                "</div>" +
-              "</div>" +
-              (expanded
-                ? '<div class="kb-keyword-card__details">' +
-                    '<div class="field"><label>Description</label>' +
-                      '<textarea class="kb-in-meta-desc input" data-idx="' + globalIdx + '" rows="2" placeholder="Optional context for this keyword">' + M.escapeHtml(meta.description || "") + "</textarea></div>" +
-                    '<div class="field"><label>Image</label>' + imageUploadHtml(globalIdx, meta) + "</div>" +
-                    '<div class="field"><label>Video URL <span class="muted">(optional)</span></label>' +
-                      '<input type="url" class="kb-in-meta-video input" data-idx="' + globalIdx + '" value="' + M.escapeHtml((meta.video_urls && meta.video_urls[0]) || "") + '" placeholder="https://…" /></div>' +
-                  "</div>"
-                : "") +
-            "</div>"
-          );
+        function reorderActiveToPosition(fromGlobalIdx, toActivePosition) {
+          var actives = activeIndices();
+          var fromPos = actives.indexOf(fromGlobalIdx);
+          if (fromPos < 0) return;
+          if (toActivePosition < 0) toActivePosition = 0;
+          if (toActivePosition > actives.length - 1) toActivePosition = actives.length - 1;
+          if (fromPos === toActivePosition) return;
+          actives.splice(fromPos, 1);
+          actives.splice(toActivePosition, 0, fromGlobalIdx);
+          var pasts = pastIndices();
+          var oldKeywords = kbKeywords;
+          kbKeywords = actives.map(function (gi) { return oldKeywords[gi]; });
+          pasts.forEach(function (gi) { kbKeywords.push(oldKeywords[gi]); });
+          renderKbKeywordsUI();
+        }
+
+        var kbDragState = { fromGlobalIdx: null, placeholder: null };
+
+        function initKbKeywordDragDrop() {
+          if (!kbActiveList || kbActiveList.getAttribute("data-kb-dnd-init")) return;
+          kbActiveList.setAttribute("data-kb-dnd-init", "1");
+
+          kbActiveList.addEventListener("dragstart", function (e) {
+            var card = e.target.closest(".kb-keyword-card--draggable");
+            if (!card || !e.target.closest(".kb-drag-handle")) {
+              e.preventDefault();
+              return;
+            }
+            var row = card.closest(".kb-reorder-row");
+            kbDragState.fromGlobalIdx = parseInt(card.getAttribute("data-global-idx"), 10);
+            card.classList.add("is-dragging");
+            if (row) row.classList.add("is-drag-source");
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", String(kbDragState.fromGlobalIdx));
+            kbDragState.placeholder = document.createElement("div");
+            kbDragState.placeholder.className = "kb-reorder-placeholder";
+            kbDragState.placeholder.innerHTML = '<div class="kb-reorder-placeholder__inner"></div>';
+            if (row) kbActiveList.insertBefore(kbDragState.placeholder, row);
+          });
+
+          kbActiveList.addEventListener("dragend", function () {
+            kbActiveList.querySelectorAll(".kb-keyword-card--draggable").forEach(function (c) {
+              c.classList.remove("is-dragging");
+            });
+            kbActiveList.querySelectorAll(".kb-reorder-row").forEach(function (r) {
+              r.classList.remove("is-drag-source");
+            });
+            if (kbDragState.placeholder) {
+              kbDragState.placeholder.remove();
+              kbDragState.placeholder = null;
+            }
+            kbDragState.fromGlobalIdx = null;
+          });
+
+          kbActiveList.addEventListener("dragover", function (e) {
+            if (kbDragState.fromGlobalIdx == null || !kbDragState.placeholder) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            var row = e.target.closest(".kb-reorder-row");
+            if (!row || row.classList.contains("is-drag-source")) return;
+            var rect = row.getBoundingClientRect();
+            var before = e.clientY < rect.top + rect.height / 2;
+            if (before) {
+              kbActiveList.insertBefore(kbDragState.placeholder, row);
+            } else {
+              kbActiveList.insertBefore(kbDragState.placeholder, row.nextSibling);
+            }
+          });
+
+          kbActiveList.addEventListener("drop", function (e) {
+            e.preventDefault();
+            if (kbDragState.fromGlobalIdx == null || !kbDragState.placeholder) return;
+            var insertPos = 0;
+            var children = kbActiveList.children;
+            for (var i = 0; i < children.length; i++) {
+              if (children[i] === kbDragState.placeholder) break;
+              if (children[i].classList.contains("kb-reorder-row") && !children[i].classList.contains("is-drag-source")) {
+                insertPos += 1;
+              }
+            }
+            reorderActiveToPosition(kbDragState.fromGlobalIdx, insertPos);
+          });
         }
 
         function renderKbKeywordsUI() {
           if (!kbActiveList || !kbPastList) return;
           var actives = activeIndices();
           var pasts = pastIndices();
-          kbActiveList.innerHTML = actives.map(function (gi) { return renderKeywordCard(gi, "active"); }).join("");
+          kbActiveList.innerHTML = actives.map(function (gi, pos) { return renderActiveKeywordCard(gi, pos + 1); }).join("");
           kbPastList.innerHTML = pasts.map(function (gi) { return renderKeywordCard(gi, "past"); }).join("");
           if (kbSlotCountLabel) kbSlotCountLabel.textContent = String(actives.length);
           if (kbPastCountLabel) kbPastCountLabel.textContent = String(pasts.length);
           if (kbPastEmpty) kbPastEmpty.hidden = pasts.length > 0;
           if (kbAddSlotBtn) kbAddSlotBtn.disabled = actives.length >= 12;
           renderKbPreview();
-        }
-
-        function moveActiveKeyword(globalIdx, direction) {
-          var actives = activeIndices();
-          var pos = actives.indexOf(globalIdx);
-          if (pos < 0) return;
-          var swapPos = pos + direction;
-          if (swapPos < 0 || swapPos >= actives.length) return;
-          var a = actives[pos];
-          var b = actives[swapPos];
-          var tmp = kbKeywords[a];
-          kbKeywords[a] = kbKeywords[b];
-          kbKeywords[b] = tmp;
-          renderKbKeywordsUI();
         }
 
         function archiveKeyword(globalIdx) {
@@ -1126,11 +1207,6 @@
               renderKbKeywordsUI();
               return;
             }
-            var orderBtn = e.target.closest(".kb-order-btn");
-            if (orderBtn && !orderBtn.disabled) {
-              moveActiveKeyword(parseInt(orderBtn.getAttribute("data-idx"), 10), orderBtn.getAttribute("data-action") === "up" ? -1 : 1);
-              return;
-            }
             var archiveBtn = e.target.closest(".kb-archive-keyword");
             if (archiveBtn) {
               archiveKeyword(parseInt(archiveBtn.getAttribute("data-idx"), 10));
@@ -1153,6 +1229,7 @@
 
         bindKeywordListEvents(kbActiveList);
         bindKeywordListEvents(kbPastList);
+        initKbKeywordDragDrop();
 
         function openKbEditor(mode, presetKey) {
           if (!kbDlg) return;
