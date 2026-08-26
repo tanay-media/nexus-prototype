@@ -7,7 +7,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Widgets · nexus</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="keyword-blocks.css?v=20260826h" />
+  <link rel="stylesheet" href="keyword-blocks.css?v=20260826i" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -616,7 +616,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js?v=20260826h"></script>
+  <script src="kb-widget-model.js?v=20260826i"></script>
   <script src="app.js"></script>
   <script>
     /* ── New Widget button → type picker → form editor ── */
@@ -1279,7 +1279,7 @@
         bindKeywordListEvents(kbPastList);
         initKbKeywordDragDrop();
 
-        function openKbEditor(mode, presetKey) {
+        function openKbEditor(mode, presetKey, initialTab) {
           if (!kbDlg) return;
           if (kbEditorTitle) kbEditorTitle.textContent = mode === "new" ? "Create keyword blocks widget" : "Edit keyword blocks widget";
           if (kbSaveBtn) kbSaveBtn.textContent = mode === "new" ? "Create widget" : "Save widget";
@@ -1302,11 +1302,26 @@
           initKbUiSelects(kbDlg);
           renderKbKeywordsUI();
           var kbTabGroup = document.querySelector("[data-tabs=\"kb-widget-detail\"]");
+          var tabId = initialTab || "kb-general";
           if (kbTabGroup) {
-            var genTab = kbTabGroup.querySelector("[data-tab=\"kb-general\"]");
-            if (genTab) genTab.click();
+            var tab = kbTabGroup.querySelector("[data-tab=\"" + tabId + "\"]");
+            if (tab) tab.click();
           }
           kbDlg.showModal();
+        }
+
+        function handleWidgetsHash() {
+          var h = (location.hash || "").replace("#", "").trim();
+          if (h === "kb-keywords") {
+            var listTab = document.querySelector("[data-tab=\"widgets-kb-list\"]");
+            if (listTab) listTab.click();
+            openKbEditor("edit", "passive", "kb-keywords");
+          }
+        }
+
+        window.addEventListener("hashchange", handleWidgetsHash);
+        if (location.hash) {
+          requestAnimationFrame(handleWidgetsHash);
         }
 
         openKbEditorFromPicker = function (mode, presetKey) {
