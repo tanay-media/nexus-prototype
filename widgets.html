@@ -7,7 +7,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Widgets · nexus</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="keyword-blocks.css?v=20260826g" />
+  <link rel="stylesheet" href="keyword-blocks.css?v=20260826h" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -517,11 +517,14 @@
 
         <div class="kb-keywords-section">
           <div class="kb-editor__slots-head">
-            <h3>Keywords <span class="kb-section-count" id="kb-slot-count-label">4</span></h3>
+            <h3 class="kb-editor__slots-title">
+              Keywords <span class="kb-section-count" id="kb-slot-count-label">4</span>
+              <button type="button" class="chrome-info-btn kb-info-btn" id="kb-terms-info" aria-expanded="false" aria-controls="kb-terms-info-text" title="Display vs keyword term">i</button>
+            </h3>
             <button type="button" class="btn btn--sm" id="kb-add-slot">+ Add keyword</button>
           </div>
-          <p class="muted kb-field-hint kb-field-hint--terms">Bold line = <strong>display term</strong> (readers see on the lander). Smaller line below = <strong>keyword term</strong> (sent to the ad provider, e.g. MAX).</p>
-          <p class="muted kb-field-hint">Grab the <strong>⋮⋮</strong> handle and drag — numbered rows show keyword order.</p>
+          <p class="field__hint kb-info-hint" id="kb-terms-info-text" hidden><strong>Bold line</strong> = display term (readers see on the lander). <strong>Smaller line</strong> = keyword term (sent to the ad provider, e.g. MAX).</p>
+          <p class="muted kb-field-hint">Grab the <strong>⋮⋮</strong> handle and drag to reorder.</p>
           <div class="kb-keyword-list" id="kb-keywords-active-list" aria-label="Active keywords"></div>
         </div>
 
@@ -529,7 +532,7 @@
           <div class="kb-editor__slots-head">
             <h3>Past keywords <span class="kb-section-count" id="kb-past-count-label">0</span></h3>
           </div>
-          <p class="muted kb-field-hint">Previously removed keywords. Same labels as above — restore to add back to the active list.</p>
+          <p class="muted kb-field-hint">Restore to add back to the active list.</p>
           <div class="kb-keyword-list kb-keyword-list--past" id="kb-keywords-past-list" aria-label="Past keywords"></div>
           <p class="kb-past-empty muted" id="kb-past-empty" hidden>No past keywords yet.</p>
         </div>
@@ -613,7 +616,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js?v=20260826g"></script>
+  <script src="kb-widget-model.js?v=20260826h"></script>
   <script src="app.js"></script>
   <script>
     /* ── New Widget button → type picker → form editor ── */
@@ -879,6 +882,16 @@
           });
         }
 
+        var kbTermsInfo = document.getElementById("kb-terms-info");
+        var kbTermsInfoText = document.getElementById("kb-terms-info-text");
+        if (kbTermsInfo && kbTermsInfoText) {
+          kbTermsInfo.addEventListener("click", function () {
+            var show = kbTermsInfoText.hidden;
+            kbTermsInfoText.hidden = !show;
+            kbTermsInfo.setAttribute("aria-expanded", show ? "true" : "false");
+          });
+        }
+
         function loadWidgetPreset(key) {
           var w = M.WIDGET_REGISTRY[key];
           if (!w) return;
@@ -943,14 +956,8 @@
               '<div class="kb-keyword-card kb-keyword-card--past" data-global-idx="' + globalIdx + '">' +
                 '<div class="kb-keyword-card__main kb-keyword-card__main--past">' +
                   '<div class="kb-keyword-card__summary">' +
-                    '<div class="kb-keyword-card__field">' +
-                      '<span class="kb-field-micro">Display term <em>readers see</em></span>' +
-                      '<span class="kb-keyword-card__display-read">' + M.escapeHtml(slot.display_term) + "</span>" +
-                    "</div>" +
-                    '<div class="kb-keyword-card__field">' +
-                      '<span class="kb-field-micro">Keyword term <em>ad provider</em></span>' +
-                      '<span class="kb-keyword-card__provider-read">' + M.escapeHtml(slot.keyword_term) + "</span>" +
-                    "</div>" +
+                    '<span class="kb-keyword-card__display-read">' + M.escapeHtml(slot.display_term) + "</span>" +
+                    '<span class="kb-keyword-card__provider-read">' + M.escapeHtml(slot.keyword_term) + "</span>" +
                   "</div>" +
                   '<div class="kb-keyword-card__actions">' +
                     '<button type="button" class="kb-restore-link" data-idx="' + globalIdx + '">Restore</button>' +
@@ -979,14 +986,8 @@
                     "</svg>" +
                   "</div>" +
                   '<div class="kb-keyword-card__summary">' +
-                    '<div class="kb-keyword-card__field">' +
-                      '<span class="kb-field-micro">Display term <em>readers see</em></span>' +
-                      '<input type="text" class="kb-in-display-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="e.g. zero fee ETFs" />' +
-                    "</div>" +
-                    '<div class="kb-keyword-card__field">' +
-                      '<span class="kb-field-micro">Keyword term <em>ad provider</em></span>' +
-                      '<input type="text" class="kb-in-keyword-term kb-keyword-card__subtitle-input input kb-input--mono" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="e.g. etf zero fee platform" />' +
-                    "</div>" +
+                    '<input type="text" class="kb-in-display-term kb-keyword-card__title-input input" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.display_term) + '" placeholder="Display term" aria-label="Display term" />' +
+                    '<input type="text" class="kb-in-keyword-term kb-keyword-card__subtitle-input input kb-input--mono" data-idx="' + globalIdx + '" value="' + M.escapeHtml(slot.keyword_term) + '" placeholder="Keyword term" aria-label="Keyword term" />' +
                   "</div>" +
                   '<div class="kb-keyword-card__actions">' +
                     '<button type="button" class="kb-details-toggle' + (expanded ? " is-open" : "") + '" data-idx="' + globalIdx + '">' + (expanded ? "Hide" : "Details") + "</button>" +

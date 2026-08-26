@@ -409,7 +409,7 @@
       "\n<!-- nexus: keyword_block (" + escapeHtml(widget.widget_name) + ") · widget_id " + widget.widget_id + " -->\n" +
       "<style class=\"lander-kb-styles\">\n" +
       "/* Keyword block — edit modal colors, corners, spacing here or ask Nexus AI */\n" +
-      ".lander-kb-embed { margin: 1rem 0; }\n" +
+      ".lander-kb-embed { margin: 1rem 0; max-width: none; }\n" +
       ".lander-kb-embed__trigger { display: block; width: 100%; padding: 12px 16px; background: #1a5276; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }\n" +
       ".lander-kb-modal { border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; margin-top: 8px; font-family: Arial, sans-serif; }\n" +
       ".lander-kb-modal__header { background: #1a5276; color: #fff; padding: 12px 14px; }\n" +

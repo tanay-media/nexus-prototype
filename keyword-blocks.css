@@ -443,6 +443,13 @@
   cursor: grabbing;
 }
 
+.kb-editor__slots-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
 .kb-field-hint--terms {
   margin-bottom: 6px;
   padding: 8px 10px;
@@ -526,7 +533,7 @@
 .kb-keyword-card__summary {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   min-width: 0;
 }
 
@@ -567,6 +574,67 @@
 
 .kb-input--mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ---- Variant editor: KB block style panel ---- */
+.editor-kb-style-panel {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #e4e8ec;
+  border-radius: 10px;
+  background: #fafbfc;
+}
+
+.editor-kb-style-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.editor-kb-style-panel__head strong {
+  font-size: 12px;
+}
+
+.editor-kb-style-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+}
+
+.editor-kb-style-grid .field--settings label {
+  font-size: 11px;
+}
+
+.editor-kb-style-grid input[type="color"] {
+  width: 100%;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.editor-kb-style-grid input[type="range"] {
+  width: 100%;
+}
+
+.editor-kb-style-panel__foot {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.editor-kb-preview-slot.is-selected {
+  border-color: #1a5276;
+  box-shadow: 0 0 0 2px rgba(26, 82, 118, 0.15);
+}
+
+.editor-kb-empty-wrap {
+  text-align: center;
+  padding: 8px 0 4px;
 }
 
 .kb-keyword-card__title-input {
