@@ -1078,9 +1078,45 @@
   vertical-align: top;
 }
 
-.kb-preview-wrap--tab {
-  max-width: 420px;
-  margin: 0 auto;
+.kb-test-run-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.kb-test-run-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kb-test-run-row {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.kb-test-run-row__kw {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.kb-test-run-row__kw strong {
+  font-size: 14px;
+}
+
+.kb-test-run-row__kw .mono {
+  font-size: 11px;
+  color: #888;
+}
+
+.kb-test-run-row__ads .kb-ad-panel {
+  margin-top: 0;
 }
 
 .kb-modal-preview--editor {

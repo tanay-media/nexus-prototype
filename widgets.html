@@ -7,7 +7,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>Widgets · nexus</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="keyword-blocks.css?v=20260826k" />
+  <link rel="stylesheet" href="keyword-blocks.css?v=20260826m" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -460,7 +460,7 @@
       <div class="tabs offer-detail-tabs" role="tablist" data-tabs="kb-widget-detail">
         <button type="button" class="tab is-active" data-tab="kb-general" role="tab" aria-selected="true">General</button>
         <button type="button" class="tab" data-tab="kb-keywords" role="tab" aria-selected="false">Keywords</button>
-        <button type="button" class="tab" data-tab="kb-preview" role="tab" aria-selected="false">Preview</button>
+        <button type="button" class="tab" data-tab="kb-test-run" role="tab" aria-selected="false">Test Run</button>
       </div>
 
       <section class="offer-detail-pane kb-detail-pane" data-tab-panel="kb-general">
@@ -536,19 +536,12 @@
         </div>
       </section>
 
-      <section class="offer-detail-pane kb-detail-pane kb-detail-pane--preview" data-tab-panel="kb-preview" hidden>
-        <p class="muted kb-field-hint">Click a reader question to preview live ads from Serving (prototype simulation).</p>
-        <div class="kb-preview-wrap kb-preview-wrap--tab">
-          <div class="kb-modal-preview kb-modal-preview--editor" id="kb-modal-preview">
-            <div class="kb-modal-preview__header">
-              <div class="kb-modal-preview__brand" id="kb-preview-brand">WIDGET PREVIEW</div>
-              <h3 class="kb-modal-preview__title" id="kb-preview-title">What would you like to explore first?</h3>
-              <span class="kb-modal-preview__close" aria-hidden="true">✕</span>
-            </div>
-            <div class="kb-modal-preview__body" id="kb-preview-blocks"></div>
-            <div class="kb-modal-preview__dismiss" id="kb-preview-dismiss">I'll continue reading on my own</div>
-          </div>
+      <section class="offer-detail-pane kb-detail-pane kb-detail-pane--test-run" data-tab-panel="kb-test-run" hidden>
+        <div class="kb-test-run-head">
+          <p class="muted kb-field-hint" style="margin:0;">CM ad fetch per active keyword via Serving. Modal CSS lives on the variant.</p>
+          <button type="button" class="btn btn--sm" id="kb-test-run-btn">Run test</button>
         </div>
+        <div class="kb-test-run-list" id="kb-test-run-list" aria-live="polite"></div>
       </section>
 
       <div class="modal__actions widget-editor__footer">
@@ -614,7 +607,7 @@
     </div>
   </dialog>
 
-  <script src="kb-widget-model.js?v=20260826k"></script>
+  <script src="kb-widget-model.js?v=20260826m"></script>
   <script src="app.js"></script>
   <script>
     /* ── New Widget button → type picker → form editor ── */
@@ -739,10 +732,9 @@
         var kbActiveList = document.getElementById("kb-keywords-active-list");
         var kbPastList = document.getElementById("kb-keywords-past-list");
         var kbPastEmpty = document.getElementById("kb-past-empty");
-        var kbPreviewBlocks = document.getElementById("kb-preview-blocks");
-        var kbPreviewTitle = document.getElementById("kb-preview-title");
-        var kbPreviewDismiss = document.getElementById("kb-preview-dismiss");
-        var kbPreviewBrand = document.getElementById("kb-preview-brand");
+        var kbTestRunList = document.getElementById("kb-test-run-list");
+        var kbTestRunBtn = document.getElementById("kb-test-run-btn");
+        var kbTestRunPanel = document.querySelector("[data-tab-panel=\"kb-test-run\"]");
         var kbSlotCountLabel = document.getElementById("kb-slot-count-label");
         var kbPastCountLabel = document.getElementById("kb-past-count-label");
         var kbAddSlotBtn = document.getElementById("kb-add-slot");
@@ -772,8 +764,7 @@
 
         var kbKeywords = M.KEYWORD_PRESETS.passive.slice();
         var kbWidgetId = M.KB_WIDGET_PASSIVE;
-        var kbActiveIndex = 0;
-        var kbPreviewFetchToken = 0;
+        var kbTestRunToken = 0;
         var kbExpandedRows = {};
 
         function widgetMaxAdsDefault() {
@@ -1091,14 +1082,61 @@
           if (kbPastCountLabel) kbPastCountLabel.textContent = String(pasts.length);
           if (kbPastEmpty) kbPastEmpty.hidden = pasts.length > 0;
           if (kbAddSlotBtn) kbAddSlotBtn.disabled = actives.length >= 12;
-          renderKbPreview();
+          runKbTestRunIfActive();
+        }
+
+        function isKbTestRunTabActive() {
+          return kbTestRunPanel && !kbTestRunPanel.hidden;
+        }
+
+        function runKbTestRunIfActive() {
+          if (isKbTestRunTabActive()) runKbTestRun();
+        }
+
+        function runKbTestRun() {
+          if (!kbTestRunList) return;
+          var widget = collectWidgetFromForm();
+          var onKeywords = onKeywordsForPreview();
+          var token = ++kbTestRunToken;
+          var advertiserId = kbAdvertiserIn ? kbAdvertiserIn.value.trim() : "";
+
+          if (!onKeywords.length) {
+            kbTestRunList.innerHTML = "<p class=\"muted\">No active keywords to test.</p>";
+            return;
+          }
+
+          kbTestRunList.innerHTML = onKeywords.map(function (slot, i) {
+            return (
+              '<div class="kb-test-run-row" data-test-idx="' + i + '">' +
+                '<div class="kb-test-run-row__kw">' +
+                  "<strong>" + M.escapeHtml(slot.display_term) + "</strong>" +
+                  '<span class="mono">' + M.escapeHtml(slot.keyword_term) + "</span>" +
+                "</div>" +
+                '<div class="kb-test-run-row__ads">' + M.renderServingAdPanelsHtml(null, { loading: true }) + "</div>" +
+              "</div>"
+            );
+          }).join("");
+
+          onKeywords.forEach(function (slot, i) {
+            var maxAds = M.resolveMaxAdsForKeyword(widget, slot);
+            M.fetchServingPreviewAds({
+              keyword_term: slot.keyword_term,
+              slotIndex: i + 1,
+              maxAds: maxAds,
+              advertiser_id: advertiserId,
+              delay: 280 + i * 100
+            }).then(function (ads) {
+              if (token !== kbTestRunToken) return;
+              var row = kbTestRunList.querySelector('[data-test-idx="' + i + '"] .kb-test-run-row__ads');
+              if (row) row.innerHTML = M.renderServingAdPanelsHtml(ads);
+            });
+          });
         }
 
         function archiveKeyword(globalIdx) {
           if (activeIndices().length <= 1) return;
           kbKeywords[globalIdx].status = "off";
           delete kbExpandedRows[globalIdx];
-          if (kbActiveIndex >= activeIndices().length) kbActiveIndex = Math.max(0, activeIndices().length - 1);
           renderKbKeywordsUI();
         }
 
@@ -1117,70 +1155,6 @@
           return kbKeywords.filter(function (k) { return k.status === "on"; });
         }
 
-        function renderKbPreviewBlocks() {
-          if (!kbPreviewBlocks) return;
-          if (kbPreviewTitle) kbPreviewTitle.textContent = "What would you like to explore first?";
-          if (kbPreviewDismiss) kbPreviewDismiss.textContent = "I'll continue reading on my own";
-          if (kbPreviewBrand && kbNameIn) kbPreviewBrand.textContent = (kbNameIn.value || "WIDGET").toUpperCase().slice(0, 40);
-          kbPreviewBlocks.innerHTML = "";
-          var hint = document.createElement("p");
-          hint.className = "kb-preview-serving-hint";
-          hint.textContent = "Select a question to preview live ads for that keyword.";
-          kbPreviewBlocks.appendChild(hint);
-          var section = document.createElement("p");
-          section.className = "kb-modal-preview__section";
-          section.textContent = "READER QUESTIONS";
-          kbPreviewBlocks.appendChild(section);
-          var onKeywords = onKeywordsForPreview();
-          onKeywords.forEach(function (slot, previewIdx) {
-            var block = document.createElement("div");
-            block.className = "kb-block" + (kbActiveIndex === previewIdx ? " is-active" : "");
-            block.setAttribute("data-kb-idx", String(previewIdx));
-            var label = M.readerQuestionFor(slot.keyword_term);
-            block.innerHTML = '<span class="kb-block__play">▶</span><span>' + label + '</span><small class="muted" style="display:block;font-size:10px;margin-top:2px;">' + slot.display_term + "</small>";
-            kbPreviewBlocks.appendChild(block);
-            if (kbActiveIndex === previewIdx) {
-              var metaHtml = M.renderKeywordMetaPreviewHtml(slot, previewIdx + 1);
-              if (metaHtml) {
-                var metaWrap = document.createElement("div");
-                metaWrap.innerHTML = metaHtml;
-                kbPreviewBlocks.appendChild(metaWrap.firstChild);
-              }
-              var panelWrap = document.createElement("div");
-              panelWrap.className = "kb-ad-panel-wrap";
-              panelWrap.innerHTML = M.renderServingAdPanelsHtml(null, { loading: true });
-              kbPreviewBlocks.appendChild(panelWrap);
-            }
-          });
-        }
-
-        function fetchKbPreviewAd() {
-          var widget = collectWidgetFromForm();
-          var onKeywords = onKeywordsForPreview();
-          var slot = onKeywords[kbActiveIndex];
-          if (!slot || !kbPreviewBlocks) return;
-          var token = ++kbPreviewFetchToken;
-          var maxAds = M.resolveMaxAdsForKeyword(widget, slot);
-          var panelWrap = kbPreviewBlocks.querySelector(".kb-ad-panel-wrap");
-          if (panelWrap) panelWrap.innerHTML = M.renderServingAdPanelsHtml(null, { loading: true });
-          M.fetchServingPreviewAds({
-            keyword_term: slot.keyword_term,
-            slotIndex: kbActiveIndex + 1,
-            maxAds: maxAds,
-            advertiser_id: kbAdvertiserIn ? kbAdvertiserIn.value.trim() : "",
-            delay: 380
-          }).then(function (ads) {
-            if (token !== kbPreviewFetchToken) return;
-            if (!panelWrap) return;
-            panelWrap.innerHTML = M.renderServingAdPanelsHtml(ads);
-          });
-        }
-
-        function renderKbPreview() {
-          renderKbPreviewBlocks();
-          fetchKbPreviewAd();
-        }
-
         function bindKeywordListEvents(listEl) {
           if (!listEl) return;
           listEl.addEventListener("input", function (e) {
@@ -1191,15 +1165,13 @@
               if (kbKeywords[idx].display_term === "" || kbKeywords[idx].display_term === kbKeywords[idx].keyword_term) {
                 kbKeywords[idx].display_term = t.value;
               }
-              renderKbPreviewBlocks();
-              fetchKbPreviewAd();
+              runKbTestRunIfActive();
             } else if (t.classList.contains("kb-in-display-term")) {
               kbKeywords[idx].display_term = t.value;
-              renderKbPreviewBlocks();
+              runKbTestRunIfActive();
             } else if (t.classList.contains("kb-in-meta-desc")) {
               if (!kbKeywords[idx].metadata) kbKeywords[idx].metadata = M.defaultMetadata();
               kbKeywords[idx].metadata.description = t.value;
-              renderKbPreviewBlocks();
             }
           });
           listEl.addEventListener("change", function (e) {
@@ -1274,7 +1246,6 @@
           } else {
             loadWidgetPreset(presetKey || "passive");
           }
-          kbActiveIndex = 0;
           kbExpandedRows = {};
           initKbUiSelects(kbDlg);
           renderKbKeywordsUI();
@@ -1321,22 +1292,23 @@
         });
 
         if (kbMaxAdsIn) {
-          kbMaxAdsIn.addEventListener("change", function () {
-            fetchKbPreviewAd();
+          kbMaxAdsIn.addEventListener("change", runKbTestRunIfActive);
+        }
+
+        if (kbTestRunBtn) {
+          kbTestRunBtn.addEventListener("click", runKbTestRun);
+        }
+
+        var kbTestRunTab = document.querySelector("[data-tab=\"kb-test-run\"]");
+        if (kbTestRunTab) {
+          kbTestRunTab.addEventListener("click", function () {
+            requestAnimationFrame(runKbTestRun);
           });
         }
 
-        if (kbPreviewBlocks) {
-          kbPreviewBlocks.addEventListener("click", function (e) {
-            var block = e.target.closest(".kb-block");
-            if (!block) return;
-            kbActiveIndex = parseInt(block.getAttribute("data-kb-idx"), 10);
-            renderKbPreviewBlocks();
-            fetchKbPreviewAd();
-          });
+        if (kbAdvertiserIn) {
+          kbAdvertiserIn.addEventListener("change", runKbTestRunIfActive);
         }
-
-        if (kbNameIn) kbNameIn.addEventListener("input", renderKbPreviewBlocks);
 
         if (kbAddSlotBtn) {
           kbAddSlotBtn.addEventListener("click", function () {
