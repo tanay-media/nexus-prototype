@@ -252,13 +252,51 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 8px 4px 10px;
+  padding: 4px 8px 4px 6px;
   background: #f5f3ee;
   border: 1px solid #e0dbd0;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
+  user-select: none;
+}
+
+.rb-chip--draggable {
+  cursor: grab;
+}
+
+.rb-chip--draggable:active {
+  cursor: grabbing;
+}
+
+.rb-chip--dragging {
+  opacity: 0.45;
+}
+
+.rb-chip--drop-before {
+  box-shadow: inset 3px 0 0 var(--black, #1a1a1a);
+}
+
+.rb-chip--drop-after {
+  box-shadow: inset -3px 0 0 var(--black, #1a1a1a);
+}
+
+.rb-chip__drag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  color: #b0a896;
+  font-size: 11px;
+  letter-spacing: -2px;
+  line-height: 1;
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.rb-chip__drag:hover {
+  color: var(--text-muted, #7a7568);
 }
 
 .rb-chip--filter {

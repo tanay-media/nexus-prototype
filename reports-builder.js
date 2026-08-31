@@ -231,18 +231,23 @@
     });
   }
 
-  function renderChips(containerId, items, labels, chipClass, onRemove) {
+  function renderChips(containerId, items, labels, chipClass, onRemove, sortable) {
     var el = document.getElementById(containerId);
     if (!el) return;
     var html = items.map(function (id) {
-      return '<span class="rb-chip' + (chipClass ? " " + chipClass : "") + '" data-id="' + id + '">' +
+      var drag = sortable
+        ? '<span class="rb-chip__drag" title="Drag to reorder" aria-hidden="true">⋮⋮</span>'
+        : "";
+      return '<span class="rb-chip' + (chipClass ? " " + chipClass : "") + (sortable ? " rb-chip--draggable" : "") + '" data-id="' + id + '"' + (sortable ? ' draggable="true" title="Drag to reorder"' : "") + ">" +
+        drag +
         (labels[id] || id) +
         '<button type="button" class="rb-chip__x" data-remove="' + id + '" aria-label="Remove">×</button></span>';
     }).join("");
     html += '<button type="button" class="rb-chip-add" data-add-to="' + containerId + '" aria-label="Add">+</button>';
     el.innerHTML = html;
     el.querySelectorAll("[data-remove]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
         onRemove(btn.getAttribute("data-remove"));
       });
     });
@@ -251,6 +256,89 @@
         showAddPop(e.target, containerId);
       });
     });
+    if (sortable) attachChipDragDrop(containerId);
+  }
+
+  function attachChipDragDrop(containerId) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    var stateKey = containerKey(containerId);
+    if (!stateKey) return;
+
+    var dragId = null;
+
+    function clearDropMarkers() {
+      el.querySelectorAll(".rb-chip--drop-before, .rb-chip--drop-after").forEach(function (c) {
+        c.classList.remove("rb-chip--drop-before", "rb-chip--drop-after");
+      });
+    }
+
+    function reorder(sourceId, targetId, insertBefore) {
+      var arr = state[stateKey].slice();
+      var fromIdx = arr.indexOf(sourceId);
+      var toIdx = arr.indexOf(targetId);
+      if (fromIdx === -1 || toIdx === -1 || sourceId === targetId) return;
+      arr.splice(fromIdx, 1);
+      var insertIdx = insertBefore ? toIdx : toIdx + 1;
+      if (fromIdx < insertIdx) insertIdx--;
+      arr.splice(insertIdx, 0, sourceId);
+      state[stateKey] = arr;
+      state.presetId = "custom-current";
+      renderBuilder();
+      renderResult();
+    }
+
+    el.querySelectorAll(".rb-chip[data-id]").forEach(function (chip) {
+      chip.addEventListener("dragstart", function (e) {
+        if (e.target.closest(".rb-chip__x")) {
+          e.preventDefault();
+          return;
+        }
+        dragId = chip.getAttribute("data-id");
+        chip.classList.add("rb-chip--dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", dragId);
+      });
+
+      chip.addEventListener("dragend", function () {
+        chip.classList.remove("rb-chip--dragging");
+        clearDropMarkers();
+        dragId = null;
+      });
+
+      chip.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        var targetId = chip.getAttribute("data-id");
+        if (!dragId || targetId === dragId) return;
+        clearDropMarkers();
+        var rect = chip.getBoundingClientRect();
+        var before = e.clientX < rect.left + rect.width / 2;
+        chip.classList.add(before ? "rb-chip--drop-before" : "rb-chip--drop-after");
+      });
+
+      chip.addEventListener("dragleave", function () {
+        chip.classList.remove("rb-chip--drop-before", "rb-chip--drop-after");
+      });
+
+      chip.addEventListener("drop", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var sourceId = e.dataTransfer.getData("text/plain") || dragId;
+        var targetId = chip.getAttribute("data-id");
+        if (!sourceId || !targetId) return;
+        var rect = chip.getBoundingClientRect();
+        var insertBefore = e.clientX < rect.left + rect.width / 2;
+        clearDropMarkers();
+        reorder(sourceId, targetId, insertBefore);
+      });
+    });
+  }
+
+  function containerKey(containerId) {
+    if (containerId === "rb-rows") return "rows";
+    if (containerId === "rb-values") return "values";
+    return null;
   }
 
   function showAddPop(anchor, containerId) {
@@ -301,11 +389,11 @@
     renderChips("rb-rows", state.rows, DIMENSIONS, "", function (id) {
       state.rows = state.rows.filter(function (r) { return r !== id; });
       renderBuilder();
-    });
+    }, true);
     renderChips("rb-values", state.values, MEASURES, "rb-chip--value", function (id) {
       state.values = state.values.filter(function (v) { return v !== id; });
       renderBuilder();
-    });
+    }, true);
     var filtersEl = document.getElementById("rb-filters");
     if (filtersEl) {
       var fhtml = Object.keys(state.filters).map(function (k) {
