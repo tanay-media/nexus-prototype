@@ -61,7 +61,6 @@
       title: "Lander performance",
       meta: "Aggregate · variant × lander",
       type: "agg",
-      viewMode: "flat",
       chart: "table",
       rows: ["lander_name", "variant_name"],
       values: ["impressions", "clicks", "ctr", "conversions", "cvr", "score"],
@@ -72,7 +71,6 @@
       title: "Visit behaviour trace",
       meta: "Visit-level · 1 row per visit_id",
       type: "visit",
-      viewMode: "flat",
       chart: "table",
       rows: ["visit_id", "lander_name", "variant_name", "device", "visit_time"],
       values: ["time_on_page", "scroll_pct", "form_start", "form_submit", "clicks"],
@@ -83,7 +81,6 @@
       title: "Scroll & time by variant",
       meta: "Charts · behaviour summary",
       type: "chart",
-      viewMode: "flat",
       chart: "bar",
       rows: ["variant_name"],
       values: ["time_on_page", "scroll_pct", "visits"],
@@ -94,7 +91,6 @@
       title: "Form & keyword funnels",
       meta: "Widget metrics · funnel steps",
       type: "widget",
-      viewMode: "nested",
       chart: "funnel",
       rows: ["form_widget"],
       values: ["form_start", "form_submit", "kb_widget_views", "kb_block_clicks", "kb_ad_clicks"],
@@ -138,7 +134,6 @@
 
   var state = {
     presetId: "lander-performance",
-    viewMode: "flat",
     chart: "table",
     rows: [],
     values: [],
@@ -172,7 +167,6 @@
 
   function applyPreset(preset) {
     state.presetId = preset.id;
-    state.viewMode = preset.viewMode;
     state.chart = preset.chart;
     state.rows = preset.rows.slice();
     state.values = preset.values.slice();
@@ -185,7 +179,6 @@
 
   function getCurrentConfig() {
     return {
-      viewMode: state.viewMode,
       chart: state.chart,
       rows: state.rows.slice(),
       values: state.values.slice(),
@@ -227,7 +220,6 @@
         var s = state.customSaved[i];
         if (!s) return;
         state.presetId = "custom-" + i;
-        state.viewMode = s.viewMode;
         state.chart = s.chart;
         state.rows = s.rows.slice();
         state.values = s.values.slice();
@@ -324,9 +316,6 @@
       fhtml += '<span class="rb-chip rb-chip--filter">Lander: <span id="rb-filter-lander">' + (state.filters.lander || "All") + "</span></span>";
       filtersEl.innerHTML = fhtml;
     }
-    document.querySelectorAll(".rb-view-mode").forEach(function (btn) {
-      btn.classList.toggle("is-active", btn.getAttribute("data-mode") === state.viewMode);
-    });
     var chartLabel = document.getElementById("rb-chart-label");
     var ct = CHART_TYPES.find(function (c) { return c.id === state.chart; });
     if (chartLabel) chartLabel.textContent = ct ? ct.label : "Table";
@@ -463,7 +452,7 @@
     }
 
     if (meta) {
-      meta.textContent = rows.length + " rows · " + state.viewMode + " view · " + (CHART_TYPES.find(function (c) { return c.id === state.chart; }) || {}).label;
+      meta.textContent = rows.length + " rows · " + (CHART_TYPES.find(function (c) { return c.id === state.chart; }) || {}).label;
     }
   }
 
@@ -484,15 +473,6 @@
       state.filters.lander = lander;
       renderBuilder();
     }
-
-    document.querySelectorAll(".rb-view-mode").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        state.viewMode = btn.getAttribute("data-mode");
-        state.presetId = "custom-current";
-        renderBuilder();
-        renderResult();
-      });
-    });
 
     var chartsBtn = document.getElementById("rb-charts-btn");
     var chartsMenu = document.getElementById("rb-charts-menu");

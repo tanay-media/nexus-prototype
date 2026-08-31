@@ -127,34 +127,6 @@
   color: var(--text-muted, #7a7568);
 }
 
-.rb-view-modes {
-  display: inline-flex;
-  border: 1px solid var(--border, #e8e4da);
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-}
-
-.rb-view-mode {
-  appearance: none;
-  border: none;
-  background: transparent;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted, #7a7568);
-  cursor: pointer;
-}
-
-.rb-view-mode + .rb-view-mode {
-  border-left: 1px solid var(--border, #e8e4da);
-}
-
-.rb-view-mode.is-active {
-  background: var(--black, #1a1a1a);
-  color: #fff;
-}
-
 .rb-charts-dd {
   position: relative;
 }
