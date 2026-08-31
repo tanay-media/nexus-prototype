@@ -722,7 +722,7 @@
         '</details>' +
         '<button class="icon-btn js-lander-settings" data-lander="'+l.name+'" data-lander-id="'+l.id+'" title="Settings">'+ICON.settings+'</button>' +
         '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'" title="Analyse in Reports">'+ICON.analyse+'</a>' +
-        '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'&view=behaviour" title="User behaviour">'+ICON.behaviour+'</a>' +
+        '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'&report=visit-behaviour" title="User behaviour">'+ICON.behaviour+'</a>' +
         renderMoreMenu(l) +
       '</div>';
     }
@@ -788,7 +788,7 @@
           '<button type="button" class="icon-btn js-variant-settings" data-lander="'+l.name+'" data-lander-id="'+l.id+'" data-variant="'+escapeHtml(v.name)+'" title="Variant settings">'+ICON.settings+'</button>' +
           '<button class="icon-btn js-clone-variant" data-lander="'+l.name+'" data-lander-id="'+l.id+'" data-variant="'+v.name+'" title="Clone variant">'+ICON.clone+'</button>' +
           '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'" title="Analyse in Reports">'+ICON.analyse+'</a>' +
-        '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'&view=behaviour" title="User behaviour">'+ICON.behaviour+'</a>' +
+        '<a class="icon-btn" href="reports.html?lander='+encodeURIComponent(l.name)+'&report=visit-behaviour" title="User behaviour">'+ICON.behaviour+'</a>' +
         '</div></td>';
       return tr;
     }

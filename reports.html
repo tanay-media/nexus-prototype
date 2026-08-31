@@ -6,7 +6,7 @@
   <title>Reports · nexus</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="keyword-blocks.css" />
-  <link rel="stylesheet" href="reports-analytics.css" />
+  <link rel="stylesheet" href="reports-builder.css" />
 </head>
 <body>
   <div class="top-strip"></div>
@@ -21,7 +21,7 @@
         <a href="offers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</a>
         <a href="domains.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Domains</a>
         <a href="logs.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Logs</a>
-        <a href="settings.html" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</a>
+        <a href="settings.html" data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</a>
       </nav>
       <div class="avatar">K</div>
     </aside>
@@ -30,1145 +30,113 @@
       <div class="page-header">
         <h1>Reports</h1>
         <div class="page-header__right">
-          <select class="select"><option>Last 7 days</option><option>Last 30 days</option><option>Custom…</option></select>
-          <select class="select"><option>All domains</option><option>offers.acme.com</option><option>refer.acme.com</option></select>
-          <select class="select" id="lander-filter">
-            <option value="">All landers</option>
-            <option>Summer Sale</option>
-            <option>Referral Q2</option>
-            <option>Founder Letter</option>
-            <option>Partner Announce</option>
-            <option>Black Friday</option>
-            <option>Hedge Your Future</option>
-          </select>
-          <button class="btn">↓ Export CSV</button>
+          <a href="logs.html" class="btn" style="text-decoration:none;font-size:13px;">Open Logs →</a>
+          <button type="button" class="btn" id="rb-export">↓ Export CSV</button>
         </div>
       </div>
 
-      <!-- Filter banner — shown when Analyse navigated here with ?lander=... -->
-      <div class="filter-note" id="filter-note">
-        <span><strong id="filter-note-name"></strong> is filtered in — other landers are hidden.</span>
-        <button type="button" id="filter-note-clear">Clear filter</button>
-      </div>
-
-      <div class="reports-page-body" data-tabs="reports-view">
-        <div class="tabs reports-view-tabs" role="tablist" aria-label="Reports views">
-          <button type="button" class="tab is-active" data-tab="performance" role="tab" aria-selected="true">Performance</button>
-          <button type="button" class="tab" data-tab="behaviour" role="tab" aria-selected="false">User behaviour</button>
-          <button type="button" class="tab" data-tab="forms" role="tab" aria-selected="false">Forms</button>
-        </div>
-
-        <section class="reports-view-panel" data-tab-panel="performance">
-      <div class="reports-layout">
-        <div class="reports-main-stack">
-        <div class="card reports-funnel-card" id="kb-reports-funnel">
-          <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-            <div>
-              <h3 class="settings-section__title" style="margin:0;">Keyword blocks funnel</h3>
-              <p class="muted" style="margin:4px 0 0;font-size:12px;">Hedge Your Future · Reader modal v1 · last 7 days</p>
-            </div>
-            <a href="widgets.html" class="btn" style="font-size:12px;text-decoration:none;">Open widget →</a>
-          </div>
-          <div style="padding:12px 20px 20px;">
-            <div class="kb-funnel-stats">
-              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Visits</div><div class="kb-funnel-step__val">3,347</div></div>
-              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">3,248</div><div class="kb-funnel-step__rate">97.0% view rate</div></div>
-              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">964</div><div class="kb-funnel-step__rate">29.7% block rate</div></div>
-              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ads shown</div><div class="kb-funnel-step__val">941</div><div class="kb-funnel-step__rate">97.6% show rate</div></div>
-              <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks → MAX</div><div class="kb-funnel-step__val">47</div><div class="kb-funnel-step__rate">5.0% ad CTR</div></div>
-            </div>
-            <div class="table-scroll">
-              <table class="table reports-funnel-table">
-                <thead>
-                  <tr>
-                    <th>Keyword</th>
-                    <th class="right">Block clicks</th>
-                    <th class="right">Ad impr.</th>
-                    <th class="right">Ad clicks</th>
-                    <th class="right">Ad CTR</th>
-                    <th>Ad served</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>passive income investing</strong></td>
-                    <td class="right">412</td>
-                    <td class="right">401</td>
-                    <td class="right">24</td>
-                    <td class="right">6.0%</td>
-                    <td class="muted" style="font-size:12px;">E*TRADE® Account Setup</td>
-                  </tr>
-                  <tr>
-                    <td><strong>etf zero fee platform</strong></td>
-                    <td class="right">198</td>
-                    <td class="right">194</td>
-                    <td class="right">11</td>
-                    <td class="right">5.7%</td>
-                    <td class="muted" style="font-size:12px;">Fidelity Zero ETFs</td>
-                  </tr>
-                  <tr>
-                    <td><strong>beginner investing start</strong></td>
-                    <td class="right">186</td>
-                    <td class="right">182</td>
-                    <td class="right">8</td>
-                    <td class="right">4.4%</td>
-                    <td class="muted" style="font-size:12px;">Schwab Beginner Guide</td>
-                  </tr>
-                  <tr>
-                    <td><strong>open brokerage account fast</strong></td>
-                    <td class="right">168</td>
-                    <td class="right">164</td>
-                    <td class="right">4</td>
-                    <td class="right">2.4%</td>
-                    <td class="muted" style="font-size:12px;">Robinhood Sign Up</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <p class="muted reports-table-hint" style="font-size:12px; margin:0 0 0.65rem; padding: 0.85rem 1rem 0;">Use <strong>Measures</strong> and <strong>Dimensions</strong> on the right to add or remove columns.</p>
-          <div class="table-scroll" role="region" aria-label="Reports data">
-          <table class="table reports-table" id="reports-data-table">
-            <thead id="reports-thead"></thead>
-            <tbody id="reports-tbody"></tbody>
-            <tfoot id="reports-tfoot"></tfoot>
-          </table>
-          </div>
-        </div>
-        </div>
-
-        <aside class="reports-side">
-          <div class="reports-side__block reports-side__block--measures">
-            <h4>Measures</h4>
-            <div class="reports-check-list" id="reports-measure-list">
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="lander_thumb" /><span>Lander thumbnail</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="variant_thumb" /><span>Variant thumbnail</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="visits" /><span>Visits</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="impressions" checked /><span>Impressions</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="impression_rate" /><span>Impression rate</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="clicks" checked /><span>Clicks</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="ctr" checked /><span>CTR</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="conversions" checked /><span>Conversions</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="cvr" checked /><span>CVR</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="score" checked /><span>Score</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_start" /><span>Form start</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_step_complete" /><span>Form step complete</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_submit" /><span>Form submit</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="form_step_abandon" /><span>Form step abandon</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_widget_views" /><span>KB widget views</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_block_clicks" /><span>KB block clicks</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_ad_impressions" /><span>KB ad impressions</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_ad_clicks" /><span>KB ad clicks</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_block_rate" /><span>KB block rate</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="measure" data-col="kb_ad_ctr" /><span>KB ad CTR</span></label>
-            </div>
-          </div>
-          <div class="reports-side__block reports-side__block--dimensions">
-            <h4>Dimensions</h4>
-            <div class="reports-check-list" id="reports-dimension-list">
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_created" /><span>Time — created date</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_updated" /><span>Time — updated date</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_hour" /><span>Time — hour of day</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_dow" /><span>Time — day of week</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_week" /><span>Time — week</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_month" /><span>Time — month</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="t_year" /><span>Time — year</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="workspace" /><span>Workspace name</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="lander_id" /><span>Lander id</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="lander_name" /><span>Lander name</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="variant_id" /><span>Variant id</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="variant_name" /><span>Variant name</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="version_id" /><span>version_id</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="domain" /><span>Domain</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="route" /><span>Route</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="device" /><span>Device type</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="os" /><span>OS</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="browser" /><span>Browser name</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="webview" /><span>Webview flag</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="country" /><span>Country</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="county" /><span>County</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="city" /><span>City</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="zip" /><span>ZIP code</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="channel" /><span>Channel name</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="utm_source" /><span>UTM source</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="utm_medium" /><span>UTM medium</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="utm_campaign" /><span>UTM campaign</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="referer" /><span>Referer</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="cta_id" /><span>CTA_id</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="linkout" /><span>Linkout</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="keyword" /><span>Keyword</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="slot_index" /><span>Slot index</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="kb_widget_id" /><span>KB widget id</span></label>
-              <label class="reports-check-row"><input type="checkbox" class="js-report-col-toggle" data-kind="dimension" data-col="ad_title" /><span>Ad title</span></label>
-            </div>
-          </div>
+      <div class="rb-layout">
+        <!-- Saved reports / Quick access -->
+        <aside class="rb-saved">
+          <div class="rb-saved__head">Saved reports</div>
+          <ul class="rb-saved__list" id="rb-saved-list"></ul>
         </aside>
-      </div>
-        </section>
 
-        <!-- User behaviour — engagement metrics, charts, visit-level table -->
-        <section class="reports-view-panel" data-tab-panel="behaviour" hidden>
-          <div class="behaviour-kpis" id="behaviour-kpis">
-            <div class="behaviour-kpi">
-              <div class="behaviour-kpi__label">Time on page</div>
-              <div class="behaviour-kpi__primary" id="beh-kpi-time-avg">42s</div>
-              <div class="behaviour-kpi__secondary"><span id="beh-kpi-time-cum">3,347</span> visits tracked</div>
-              <span class="behaviour-kpi__delta">↑ 8% vs prior period</span>
-            </div>
-            <div class="behaviour-kpi">
-              <div class="behaviour-kpi__label">Scroll depth</div>
-              <div class="behaviour-kpi__primary" id="beh-kpi-scroll-avg">68%</div>
-              <div class="behaviour-kpi__secondary">median <span id="beh-kpi-scroll-med">72%</span></div>
-              <span class="behaviour-kpi__delta">↑ 3% vs prior period</span>
-            </div>
-            <div class="behaviour-kpi">
-              <div class="behaviour-kpi__label">Quick exit</div>
-              <div class="behaviour-kpi__primary" id="beh-kpi-exit-rate">26.6%</div>
-              <div class="behaviour-kpi__secondary"><span id="beh-kpi-exit-cum">892</span> exits &lt;10s</div>
-              <span class="behaviour-kpi__delta is-down">↓ 2% vs prior period</span>
-            </div>
-            <div class="behaviour-kpi">
-              <div class="behaviour-kpi__label">CTA engagement</div>
-              <div class="behaviour-kpi__primary" id="beh-kpi-cta-rate">38.2%</div>
-              <div class="behaviour-kpi__secondary"><span id="beh-kpi-cta-cum">1,278</span> clicks from visits</div>
-              <span class="behaviour-kpi__delta">↑ 1.1% vs prior period</span>
-            </div>
-          </div>
-
-          <div class="behaviour-charts">
-            <div class="behaviour-chart-card">
-              <div class="behaviour-chart-card__head">
-                <div>
-                  <h3 class="behaviour-chart-card__title">Scroll depth (cumulative)</h3>
-                  <p class="behaviour-chart-card__sub">% of visits reaching each depth · last 7 days</p>
+        <div class="rb-main">
+          <!-- Builder -->
+          <div class="rb-builder">
+            <div class="rb-builder__top">
+              <div class="rb-model">
+                <span class="rb-model__name">nexus_lander_metrics</span>
+                <span class="rb-model__sub">Model: Visit · Impression · Click · Conversion</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <div class="rb-view-modes" role="group" aria-label="View mode">
+                  <button type="button" class="rb-view-mode is-active" data-mode="flat">Flat</button>
+                  <button type="button" class="rb-view-mode" data-mode="nested">Nested</button>
+                  <button type="button" class="rb-view-mode" data-mode="pivot">Pivot</button>
                 </div>
-                <div class="behaviour-chart-legend"><span class="leg-bar">Reached depth</span></div>
-              </div>
-              <div class="scroll-depth-chart" id="scroll-depth-chart">
-                <div class="scroll-depth-row"><span class="scroll-depth-row__label">25%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:94%"></div></div><span class="scroll-depth-row__pct">94%</span></div>
-                <div class="scroll-depth-row"><span class="scroll-depth-row__label">50%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:81%"></div></div><span class="scroll-depth-row__pct">81%</span></div>
-                <div class="scroll-depth-row"><span class="scroll-depth-row__label">75%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:58%"></div></div><span class="scroll-depth-row__pct">58%</span></div>
-                <div class="scroll-depth-row"><span class="scroll-depth-row__label">100%</span><div class="scroll-depth-row__track"><div class="scroll-depth-row__fill" style="width:31%"></div></div><span class="scroll-depth-row__pct">31%</span></div>
-              </div>
-            </div>
-            <div class="behaviour-chart-card">
-              <div class="behaviour-chart-card__head">
-                <div>
-                  <h3 class="behaviour-chart-card__title">Time on page distribution</h3>
-                  <p class="behaviour-chart-card__sub">Visit count by bucket · avg <strong id="beh-chart-time-avg">42s</strong></p>
-                </div>
-                <div class="behaviour-chart-legend"><span class="leg-bar">Visits</span></div>
-              </div>
-              <div class="time-histogram" id="time-histogram" aria-hidden="true">
-                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:28%"></div><span class="time-histogram__label">0–10s</span></div>
-                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:52%"></div><span class="time-histogram__label">10–30s</span></div>
-                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar is-avg" style="height:88%"></div><span class="time-histogram__label">30–60s</span></div>
-                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:64%"></div><span class="time-histogram__label">1–2m</span></div>
-                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:38%"></div><span class="time-histogram__label">2–5m</span></div>
-                <div class="time-histogram__bar-wrap"><div class="time-histogram__bar" style="height:18%"></div><span class="time-histogram__label">5m+</span></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="behaviour-heatmap-row">
-            <div class="behaviour-heatmap-preview">
-              <div class="behaviour-heatmap-preview__chrome">
-                <div class="behaviour-heatmap-preview__bar"></div>
-                <div class="behaviour-heatmap-preview__screen">
-                  <div class="behaviour-heatmap-preview__screen-inner">
-                    <div class="behaviour-heatmap-preview__hero">
-                      <p class="muted" style="font-size:9px;margin:0 0 4px;">Limited time</p>
-                      <h3>Refresh your space for spring</h3>
-                      <p class="muted" style="margin:0;font-size:10px;">See pricing for your zip in under a minute.</p>
-                      <span class="behaviour-heatmap-preview__cta">Get my quote →</span>
+                <div class="rb-charts-dd">
+                  <button type="button" class="rb-charts-dd__btn" id="rb-charts-btn" aria-haspopup="true" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+                    <span id="rb-chart-label">Table</span>
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                  </button>
+                  <div class="rb-charts-dd__menu" id="rb-charts-menu" hidden>
+                    <input type="search" class="rb-charts-dd__search" placeholder="Search chart type…" aria-label="Search charts" />
+                    <div class="rb-charts-dd__group">
+                      <div class="rb-charts-dd__label">Data presentation</div>
+                      <button type="button" class="rb-charts-dd__opt is-active" data-chart="table">Table</button>
+                      <button type="button" class="rb-charts-dd__opt" data-chart="basic_table">Basic table</button>
+                      <button type="button" class="rb-charts-dd__opt" data-chart="metric"># Metric</button>
                     </div>
-                    <div class="behaviour-heatmap-preview__block"><strong>Why homeowners choose us</strong><p class="muted" style="margin:4px 0 0;font-size:10px;">Transparent quotes, clear timelines.</p></div>
-                    <div class="behaviour-heatmap-preview__block"><strong>How it works</strong><p class="muted" style="margin:4px 0 0;font-size:10px;">1. Tell us · 2. Compare · 3. Book</p></div>
-                  </div>
-                  <div class="heatmap-overlay" aria-hidden="true"></div>
-                </div>
-              </div>
-            </div>
-            <div class="behaviour-heatmap-meta">
-              <h3>Click heatmap</h3>
-              <p class="muted" style="font-size:12px;margin:0;">Aggregated click positions overlaid on variant preview.</p>
-              <div class="behaviour-heatmap-filters">
-                <select class="select" id="beh-heatmap-variant" aria-label="Variant">
-                  <option>V1 — Main hero</option>
-                  <option>V2 — Urgency countdown</option>
-                  <option>V1 — Single-field</option>
-                </select>
-                <select class="select" id="beh-heatmap-device" aria-label="Device">
-                  <option value="">All devices</option>
-                  <option selected>Mobile</option>
-                  <option>Desktop</option>
-                  <option>Tablet</option>
-                </select>
-              </div>
-              <div class="behaviour-heatmap-stats">
-                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Total clicks</div><div class="behaviour-heatmap-stat__val" id="beh-hm-clicks">1,278</div></div>
-                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Hot zone (hero CTA)</div><div class="behaviour-heatmap-stat__val">64%</div></div>
-                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Avg click Y</div><div class="behaviour-heatmap-stat__val">312px</div></div>
-                <div class="behaviour-heatmap-stat"><div class="behaviour-heatmap-stat__label">Rage clicks</div><div class="behaviour-heatmap-stat__val">0.4%</div></div>
-              </div>
-              <div class="behaviour-heatmap-legend">
-                <span>Low</span>
-                <div class="behaviour-heatmap-legend__gradient"></div>
-                <span>High</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="card behaviour-visits-card">
-            <div class="card-head">
-              <div>
-                <h3>Visits</h3>
-                <p>One row per visit — drill into Logs for the full event trail.</p>
-              </div>
-              <button type="button" class="btn" id="beh-visits-export">↓ Export CSV</button>
-            </div>
-            <div class="table-scroll" role="region" aria-label="Visit-level behaviour">
-              <table class="table table--behaviour-visits" id="behaviour-visits-table">
-                <thead>
-                  <tr>
-                    <th>visit_id</th>
-                    <th>Time</th>
-                    <th>Lander / variant</th>
-                    <th>Device</th>
-                    <th class="right">Time on page</th>
-                    <th class="right">Scroll %</th>
-                    <th>Clicked</th>
-                    <th>Form</th>
-                    <th>KB keyword</th>
-                    <th class="right"></th>
-                  </tr>
-                </thead>
-                <tbody id="behaviour-visits-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- Forms — funnel analytics (responses live in Widgets) -->
-        <section class="reports-view-panel" data-tab-panel="forms" hidden>
-          <div class="forms-analytics-stack">
-            <div class="forms-funnel-card">
-              <div class="forms-funnel-head">
-                <div>
-                  <h3>Form funnel</h3>
-                  <p class="muted">Cumulative counts and step conversion rates · <span id="forms-funnel-lander-label">all landers</span></p>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-                  <div>
-                    <label class="muted" style="font-size:11px;font-weight:600;text-transform:uppercase;display:block;margin-bottom:4px;">Form widget</label>
-                    <select class="select" id="forms-widget-select" aria-label="Form widget">
-                      <option value="lead-qualify">Lead — short qualify</option>
-                      <option value="quote-request">Quote request</option>
-                      <option value="newsletter-sms">Newsletter + SMS opt-in</option>
-                      <option value="home-service">Home service quote</option>
-                    </select>
+                    <div class="rb-charts-dd__group">
+                      <div class="rb-charts-dd__label">Trend charts</div>
+                      <button type="button" class="rb-charts-dd__opt is-disabled" data-chart="line">Line graph</button>
+                      <button type="button" class="rb-charts-dd__opt is-disabled" data-chart="area">Area chart</button>
+                      <button type="button" class="rb-charts-dd__opt is-disabled" data-chart="combo">Combo chart</button>
+                    </div>
+                    <div class="rb-charts-dd__group">
+                      <div class="rb-charts-dd__label">Comparison charts</div>
+                      <button type="button" class="rb-charts-dd__opt" data-chart="bar">Bar graph</button>
+                    </div>
+                    <div class="rb-charts-dd__group">
+                      <div class="rb-charts-dd__label">Composition charts</div>
+                      <button type="button" class="rb-charts-dd__opt" data-chart="funnel">Funnel graph</button>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="forms-step-funnel" id="forms-step-funnel">
-                <div class="forms-step"><div class="forms-step__label">Visits</div><div class="forms-step__cum" id="forms-visits">118,420</div><div class="forms-step__avg">100%</div></div>
-                <div class="forms-step"><div class="forms-step__label">Form start</div><div class="forms-step__cum" id="forms-start">98,200</div><div class="forms-step__rate" id="forms-start-rate">82.9% of visits</div></div>
-                <div class="forms-step"><div class="forms-step__label">Step 1 complete</div><div class="forms-step__cum" id="forms-s1">86,400</div><div class="forms-step__rate" id="forms-s1-rate">88.0% of starts</div></div>
-                <div class="forms-step"><div class="forms-step__label">Step 2 complete</div><div class="forms-step__cum" id="forms-s2">72,450</div><div class="forms-step__rate" id="forms-s2-rate">73.8% of starts</div></div>
-                <div class="forms-step"><div class="forms-step__label">Submit</div><div class="forms-step__cum" id="forms-submit">52,164</div><div class="forms-step__rate" id="forms-submit-rate">53.1% of starts</div></div>
-              </div>
-              <div class="forms-cross-links" style="margin-top:16px;">
-                <a href="widgets.html" class="btn" style="font-size:12px;text-decoration:none;" id="forms-link-responses">View form responses in Widgets →</a>
-                <span class="muted" style="font-size:12px;align-self:center;">PII &amp; field values stay in Widgets · not duplicated here</span>
-              </div>
             </div>
 
-            <div class="card">
-              <p class="muted" style="font-size:12px;margin:0;padding:14px 20px 0;">Step-level drop-off — cumulative abandon vs avg time per step.</p>
-              <div class="table-scroll" role="region" aria-label="Form step analytics">
-                <table class="table forms-drop-table" id="forms-drop-table">
-                  <thead>
-                    <tr>
-                      <th>Step</th>
-                      <th class="right">Reached (cum.)</th>
-                      <th class="right">Drop-off</th>
-                      <th class="right">Step CVR</th>
-                      <th class="right">Avg time on step</th>
-                      <th>Top abandon field</th>
-                    </tr>
-                  </thead>
-                  <tbody id="forms-drop-tbody">
-                    <tr><td><strong>ZIP code</strong></td><td class="right num">98,200</td><td class="right num">11,800</td><td class="right">88.0%</td><td class="right">8s</td><td class="muted">—</td></tr>
-                    <tr><td><strong>Age range</strong></td><td class="right num">86,400</td><td class="right num">13,950</td><td class="right">86.1%</td><td class="right">12s</td><td class="muted">Age (4.2%)</td></tr>
-                    <tr><td><strong>Email</strong></td><td class="right num">72,450</td><td class="right num">20,286</td><td class="right">72.0%</td><td class="right">18s</td><td class="muted">Email (9.1%)</td></tr>
-                    <tr><td><strong>Submit</strong></td><td class="right num">52,164</td><td class="right num">—</td><td class="right">53.1%</td><td class="right">3s</td><td class="muted">—</td></tr>
-                  </tbody>
-                </table>
+            <div class="rb-builder__body">
+              <div class="rb-field">
+                <span class="rb-field__label">Rows</span>
+                <div class="rb-chips" id="rb-rows"></div>
               </div>
-            </div>
-
-            <div class="card reports-funnel-card" id="forms-kb-card">
-              <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-                <div>
-                  <h3 class="settings-section__title" style="margin:0;">Keyword blocks funnel</h3>
-                  <p class="muted" style="margin:4px 0 0;font-size:12px;">Widget-level engagement · also in <a href="widgets.html">Widgets → Keyword funnel</a></p>
-                </div>
-                <a href="widgets.html" class="btn" style="font-size:12px;text-decoration:none;">Open widget →</a>
+              <div class="rb-field">
+                <span class="rb-field__label">Values</span>
+                <div class="rb-chips" id="rb-values"></div>
               </div>
-              <div style="padding:12px 20px 20px;">
-                <div class="kb-funnel-stats">
-                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">3,248</div><div class="kb-funnel-step__rate">97% of visits</div></div>
-                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">964</div><div class="kb-funnel-step__rate">29.7% block rate</div></div>
-                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ads shown</div><div class="kb-funnel-step__val">941</div><div class="kb-funnel-step__rate">97.6% show rate</div></div>
-                  <div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks</div><div class="kb-funnel-step__val">47</div><div class="kb-funnel-step__rate">5.0% ad CTR</div></div>
-                </div>
+              <div class="rb-field">
+                <span class="rb-field__label">Filters</span>
+                <div class="rb-chips" id="rb-filters"></div>
+              </div>
+              <div class="rb-builder__actions">
+                <button type="button" class="btn btn--generate" id="rb-generate">Generate</button>
+                <button type="button" class="btn" id="rb-save-view">Save view</button>
+                <span class="muted" style="font-size:12px;">Rows = dimensions · Values = columns</span>
               </div>
             </div>
           </div>
-        </section>
+
+          <!-- Result -->
+          <div class="rb-result">
+            <div class="rb-result__tabs" role="tablist">
+              <button type="button" class="rb-result__tab is-active" role="tab">Result</button>
+              <button type="button" class="rb-result__tab" role="tab" disabled title="Prototype">Quick access</button>
+              <button type="button" class="rb-result__tab" role="tab" disabled title="Prototype">Dictionary</button>
+            </div>
+            <div class="rb-result__toolbar">
+              <input type="search" class="rb-result__search" placeholder="Search in table…" aria-label="Search results" />
+              <button type="button" class="btn" style="font-size:12px;padding:5px 10px;">Compare to past</button>
+              <span class="rb-result__meta" id="rb-result-meta">—</span>
+            </div>
+            <div class="rb-result__body">
+              <div class="rb-chart-wrap" id="rb-chart-area" hidden></div>
+              <div id="rb-table-area"></div>
+            </div>
+            <div class="rb-pagination">
+              <span>Page 1</span>
+              <span>20 rows per page</span>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>
 
-  <!-- 5: Side drawer for viewing a variant -->
-  <div class="drawer-scrim" id="drawer-scrim"></div>
-  <aside class="drawer" id="variant-drawer" aria-hidden="true" aria-labelledby="drawer-variant-title">
-    <div class="drawer__head">
-      <div class="drawer__head-text">
-        <div class="drawer__title">
-          <span class="badge badge--variant" id="drawer-variant-badge">V1</span>
-          <span id="drawer-variant-title">Summer Sale</span>
-        </div>
-        <div class="drawer__sub" id="drawer-variant-sub">offers.acme.com</div>
-      </div>
-      <div class="drawer__head-actions">
-        <a class="icon-btn" id="drawer-edit-btn" href="editor.html" title="Edit in editor" aria-label="Edit in editor">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
-        </a>
-        <a class="icon-btn" id="drawer-settings-btn" href="editor.html" title="Lander settings" aria-label="Lander settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="drawer__body drawer__body--preview">
-      <div class="drawer-mobile-chrome" aria-hidden="true">
-        <div class="drawer-mobile-bar"></div>
-        <div class="drawer-mobile-scroll">
-          <div class="drawer-dummy-lander">
-            <div class="drawer-dummy-lander__hero">
-              <p class="drawer-dummy-lander__eyebrow">Limited time</p>
-              <h1 class="drawer-dummy-lander__h1">Refresh your space for spring</h1>
-              <p class="drawer-dummy-lander__lead">See pricing for your zip in under a minute — no obligation.</p>
-              <button type="button" class="drawer-dummy-lander__cta">Get my quote →</button>
-            </div>
-            <ul class="drawer-dummy-lander__bullets">
-              <li>Licensed &amp; insured pros in your area</li>
-              <li>Financing options available</li>
-              <li>Thousands of five-star reviews</li>
-            </ul>
-            <div class="drawer-dummy-lander__card">
-              <strong>Why homeowners choose us</strong>
-              <p>Transparent quotes, clear timelines, and a dedicated coordinator from measure to install.</p>
-            </div>
-            <div class="drawer-dummy-lander__card">
-              <strong>How it works</strong>
-              <ol>
-                <li>Tell us about your project</li>
-                <li>Compare options matched to your home</li>
-                <li>Book when you’re ready</li>
-              </ol>
-            </div>
-            <p class="drawer-dummy-lander__fine">Mock mobile preview · not live HTML</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
   <script src="app.js"></script>
-  <script>
-    (function () {
-      var MEASURE_ORDER = ["lander_thumb", "variant_thumb", "visits", "impressions", "impression_rate", "clicks", "ctr", "conversions", "cvr", "score", "form_start", "form_step_complete", "form_submit", "form_step_abandon", "kb_widget_views", "kb_block_clicks", "kb_ad_impressions", "kb_ad_clicks", "kb_block_rate", "kb_ad_ctr"];
-      var DIMENSION_ORDER = ["t_created", "t_updated", "t_hour", "t_dow", "t_week", "t_month", "t_year", "workspace", "lander_id", "lander_name", "variant_id", "variant_name", "version_id", "domain", "route", "device", "os", "browser", "webview", "country", "county", "city", "zip", "channel", "utm_source", "utm_medium", "utm_campaign", "referer", "cta_id", "linkout", "keyword", "slot_index", "kb_widget_id", "ad_title"];
-      var MEASURE_LABEL = {
-        lander_thumb: "Lander",
-        variant_thumb: "Variant",
-        visits: "Visits",
-        impressions: "Impressions",
-        impression_rate: "Impr. rate",
-        clicks: "Clicks",
-        ctr: "CTR",
-        conversions: "Conversions",
-        cvr: "CVR",
-        score: "Score",
-        form_start: "Form start",
-        form_step_complete: "Form step complete",
-        form_submit: "Form submit",
-        form_step_abandon: "Form step abandon",
-        kb_widget_views: "KB widget views",
-        kb_block_clicks: "KB block clicks",
-        kb_ad_impressions: "KB ad impr.",
-        kb_ad_clicks: "KB ad clicks",
-        kb_block_rate: "KB block rate",
-        kb_ad_ctr: "KB ad CTR"
-      };
-      var DIMENSION_LABEL = {
-        t_created: "Created date",
-        t_updated: "Updated date",
-        t_hour: "Hour",
-        t_dow: "Day of week",
-        t_week: "Week",
-        t_month: "Month",
-        t_year: "Year",
-        workspace: "Workspace",
-        lander_id: "Lander id",
-        lander_name: "Lander name",
-        variant_id: "Variant id",
-        variant_name: "Variant name",
-        version_id: "version_id",
-        domain: "Domain",
-        route: "Route",
-        device: "Device",
-        os: "OS",
-        browser: "Browser",
-        webview: "Webview",
-        country: "Country",
-        county: "County",
-        city: "City",
-        zip: "ZIP",
-        channel: "Channel",
-        utm_source: "UTM source",
-        utm_medium: "UTM medium",
-        utm_campaign: "UTM campaign",
-        referer: "Referer",
-        cta_id: "CTA_id",
-        linkout: "Linkout",
-        keyword: "Keyword",
-        slot_index: "Slot",
-        kb_widget_id: "KB widget",
-        ad_title: "Ad title"
-      };
-
-      function nf(n) {
-        return Math.round(n).toLocaleString();
-      }
-      function pct(a, b) {
-        if (!b) return "—";
-        return (100 * a / b).toFixed(1) + "%";
-      }
-
-      var ROWS = [
-        { key: "pa", lander: "Partner Announce", variant: "V1 — Press", domain: "try.acme.com", expandId: "pa-days", startOpen: true, vstrong: "Press", hue: 32,
-          m: { visits: 2410, impressions: 2285, clicks: 868, conversions: 329, score: 0.144, form_start: 1960, form_step_complete: 1420, form_submit: 329, form_abandon: 1631 },
-          days: [
-            { header: true },
-            { impressions: 482, clicks: 183, conversions: 70, score: 0.145, date: "Apr 21, 2026" },
-            { impressions: 424, clicks: 161, conversions: 61, score: 0.144, date: "Apr 20, 2026" },
-            { impressions: 381, clicks: 145, conversions: 55, score: 0.144, date: "Apr 19, 2026" },
-            { impressions: 328, clicks: 124, conversions: 47, score: 0.143, date: "Apr 18, 2026" },
-            { impressions: 265, clicks: 101, conversions: 38, score: 0.143, date: "Apr 17, 2026" },
-            { impressions: 222, clicks: 84, conversions: 32, score: 0.144, date: "Apr 16, 2026" },
-            { impressions: 183, clicks: 70, conversions: 26, score: 0.142, date: "Apr 15, 2026" }
-          ]
-        },
-        { key: "bf", lander: "Black Friday", variant: "V1 — Orange bold", domain: "offers.acme.com", expandId: "bf-days", startOpen: false, vstrong: "Orange bold", hue: 210,
-          m: { visits: 6050, impressions: 5786, clicks: 1042, conversions: 185, score: 0.032, form_start: 4200, form_step_complete: 2880, form_submit: 185, form_abandon: 4015 },
-          days: [{ header: true }, { impressions: 1240, clicks: 223, conversions: 40, score: 0.032, date: "Apr 21, 2026" }, { impressions: 1102, clicks: 198, conversions: 35, score: 0.032, date: "Apr 20, 2026" }]
-        },
-        { key: "fl", lander: "Founder Letter", variant: "V1 — Long form", domain: "offers.acme.com", expandId: "fl-days", startOpen: false, vstrong: "Long form", hue: 118,
-          m: { visits: 15420, impressions: 14668, clicks: 6601, conversions: 2376, score: 0.162, form_start: 12900, form_step_complete: 9100, form_submit: 2376, form_abandon: 10524 },
-          days: [{ header: true }, { impressions: 3120, clicks: 1404, conversions: 505, score: 0.162, date: "Apr 21, 2026" }, { impressions: 2890, clicks: 1300, conversions: 468, score: 0.162, date: "Apr 20, 2026" }]
-        },
-        { key: "rq", lander: "Referral Q2", variant: "V1 — Single-field", domain: "refer.acme.com", expandId: "rq-days", startOpen: false, vstrong: "Single-field", hue: 265,
-          m: { visits: 17800, impressions: 16951, clicks: 8608, conversions: 4657, score: 0.275, form_start: 15100, form_step_complete: 11200, form_submit: 4657, form_abandon: 13143 },
-          days: [{ header: true }, { impressions: 3610, clicks: 1834, conversions: 992, score: 0.275, date: "Apr 21, 2026" }, { impressions: 3401, clicks: 1728, conversions: 935, score: 0.275, date: "Apr 20, 2026" }]
-        },
-        { key: "hyf", lander: "Hedge Your Future", variant: "V1 — Reader modal", domain: "hedgeyourfuture.com", expandId: "hyf-days", startOpen: false, vstrong: "Reader modal", hue: 145,
-          m: { visits: 3347, impressions: 3248, clicks: 47, conversions: 12, score: 0.014, form_start: 0, form_step_complete: 0, form_submit: 0, form_abandon: 0, kb_widget_views: 3248, kb_block_clicks: 964, kb_ad_impressions: 941, kb_ad_clicks: 47 },
-          days: [{ header: true }, { impressions: 620, clicks: 9, conversions: 2, score: 0.014, date: "Apr 21, 2026" }, { impressions: 580, clicks: 8, conversions: 2, score: 0.014, date: "Apr 20, 2026" }]
-        },
-        { key: "ss", lander: "Summer Sale", variant: "V1 — Main hero", domain: "offers.acme.com", expandId: "ss-days", startOpen: false, vstrong: "Main hero", hue: 18,
-          m: { visits: 118420, impressions: 112613, clicks: 75899, conversions: 52164, score: 0.463, form_start: 98200, form_step_complete: 72450, form_submit: 52164, form_abandon: 46036 },
-          days: [{ header: true }, { impressions: 24100, clicks: 16243, conversions: 11170, score: 0.463, date: "Apr 21, 2026" }, { impressions: 22800, clicks: 15360, conversions: 10552, score: 0.463, date: "Apr 20, 2026" }]
-        }
-      ];
-
-      var MOCK_DIM = { t_created: "Apr 1, 2026", t_updated: "Apr 21, 2026", t_hour: "14", t_dow: "Tue", t_week: "W16", t_month: "Apr", t_year: "2026", workspace: "ACME Growth", lander_id: "ldr_mock", variant_id: "var_mock", version_id: "vv_m5n8k3p", route: "/", device: "mobile", os: "iOS 18", browser: "Safari", webview: "no", country: "US", county: "Cuyahoga", city: "Cleveland", zip: "44102", channel: "Paid search", utm_source: "google", utm_medium: "cpc", utm_campaign: "brand_q2", referer: "google.com", cta_id: "cta_primary", linkout: "adv_default", keyword: "passive income investing", slot_index: "0", kb_widget_id: "7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8", ad_title: "E*TRADE® Account Setup" };
-
-      // Mock split values for each dimension. When a dimension is selected, each parent row
-      // expands into one child row per value — i.e. "group by" that dimension.
-      var DIM_VALUES = {
-        t_created: ["Apr 21, 2026", "Apr 20, 2026", "Apr 19, 2026"],
-        t_updated: ["Apr 21, 2026", "Apr 20, 2026"],
-        t_hour: ["09:00", "13:00", "20:00"],
-        t_dow: ["Mon", "Wed", "Fri", "Sun"],
-        t_week: ["W16", "W15", "W14"],
-        t_month: ["Apr", "Mar"],
-        t_year: ["2026"],
-        workspace: ["ACME Growth"],
-        domain: ["offers.acme.com", "refer.acme.com", "try.acme.com"],
-        route: ["/", "/hero", "/promo"],
-        device: ["mobile", "desktop", "tablet"],
-        os: ["iOS 18", "Android 14", "Windows 11", "macOS"],
-        browser: ["Safari", "Chrome", "Edge", "Firefox"],
-        webview: ["no", "yes"],
-        country: ["United States", "United Kingdom", "Canada", "Australia"],
-        county: ["Cuyahoga", "Los Angeles", "King", "Harris"],
-        city: ["Cleveland", "Austin", "New York", "Seattle"],
-        zip: ["44102", "73301", "10001", "98101"],
-        channel: ["Paid search", "Organic", "Email", "Social"],
-        utm_source: ["google", "meta", "reddit", "direct"],
-        utm_medium: ["cpc", "organic", "email", "social"],
-        utm_campaign: ["brand_q2", "spring_promo", "referral_push"],
-        referer: ["google.com", "facebook.com", "(direct)"],
-        cta_id: ["cta_primary", "cta_secondary", "cta_footer"],
-        linkout: ["adv_default", "adv_partner"],
-        keyword: ["passive income investing", "etf zero fee platform", "beginner investing start", "open brokerage account fast"],
-        slot_index: ["0", "1", "2", "3"],
-        kb_widget_id: ["7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8"],
-        ad_title: ["E*TRADE® Account Setup", "Fidelity Zero ETFs", "Schwab Beginner Guide"]
-      };
-
-      function weightsForN(n) {
-        if (n <= 0) return [];
-        if (n === 1) return [1];
-        var raw = [], total = 0;
-        for (var i = 0; i < n; i++) { var v = 1 / Math.pow(1.45, i); raw.push(v); total += v; }
-        return raw.map(function (x) { return x / total; });
-      }
-
-      function pickGroupByDim(dimensions) {
-        for (var i = 0; i < dimensions.length; i++) {
-          var d = dimensions[i];
-          if (DIM_VALUES[d] && DIM_VALUES[d].length) return d;
-        }
-        return null;
-      }
-
-      function splitMeasureCell(mid, row, weight, dimLabel) {
-        var m = row.m;
-        if (mid === "lander_thumb") return '<span class="reports-thumb reports-thumb--lander" style="--th:' + row.hue + '"></span>';
-        if (mid === "variant_thumb") return '<span class="reports-thumb reports-thumb--variant" style="--th:' + ((row.hue + 140) % 360) + '"></span>';
-        if (mid === "visits") return nf(m.visits * weight);
-        if (mid === "impressions") return nf(m.impressions * weight);
-        if (mid === "clicks") return nf(m.clicks * weight);
-        if (mid === "conversions") return nf(m.conversions * weight);
-        if (mid === "ctr") return pct(m.clicks * weight, m.impressions * weight);
-        if (mid === "cvr") return pct(m.conversions * weight, m.clicks * weight);
-        if (mid === "score") return (m.score * (0.9 + 0.2 * weight)).toFixed(3);
-        if (mid === "impression_rate") return pct(m.impressions * weight, m.visits * weight);
-        if (mid === "form_start") return nf(m.form_start * weight);
-        if (mid === "form_step_complete") return nf(m.form_step_complete * weight);
-        if (mid === "form_submit") return nf(m.form_submit * weight);
-        if (mid === "form_step_abandon") return nf(m.form_abandon * weight);
-        if (mid === "kb_widget_views") return nf((m.kb_widget_views || 0) * weight);
-        if (mid === "kb_block_clicks") return nf((m.kb_block_clicks || 0) * weight);
-        if (mid === "kb_ad_impressions") return nf((m.kb_ad_impressions || 0) * weight);
-        if (mid === "kb_ad_clicks") return nf((m.kb_ad_clicks || 0) * weight);
-        if (mid === "kb_block_rate") return pct((m.kb_block_clicks || 0) * weight, (m.kb_widget_views || 0) * weight);
-        if (mid === "kb_ad_ctr") return pct((m.kb_ad_clicks || 0) * weight, (m.kb_ad_impressions || 0) * weight);
-        return "—";
-      }
-
-      function rowCtr(m) { return pct(m.clicks, m.impressions); }
-      function rowCvr(m) { return pct(m.conversions, m.clicks); }
-      function rowImprRate(m) { return pct(m.impressions, m.visits); }
-
-      function measureCell(row, mid, isDay, day) {
-        if (isDay && day.header) return "—";
-        var m = row.m;
-        if (mid === "lander_thumb") return isDay ? "—" : '<span class="reports-thumb reports-thumb--lander" style="--th:' + row.hue + '"></span>';
-        if (mid === "variant_thumb") return isDay ? "—" : '<span class="reports-thumb reports-thumb--variant" style="--th:' + ((row.hue + 140) % 360) + '"></span>';
-        if (isDay) {
-          if (mid === "impressions") return nf(day.impressions);
-          if (mid === "clicks") return nf(day.clicks);
-          if (mid === "conversions") return nf(day.conversions);
-          if (mid === "ctr") return pct(day.clicks, day.impressions);
-          if (mid === "cvr") return pct(day.conversions, day.clicks);
-          if (mid === "score") return day.score.toFixed(3);
-          if (mid === "impression_rate") return "—";
-          return "—";
-        }
-        if (mid === "visits") return nf(m.visits);
-        if (mid === "impressions") return nf(m.impressions);
-        if (mid === "clicks") return nf(m.clicks);
-        if (mid === "conversions") return nf(m.conversions);
-        if (mid === "ctr") return rowCtr(m);
-        if (mid === "cvr") return rowCvr(m);
-        if (mid === "score") return "<strong>" + m.score.toFixed(3) + "</strong>";
-        if (mid === "impression_rate") return rowImprRate(m);
-        if (mid === "form_start") return nf(m.form_start);
-        if (mid === "form_step_complete") return nf(m.form_step_complete);
-        if (mid === "form_submit") return nf(m.form_submit);
-        if (mid === "form_step_abandon") return nf(m.form_abandon);
-        if (mid === "kb_widget_views") return nf(m.kb_widget_views || 0);
-        if (mid === "kb_block_clicks") return nf(m.kb_block_clicks || 0);
-        if (mid === "kb_ad_impressions") return nf(m.kb_ad_impressions || 0);
-        if (mid === "kb_ad_clicks") return nf(m.kb_ad_clicks || 0);
-        if (mid === "kb_block_rate") return pct(m.kb_block_clicks || 0, m.kb_widget_views || 0);
-        if (mid === "kb_ad_ctr") return pct(m.kb_ad_clicks || 0, m.kb_ad_impressions || 0);
-        return "—";
-      }
-
-      function dimensionCell(row, did, isDay, day) {
-        if (isDay && day.header) return "—";
-        if (isDay && !day.header && (did === "lander_name" || did === "variant_name" || did === "domain")) {
-          if (did === "lander_name") return row.lander;
-          if (did === "variant_name") return row.vstrong;
-          return row.domain;
-        }
-        if (did === "lander_name") return row.lander;
-        if (did === "variant_name") return row.vstrong;
-        if (did === "domain") return row.domain;
-        if (did === "lander_id") return "ldr_" + row.key;
-        if (did === "variant_id") return "var_" + row.key;
-        if (did === "kb_widget_id" && row.key === "hyf") return "7f3a8b2c-4d5e-6f70-8192-a3b4c5d6e7f8";
-        if (did === "keyword" && row.key === "hyf") return "passive income investing";
-        if (did === "slot_index" && row.key === "hyf") return "0";
-        if (did === "ad_title" && row.key === "hyf") return "E*TRADE® Account Setup";
-        if (isDay) return "—";
-        return MOCK_DIM[did] != null ? MOCK_DIM[did] : "—";
-      }
-
-      function collectActive(kind) {
-        var out = [];
-        document.querySelectorAll('.js-report-col-toggle[data-kind="' + kind + '"]:checked').forEach(function (inp) {
-          out.push(inp.getAttribute("data-col"));
-        });
-        var order = kind === "measure" ? MEASURE_ORDER : DIMENSION_ORDER;
-        return order.filter(function (id) { return out.indexOf(id) !== -1; });
-      }
-
-      function renderReportsTable() {
-        var measures = collectActive("measure");
-        var dimensions = collectActive("dimension");
-        var thead = document.getElementById("reports-thead");
-        var tbody = document.getElementById("reports-tbody");
-        var tfoot = document.getElementById("reports-tfoot");
-        if (!thead || !tbody || !tfoot) return;
-
-        var trh = document.createElement("tr");
-        trh.appendChild(document.createElement("th")).style.width = "28px";
-        var thName = document.createElement("th");
-        thName.textContent = "Variant / Lander";
-        trh.appendChild(thName);
-        measures.forEach(function (id) {
-          var th = document.createElement("th");
-          th.className = id.indexOf("thumb") !== -1 ? "" : "right";
-          th.textContent = MEASURE_LABEL[id] || id;
-          trh.appendChild(th);
-        });
-        dimensions.forEach(function (id) {
-          var th = document.createElement("th");
-          th.textContent = DIMENSION_LABEL[id] || id;
-          trh.appendChild(th);
-        });
-        var thView = document.createElement("th");
-        thView.className = "right reports-col-view";
-        thView.setAttribute("aria-label", "View variant");
-        trh.appendChild(thView);
-        thead.innerHTML = "";
-        thead.appendChild(trh);
-
-        var groupDim = pickGroupByDim(dimensions);
-        tbody.innerHTML = "";
-        ROWS.forEach(function (row) {
-          var tr = document.createElement("tr");
-          tr.className = "reports-data-row" + (row.startOpen ? " is-expanded" : "");
-          tr.setAttribute("data-report-row", "");
-          tr.setAttribute("data-lander", row.lander);
-          tr.setAttribute("data-variant", row.variant);
-          tr.setAttribute("data-domain", row.domain);
-          tr.setAttribute("data-row-key", row.key);
-
-          var td0 = document.createElement("td");
-          var tb = document.createElement("button");
-          tb.type = "button";
-          tb.className = "lander-toggle";
-          tb.setAttribute("aria-expanded", row.startOpen ? "true" : "false");
-          tb.setAttribute("aria-controls", row.expandId);
-          tb.innerHTML = '<span class="chev">▸</span>';
-          td0.appendChild(tb);
-          tr.appendChild(td0);
-
-          var td1 = document.createElement("td");
-          td1.innerHTML = '<div class="lander-cell"><div class="lander-name"><strong>' + row.vstrong + "</strong><small>" + row.lander + " · " + row.domain + "</small></div></div>";
-          tr.appendChild(td1);
-
-          measures.forEach(function (mid) {
-            var td = document.createElement("td");
-            if (mid.indexOf("thumb") === -1) td.className = "right num";
-            td.innerHTML = measureCell(row, mid, false, null);
-            tr.appendChild(td);
-          });
-          dimensions.forEach(function (did) {
-            var td = document.createElement("td");
-            if (did === groupDim) { td.textContent = "All"; td.className = "muted reports-dim-all"; }
-            else {
-              td.textContent = dimensionCell(row, did, false, null);
-              if (did !== "lander_name" && did !== "variant_name" && did !== "domain") td.className = "muted";
-            }
-            tr.appendChild(td);
-          });
-
-          var tdV = document.createElement("td");
-          tdV.className = "right reports-col-view";
-          tdV.innerHTML = '<button type="button" class="icon-btn js-drawer-view" title="View variant" aria-label="View variant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>';
-          tr.appendChild(tdV);
-          tbody.appendChild(tr);
-
-          if (groupDim) {
-            var values = DIM_VALUES[groupDim];
-            var weights = weightsForN(values.length);
-            values.forEach(function (val, idx) {
-              var dr = document.createElement("tr");
-              dr.className = "day-row dim-row";
-              dr.setAttribute("data-parent", row.expandId);
-              dr.hidden = !row.startOpen;
-              dr.appendChild(document.createElement("td"));
-              var c1 = document.createElement("td");
-              c1.innerHTML = '<span class="dim-row-label">↳ ' + (DIMENSION_LABEL[groupDim] || groupDim) + '</span>';
-              dr.appendChild(c1);
-              var w = weights[idx];
-              measures.forEach(function (mid) {
-                var td = document.createElement("td");
-                if (mid.indexOf("thumb") === -1) td.className = "right num";
-                td.innerHTML = splitMeasureCell(mid, row, w, val);
-                dr.appendChild(td);
-              });
-              dimensions.forEach(function (did) {
-                var td = document.createElement("td");
-                if (did === groupDim) { td.textContent = val; td.className = "reports-dim-value"; }
-                else { td.textContent = dimensionCell(row, did, false, null); if (did !== "lander_name" && did !== "variant_name" && did !== "domain") td.className = "muted"; }
-                dr.appendChild(td);
-              });
-              dr.appendChild(document.createElement("td"));
-              tbody.appendChild(dr);
-            });
-          } else {
-            row.days.forEach(function (day, idx) {
-              var dr = document.createElement("tr");
-              dr.className = "day-row";
-              dr.setAttribute("data-parent", row.expandId);
-              dr.hidden = !row.startOpen;
-              var c0 = document.createElement("td");
-              dr.appendChild(c0);
-              var c1 = document.createElement("td");
-              c1.textContent = day.header ? "DAY" : day.date;
-              dr.appendChild(c1);
-              measures.forEach(function (mid) {
-                var td = document.createElement("td");
-                if (!day.header && mid.indexOf("thumb") === -1) td.className = "right num";
-                td.innerHTML = measureCell(row, mid, true, day);
-                dr.appendChild(td);
-              });
-              dimensions.forEach(function (did) {
-                var td = document.createElement("td");
-                td.textContent = dimensionCell(row, did, true, day);
-                if (!day.header && did !== "lander_name" && did !== "variant_name" && did !== "domain") td.className = "muted";
-                dr.appendChild(td);
-              });
-              dr.appendChild(document.createElement("td"));
-              tbody.appendChild(dr);
-            });
-          }
-        });
-
-        var sumImp = 0, sumClk = 0, sumConv = 0, sumVisit = 0, sumFs = 0, sumFsc = 0, sumFsub = 0, sumFab = 0;
-        ROWS.forEach(function (row) {
-          sumImp += row.m.impressions; sumClk += row.m.clicks; sumConv += row.m.conversions;
-          sumVisit += row.m.visits; sumFs += row.m.form_start; sumFsc += row.m.form_step_complete; sumFsub += row.m.form_submit; sumFab += row.m.form_abandon;
-        });
-        var trf = document.createElement("tr");
-        trf.className = "reports-grand-total";
-        trf.appendChild(document.createElement("td"));
-        var tdf = document.createElement("td");
-        tdf.textContent = "Grand total";
-        trf.appendChild(tdf);
-        measures.forEach(function (mid) {
-          var td = document.createElement("td");
-          td.className = "right num";
-          if (mid === "lander_thumb" || mid === "variant_thumb") td.textContent = "";
-          else if (mid === "impressions") td.textContent = nf(sumImp);
-          else if (mid === "clicks") td.textContent = nf(sumClk);
-          else if (mid === "conversions") td.textContent = nf(sumConv);
-          else if (mid === "ctr") td.textContent = pct(sumClk, sumImp);
-          else if (mid === "cvr") td.textContent = pct(sumConv, sumClk);
-          else if (mid === "visits") td.textContent = nf(sumVisit);
-          else if (mid === "impression_rate") td.textContent = pct(sumImp, sumVisit);
-          else if (mid === "score") td.textContent = "0.392";
-          else if (mid === "form_start") td.textContent = nf(sumFs);
-          else if (mid === "form_step_complete") td.textContent = nf(sumFsc);
-          else if (mid === "form_submit") td.textContent = nf(sumFsub);
-          else if (mid === "form_step_abandon") td.textContent = nf(sumFab);
-          else td.textContent = "—";
-          trf.appendChild(td);
-        });
-        dimensions.forEach(function () {
-          var td = document.createElement("td");
-          td.textContent = "—";
-          td.className = "muted";
-          trf.appendChild(td);
-        });
-        trf.appendChild(document.createElement("td"));
-        tfoot.innerHTML = "";
-        tfoot.appendChild(trf);
-      }
-
-      document.querySelectorAll(".js-report-col-toggle").forEach(function (inp) {
-        inp.addEventListener("change", function () {
-          renderReportsTable();
-          var sel = document.getElementById("lander-filter");
-          if (sel && sel.value) applyReportsLanderFilter(sel.value);
-        });
-      });
-
-      function applyReportsLanderFilter(value) {
-        document.querySelectorAll("#reports-tbody tr[data-report-row]").forEach(function (r) {
-          var keep = !value || r.getAttribute("data-lander") === value;
-          r.classList.toggle("row-hidden", !keep);
-          var toggleBtn = r.querySelector(".lander-toggle");
-          var parentId = toggleBtn && toggleBtn.getAttribute("aria-controls");
-          if (parentId) {
-            document.querySelectorAll('#reports-tbody tr[data-parent="' + parentId + '"]').forEach(function (d) {
-              d.classList.toggle("row-hidden", !keep);
-            });
-          }
-        });
-      }
-      window.applyReportsLanderFilter = applyReportsLanderFilter;
-
-      var reportsTable = document.getElementById("reports-data-table");
-      if (reportsTable) {
-        reportsTable.addEventListener("click", function (e) {
-          var t = e.target.closest(".lander-toggle");
-          if (!t) return;
-          // Stop the global app.js .lander-toggle handler from also firing and undoing us.
-          e.preventDefault();
-          e.stopPropagation();
-          var id = t.getAttribute("aria-controls");
-          var wasOpen = t.getAttribute("aria-expanded") === "true";
-          var nowOpen = !wasOpen;
-          t.setAttribute("aria-expanded", nowOpen ? "true" : "false");
-          var parentRow = t.closest("tr.reports-data-row");
-          if (parentRow) parentRow.classList.toggle("is-expanded", nowOpen);
-          document.querySelectorAll('#reports-tbody tr[data-parent="' + id + '"]').forEach(function (dr) {
-            dr.hidden = !nowOpen;
-          });
-        });
-      }
-
-      renderReportsTable();
-    })();
-
-    var scrim = document.getElementById("drawer-scrim");
-    var drawer = document.getElementById("variant-drawer");
-    var titleEl = document.getElementById("drawer-variant-title");
-    var subEl = document.getElementById("drawer-variant-sub");
-    var badgeEl = document.getElementById("drawer-variant-badge");
-    var editBtn = document.getElementById("drawer-edit-btn");
-    var settingsBtn = document.getElementById("drawer-settings-btn");
-
-    function closeDrawer() {
-      drawer.classList.remove("is-open");
-      scrim.classList.remove("is-open");
-      drawer.setAttribute("aria-hidden", "true");
-    }
-
-    function openDrawer(row) {
-      var lander = row.getAttribute("data-lander") || "";
-      var variant = row.getAttribute("data-variant") || "";
-      var domain = row.getAttribute("data-domain") || "";
-      var parts = variant.split(" — ");
-      badgeEl.textContent = (parts[0] || "—").trim();
-      titleEl.textContent = (parts[1] || variant).trim();
-      subEl.textContent = lander + " · " + domain;
-
-      var vLabel = (parts[1] || variant).trim();
-      var q = "name=" + encodeURIComponent(lander) + "&variant=" + encodeURIComponent(vLabel);
-      if (editBtn && lander) editBtn.href = "editor.html?" + q;
-      if (settingsBtn && lander) settingsBtn.href = "editor.html?" + q + "&panel=settings";
-
-      drawer.classList.add("is-open");
-      scrim.classList.add("is-open");
-      drawer.setAttribute("aria-hidden", "false");
-    }
-
-    var reportsDataTable = document.getElementById("reports-data-table");
-    if (reportsDataTable) {
-      reportsDataTable.addEventListener("click", function (e) {
-        var viewBtn = e.target.closest(".js-drawer-view");
-        if (!viewBtn) return;
-        e.preventDefault();
-        e.stopPropagation();
-        var row = viewBtn.closest("tr[data-report-row]");
-        if (row) openDrawer(row);
-      });
-    }
-
-    scrim.addEventListener("click", closeDrawer);
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
-
-    // Honor ?lander=<name> and ?view=<tab> — pre-select filter and tab.
-    (function applyLanderFilter() {
-      var params = new URLSearchParams(window.location.search);
-      var name   = params.get("lander");
-      var view   = params.get("view");
-      var sel    = document.getElementById("lander-filter");
-      var note   = document.getElementById("filter-note");
-      var noteN  = document.getElementById("filter-note-name");
-      var clearBtn = document.getElementById("filter-note-clear");
-      var tabGroup = document.querySelector('[data-tabs="reports-view"]');
-
-      var VISITS = [
-        { id: "v_a10ec9aa", ts: "Apr 21, 14:32", lander: "Summer Sale", variant: "Main hero", device: "mobile", time: "58s", scroll: 84, clicked: true, form: "Submitted", keyword: "—" },
-        { id: "v_1f105248", ts: "Apr 21, 14:28", lander: "Summer Sale", variant: "Main hero", device: "desktop", time: "1m 12s", scroll: 91, clicked: true, form: "Step 2", keyword: "—" },
-        { id: "v_54bde6b4", ts: "Apr 21, 14:19", lander: "Referral Q2", variant: "Single-field", device: "mobile", time: "34s", scroll: 62, clicked: false, form: "Abandoned", keyword: "—" },
-        { id: "v_adaca551", ts: "Apr 21, 13:55", lander: "Founder Letter", variant: "Long form", device: "tablet", time: "2m 04s", scroll: 100, clicked: true, form: "Submitted", keyword: "—" },
-        { id: "v_458ad589", ts: "Apr 21, 13:41", lander: "Summer Sale", variant: "Urgency countdown", device: "mobile", time: "6s", scroll: 12, clicked: false, form: "—", keyword: "—" },
-        { id: "v_f500d9d0", ts: "Apr 21, 13:22", lander: "Referral Q2", variant: "Single-field", device: "mobile", time: "47s", scroll: 71, clicked: true, form: "Submitted", keyword: "—" },
-        { id: "v_c460c944", ts: "Apr 21, 12:58", lander: "Founder Letter", variant: "Long form", device: "desktop", time: "1m 38s", scroll: 88, clicked: false, form: "Started", keyword: "—" },
-        { id: "v_8e2b1c3d", ts: "Apr 21, 12:34", lander: "Hedge Your Future", variant: "Reader modal", device: "mobile", time: "1m 05s", scroll: 76, clicked: true, form: "—", keyword: "passive income investing" },
-        { id: "v_7d9e4f2a", ts: "Apr 21, 11:47", lander: "Hedge Your Future", variant: "Reader modal", device: "mobile", time: "22s", scroll: 45, clicked: false, form: "—", keyword: "etf zero fee platform" },
-        { id: "v_3c8b5e1f", ts: "Apr 21, 11:12", lander: "Summer Sale", variant: "Main hero", device: "mobile", time: "39s", scroll: 55, clicked: true, form: "Step 1", keyword: "—" }
-      ];
-
-      var LANDER_BEHAVIOUR = {
-        "Summer Sale": { visits: 118420, timeAvg: "44s", scrollAvg: "71%", scrollMed: "74%", exitRate: "24.1%", exitCum: "28,536", ctaRate: "64.1%", ctaCum: 75899 },
-        "Referral Q2": { visits: 17800, timeAvg: "38s", scrollAvg: "65%", scrollMed: "68%", exitRate: "28.4%", exitCum: "5,055", ctaRate: "48.4%", ctaCum: 8608 },
-        "Founder Letter": { visits: 15420, timeAvg: "52s", scrollAvg: "82%", scrollMed: "85%", exitRate: "19.2%", exitCum: "2,961", ctaRate: "42.8%", ctaCum: 6601 },
-        "Hedge Your Future": { visits: 3347, timeAvg: "48s", scrollAvg: "62%", scrollMed: "58%", exitRate: "31.0%", exitCum: "1,038", ctaRate: "1.4%", ctaCum: 47 },
-        "": { visits: 163447, timeAvg: "43s", scrollAvg: "70%", scrollMed: "73%", exitRate: "25.8%", exitCum: "42,169", ctaRate: "52.3%", ctaCum: 85412 }
-      };
-
-      function setText(id, text) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = text;
-      }
-
-      function nfLocal(n) {
-        return Number(n).toLocaleString();
-      }
-
-      function renderVisits(landerFilter) {
-        var tbody = document.getElementById("behaviour-visits-tbody");
-        if (!tbody) return;
-        var rows = VISITS.filter(function (v) {
-          return !landerFilter || v.lander === landerFilter;
-        });
-        tbody.innerHTML = rows.map(function (v) {
-          var clickPill = v.clicked
-            ? '<span class="behaviour-pill behaviour-pill--yes">Yes</span>'
-            : '<span class="behaviour-pill behaviour-pill--no">No</span>';
-          var logsHref = "logs.html?visit_id=" + encodeURIComponent(v.id);
-          return (
-            "<tr data-visit-lander=\"" + v.lander + "\">" +
-            "<td class=\"mono\"><a class=\"behaviour-visit-link\" href=\"" + logsHref + "\">" + v.id + "</a></td>" +
-            "<td class=\"muted\">" + v.ts + "</td>" +
-            "<td><strong>" + v.variant + "</strong><br><span class=\"muted\" style=\"font-size:11px;\">" + v.lander + "</span></td>" +
-            "<td><span class=\"behaviour-pill behaviour-pill--device\">" + v.device + "</span></td>" +
-            "<td class=\"right num\">" + v.time + "</td>" +
-            "<td class=\"right num\">" + v.scroll + "%</td>" +
-            "<td>" + clickPill + "</td>" +
-            "<td class=\"muted\">" + v.form + "</td>" +
-            "<td class=\"muted\" style=\"font-size:12px;\">" + v.keyword + "</td>" +
-            "<td class=\"right\"><a class=\"icon-btn\" href=\"" + logsHref + "\" title=\"Open in Logs\" aria-label=\"Open in Logs\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" width=\"16\" height=\"16\"><path d=\"M5 12h14M12 5l7 7-7 7\"/></svg></a></td>" +
-            "</tr>"
-          );
-        }).join("");
-      }
-
-      function updateBehaviourKpis(landerFilter) {
-        var b = LANDER_BEHAVIOUR[landerFilter || ""] || LANDER_BEHAVIOUR[""];
-        setText("beh-kpi-time-avg", b.timeAvg);
-        setText("beh-kpi-time-cum", nfLocal(b.visits));
-        setText("beh-kpi-scroll-avg", b.scrollAvg);
-        setText("beh-kpi-scroll-med", b.scrollMed);
-        setText("beh-kpi-exit-rate", b.exitRate);
-        setText("beh-kpi-exit-cum", b.exitCum);
-        setText("beh-kpi-cta-rate", b.ctaRate);
-        setText("beh-kpi-cta-cum", nfLocal(b.ctaCum));
-        setText("beh-chart-time-avg", b.timeAvg);
-        setText("beh-hm-clicks", nfLocal(Math.min(b.ctaCum, Math.round(b.visits * 0.38))));
-      }
-
-      function activateReportsTab(key) {
-        if (!tabGroup || !key) return;
-        if (typeof window.nexusActivateTabGroup === "function") {
-          window.nexusActivateTabGroup(tabGroup, key);
-        } else {
-          tabGroup.querySelectorAll(".tab").forEach(function (btn) {
-            var on = btn.getAttribute("data-tab") === key;
-            btn.classList.toggle("is-active", on);
-            btn.setAttribute("aria-selected", on ? "true" : "false");
-          });
-          tabGroup.querySelectorAll("[data-tab-panel]").forEach(function (p) {
-            p.hidden = p.getAttribute("data-tab-panel") !== key;
-          });
-        }
-      }
-
-      function syncViewParam(key) {
-        var url = new URL(window.location.href);
-        if (key && key !== "performance") url.searchParams.set("view", key);
-        else url.searchParams.delete("view");
-        window.history.replaceState({}, "", url.toString());
-      }
-
-      if (tabGroup) {
-        tabGroup.querySelectorAll(".tab").forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            var key = btn.getAttribute("data-tab");
-            syncViewParam(key);
-          });
-        });
-      }
-
-      function applyFilter(value) {
-        if (typeof applyReportsLanderFilter === "function") applyReportsLanderFilter(value);
-        if (value) { noteN.textContent = value; note.classList.add("is-active"); }
-        else { note.classList.remove("is-active"); }
-        var kbFunnel = document.getElementById("kb-reports-funnel");
-        if (kbFunnel) {
-          kbFunnel.style.display = (!value || value === "Hedge Your Future") ? "" : "none";
-        }
-        var formsKb = document.getElementById("forms-kb-card");
-        if (formsKb) {
-          formsKb.style.display = (!value || value === "Hedge Your Future") ? "" : "none";
-        }
-        var formsLabel = document.getElementById("forms-funnel-lander-label");
-        if (formsLabel) formsLabel.textContent = value || "all landers";
-        renderVisits(value);
-        updateBehaviourKpis(value);
-      }
-
-      if (name) { sel.value = name; applyFilter(name); }
-      else { renderVisits(""); updateBehaviourKpis(""); }
-
-      if (view && ["performance", "behaviour", "forms"].indexOf(view) !== -1) {
-        activateReportsTab(view);
-      }
-
-      sel.addEventListener("change", function () { applyFilter(sel.value); });
-      clearBtn.addEventListener("click", function () {
-        sel.value = "";
-        applyFilter("");
-        var url = new URL(window.location.href);
-        url.searchParams.delete("lander");
-        window.history.replaceState({}, "", url.toString());
-      });
-
-      var formsLink = document.getElementById("forms-link-responses");
-      var formsSelect = document.getElementById("forms-widget-select");
-      if (formsLink && formsSelect) {
-        formsSelect.addEventListener("change", function () {
-          formsLink.href = "widgets.html#responses-" + formsSelect.value;
-        });
-        formsLink.href = "widgets.html#responses-" + formsSelect.value;
-      }
-    })();
-  </script>
+  <script src="reports-builder.js"></script>
 </body>
 </html>
