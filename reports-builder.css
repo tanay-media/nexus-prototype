@@ -27,15 +27,39 @@
   color: var(--text-muted, #7a7568);
 }
 
+.rb-saved__scroll {
+  max-height: calc(100dvh - 100px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 .rb-saved__list {
   list-style: none;
   margin: 0;
   padding: 6px;
 }
 
+.rb-saved__section {
+  padding: 10px 10px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #7a7568);
+}
+
+.rb-saved__row {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
 .rb-saved__item {
+  flex: 1;
+  min-width: 0;
   display: block;
-  width: 100%;
   text-align: left;
   border: none;
   background: transparent;
@@ -68,21 +92,32 @@
   line-height: 1.35;
 }
 
-.rb-saved__badge {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-bottom: 5px;
+.rb-saved__delete {
+  flex-shrink: 0;
+  align-self: center;
+  appearance: none;
+  border: none;
+  background: transparent;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-muted, #7a7568);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, background 0.12s;
 }
 
-.rb-saved__badge--agg { background: #eef2ff; color: #2b4acb; }
-.rb-saved__badge--visit { background: #fef3e6; color: #9a5b00; }
-.rb-saved__badge--chart { background: #eef8f0; color: #1b6b2e; }
-.rb-saved__badge--widget { background: #f3e8ff; color: #6b21a8; }
+.rb-saved__row:hover .rb-saved__delete,
+.rb-saved__delete:focus-visible {
+  opacity: 1;
+}
+
+.rb-saved__delete:hover {
+  background: #fef2f2;
+  color: #b42318;
+}
 
 .rb-main {
   min-width: 0;

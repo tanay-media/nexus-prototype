@@ -55,12 +55,15 @@
     { id: "funnel", label: "Funnel graph", group: "Composition charts" }
   ];
 
-  var PRESETS = [
+  var CURRENT_USER = { id: "kyle", name: "Kyle", isTeamAdmin: true };
+  var CURRENT_TEAM = "ACME Growth";
+
+  var SYSTEM_REPORTS = [
     {
       id: "lander-performance",
       title: "Lander performance",
-      meta: "Aggregate · variant × lander",
-      type: "agg",
+      meta: "Variant × lander · outcomes",
+      scope: "system",
       chart: "table",
       rows: ["lander_name", "variant_name"],
       values: ["impressions", "clicks", "ctr", "conversions", "cvr", "score"],
@@ -69,8 +72,8 @@
     {
       id: "visit-behaviour",
       title: "Visit behaviour trace",
-      meta: "Visit-level · 1 row per visit_id",
-      type: "visit",
+      meta: "1 row per visit_id",
+      scope: "system",
       chart: "table",
       rows: ["visit_id", "lander_name", "variant_name", "device", "visit_time"],
       values: ["time_on_page", "scroll_pct", "form_start", "form_submit", "clicks"],
@@ -79,8 +82,8 @@
     {
       id: "scroll-time-charts",
       title: "Scroll & time by variant",
-      meta: "Charts · behaviour summary",
-      type: "chart",
+      meta: "Behaviour summary · bar chart",
+      scope: "system",
       chart: "bar",
       rows: ["variant_name"],
       values: ["time_on_page", "scroll_pct", "visits"],
@@ -89,14 +92,95 @@
     {
       id: "widget-funnels",
       title: "Form & keyword funnels",
-      meta: "Widget metrics · funnel steps",
-      type: "widget",
+      meta: "Widget step metrics",
+      scope: "system",
       chart: "funnel",
       rows: ["form_widget"],
       values: ["form_start", "form_submit", "kb_widget_views", "kb_block_clicks", "kb_ad_clicks"],
       filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
+    },
+    {
+      id: "channel-breakdown",
+      title: "Channel breakdown",
+      meta: "UTM source × campaign",
+      scope: "system",
+      chart: "table",
+      rows: ["utm_source", "utm_campaign"],
+      values: ["visits", "clicks", "ctr", "conversions", "cvr"],
+      filters: { date: "Last 30 days", status: "Published", domain: "All domains" }
+    },
+    {
+      id: "device-geo",
+      title: "Device & geo split",
+      meta: "Device × country",
+      scope: "system",
+      chart: "table",
+      rows: ["device", "country"],
+      values: ["visits", "impressions", "score"],
+      filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
     }
   ];
+
+  var TEAM_REPORTS = [
+    {
+      id: "team-weekly-rollup",
+      title: "Weekly team rollup",
+      meta: "ACME Growth · Maya",
+      scope: "team",
+      createdBy: "maya",
+      chart: "table",
+      rows: ["lander_name"],
+      values: ["visits", "conversions", "cvr", "score"],
+      filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
+    },
+    {
+      id: "team-q2-referral",
+      title: "Q2 referral performance",
+      meta: "ACME Growth · Sam",
+      scope: "team",
+      createdBy: "sam",
+      chart: "table",
+      rows: ["variant_name", "domain"],
+      values: ["impressions", "clicks", "ctr", "conversions"],
+      filters: { date: "Last 30 days", status: "Published", domain: "refer.acme.com" }
+    },
+    {
+      id: "team-form-dropoff",
+      title: "Form drop-off (team)",
+      meta: "ACME Growth · Dana",
+      scope: "team",
+      createdBy: "dana",
+      chart: "funnel",
+      rows: ["form_widget"],
+      values: ["form_start", "form_submit", "form_abandon"],
+      filters: { date: "Last 14 days", status: "Published", domain: "All domains" }
+    },
+    {
+      id: "team-kb-keywords",
+      title: "KB keywords — team view",
+      meta: "ACME Growth · Kyle",
+      scope: "team",
+      createdBy: "kyle",
+      chart: "table",
+      rows: ["keyword"],
+      values: ["kb_widget_views", "kb_block_clicks", "kb_ad_clicks", "kb_block_rate"],
+      filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
+    },
+    {
+      id: "team-mobile-only",
+      title: "Mobile landers only",
+      meta: "ACME Growth · Maya",
+      scope: "team",
+      createdBy: "maya",
+      chart: "bar",
+      rows: ["lander_name"],
+      values: ["time_on_page", "scroll_pct", "visits"],
+      filters: { date: "Last 7 days", status: "Published", domain: "All domains", device: "mobile" }
+    }
+  ];
+
+  /* Legacy alias for URL presets */
+  var PRESETS = SYSTEM_REPORTS;
 
   var AGG_ROWS = [
     { lander_name: "Summer Sale", variant_name: "Main hero", impressions: 112613, clicks: 75899, conversions: 52164, score: 0.463 },
@@ -138,8 +222,42 @@
     rows: [],
     values: [],
     filters: {},
-    customSaved: []
+    userSaved: [],
+    hiddenTeamIds: []
   };
+
+  function scopeLabel(scope) {
+    if (scope === "system") return "System";
+    if (scope === "team") return "Team";
+    return "You";
+  }
+
+  function canDeleteReport(report) {
+    if (report.scope === "system") return false;
+    if (report.scope === "team") return CURRENT_USER.isTeamAdmin;
+    if (report.scope === "user") return report.ownerId === CURRENT_USER.id;
+    return false;
+  }
+
+  function getAllReports() {
+    var team = TEAM_REPORTS.filter(function (r) {
+      return state.hiddenTeamIds.indexOf(r.id) === -1;
+    });
+    return {
+      system: SYSTEM_REPORTS,
+      team: team,
+      user: state.userSaved
+    };
+  }
+
+  function findReportById(id) {
+    var all = getAllReports();
+    var found = null;
+    all.system.forEach(function (r) { if (r.id === id) found = r; });
+    all.team.forEach(function (r) { if (r.id === id) found = r; });
+    all.user.forEach(function (r) { if (r.id === id) found = r; });
+    return found;
+  }
 
   function nf(n) {
     return Number(n).toLocaleString();
@@ -152,29 +270,72 @@
 
   function loadCustomSaved() {
     try {
-      var raw = localStorage.getItem(STORAGE_KEY + "custom");
-      state.customSaved = raw ? JSON.parse(raw) : [];
+      var raw = localStorage.getItem(STORAGE_KEY + "user");
+      state.userSaved = raw ? JSON.parse(raw) : [];
     } catch (e) {
-      state.customSaved = [];
+      state.userSaved = [];
+    }
+    try {
+      var hidden = localStorage.getItem(STORAGE_KEY + "hidden-team");
+      state.hiddenTeamIds = hidden ? JSON.parse(hidden) : [];
+    } catch (e2) {
+      state.hiddenTeamIds = [];
+    }
+    if (!state.userSaved.length) {
+      state.userSaved = [
+        {
+          id: "user-summer-deep-dive",
+          title: "Summer Sale deep dive",
+          meta: "You · last 7 days",
+          scope: "user",
+          ownerId: "kyle",
+          chart: "table",
+          rows: ["variant_name"],
+          values: ["impressions", "clicks", "ctr", "score"],
+          filters: { date: "Last 7 days", lander: "Summer Sale" }
+        },
+        {
+          id: "user-hero-scroll",
+          title: "Hero scroll check",
+          meta: "You · behaviour",
+          scope: "user",
+          ownerId: "kyle",
+          chart: "bar",
+          rows: ["variant_name"],
+          values: ["scroll_pct", "time_on_page"],
+          filters: { date: "Last 7 days" }
+        }
+      ];
     }
   }
 
   function saveCustomSaved() {
     try {
-      localStorage.setItem(STORAGE_KEY + "custom", JSON.stringify(state.customSaved));
+      localStorage.setItem(STORAGE_KEY + "user", JSON.stringify(state.userSaved));
     } catch (e) {}
   }
 
-  function applyPreset(preset) {
-    state.presetId = preset.id;
-    state.chart = preset.chart;
-    state.rows = preset.rows.slice();
-    state.values = preset.values.slice();
-    state.filters = Object.assign({}, preset.filters);
+  function saveHiddenTeam() {
+    try {
+      localStorage.setItem(STORAGE_KEY + "hidden-team", JSON.stringify(state.hiddenTeamIds));
+    } catch (e) {}
+  }
+
+  function applyReport(report) {
+    if (!report) return;
+    state.presetId = report.id;
+    state.chart = report.chart;
+    state.rows = report.rows.slice();
+    state.values = report.values.slice();
+    state.filters = Object.assign({}, report.filters);
     renderBuilder();
     renderResult();
     renderSavedList();
     syncUrl();
+  }
+
+  function applyPreset(preset) {
+    applyReport(preset);
   }
 
   function getCurrentConfig() {
@@ -186,47 +347,64 @@
     };
   }
 
+  function renderSavedItem(report) {
+    var isActive = state.presetId === report.id;
+    var del = canDeleteReport(report)
+      ? '<button type="button" class="rb-saved__delete" data-delete="' + report.id + '" aria-label="Delete report" title="Delete">×</button>'
+      : "";
+    return (
+      '<li class="rb-saved__row">' +
+      '<button type="button" class="rb-saved__item' + (isActive ? " is-active" : "") + '" data-report="' + report.id + '">' +
+      '<div class="rb-saved__item-title">' + report.title + "</div>" +
+      '<div class="rb-saved__item-meta">' + scopeLabel(report.scope) + " · " + (report.meta || report.chart) + "</div>" +
+      "</button>" + del + "</li>"
+    );
+  }
+
   function renderSavedList() {
     var list = document.getElementById("rb-saved-list");
     if (!list) return;
+    var groups = getAllReports();
     var html = "";
-    PRESETS.forEach(function (p) {
-      html +=
-        '<li><button type="button" class="rb-saved__item' + (state.presetId === p.id ? " is-active" : "") + '" data-preset="' + p.id + '">' +
-        '<span class="rb-saved__badge rb-saved__badge--' + p.type + '">' + p.type + '</span>' +
-        '<div class="rb-saved__item-title">' + p.title + "</div>" +
-        '<div class="rb-saved__item-meta">' + p.meta + "</div></button></li>";
-    });
-    if (state.customSaved.length) {
-      html += '<li style="padding:8px 10px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a7568;">Your saved views</li>';
-      state.customSaved.forEach(function (s, i) {
-        html +=
-          '<li><button type="button" class="rb-saved__item' + (state.presetId === "custom-" + i ? " is-active" : "") + '" data-custom="' + i + '">' +
-          '<div class="rb-saved__item-title">' + s.name + "</div>" +
-          '<div class="rb-saved__item-meta">' + s.chart + " · " + s.rows.length + " rows</div></button></li>";
-      });
+
+    html += '<li class="rb-saved__section">System</li>';
+    groups.system.forEach(function (r) { html += renderSavedItem(r); });
+
+    if (groups.team.length) {
+      html += '<li class="rb-saved__section">Team · ' + CURRENT_TEAM + "</li>";
+      groups.team.forEach(function (r) { html += renderSavedItem(r); });
     }
+
+    if (groups.user.length) {
+      html += '<li class="rb-saved__section">Your reports</li>';
+      groups.user.forEach(function (r) { html += renderSavedItem(r); });
+    }
+
     list.innerHTML = html;
-    list.querySelectorAll("[data-preset]").forEach(function (btn) {
+
+    list.querySelectorAll("[data-report]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        var id = btn.getAttribute("data-preset");
-        var preset = PRESETS.find(function (p) { return p.id === id; });
-        if (preset) applyPreset(preset);
+        var report = findReportById(btn.getAttribute("data-report"));
+        if (report) applyReport(report);
       });
     });
-    list.querySelectorAll("[data-custom]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var i = parseInt(btn.getAttribute("data-custom"), 10);
-        var s = state.customSaved[i];
-        if (!s) return;
-        state.presetId = "custom-" + i;
-        state.chart = s.chart;
-        state.rows = s.rows.slice();
-        state.values = s.values.slice();
-        state.filters = Object.assign({}, s.filters);
-        renderBuilder();
-        renderResult();
-        renderSavedList();
+
+    list.querySelectorAll("[data-delete]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var id = btn.getAttribute("data-delete");
+        var report = findReportById(id);
+        if (!report || !canDeleteReport(report)) return;
+        if (!window.confirm('Delete "' + report.title + '"?')) return;
+        if (report.scope === "user") {
+          state.userSaved = state.userSaved.filter(function (r) { return r.id !== id; });
+          saveCustomSaved();
+        } else if (report.scope === "team") {
+          if (state.hiddenTeamIds.indexOf(id) === -1) state.hiddenTeamIds.push(id);
+          saveHiddenTeam();
+        }
+        if (state.presetId === id) applyReport(SYSTEM_REPORTS[0]);
+        else renderSavedList();
       });
     });
   }
@@ -555,7 +733,7 @@
     var params = new URLSearchParams(window.location.search);
     var reportId = params.get("report");
     var lander = params.get("lander");
-    var preset = PRESETS.find(function (p) { return p.id === reportId; }) || PRESETS[0];
+    var preset = SYSTEM_REPORTS.find(function (p) { return p.id === reportId; }) || SYSTEM_REPORTS[0];
     applyPreset(preset);
     if (lander) {
       state.filters.lander = lander;
@@ -592,10 +770,21 @@
         var name = window.prompt("Name this report view:", "My custom report");
         if (!name || !name.trim()) return;
         var cfg = getCurrentConfig();
-        cfg.name = name.trim();
-        state.customSaved.push(cfg);
+        var id = "user-" + Date.now().toString(36);
+        var report = {
+          id: id,
+          title: name.trim(),
+          meta: "You · " + (CHART_TYPES.find(function (c) { return c.id === cfg.chart; }) || {}).label,
+          scope: "user",
+          ownerId: CURRENT_USER.id,
+          chart: cfg.chart,
+          rows: cfg.rows,
+          values: cfg.values,
+          filters: cfg.filters
+        };
+        state.userSaved.unshift(report);
         saveCustomSaved();
-        renderSavedList();
+        applyReport(report);
       });
     }
 
