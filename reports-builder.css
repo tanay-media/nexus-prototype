@@ -372,31 +372,6 @@
   overflow: hidden;
 }
 
-.rb-result__tabs {
-  display: flex;
-  gap: 1.25rem;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--border, #e8e4da);
-}
-
-.rb-result__tab {
-  appearance: none;
-  border: none;
-  background: none;
-  padding: 12px 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted, #7a7568);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  cursor: pointer;
-}
-
-.rb-result__tab.is-active {
-  color: var(--text, #1a1a1a);
-  border-bottom-color: var(--black, #1a1a1a);
-}
-
 .rb-result__toolbar {
   display: flex;
   align-items: center;
