@@ -24,14 +24,26 @@
     return widgetMax;
   }
 
-  function makeKeyword(keyword_term, display_term, status, metadata) {
+  function makeKeyword(keyword_term, display_term, status, metadata, updated_at) {
     var meta = metadata || defaultMetadata();
     return {
       keyword_term: keyword_term,
       display_term: display_term || keyword_term,
       status: status || "on",
-      metadata: meta
+      metadata: meta,
+      updated_at: updated_at || null
     };
+  }
+
+  function formatKeywordUpdatedAt(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return "Updated " + d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  function touchKeywordUpdatedAt(kw) {
+    if (kw) kw.updated_at = new Date().toISOString();
   }
 
   function buildGenPayload(widget) {
@@ -295,28 +307,28 @@
         video_urls: [],
         options: [],
         max_ads: null
-      }),
+      }, "2026-03-15T09:00:00Z"),
       makeKeyword("roth ira contribution limits", "roth ira limits", "off", {
         description: "Annual Roth IRA contribution rules and eligibility.",
         image_urls: [],
         video_urls: [],
         options: [],
         max_ads: null
-      }),
+      }, "2026-02-28T16:45:00Z"),
       makeKeyword("tax loss harvesting guide", "tax loss harvesting", "off", {
         description: "Offset portfolio gains with strategic loss harvesting.",
         image_urls: ["https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=320&h=180&fit=crop"],
         video_urls: [],
         options: [],
         max_ads: null
-      }),
+      }, "2026-01-20T11:20:00Z"),
       makeKeyword("retirement withdrawal strategy", "retirement withdrawals", "off", {
         description: "Sustainable withdrawal rates for retirement portfolios.",
         image_urls: [],
         video_urls: [],
         options: [],
         max_ads: null
-      })
+      }, "2025-12-10T14:30:00Z")
     ],
     auto: [
       makeKeyword("teen driver insurance rates", "teen driver rates", "off", {
@@ -440,6 +452,8 @@
 
   global.KbWidgetModel = {
     makeKeyword: makeKeyword,
+    formatKeywordUpdatedAt: formatKeywordUpdatedAt,
+    touchKeywordUpdatedAt: touchKeywordUpdatedAt,
     defaultMetadata: defaultMetadata,
     defaultMaxAdsPerKeyword: defaultMaxAdsPerKeyword,
     resolveMaxAdsForKeyword: resolveMaxAdsForKeyword,

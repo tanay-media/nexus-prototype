@@ -1074,6 +1074,29 @@
   line-height: 1.4;
 }
 
+.kb-keyword-chip--truncate {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.kb-keyword-chip-more {
+  font-size: 11px;
+  color: #888;
+  padding: 2px 4px;
+  line-height: 1.4;
+}
+
+.kb-keyword-card__updated {
+  display: block;
+  font-size: 10px;
+  color: #999;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
 .table--kb-widgets td {
   vertical-align: top;
 }
