@@ -195,12 +195,22 @@
         <section data-tab-panel="widgets-kb-list" hidden>
           <div class="card">
             <p class="muted" style="margin:0 0 16px;padding:16px 20px 0;font-size:13px;">Workspace <code>keyword_block</code> widgets. <strong>keywords[]</strong> holds <code>keyword_term</code>, <code>display_term</code>, <code>status</code>, <code>metadata</code>. Base syncs <strong>KeywordBlockServingSync</strong> (same <code>keywords</code> field, no keyword <code>status</code>). Reader questions live in variant HTML.</p>
+            <div class="kb-widgets-toolbar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;padding:0 20px 16px;">
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label for="kb-widgets-in-use-filter" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#888;">In use</label>
+                <select class="select" id="kb-widgets-in-use-filter" style="min-width:140px;" aria-label="Filter by in use">
+                  <option value="all">All</option>
+                  <option value="in-use">In use</option>
+                  <option value="unused">Unused</option>
+                </select>
+              </div>
+              <span class="muted" style="font-size:12px;margin-left:auto;" id="kb-widgets-filter-summary">Showing 3 widgets</span>
+            </div>
             <div class="table-scroll" role="region" aria-label="Keyword block widgets">
-              <table class="table table--widgets table--kb-widgets">
+              <table class="table table--widgets table--kb-widgets" id="kb-widgets-table">
                 <thead>
                   <tr>
                     <th>Widget</th>
-                    <th>In use</th>
                     <th>Advertiser / campaign</th>
                     <th>Keyword slots</th>
                     <th>Used in</th>
@@ -210,12 +220,11 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr data-kb-in-use="1">
                     <td>
                       <strong>Passive investing - keywords</strong>
                       <div class="muted" style="font-size:11px;font-family:monospace;">7f3a8b2c-…e7f8 · static</div>
                     </td>
-                    <td><span class="badge badge--kb">In use</span></td>
                     <td>
                       <div style="line-height:1.5;font-size:13px;">E*TRADE</div>
                       <div class="muted" style="font-size:11px;">MAX-CMP-9912 · $12.50 CPC</div>
@@ -244,12 +253,11 @@
                       <button type="button" class="icon-btn js-widget-clone" data-widget="Passive investing — reader questions" title="Clone to workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
                     </div></td>
                   </tr>
-                  <tr>
+                  <tr data-kb-in-use="1">
                     <td>
                       <strong>Auto insurance - keywords</strong>
                       <div class="muted" style="font-size:11px;font-family:monospace;">8e4b9c3d-…f809 · static</div>
                     </td>
-                    <td><span class="badge badge--kb">In use</span></td>
                     <td>
                       <div style="line-height:1.5;font-size:13px;">State Farm</div>
                       <div class="muted" style="font-size:11px;">MAX-CMP-7721 · $18.00 CPC</div>
@@ -278,12 +286,11 @@
                       <button type="button" class="icon-btn js-widget-clone" data-widget="Auto insurance — reader questions" title="Clone to workspace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
                     </div></td>
                   </tr>
-                  <tr>
+                  <tr data-kb-in-use="0">
                     <td>
                       <strong>Fidelity ETF - keywords (unused)</strong>
                       <div class="muted" style="font-size:11px;font-family:monospace;">9f5c0d4e-…e910 · static</div>
                     </td>
-                    <td><span class="badge" style="background:#f5f5f5;color:#888;">Unused</span></td>
                     <td>
                       <div style="line-height:1.5;font-size:13px;">Fidelity</div>
                       <div class="muted" style="font-size:11px;">MAX-CMP-8840 · $9.75 CPC</div>
@@ -295,6 +302,7 @@
                       </div>
                       <div class="muted" style="font-size:11px;margin-top:6px;">2 enabled / 2 total</div>
                     </td>
+                    <td class="muted" style="font-size:12px;">—</td>
                     <td class="muted" style="font-size:12px;">—</td>
                     <td class="muted" style="font-size:12px;">2d ago<br/>Maya</td>
                     <td class="right"><div class="actions">
@@ -1589,6 +1597,31 @@
           alert("CSV export triggered.\n\nIn production, this downloads a file with PII handling based on your encryption toggle.");
         });
       }
+    })();
+
+    /* ── Keyword blocks list: in-use filter ── */
+    (function () {
+      var filter = document.getElementById("kb-widgets-in-use-filter");
+      var table = document.getElementById("kb-widgets-table");
+      var summary = document.getElementById("kb-widgets-filter-summary");
+      if (!filter || !table) return;
+
+      var rows = table.querySelectorAll("tbody tr[data-kb-in-use]");
+
+      function applyKbInUseFilter() {
+        var val = filter.value;
+        var shown = 0;
+        rows.forEach(function (row) {
+          var inUse = row.getAttribute("data-kb-in-use") === "1";
+          var match = val === "all" || (val === "in-use" && inUse) || (val === "unused" && !inUse);
+          row.hidden = !match;
+          if (match) shown += 1;
+        });
+        if (summary) summary.textContent = "Showing " + shown + " widget" + (shown === 1 ? "" : "s");
+      }
+
+      filter.addEventListener("change", applyKbInUseFilter);
+      applyKbInUseFilter();
     })();
   </script>
 </body>
