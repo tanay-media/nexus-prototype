@@ -816,60 +816,49 @@
   }
 
   function renderKbFunnelTable() {
-    var body = KB_KEYWORD_FUNNEL_DATA.map(function (kw) {
-      var adRows = kw.ads.map(function (ad) {
-        return '<tr class="rb-kb-ad-row" data-kb-keyword="' + kw.id + '" hidden>' +
-          '<td class="rb-kb-ad-row__indent"></td>' +
-          '<td class="muted">—</td>' +
-          "<td>" + ad.ad_title + "</td>" +
-          '<td class="right">' + nf(ad.kb_widget_views) + "</td>" +
-          '<td class="right">' + nf(ad.kb_block_clicks) + "</td>" +
-          '<td class="right">' + nf(ad.kb_ad_clicks) + "</td>" +
-          "</tr>";
-      }).join("");
-      return '<tr class="rb-kb-keyword-row" data-kb-keyword="' + kw.id + '">' +
-        '<td><button type="button" class="rb-form-funnel-toggle rb-kb-funnel-toggle" aria-expanded="false" aria-label="Show ads for keyword">▸</button></td>' +
-        "<td><strong>" + kw.keyword + "</strong></td>" +
-        '<td class="muted">' + kw.ads.length + " ad" + (kw.ads.length === 1 ? "" : "s") + "</td>" +
-        '<td class="right">' + nf(kw.kb_widget_views) + "</td>" +
-        '<td class="right">' + nf(kw.kb_block_clicks) + "</td>" +
-        '<td class="right">' + nf(kw.kb_ad_clicks) + "</td>" +
-        "</tr>" + adRows;
+    var flatRows = [];
+    KB_KEYWORD_FUNNEL_DATA.forEach(function (kw) {
+      kw.ads.forEach(function (ad) {
+        flatRows.push({
+          keyword: kw.keyword,
+          ad_title: ad.ad_title,
+          kb_widget_views: ad.kb_widget_views,
+          kb_block_clicks: ad.kb_block_clicks,
+          kb_ad_clicks: ad.kb_ad_clicks
+        });
+      });
+    });
+
+    var body = flatRows.map(function (row) {
+      return "<tr>" +
+        "<td><strong>" + row.keyword + "</strong></td>" +
+        "<td>" + row.ad_title + "</td>" +
+        '<td class="right">' + nf(row.kb_widget_views) + "</td>" +
+        '<td class="right">' + nf(row.kb_block_clicks) + "</td>" +
+        '<td class="right">' + nf(row.kb_ad_clicks) + "</td>" +
+        "</tr>";
     }).join("");
 
-    var totals = { views: 6008, blocks: 1564, clicks: 74 };
+    var totals = flatRows.reduce(function (acc, row) {
+      acc.views += row.kb_widget_views;
+      acc.blocks += row.kb_block_clicks;
+      acc.clicks += row.kb_ad_clicks;
+      return acc;
+    }, { views: 0, blocks: 0, clicks: 0 });
 
-    return '<p class="muted" style="font-size:12px;margin:0 0 12px;">Keyword block funnel · expand a keyword to see per-ad breakdown</p>' +
+    return '<p class="muted" style="font-size:12px;margin:0 0 12px;">Keyword block funnel · one row per keyword + ad title</p>' +
       '<div class="kb-funnel-stats" style="margin-bottom:16px;">' +
       '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">6,008</div></div>' +
       '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">1,564</div></div>' +
       '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks</div><div class="kb-funnel-step__val">74</div></div>' +
       '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad CTR</div><div class="kb-funnel-step__val">4.7%</div></div></div>' +
       '<div class="table-scroll rb-table-wrap"><table class="table rb-kb-funnel-table"><thead><tr>' +
-      '<th class="rb-kb-funnel-table__chev"></th><th>keyword</th><th>ad title</th><th class="right">KB widget views</th><th class="right">KB block clicks</th><th class="right">KB ad clicks</th>' +
+      "<th>keyword</th><th>ad title</th><th class=\"right\">KB widget views</th><th class=\"right\">KB block clicks</th><th class=\"right\">KB ad clicks</th>" +
       "</tr></thead><tbody>" + body + '</tbody><tfoot><tr class="rb-table-total">' +
-      '<td></td><td><strong>Grand total</strong></td><td></td>' +
+      "<td><strong>Grand total</strong></td><td></td>" +
       '<td class="right"><strong>' + nf(totals.views) + "</strong></td>" +
       '<td class="right"><strong>' + nf(totals.blocks) + "</strong></td>" +
       '<td class="right"><strong>' + nf(totals.clicks) + "</strong></td></tr></tfoot></table></div>";
-  }
-
-  function wireKbFunnelToggles(root) {
-    if (!root) return;
-    root.querySelectorAll(".rb-kb-funnel-toggle").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var row = btn.closest(".rb-kb-keyword-row");
-        if (!row) return;
-        var id = row.getAttribute("data-kb-keyword");
-        var open = btn.getAttribute("aria-expanded") === "true";
-        btn.setAttribute("aria-expanded", open ? "false" : "true");
-        btn.textContent = open ? "▸" : "▾";
-        row.classList.toggle("is-expanded", !open);
-        root.querySelectorAll('.rb-kb-ad-row[data-kb-keyword="' + id + '"]').forEach(function (adRow) {
-          adRow.hidden = open;
-        });
-      });
-    });
   }
 
   function wireFormFunnelToggles(root) {
@@ -1168,7 +1157,6 @@
       wireFormFunnelToggles(tableWrap);
     } else if (isKbFunnel) {
       tableWrap.innerHTML = renderKbFunnelTable();
-      wireKbFunnelToggles(tableWrap);
     } else if (state.chart === "funnel") {
       tableWrap.innerHTML = renderFormFunnelTable();
       wireFormFunnelToggles(tableWrap);
