@@ -26,7 +26,8 @@
 
     <main class="main">
       <div class="page-header">
-        <h1>Event logs</h1>
+        <h1>Logs</h1>
+        <p class="page-header__sub muted">Visit-level lander pipeline and widget engagement traces</p>
         <div class="page-header__right">
           <button type="button" class="btn">↓ CSV</button>
         </div>
@@ -34,14 +35,21 @@
 
       <div class="page-body" data-tabs="logs-page">
         <div class="tabs">
-          <button type="button" class="tab is-active" data-tab="flat">All logs</button>
-          <button type="button" class="tab" data-tab="events">Logs Dump <span class="tab-beta">beta</span></button>
+          <button type="button" class="tab is-active" data-tab="lander">Lander logs</button>
+          <button type="button" class="tab" data-tab="widget">Widget logs</button>
         </div>
 
         <!-- ==========================================================
-             Conversions — stitched, one row per conversion_id
+             Lander logs — visit_id grain · conversions + raw events
              ========================================================== -->
-        <section data-tab-panel="flat">
+        <section data-tab-panel="lander">
+          <p class="logs-tab-hint muted">Lander attribution and conversion pipeline · primary key: <code>visit_id</code></p>
+          <div class="logs-seg" role="tablist" aria-label="Lander log view">
+            <button type="button" class="logs-seg__btn is-active" data-lander-view="conversions">Conversions</button>
+            <button type="button" class="logs-seg__btn" data-lander-view="events">Events</button>
+          </div>
+
+          <div id="lander-view-conversions">
           <div class="flow-pop-wrap">
             <button type="button" class="flow-pop-trigger" id="flow-pop-trigger" aria-expanded="false">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
@@ -213,12 +221,9 @@
             </div>
             <div class="flat-empty" id="flat-empty" hidden>No conversions match these filters.</div>
           </div>
-        </section>
+          </div>
 
-        <!-- ==========================================================
-             All events (existing flat view)
-             ========================================================== -->
-        <section data-tab-panel="events" hidden>
+          <div id="lander-view-events" hidden>
         <div class="logs-pills-bar">
           <div class="logs-pills" role="tablist" aria-label="Filter by event type (4-system flow)">
             <button type="button" class="log-filter-pill is-active" data-filter="all">All <span class="log-filter-count" id="log-count-all">·</span></button>
@@ -768,6 +773,65 @@
             </div>
           </div>
         </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================
+             Widget logs — widget_view_id grain · form + keyword block
+             ========================================================== -->
+        <section data-tab-panel="widget" hidden>
+          <p class="logs-tab-hint muted">Widget engagement instances · primary key: <code>widget_view_id</code> · expand a row for the event timeline</p>
+
+          <div class="toolbar widget-logs-toolbar">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input class="input" type="search" id="widget-logs-search" placeholder="Filter widget_view_id or visit_id" />
+            </div>
+            <select class="select" id="widget-logs-type" aria-label="Widget type">
+              <option value="">All types</option>
+              <option value="form">Form</option>
+              <option value="keyword_block">Keyword block</option>
+            </select>
+            <select class="select" id="widget-logs-widget" aria-label="Widget">
+              <option value="">All widgets</option>
+            </select>
+            <select class="select" id="widget-logs-outcome" aria-label="Outcome">
+              <option value="">All outcomes</option>
+              <option value="submitted">Submitted</option>
+              <option value="abandoned">Abandoned</option>
+              <option value="ad_click">Ad click</option>
+              <option value="in_progress">In progress</option>
+            </select>
+          </div>
+
+          <div class="card logs-card">
+            <div class="logs-table-wrap">
+              <table class="table table--logs table--widget-logs">
+                <thead>
+                  <tr>
+                    <th class="log-th-chev" aria-hidden="true"></th>
+                    <th>widget_view_id</th>
+                    <th>visit_id</th>
+                    <th>Widget</th>
+                    <th>Type</th>
+                    <th>Lander</th>
+                    <th>Variant</th>
+                    <th>Started</th>
+                    <th>Last event</th>
+                    <th>Outcome</th>
+                    <th>Events</th>
+                  </tr>
+                </thead>
+                <tbody id="widget-logs-tbody"></tbody>
+              </table>
+            </div>
+            <div class="logs-footer">
+              <div>
+                <p class="logs-footer-range" id="widget-logs-footer-range"><strong>·</strong></p>
+                <p class="logs-footer-disclaimer muted">Each row is one widget engagement on a visit. Timeline events share the same <code>widget_view_id</code>.</p>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </main>
@@ -775,10 +839,13 @@
 
   <link rel="stylesheet" href="logs-journeys.css" />
   <link rel="stylesheet" href="logs-flat.css" />
+  <link rel="stylesheet" href="logs-widget.css" />
   <script src="app.js"></script>
   <script src="thumbs.js"></script>
   <script src="logs-journeys.js"></script>
   <script src="logs-flat.js"></script>
+  <script src="logs-widget.js"></script>
+  <script src="logs-page.js"></script>
   <script>
     // Combined filters for the logs table. app.js also toggles rows based on the
     // event-type pill; this runs after it and intersects with the other filters.

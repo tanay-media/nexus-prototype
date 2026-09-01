@@ -1,0 +1,126 @@
+/* Widget logs tab */
+
+.logs-tab-hint {
+  font-size: 12.5px;
+  margin: 0 0 14px;
+}
+
+.logs-tab-hint code {
+  font-size: 11.5px;
+  background: #f3f4f6;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.logs-seg {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.logs-seg__btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.logs-seg__btn.is-active {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.widget-logs-toolbar {
+  margin-bottom: 12px;
+}
+
+.table--widget-logs .mono {
+  font-size: 11.5px;
+}
+
+.wl-type {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.wl-type--form {
+  background: #e8f0fe;
+  color: #1a4a9e;
+}
+
+.wl-type--keyword_block {
+  background: #f3e8ff;
+  color: #6b2a8f;
+}
+
+.wl-outcome {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.wl-outcome--submitted { background: #e0f0e4; color: #1a6b32; }
+.wl-outcome--abandoned { background: #fbe2e2; color: #a31a1a; }
+.wl-outcome--ad_click { background: #fce8d4; color: #a35216; }
+.wl-outcome--in_progress { background: #eef4fc; color: #1d61c9; }
+
+.wl-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 8px;
+}
+
+.wl-timeline__row {
+  display: grid;
+  grid-template-columns: 150px auto 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.wl-timeline__ts {
+  font-size: 11.5px;
+}
+
+.wl-timeline__meta {
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-event--form_start,
+.log-event--form_step_complete,
+.log-event--form_submit,
+.log-event--form_abandon {
+  background: #e8f0fe;
+  color: #1a4a9e;
+}
+
+.log-event--keyword_blocks_view,
+.log-event--keyword_block_click,
+.log-event--keyword_ad_impression,
+.log-event--keyword_ad_click {
+  background: #f3e8ff;
+  color: #6b2a8f;
+}
+
+.page-header__sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+}

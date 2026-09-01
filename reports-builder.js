@@ -960,7 +960,7 @@
       var cells = rowCols.map(function (c) {
         var v = r[c];
         if (c === "visit_id" && isVisit) {
-          return '<td class="mono"><a href="logs.html?visit_id=' + encodeURIComponent(v) + '">' + v + "</a></td>";
+          return '<td class="mono"><a href="logs.html?tab=lander&visit_id=' + encodeURIComponent(v) + '">' + v + "</a></td>";
         }
         return "<td>" + (v != null ? v : "—") + "</td>";
       }).join("");
