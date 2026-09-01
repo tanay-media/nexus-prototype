@@ -525,6 +525,53 @@
   border-radius: 4px;
 }
 
+.rb-form-funnel-toggle {
+  border: none;
+  background: transparent;
+  color: var(--muted, #6b7280);
+  cursor: pointer;
+  padding: 0 4px 0 0;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.rb-form-funnel-row.is-expanded > td {
+  background: #f8fafc;
+}
+
+.rb-form-funnel-detail > td {
+  background: #f8fafc;
+  padding-top: 0;
+  border-top: none;
+}
+
+.rb-form-step-funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0 12px 28px;
+  max-width: 720px;
+}
+
+.rb-form-step-funnel__step {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) 1fr 72px;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.rb-form-step-funnel__label {
+  color: #374151;
+}
+
+.rb-form-step-funnel__drop {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
 .rb-table-wrap .table {
   font-size: 12px;
 }

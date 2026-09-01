@@ -93,13 +93,23 @@
       filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
     },
     {
-      id: "widget-funnels",
-      title: "Form & keyword funnels",
-      meta: "Widget step metrics",
+      id: "form-funnels",
+      title: "Form funnels",
+      meta: "Per-widget starts → steps → submit",
       scope: "system",
       chart: "funnel",
       rows: ["form_widget"],
-      values: ["form_start", "form_submit", "kb_widget_views", "kb_block_clicks", "kb_ad_clicks"],
+      values: ["form_start", "form_submit", "form_abandon"],
+      filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
+    },
+    {
+      id: "kb-funnels",
+      title: "Keyword block funnels",
+      meta: "Widget views → block click → ad click",
+      scope: "system",
+      chart: "funnel",
+      rows: ["kb_widget"],
+      values: ["kb_widget_views", "kb_block_clicks", "kb_ad_clicks"],
       filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
     },
     {
@@ -218,14 +228,64 @@
     { variant_name: "Orange bold", time_on_page: 29, scroll_pct: 54, visits: 6050 }
   ];
 
-  var FUNNEL_STEPS = [
-    { label: "Visits", val: 118420, pct: 100 },
-    { label: "Form start", val: 98200, pct: 82.9 },
-    { label: "Step 1 complete", val: 86400, pct: 73.8 },
+  var FORM_FUNNEL_STEPS = [
+    { label: "Form start", val: 98200, pct: 100 },
+    { label: "Step completions (all)", val: 86400, pct: 88.0 },
     { label: "Submit", val: 52164, pct: 53.1 },
-    { label: "KB widget views", val: 3248, pct: 97.0 },
+    { label: "Abandon", val: 46036, pct: 46.9 }
+  ];
+
+  var KB_FUNNEL_STEPS = [
+    { label: "Widget views", val: 3248, pct: 100 },
     { label: "Keyword picks", val: 964, pct: 29.7 },
+    { label: "Ads shown", val: 941, pct: 97.6 },
     { label: "Ad clicks", val: 47, pct: 5.0 }
+  ];
+
+  var FORM_FUNNEL_DATA = [
+    {
+      id: "lead-short",
+      form_widget: "Lead — short qualify",
+      form_start: 42100,
+      form_submit: 18200,
+      form_abandon: 23900,
+      steps: [
+        { step_id: "step_zip", label: "Zip code", count: 38900 },
+        { step_id: "step_age", label: "Age range", count: 22100 }
+      ]
+    },
+    {
+      id: "quote-request",
+      form_widget: "Quote request",
+      form_start: 28400,
+      form_submit: 12100,
+      form_abandon: 16300,
+      steps: [
+        { step_id: "step_contact", label: "Contact info", count: 25100 },
+        { step_id: "step_coverage", label: "Coverage type", count: 18200 },
+        { step_id: "step_review", label: "Review", count: 12100 }
+      ]
+    },
+    {
+      id: "long-qualify",
+      form_widget: "Long qualify — 5 step",
+      form_start: 8600,
+      form_submit: 2100,
+      form_abandon: 6500,
+      steps: [
+        { step_id: "step_intro", label: "Intro", count: 7900 },
+        { step_id: "step_household", label: "Household", count: 6100 },
+        { step_id: "step_income", label: "Income", count: 4800 },
+        { step_id: "step_health", label: "Health history", count: 3200 },
+        { step_id: "step_confirm", label: "Confirm", count: 2100 }
+      ]
+    }
+  ];
+
+  var KB_FUNNEL_DATA = [
+    { kb_widget: "Passive investing KB", kb_widget_views: 3248, kb_block_clicks: 964, kb_ad_clicks: 47 },
+    { kb_widget: "Medicare savings KB", kb_widget_views: 1820, kb_block_clicks: 412, kb_ad_clicks: 19 },
+    { kb_widget: "Auto insurance KB", kb_widget_views: 940, kb_block_clicks: 188, kb_ad_clicks: 8 }
   ];
 
   var state = {
@@ -627,10 +687,96 @@
     }).join("") + "</div>";
   }
 
-  function renderFunnel() {
-    return '<div class="rb-funnel-viz">' + FUNNEL_STEPS.map(function (s) {
+  function renderFunnel(steps) {
+    var funnelSteps = steps || FORM_FUNNEL_STEPS;
+    return '<div class="rb-funnel-viz">' + funnelSteps.map(function (s) {
       return '<div class="rb-funnel-viz__step"><span>' + s.label + '</span><div class="rb-funnel-viz__bar"><div class="rb-funnel-viz__fill" style="width:' + s.pct + '%"></div></div><strong>' + nf(s.val) + "</strong></div>";
     }).join("") + "</div>";
+  }
+
+  function pctOf(part, whole) {
+    if (!whole) return "—";
+    return (Math.round((part / whole) * 1000) / 10) + "%";
+  }
+
+  function renderFormStepFunnel(form) {
+    var prev = form.form_start;
+    var bars = [{ label: "Start", count: form.form_start, pct: 100 }];
+    form.steps.forEach(function (step, i) {
+      var rate = prev ? Math.round((step.count / prev) * 1000) / 10 : 0;
+      bars.push({
+        label: "Step " + (i + 1) + ": " + step.label,
+        count: step.count,
+        pct: form.form_start ? Math.round((step.count / form.form_start) * 1000) / 10 : 0,
+        drop: rate
+      });
+      prev = step.count;
+    });
+    bars.push({
+      label: "Submit",
+      count: form.form_submit,
+      pct: form.form_start ? Math.round((form.form_submit / form.form_start) * 1000) / 10 : 0,
+      drop: prev ? Math.round((form.form_submit / prev) * 1000) / 10 : 0
+    });
+    return '<div class="rb-form-step-funnel">' + bars.map(function (b, idx) {
+      var drop = idx > 0 && b.drop != null ? '<span class="rb-form-step-funnel__drop">' + b.drop + "% from prev</span>" : "";
+      return '<div class="rb-form-step-funnel__step">' +
+        '<div class="rb-form-step-funnel__label">' + b.label + drop + "</div>" +
+        '<div class="rb-funnel-viz__bar"><div class="rb-funnel-viz__fill" style="width:' + b.pct + '%"></div></div>' +
+        "<strong>" + nf(b.count) + "</strong></div>";
+    }).join("") + "</div>";
+  }
+
+  function renderFormFunnelTable() {
+    var rows = FORM_FUNNEL_DATA.map(function (form) {
+      var cvr = pctOf(form.form_submit, form.form_start);
+      return '<tr class="rb-form-funnel-row" data-form-funnel="' + form.id + '">' +
+        '<td><button type="button" class="rb-form-funnel-toggle" aria-expanded="false" aria-label="Show step funnel">▸</button> ' + form.form_widget + "</td>" +
+        "<td>" + nf(form.form_start) + "</td>" +
+        "<td>" + form.steps.length + "</td>" +
+        "<td>" + nf(form.form_submit) + "</td>" +
+        "<td>" + cvr + "</td>" +
+        "<td>" + nf(form.form_abandon) + "</td>" +
+        "</tr>" +
+        '<tr class="rb-form-funnel-detail" data-form-funnel-detail="' + form.id + '" hidden>' +
+        '<td colspan="6">' + renderFormStepFunnel(form) + "</td></tr>";
+    }).join("");
+    return '<p class="muted" style="font-size:12px;margin:0 0 12px;">Form widgets only · expand a row for that form\'s step funnel (steps come from widget schema)</p>' +
+      '<div class="kb-funnel-stats" style="margin-bottom:16px;">' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Form starts</div><div class="kb-funnel-step__val">98,200</div></div>' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Submits</div><div class="kb-funnel-step__val">52,164</div></div>' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Avg CVR</div><div class="kb-funnel-step__val">53.1%</div></div>' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Abandons</div><div class="kb-funnel-step__val">46,036</div></div></div>' +
+      '<div class="table-scroll rb-table-wrap"><table class="table rb-form-funnel-table"><thead><tr>' +
+      "<th>Form widget</th><th>Starts</th><th>Steps</th><th>Submits</th><th>CVR</th><th>Abandon</th>" +
+      "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+  }
+
+  function renderKbFunnelTable() {
+    return '<p class="muted" style="font-size:12px;margin:0 0 12px;">Keyword block widgets only · fixed 4-stage funnel</p>' +
+      '<div class="kb-funnel-stats" style="margin-bottom:16px;">' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">6,008</div></div>' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">1,564</div></div>' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks</div><div class="kb-funnel-step__val">74</div></div>' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad CTR</div><div class="kb-funnel-step__val">4.7%</div></div></div>' +
+      renderTable(KB_FUNNEL_DATA, ["kb_widget"], state.values.length ? state.values : ["kb_widget_views", "kb_block_clicks", "kb_ad_clicks"], false);
+  }
+
+  function wireFormFunnelToggles(root) {
+    if (!root) return;
+    root.querySelectorAll(".rb-form-funnel-toggle").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var row = btn.closest(".rb-form-funnel-row");
+        if (!row) return;
+        var id = row.getAttribute("data-form-funnel");
+        var detail = root.querySelector('[data-form-funnel-detail="' + id + '"]');
+        var open = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", open ? "false" : "true");
+        btn.textContent = open ? "▸" : "▾";
+        if (detail) detail.hidden = open;
+        row.classList.toggle("is-expanded", !open);
+      });
+    });
   }
 
   function computeHistogram(samples, accessor, mode, binCount, binSize, maxVal) {
@@ -869,7 +1015,9 @@
 
     var isBehaviour = isBehaviourReport();
     var isVisit = isBehaviour || state.rows.indexOf("visit_id") !== -1;
-    var isFunnel = state.chart === "funnel" || state.presetId === "widget-funnels";
+    var isFormFunnel = state.presetId === "form-funnels" || state.presetId === "team-form-dropoff";
+    var isKbFunnel = state.presetId === "kb-funnels";
+    var isFunnel = isFormFunnel || isKbFunnel || state.chart === "funnel";
     var isChart = state.chart === "bar" || state.chart === "line" || state.chart === "area";
 
     var rows, rowCols, valueCols;
@@ -896,7 +1044,7 @@
       chartWrap.innerHTML = renderBehaviourDashboard();
       wireBehaviourControls(chartWrap);
     } else if (isFunnel) {
-      chartWrap.innerHTML = renderFunnel();
+      chartWrap.innerHTML = renderFunnel(isKbFunnel ? KB_FUNNEL_STEPS : FORM_FUNNEL_STEPS);
     } else if (isChart) {
       var vk = valueCols.filter(function (c) { return ["time_on_page", "scroll_pct", "visits", "impressions", "clicks"].indexOf(c) !== -1; }).slice(0, 2);
       if (!vk.length) vk = ["time_on_page", "scroll_pct"];
@@ -905,18 +1053,14 @@
       chartWrap.innerHTML = "";
     }
 
-    if (isFunnel) {
-      tableWrap.innerHTML = '<p class="muted" style="font-size:12px;margin:0 0 12px;">Funnel steps — form + keyword block widgets · last 7 days</p>' +
-        '<div class="kb-funnel-stats" style="margin-bottom:16px;">' +
-        '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Form starts</div><div class="kb-funnel-step__val">98,200</div></div>' +
-        '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Submits</div><div class="kb-funnel-step__val">52,164</div></div>' +
-        '<div class="kb-funnel-step"><div class="kb-funnel-step__label">KB picks</div><div class="kb-funnel-step__val">964</div></div>' +
-        '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks</div><div class="kb-funnel-step__val">47</div></div></div>' +
-        renderTable([
-          { form_widget: "Lead — short qualify", form_start: 42100, form_submit: 18200, kb_widget_views: "—", kb_block_clicks: "—", kb_ad_clicks: "—" },
-          { form_widget: "Quote request", form_start: 28400, form_submit: 12100, kb_widget_views: "—", kb_block_clicks: "—", kb_ad_clicks: "—" },
-          { form_widget: "Passive investing KB", form_start: "—", form_submit: "—", kb_widget_views: 3248, kb_block_clicks: 964, kb_ad_clicks: 47 }
-        ], ["form_widget"], state.values, false);
+    if (isFormFunnel) {
+      tableWrap.innerHTML = renderFormFunnelTable();
+      wireFormFunnelToggles(tableWrap);
+    } else if (isKbFunnel) {
+      tableWrap.innerHTML = renderKbFunnelTable();
+    } else if (state.chart === "funnel") {
+      tableWrap.innerHTML = renderFormFunnelTable();
+      wireFormFunnelToggles(tableWrap);
     } else {
       if (isBehaviour) {
         tableWrap.innerHTML = '<p class="rb-section-label">Visit-level trace</p>' + renderTable(rows, rowCols, valueCols, true);
