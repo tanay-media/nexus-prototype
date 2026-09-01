@@ -780,7 +780,7 @@
              Widget logs — widget_view_id grain · form + keyword block
              ========================================================== -->
         <section data-tab-panel="widget" hidden>
-          <p class="logs-tab-hint muted">Widget engagement instances · primary key: <code>widget_view_id</code> · expand a row for the event timeline</p>
+          <p class="logs-tab-hint muted" id="widget-logs-hint">Widget engagement instances · primary key: <code>widget_view_id</code></p>
 
           <div class="toolbar widget-logs-toolbar">
             <div class="search-wrap">
@@ -805,17 +805,17 @@
           </div>
 
           <div class="card logs-card">
-            <div class="logs-table-wrap">
-              <table class="table table--logs table--widget-logs">
-                <thead>
+            <div class="logs-table-wrap logs-table-wrap--widget">
+              <table class="table table--logs table--widget-logs" id="widget-logs-table">
+                <thead id="widget-logs-thead">
                   <tr>
                     <th class="log-th-chev" aria-hidden="true"></th>
                     <th>widget_view_id</th>
                     <th>visit_id</th>
                     <th>Widget</th>
                     <th>Type</th>
-                    <th>Lander</th>
-                    <th>Variant</th>
+                    <th>lander_name</th>
+                    <th>variant_name</th>
                     <th>Started</th>
                     <th>Last event</th>
                     <th>Outcome</th>
@@ -828,7 +828,7 @@
             <div class="logs-footer">
               <div>
                 <p class="logs-footer-range" id="widget-logs-footer-range"><strong>·</strong></p>
-                <p class="logs-footer-disclaimer muted">Each row is one widget engagement on a visit. Timeline events share the same <code>widget_view_id</code>.</p>
+                <p class="logs-footer-disclaimer muted" id="widget-logs-disclaimer">Each row is one widget engagement on a visit.</p>
               </div>
             </div>
           </div>

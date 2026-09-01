@@ -48,6 +48,42 @@
   font-size: 11.5px;
 }
 
+.logs-table-wrap--widget {
+  overflow-x: auto;
+}
+
+.table--widget-logs-kb {
+  min-width: 3200px;
+}
+
+.table--widget-logs-kb th,
+.table--widget-logs-kb td {
+  white-space: nowrap;
+  font-size: 11.5px;
+  vertical-align: top;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table--widget-logs-kb th {
+  font-size: 10.5px;
+  text-transform: lowercase;
+  letter-spacing: 0.01em;
+}
+
+.wl-dash {
+  color: #c4c8cf;
+}
+
+.wl-url {
+  display: inline-block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
 .wl-type {
   display: inline-block;
   font-size: 11px;
