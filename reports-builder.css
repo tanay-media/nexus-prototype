@@ -572,6 +572,28 @@
   margin-top: 2px;
 }
 
+.rb-kb-funnel-table .rb-kb-funnel-table__chev {
+  width: 28px;
+}
+
+.rb-kb-keyword-row.is-expanded > td {
+  background: #f8fafc;
+}
+
+.rb-kb-ad-row > td {
+  background: #fafbfc;
+  font-size: 12px;
+}
+
+.rb-kb-ad-row__indent {
+  width: 28px;
+}
+
+.rb-table-total td {
+  background: #f5f3ee;
+  font-weight: 600;
+}
+
 .rb-table-wrap .table {
   font-size: 12px;
 }
