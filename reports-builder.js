@@ -29,6 +29,8 @@
     score: "Score",
     time_on_page: "Time on page",
     scroll_pct: "Scroll %",
+    avg_time_on_page: "Avg time on page",
+    avg_scroll_pct: "Avg scroll %",
     form_start: "Form start",
     form_submit: "Form submit",
     form_abandon: "Form abandon",
@@ -66,14 +68,15 @@
       scope: "system",
       chart: "table",
       rows: ["lander_name", "variant_name"],
-      values: ["impressions", "clicks", "ctr", "conversions", "cvr", "score"],
+      values: ["impressions", "clicks", "ctr", "conversions", "cvr", "score", "avg_time_on_page", "avg_scroll_pct"],
       filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
     },
     {
       id: "visit-behaviour",
       title: "Visit behaviour trace",
-      meta: "1 row per visit_id",
+      meta: "Histograms · heatmap · visit table",
       scope: "system",
+      layout: "behaviour",
       chart: "table",
       rows: ["visit_id", "lander_name", "variant_name", "device", "visit_time"],
       values: ["time_on_page", "scroll_pct", "form_start", "form_submit", "clicks"],
@@ -183,12 +186,21 @@
   var PRESETS = SYSTEM_REPORTS;
 
   var AGG_ROWS = [
-    { lander_name: "Summer Sale", variant_name: "Main hero", impressions: 112613, clicks: 75899, conversions: 52164, score: 0.463 },
-    { lander_name: "Referral Q2", variant_name: "Single-field", impressions: 16951, clicks: 8608, conversions: 4657, score: 0.275 },
-    { lander_name: "Founder Letter", variant_name: "Long form", impressions: 14668, clicks: 6601, conversions: 2376, score: 0.162 },
-    { lander_name: "Hedge Your Future", variant_name: "Reader modal", impressions: 3248, clicks: 47, conversions: 12, score: 0.014 },
-    { lander_name: "Black Friday", variant_name: "Orange bold", impressions: 5786, clicks: 1042, conversions: 185, score: 0.032 }
+    { lander_name: "Summer Sale", variant_name: "Main hero", impressions: 112613, clicks: 75899, conversions: 52164, score: 0.463, avg_time_on_page: "44s", avg_scroll_pct: "71%", avg_time_sec: 44, avg_scroll_num: 71 },
+    { lander_name: "Referral Q2", variant_name: "Single-field", impressions: 16951, clicks: 8608, conversions: 4657, score: 0.275, avg_time_on_page: "38s", avg_scroll_pct: "65%", avg_time_sec: 38, avg_scroll_num: 65 },
+    { lander_name: "Founder Letter", variant_name: "Long form", impressions: 14668, clicks: 6601, conversions: 2376, score: 0.162, avg_time_on_page: "52s", avg_scroll_pct: "82%", avg_time_sec: 52, avg_scroll_num: 82 },
+    { lander_name: "Hedge Your Future", variant_name: "Reader modal", impressions: 3248, clicks: 47, conversions: 12, score: 0.014, avg_time_on_page: "48s", avg_scroll_pct: "62%", avg_time_sec: 48, avg_scroll_num: 62 },
+    { lander_name: "Black Friday", variant_name: "Orange bold", impressions: 5786, clicks: 1042, conversions: 185, score: 0.032, avg_time_on_page: "29s", avg_scroll_pct: "54%", avg_time_sec: 29, avg_scroll_num: 54 }
   ];
+
+  /* Mock visit-level samples for behaviour histograms (time in seconds, scroll 0–100) */
+  var VISIT_BEHAVIOUR_SAMPLES = [
+    6, 8, 9, 12, 14, 18, 22, 24, 28, 31, 34, 36, 38, 42, 44, 48, 52, 55, 58, 62, 68, 72, 78, 84, 92, 98, 105, 118, 124, 142,
+    8, 11, 15, 19, 26, 33, 41, 47, 53, 61, 67, 74, 81, 88, 95, 102, 115, 128, 8, 16, 21, 27, 35, 43, 51, 59, 66, 73, 80, 89
+  ].map(function (t, i) {
+    var scrolls = [12, 18, 22, 28, 35, 42, 48, 55, 62, 68, 74, 81, 88, 91, 95, 100, 38, 45, 52, 58, 64, 70, 76, 83, 90, 15, 25, 32, 40, 50];
+    return { time_sec: t, scroll: scrolls[i % scrolls.length] };
+  });
 
   var VISIT_ROWS = [
     { visit_id: "v_a10ec9aa", lander_name: "Summer Sale", variant_name: "Main hero", device: "mobile", visit_time: "Apr 21, 14:32", time_on_page: "58s", scroll_pct: "84%", form_start: "Yes", form_submit: "Yes", clicks: 1 },
@@ -223,7 +235,13 @@
     values: [],
     filters: {},
     userSaved: [],
-    hiddenTeamIds: []
+    hiddenTeamIds: [],
+    histTimeMode: "count",
+    histTimeBins: 8,
+    histTimeBinSize: 15,
+    histScrollMode: "count",
+    histScrollBins: 5,
+    histScrollBinSize: 10
   };
 
   function scopeLabel(scope) {
@@ -615,6 +633,180 @@
     }).join("") + "</div>";
   }
 
+  function computeHistogram(samples, accessor, mode, binCount, binSize, maxVal) {
+    var values = samples.map(accessor);
+    var max = maxVal || Math.max.apply(null, values.concat([1]));
+    var numBins;
+    var step;
+    if (mode === "size") {
+      step = Math.max(1, binSize);
+      numBins = Math.ceil(max / step);
+      if (numBins > 20) {
+        numBins = 20;
+        step = Math.ceil(max / numBins);
+      }
+    } else {
+      numBins = Math.max(3, Math.min(16, binCount));
+      step = max / numBins;
+    }
+    var bins = [];
+    for (var i = 0; i < numBins; i++) {
+      var low = i * step;
+      var high = (i + 1) * step;
+      var count = values.filter(function (v) {
+        if (i === numBins - 1) return v >= low && v <= high;
+        return v >= low && v < high;
+      }).length;
+      bins.push({ low: low, high: high, count: count });
+    }
+    var avg = values.reduce(function (a, b) { return a + b; }, 0) / (values.length || 1);
+    var maxCount = Math.max.apply(null, bins.map(function (b) { return b.count; }).concat([1]));
+    return { bins: bins, avg: avg, maxCount: maxCount, step: step };
+  }
+
+  function formatHistLabel(low, high, suffix) {
+    var a = Math.round(low);
+    var b = Math.round(high);
+    if (suffix === "%") return a + "–" + b + suffix;
+    return a + "–" + b + suffix;
+  }
+
+  function renderHistControls(prefix, mode, bins, binSize, sizeOptions, sizeSuffix) {
+    var modeOpts = '<option value="count"' + (mode === "count" ? " selected" : "") + ">Number of bins</option>" +
+      '<option value="size"' + (mode === "size" ? " selected" : "") + ">Bin size</option>";
+    var countOpts = [4, 5, 6, 8, 10, 12, 16].map(function (n) {
+      return '<option value="' + n + '"' + (bins === n ? " selected" : "") + ">" + n + " bins</option>";
+    }).join("");
+    var sizeOpts = sizeOptions.map(function (n) {
+      return '<option value="' + n + '"' + (binSize === n ? " selected" : "") + ">" + n + sizeSuffix + "</option>";
+    }).join("");
+    return (
+      '<div class="rb-hist-controls" data-hist="' + prefix + '">' +
+      '<label class="rb-hist-controls__field"><span>Grouping</span><select class="rb-hist-mode" data-hist="' + prefix + '">' + modeOpts + "</select></label>" +
+      '<label class="rb-hist-controls__field rb-hist-controls__count"' + (mode === "count" ? "" : ' hidden') + '><span>Bins</span><select class="rb-hist-bins" data-hist="' + prefix + '">' + countOpts + "</select></label>" +
+      '<label class="rb-hist-controls__field rb-hist-controls__size"' + (mode === "size" ? "" : ' hidden') + '><span>Bin size</span><select class="rb-hist-size" data-hist="' + prefix + '">' + sizeOpts + "</select></label>" +
+      "</div>"
+    );
+  }
+
+  function renderHistogramBars(hist, suffix, avgLine) {
+    return '<div class="rb-time-histogram">' + hist.bins.map(function (b, i) {
+      var h = Math.max(4, Math.round((b.count / hist.maxCount) * 130));
+      var inAvg = avgLine && hist.avg >= b.low && (i === hist.bins.length - 1 ? hist.avg <= b.high : hist.avg < b.high);
+      return (
+        '<div class="rb-time-histogram__bar-wrap">' +
+        '<div class="rb-time-histogram__bar' + (inAvg ? " is-avg" : "") + '" style="height:' + h + 'px" title="' + b.count + ' visits"></div>' +
+        '<div class="rb-time-histogram__label">' + formatHistLabel(b.low, b.high, suffix) + "</div>" +
+        "</div>"
+      );
+    }).join("") + "</div>";
+  }
+
+  function renderBehaviourHeatmap() {
+    return (
+      '<div class="rb-heatmap-row">' +
+      '<div class="rb-heatmap-preview">' +
+      '<div class="rb-heatmap-preview__chrome">' +
+      '<div class="rb-heatmap-preview__bar"></div>' +
+      '<div class="rb-heatmap-preview__screen">' +
+      '<div class="rb-heatmap-preview__screen-inner">' +
+      '<div class="rb-heatmap-preview__hero"><h3>Summer Sale — Main hero</h3><p>Limited-time offer on premium plans.</p><span class="rb-heatmap-preview__cta">Get started</span></div>' +
+      '<div class="rb-heatmap-preview__block">Social proof · 12k+ customers</div>' +
+      '<div class="rb-heatmap-preview__block">Feature grid · Compare plans</div>' +
+      '<div class="rb-heatmap-preview__block">FAQ accordion</div>' +
+      "</div>" +
+      '<div class="rb-heatmap-overlay" aria-hidden="true"></div>' +
+      "</div></div></div>" +
+      '<div class="rb-heatmap-meta">' +
+      "<h3>Full-page click heatmap</h3>" +
+      '<p class="muted" style="font-size:12px;margin:4px 0 0;">Aggregated pointer taps &amp; scroll stops · all visits in filter</p>' +
+      '<div class="rb-heatmap-stats">' +
+      '<div class="rb-heatmap-stat"><div class="rb-heatmap-stat__label">Hot zone</div><div class="rb-heatmap-stat__val">Hero CTA</div></div>' +
+      '<div class="rb-heatmap-stat"><div class="rb-heatmap-stat__label">Median scroll</div><div class="rb-heatmap-stat__val">71%</div></div>' +
+      '<div class="rb-heatmap-stat"><div class="rb-heatmap-stat__label">Avg time</div><div class="rb-heatmap-stat__val">44s</div></div>' +
+      '<div class="rb-heatmap-stat"><div class="rb-heatmap-stat__label">Visits mapped</div><div class="rb-heatmap-stat__val">' + VISIT_BEHAVIOUR_SAMPLES.length + "+</div></div>" +
+      "</div>" +
+      '<div class="rb-heatmap-legend"><span>Low</span><div class="rb-heatmap-legend__gradient"></div><span>High</span></div>' +
+      "</div></div>"
+    );
+  }
+
+  function renderBehaviourDashboard() {
+    var timeHist = computeHistogram(
+      VISIT_BEHAVIOUR_SAMPLES,
+      function (s) { return s.time_sec; },
+      state.histTimeMode,
+      state.histTimeBins,
+      state.histTimeBinSize,
+      150
+    );
+    var scrollHist = computeHistogram(
+      VISIT_BEHAVIOUR_SAMPLES,
+      function (s) { return s.scroll; },
+      state.histScrollMode,
+      state.histScrollBins,
+      state.histScrollBinSize,
+      100
+    );
+    return (
+      '<div class="rb-behaviour-dashboard">' +
+      '<div class="rb-behaviour-charts">' +
+      '<div class="rb-hist-card">' +
+      '<div class="rb-hist-card__head">' +
+      '<div><h3 class="rb-hist-card__title">Time on page</h3><p class="rb-hist-card__sub">Distribution across visits · avg ' + Math.round(timeHist.avg) + "s</p></div>" +
+      renderHistControls("time", state.histTimeMode, state.histTimeBins, state.histTimeBinSize, [5, 10, 15, 20, 30, 45], "s") +
+      "</div>" +
+      renderHistogramBars(timeHist, "s", true) +
+      "</div>" +
+      '<div class="rb-hist-card">' +
+      '<div class="rb-hist-card__head">' +
+      '<div><h3 class="rb-hist-card__title">Scroll depth</h3><p class="rb-hist-card__sub">Max scroll % per visit · avg ' + Math.round(scrollHist.avg) + "%</p></div>" +
+      renderHistControls("scroll", state.histScrollMode, state.histScrollBins, state.histScrollBinSize, [5, 10, 15, 20, 25], "%") +
+      "</div>" +
+      renderHistogramBars(scrollHist, "%", true) +
+      "</div>" +
+      "</div>" +
+      renderBehaviourHeatmap() +
+      "</div>"
+    );
+  }
+
+  function wireBehaviourControls(root) {
+    if (!root) return;
+    root.querySelectorAll(".rb-hist-mode").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        var key = sel.getAttribute("data-hist");
+        if (key === "time") state.histTimeMode = sel.value;
+        else state.histScrollMode = sel.value;
+        renderResult();
+      });
+    });
+    root.querySelectorAll(".rb-hist-bins").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        var key = sel.getAttribute("data-hist");
+        var val = parseInt(sel.value, 10);
+        if (key === "time") state.histTimeBins = val;
+        else state.histScrollBins = val;
+        renderResult();
+      });
+    });
+    root.querySelectorAll(".rb-hist-size").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        var key = sel.getAttribute("data-hist");
+        var val = parseInt(sel.value, 10);
+        if (key === "time") state.histTimeBinSize = val;
+        else state.histScrollBinSize = val;
+        renderResult();
+      });
+    });
+  }
+
+  function isBehaviourReport() {
+    if (state.presetId === "visit-behaviour") return true;
+    var report = findReportById(state.presetId);
+    return report && report.layout === "behaviour";
+  }
+
   function renderTable(rows, rowCols, valueCols, isVisit) {
     var thead = rowCols.map(function (c) { return "<th>" + (DIMENSIONS[c] || c) + "</th>"; }).join("") +
       valueCols.map(function (c) { return '<th class="right">' + (MEASURES[c] || c) + "</th>"; }).join("");
@@ -653,7 +845,15 @@
         else if (c === "conversions") tfoot += '<td class="right">' + nf(sumConv) + "</td>";
         else if (c === "ctr") tfoot += '<td class="right">' + pct(sumClk, sumImp) + "</td>";
         else if (c === "cvr") tfoot += '<td class="right">' + pct(sumConv, sumClk) + "</td>";
-        else tfoot += '<td class="right">—</td>';
+        else if (c === "avg_time_on_page") {
+          var wTime = 0;
+          rows.forEach(function (r) { wTime += (r.avg_time_sec || 0) * (r.impressions || 0); });
+          tfoot += '<td class="right">' + (sumImp ? Math.round(wTime / sumImp) + "s" : "—") + "</td>";
+        } else if (c === "avg_scroll_pct") {
+          var wScroll = 0;
+          rows.forEach(function (r) { wScroll += (r.avg_scroll_num || 0) * (r.impressions || 0); });
+          tfoot += '<td class="right">' + (sumImp ? Math.round(wScroll / sumImp) + "%" : "—") + "</td>";
+        } else tfoot += '<td class="right">—</td>';
       });
       tfoot += "</tr></tfoot>";
     }
@@ -667,7 +867,8 @@
     var meta = document.getElementById("rb-result-meta");
     if (!chartWrap || !tableWrap) return;
 
-    var isVisit = state.presetId === "visit-behaviour" || state.rows.indexOf("visit_id") !== -1;
+    var isBehaviour = isBehaviourReport();
+    var isVisit = isBehaviour || state.rows.indexOf("visit_id") !== -1;
     var isFunnel = state.chart === "funnel" || state.presetId === "widget-funnels";
     var isChart = state.chart === "bar" || state.chart === "line" || state.chart === "area";
 
@@ -690,8 +891,11 @@
       valueCols = state.values.length ? state.values : ["impressions", "clicks", "ctr"];
     }
 
-    chartWrap.hidden = !isChart && !isFunnel;
-    if (isFunnel) {
+    chartWrap.hidden = !isChart && !isFunnel && !isBehaviour;
+    if (isBehaviour) {
+      chartWrap.innerHTML = renderBehaviourDashboard();
+      wireBehaviourControls(chartWrap);
+    } else if (isFunnel) {
       chartWrap.innerHTML = renderFunnel();
     } else if (isChart) {
       var vk = valueCols.filter(function (c) { return ["time_on_page", "scroll_pct", "visits", "impressions", "clicks"].indexOf(c) !== -1; }).slice(0, 2);
@@ -714,11 +918,18 @@
           { form_widget: "Passive investing KB", form_start: "—", form_submit: "—", kb_widget_views: 3248, kb_block_clicks: 964, kb_ad_clicks: 47 }
         ], ["form_widget"], state.values, false);
     } else {
-      tableWrap.innerHTML = renderTable(rows, rowCols, valueCols, isVisit);
+      if (isBehaviour) {
+        tableWrap.innerHTML = '<p class="rb-section-label">Visit-level trace</p>' + renderTable(rows, rowCols, valueCols, true);
+      } else {
+        tableWrap.innerHTML = renderTable(rows, rowCols, valueCols, isVisit);
+      }
     }
 
     if (meta) {
-      meta.textContent = rows.length + " rows · " + (CHART_TYPES.find(function (c) { return c.id === state.chart; }) || {}).label;
+      var label = (CHART_TYPES.find(function (c) { return c.id === state.chart; }) || {}).label;
+      meta.textContent = isBehaviour
+        ? rows.length + " visits · histograms + heatmap"
+        : rows.length + " rows · " + label;
     }
   }
 

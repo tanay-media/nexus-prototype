@@ -597,3 +597,282 @@
     gap: 6px;
   }
 }
+
+/* Visit behaviour — histograms + heatmap */
+
+.rb-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted, #7a7568);
+  margin: 0 0 10px;
+}
+
+.rb-behaviour-dashboard {
+  padding: 4px 0 8px;
+}
+
+.rb-behaviour-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.rb-hist-card {
+  background: #fff;
+  border: 1px solid var(--border, #e8e4da);
+  border-radius: 10px;
+  padding: 14px 16px 16px;
+}
+
+.rb-hist-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rb-hist-card__title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.rb-hist-card__sub {
+  font-size: 11px;
+  color: var(--text-muted, #7a7568);
+  margin: 3px 0 0;
+}
+
+.rb-hist-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rb-hist-controls__field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--text-muted, #7a7568);
+}
+
+.rb-hist-controls__field select {
+  font-size: 11px;
+  padding: 4px 6px;
+  border: 1px solid var(--border, #e8e4da);
+  border-radius: 6px;
+  background: #fff;
+  min-width: 108px;
+}
+
+.rb-hist-controls__field[hidden] {
+  display: none;
+}
+
+.rb-time-histogram {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 150px;
+  padding-top: 8px;
+}
+
+.rb-time-histogram__bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.rb-time-histogram__bar {
+  width: 100%;
+  max-width: 44px;
+  background: #1a1a1a;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  position: relative;
+}
+
+.rb-time-histogram__bar.is-avg::after {
+  content: "avg";
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1b6b2e;
+  white-space: nowrap;
+}
+
+.rb-time-histogram__label {
+  font-size: 9px;
+  color: var(--text-muted, #7a7568);
+  text-align: center;
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.rb-heatmap-row {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+}
+
+.rb-heatmap-preview {
+  background: #fff;
+  border: 1px solid var(--border, #e8e4da);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.rb-heatmap-preview__chrome {
+  background: #111;
+  border-radius: 28px;
+  padding: 10px 8px 14px;
+  max-width: 240px;
+  margin: 0 auto;
+}
+
+.rb-heatmap-preview__bar {
+  height: 4px;
+  width: 36%;
+  background: #333;
+  border-radius: 999px;
+  margin: 0 auto 10px;
+}
+
+.rb-heatmap-preview__screen {
+  position: relative;
+  background: #faf9f7;
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 360px;
+}
+
+.rb-heatmap-preview__screen-inner {
+  padding: 14px 12px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.rb-heatmap-preview__hero {
+  background: linear-gradient(135deg, #fff5e6, #ffe8cc);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.rb-heatmap-preview__hero h3 {
+  font-size: 13px;
+  margin: 0 0 4px;
+  line-height: 1.25;
+}
+
+.rb-heatmap-preview__cta {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #1a1a1a;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.rb-heatmap-preview__block {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.rb-heatmap-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80px 60px at 50% 18%, rgba(255, 60, 0, 0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 60px 40px at 48% 32%, rgba(255, 120, 0, 0.4) 0%, transparent 70%),
+    radial-gradient(ellipse 50px 35px at 72% 55%, rgba(255, 180, 0, 0.35) 0%, transparent 70%),
+    radial-gradient(ellipse 40px 30px at 30% 72%, rgba(255, 100, 0, 0.3) 0%, transparent 70%);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
+
+.rb-heatmap-meta {
+  background: #fff;
+  border: 1px solid var(--border, #e8e4da);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.rb-heatmap-meta h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.rb-heatmap-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.rb-heatmap-stat {
+  background: #faf9f7;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.rb-heatmap-stat__label {
+  font-size: 11px;
+  color: var(--text-muted, #7a7568);
+  margin-bottom: 2px;
+}
+
+.rb-heatmap-stat__val {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rb-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text-muted, #7a7568);
+}
+
+.rb-heatmap-legend__gradient {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ffe8cc, #ff6a00, #c41e00);
+}
+
+@media (max-width: 960px) {
+  .rb-behaviour-charts {
+    grid-template-columns: 1fr;
+  }
+  .rb-heatmap-row {
+    grid-template-columns: 1fr;
+  }
+  .rb-hist-card__head {
+    flex-direction: column;
+  }
+}
