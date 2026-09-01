@@ -1499,6 +1499,18 @@ button.dsk-row-name:focus-visible strong {
 .table-scroll > .table.table--form-responses {
   min-width: 640px;
 }
+.form-responses-drawer {
+  width: min(720px, 100vw - 20px);
+}
+.form-responses-drawer__summary {
+  font-size: 12px;
+  margin: 0 0 0.75rem;
+}
+.form-responses-drawer__table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg);
+}
 .breakdown-list { display: flex; flex-direction: column; gap: 2px; }
 .breakdown-list button {
   text-align: left;
