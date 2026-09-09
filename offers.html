@@ -557,6 +557,24 @@
     </div>
   </dialog>
 
+  <dialog class="modal modal--settings" id="dialog-republish-landers">
+    <form method="dialog" class="modal__inner" id="republish-landers-form">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title">Republish landers</h2>
+          <p class="modal__hint" id="republish-dialog-sub">Select landers to republish with updated deal details.</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
+      </div>
+      <p class="republish-summary muted" id="republish-dialog-summary">Published landers are pre-selected.</p>
+      <ul class="offer-ws-list" id="republish-landers-list"></ul>
+      <div class="modal__actions">
+        <button type="button" class="btn" id="republish-skip-btn">Skip for now</button>
+        <button type="submit" class="btn btn--black" id="republish-submit-btn">Republish selected</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog class="modal modal--settings" id="dialog-offers-alerts">
     <div class="modal__inner">
       <div class="modal__header">
@@ -578,6 +596,7 @@
   <script src="offer-categories.js"></script>
   <script src="offer-countries.js"></script>
   <script src="offers-governance.js"></script>
+  <script src="deal-landers.js"></script>
   <script>
     var ICON = {
       edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
@@ -927,9 +946,11 @@
     }
 
     var expandedAdvertisers = {};
+    var expandedDeals = {};
     var activeTeamOfferId = null;
     var activeParentOfferId = null;
     var isNewTeamOffer = false;
+    var isNewParentOffer = false;
     var tbody = document.getElementById("offers-body");
     var parentBody = document.getElementById("parent-offers-body");
     var teamDetailDlg = document.getElementById("dialog-team-offer-detail");
@@ -1088,6 +1109,71 @@
       return ids.map(function (id) { return escapeHtml(map[id] || id); }).join(", ");
     }
 
+    var ICON_OPEN_LANDER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M7 17L17 7M7 7h10v10"/></svg>';
+
+    function landersForTeamOffer(teamOfferId) {
+      return window.NexusDealLanders ? NexusDealLanders.forTeamOffer(teamOfferId) : [];
+    }
+
+    function landersForParentOffer(parentOfferId) {
+      return window.NexusDealLanders ? NexusDealLanders.forParentOffer(parentOfferId, teamOffers) : [];
+    }
+
+    function landerStatusBadge(status) {
+      if (status === "published") return '<span class="badge badge--published">Published</span>';
+      return '<span class="badge badge--unpublished">Unpublished</span>';
+    }
+
+    function landerToggleMeta(count, nestedId, expanded) {
+      if (!count) return '<div class="offer-row__meta muted">0 landers</div>';
+      return '<div class="offer-row__meta">' + count + ' lander' + (count === 1 ? "" : "s") + ' · ' +
+        '<button type="button" class="js-domain-toggle" data-target="' + escapeHtml(nestedId) + '" aria-expanded="' + (expanded ? "true" : "false") + '" aria-controls="' + escapeHtml(nestedId) + '">' +
+        '<span class="js-collapse-label">' + (expanded ? "collapse ▴" : "expand ▾") + '</span></button></div>';
+    }
+
+    function buildNestedLandersHtml(landers, nestedId, expanded) {
+      var items = landers.map(function (l) {
+        var path = (l.url || "").replace(/^https?:\/\//, "");
+        return '<div class="nested-lander">' +
+          '<div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>' + escapeHtml(l.name) + '</strong><small>' + escapeHtml(path) + '</small></div></div>' +
+          '<div>' + landerStatusBadge(l.status) + '</div>' +
+          '<div class="right">' + (l.variantCount || 1) + '</div>' +
+          '<div><a class="icon-btn" href="landers.html?lander=' + escapeHtml(l.id) + '" title="Open in Landers" aria-label="Open ' + escapeHtml(l.name) + ' in Landers">' + ICON_OPEN_LANDER + '</a></div>' +
+        '</div>';
+      }).join("");
+      return '<div class="nested-landers nested-landers--deal" id="' + escapeHtml(nestedId) + '"' + (expanded ? "" : " hidden") + '>' +
+        '<div class="nested-landers__head"><div>Lander</div><div>Status</div><div class="right">Variants</div><div></div></div>' +
+        items + '</div>';
+    }
+
+    function appendDealNestedRow(parentTbody, teamOfferId, advertiserExpanded) {
+      var landers = landersForTeamOffer(teamOfferId);
+      var nestedId = "nested-deal-" + teamOfferId;
+      var dealExpanded = expandedDeals[teamOfferId] === true;
+      var nrow = document.createElement("tr");
+      nrow.className = "offer-nested-row";
+      nrow.setAttribute("data-deal-nested", teamOfferId);
+      if (!advertiserExpanded) nrow.hidden = true;
+      nrow.innerHTML = '<td colspan="11" style="padding:0;border:none;">' +
+        (landers.length ? buildNestedLandersHtml(landers, nestedId, dealExpanded) : '<div class="nested-landers nested-landers--deal is-empty muted" style="padding:.75rem 1rem;font-size:12px;">No landers linked to this deal yet.</div>') +
+      '</td>';
+      parentTbody.appendChild(nrow);
+    }
+
+    function appendParentOfferNestedRow(parentTbody, parentOfferId, advertiserExpanded) {
+      var landers = landersForParentOffer(parentOfferId);
+      var nestedId = "nested-offer-" + parentOfferId;
+      var offerExpanded = expandedDeals["po:" + parentOfferId] === true;
+      var nrow = document.createElement("tr");
+      nrow.className = "offer-nested-row";
+      nrow.setAttribute("data-offer-nested", parentOfferId);
+      if (!advertiserExpanded) nrow.hidden = true;
+      nrow.innerHTML = '<td colspan="12" style="padding:0;border:none;">' +
+        (landers.length ? buildNestedLandersHtml(landers, nestedId, offerExpanded) : '<div class="nested-landers nested-landers--deal is-empty muted" style="padding:.75rem 1rem;font-size:12px;">No landers linked to team deals for this offer yet.</div>') +
+      '</td>';
+      parentTbody.appendChild(nrow);
+    }
+
     function renderAdvertiserFilters() {
       ["offers-advertiser-filter", "parent-offers-advertiser-filter"].forEach(function (id) {
         var sel = document.getElementById(id);
@@ -1124,13 +1210,17 @@
         tbody.appendChild(tr);
         g.offers.forEach(function (to) {
           var p = parentById(to.parentOfferId);
+          var linkedLanders = landersForTeamOffer(to.id);
+          var nestedId = "nested-deal-" + to.id;
+          var dealExpanded = expandedDeals[to.id] === true;
           var orow = document.createElement("tr");
-          orow.className = "offer-row variant-row" + (to.deletedAt ? " is-soft-deleted" : "");
+          orow.className = "offer-row variant-row" + (to.deletedAt ? " is-soft-deleted" : "") + (dealExpanded && linkedLanders.length ? " is-deal-expanded" : "");
           if (!expanded) orow.hidden = true;
           orow.setAttribute("data-team-offer-id", to.id);
           orow.innerHTML =
             '<td></td>' +
-            '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong>' + (to.deletedAt ? ' <span class="badge badge--archived">Deleted</span>' : '') + '</td>' +
+            '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong>' + (to.deletedAt ? ' <span class="badge badge--archived">Deleted</span>' : '') +
+              landerToggleMeta(linkedLanders.length, nestedId, dealExpanded) + '</td>' +
             '<td class="muted" style="font-size:12px;">' + escapeHtml(p ? p.name : "—") + '</td>' +
             '<td class="muted">' + escapeHtml(p ? catL2FromParent(p) : "—") + '</td>' +
             '<td class="right num"><span class="offer-deal-cell">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + ' <span class="offer-deal-value">' + fmtDealValueResolved(to) + '</span></span></td>' +
@@ -1144,6 +1234,7 @@
               '<button type="button" class="icon-btn js-team-offer-settings" data-team-offer-id="' + escapeHtml(to.id) + '" title="Edit deal">' + ICON.edit + '</button>' +
             '</div></td>';
           tbody.appendChild(orow);
+          appendDealNestedRow(tbody, to.id, expanded);
         });
       });
     }
@@ -1175,12 +1266,16 @@
           '<td colspan="11"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
         parentBody.appendChild(tr);
         g.offers.forEach(function (p) {
+          var linkedLanders = landersForParentOffer(p.id);
+          var nestedId = "nested-offer-" + p.id;
+          var offerExpanded = expandedDeals["po:" + p.id] === true;
           var orow = document.createElement("tr");
-          orow.className = "offer-row variant-row";
+          orow.className = "offer-row variant-row" + (offerExpanded && linkedLanders.length ? " is-deal-expanded" : "");
           if (!expanded) orow.hidden = true;
           orow.innerHTML =
             '<td></td>' +
-            '<td><strong>' + escapeHtml(p.name) + '</strong></td>' +
+            '<td><strong>' + escapeHtml(p.name) + '</strong>' +
+              landerToggleMeta(linkedLanders.length, nestedId, offerExpanded) + '</td>' +
             '<td class="muted">' + escapeHtml(catL2FromParent(p) || "—") + '</td>' +
             '<td>' + escapeHtml(fmtDealParent(p)) + '</td>' +
             '<td>' + escapeHtml(fmtTargetTypeParent(p)) + '</td>' +
@@ -1195,6 +1290,7 @@
               '<button type="button" class="icon-btn js-parent-offer-settings" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Edit offer">' + ICON.edit + '</button>' +
             '</div></td>';
           parentBody.appendChild(orow);
+          appendParentOfferNestedRow(parentBody, p.id, expanded);
         });
       });
     }
@@ -1688,9 +1784,34 @@
       teamDetailDlg.showModal();
     }
 
+    var republishDlg = document.getElementById("dialog-republish-landers");
+
+    function openRepublishDialog(opts) {
+      if (!republishDlg || !opts || !opts.landers || !opts.landers.length) return;
+      var list = document.getElementById("republish-landers-list");
+      var sub = document.getElementById("republish-dialog-sub");
+      var summary = document.getElementById("republish-dialog-summary");
+      if (sub) sub.textContent = opts.contextLabel || "Select landers to republish with updated deal details.";
+      if (summary) summary.textContent = opts.landers.length + " linked lander" + (opts.landers.length === 1 ? "" : "s") + " · published landers are pre-selected";
+      if (list) {
+        list.innerHTML = opts.landers.map(function (l) {
+          var checked = l.status === "published" ? " checked" : "";
+          return '<li class="offer-ws-row republish-lander-row"><label class="offer-ws-pick">' +
+            '<input type="checkbox" value="' + escapeHtml(l.id) + '"' + checked + ' />' +
+            '<span class="republish-lander-row__main"><strong>' + escapeHtml(l.name) + '</strong><small class="muted">' + escapeHtml(l.url || "") + '</small></span>' +
+            landerStatusBadge(l.status) +
+          '</label></li>';
+        }).join("");
+      }
+      republishDlg.dataset.sourceType = opts.sourceType || "";
+      republishDlg.dataset.sourceId = opts.sourceId || "";
+      republishDlg.showModal();
+    }
+
     function saveTeamOfferDetail() {
       var to = teamOfferById(activeTeamOfferId);
       if (!to) return;
+      var wasExistingDeal = !isNewTeamOffer;
       var prevStatus = to.status;
       if (!to.parentOfferId) {
         alert("Please select an offer before saving.");
@@ -1740,6 +1861,18 @@
       renderAlertsBadge();
       renderAdvertiserFilters();
       render();
+      if (teamDetailDlg) teamDetailDlg.close();
+      if (wasExistingDeal) {
+        var linked = landersForTeamOffer(to.id);
+        if (linked.length) {
+          openRepublishDialog({
+            sourceType: "deal",
+            sourceId: to.id,
+            contextLabel: 'Updated deal "' + to.displayName + '" — republish linked landers so visitors get the new campaign ID, CTA URL, and deal value.',
+            landers: linked
+          });
+        }
+      }
     }
 
     function populatePoCountrySelect(selected) {
@@ -1798,10 +1931,11 @@
         }).join("");
     }
 
-    function openParentOfferDetail(id) {
+    function openParentOfferDetail(id, isNew) {
       var p = parentById(id);
       if (!p || !parentDetailDlg) return;
       activeParentOfferId = id;
+      isNewParentOffer = !!isNew || !p.name;
       document.getElementById("parent-offer-detail-title").textContent = p.name || "New offer";
       document.getElementById("parent-offer-detail-sub").textContent = advName(p.advertiserId) || "Select advertiser";
       document.getElementById("po-name").value = p.name || "";
@@ -1827,6 +1961,7 @@
     function saveParentOfferDetail() {
       var p = parentById(activeParentOfferId);
       if (!p) return;
+      var wasExistingOffer = !isNewParentOffer;
       var prevStatus = p.status;
       p.name = document.getElementById("po-name").value.trim();
       p.description = document.getElementById("po-description").value.trim();
@@ -1867,9 +2002,20 @@
         Gov.cascadeSoftDeleteTeamOffersForParent(p, "offer set inactive");
       }
       touchEntity(p);
+      isNewParentOffer = false;
       renderAlertsBadge();
       renderAdvertiserFilters();
       render();
+      if (parentDetailDlg) parentDetailDlg.close();
+      var linked = landersForParentOffer(p.id);
+      if (wasExistingOffer && linked.length) {
+        openRepublishDialog({
+          sourceType: "offer",
+          sourceId: p.id,
+          contextLabel: 'Updated offer "' + p.name + '" — republish linked landers so team deployments and live pages reflect catalog changes.',
+          landers: linked
+        });
+      }
     }
 
     function wireParamsContainer(containerId, params, onChange) {
@@ -1949,10 +2095,26 @@
       tbtn.classList.toggle("is-expanded", nowExpanded);
       var row = tbtn.closest("tr");
       var next = row && row.nextElementSibling;
-      while (next && next.classList.contains("offer-row")) {
+      while (next && (next.classList.contains("offer-row") || next.classList.contains("offer-nested-row"))) {
         next.hidden = !nowExpanded;
         next = next.nextElementSibling;
       }
+      return true;
+    }
+
+    function handleDealLandersToggle(e) {
+      var tbtn = e.target.closest(".js-domain-toggle[data-target^='nested-deal-'], .js-domain-toggle[data-target^='nested-offer-']");
+      if (!tbtn) return false;
+      var targetId = tbtn.getAttribute("data-target");
+      if (!targetId) return false;
+      var nowExpanded = tbtn.getAttribute("aria-expanded") !== "true";
+      if (targetId.indexOf("nested-deal-") === 0) {
+        expandedDeals[targetId.slice("nested-deal-".length)] = nowExpanded;
+      } else if (targetId.indexOf("nested-offer-") === 0) {
+        expandedDeals["po:" + targetId.slice("nested-offer-".length)] = nowExpanded;
+      }
+      var dealRow = tbtn.closest("tr.offer-row");
+      if (dealRow) dealRow.classList.toggle("is-deal-expanded", nowExpanded);
       return true;
     }
 
@@ -2254,6 +2416,7 @@
 
     tbody.addEventListener("click", function (e) {
       if (handleAdvertiserToggle(e)) return;
+      if (handleDealLandersToggle(e)) return;
       var cbtn = e.target.closest(".js-team-offer-clone");
       if (cbtn) { openTeamOfferClone(cbtn.getAttribute("data-team-offer-id")); return; }
       var sbtn = e.target.closest(".js-team-offer-settings");
@@ -2263,6 +2426,7 @@
     if (parentBody) {
       parentBody.addEventListener("click", function (e) {
         if (handleAdvertiserToggle(e)) return;
+        if (handleDealLandersToggle(e)) return;
         var cbtn = e.target.closest(".js-parent-offer-clone");
         if (cbtn) { openParentOfferClone(cbtn.getAttribute("data-parent-offer-id")); return; }
         var sbtn = e.target.closest(".js-parent-offer-settings");
@@ -2271,10 +2435,42 @@
     }
 
     if (teamDetailDlg) {
-      teamDetailDlg.querySelector("form").addEventListener("submit", saveTeamOfferDetail);
+      teamDetailDlg.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        saveTeamOfferDetail();
+      });
     }
     if (parentDetailDlg) {
-      parentDetailDlg.querySelector("form").addEventListener("submit", saveParentOfferDetail);
+      parentDetailDlg.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        saveParentOfferDetail();
+      });
+    }
+
+    var republishForm = document.getElementById("republish-landers-form");
+    if (republishForm) {
+      republishForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var picked = [];
+        republishForm.querySelectorAll("#republish-landers-list input:checked").forEach(function (cb) {
+          picked.push(cb.value);
+        });
+        if (!picked.length) {
+          alert("Select at least one lander to republish.");
+          return;
+        }
+        Gov.notifyGovernanceEvent("landers_republished", {
+          message: "Republished " + picked.length + " lander" + (picked.length === 1 ? "" : "s") + " with updated deal/offer details.",
+          email: false
+        });
+        renderAlertsBadge();
+        republishDlg.close();
+        alert("Republish queued for " + picked.length + " lander" + (picked.length === 1 ? "" : "s") + ".\n\nIn production, this pushes updated campaign ID, CTA URL, and deal metadata to the live edge.");
+      });
+    }
+    var republishSkipBtn = document.getElementById("republish-skip-btn");
+    if (republishSkipBtn && republishDlg) {
+      republishSkipBtn.addEventListener("click", function () { republishDlg.close(); });
     }
 
     document.getElementById("team-offer-add-btn").addEventListener("click", function () {
@@ -2322,7 +2518,7 @@
         description: "", dealType: "cpa", targetType: "cpa",
         targetValue: { amount: 0, currency: "USD" }, countries: ["US"], teamIds: [], status: "active"
       }, auditFields()));
-      openParentOfferDetail(id);
+      openParentOfferDetail(id, true);
     });
 
     populateCategoryL1("", "po");

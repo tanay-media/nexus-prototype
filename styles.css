@@ -2446,8 +2446,15 @@ button.dsk-row-name:focus-visible strong {
 /* ---------- Domains ---------- */
 
 .domain-row { cursor: pointer; }
-.domain-row__meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; font-family: ui-monospace, Menlo, monospace; }
-.domain-row__meta button {
+.domain-row__meta,
+.offer-row__meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.domain-row__meta button,
+.offer-row__meta button {
   appearance: none;
   background: none;
   border: none;
@@ -2497,6 +2504,37 @@ button.dsk-row-name:focus-visible strong {
 .nested-lander a.icon-btn {
   text-decoration: none;
   color: inherit;
+}
+.nested-landers--deal {
+  margin-left: 1.75rem;
+  border-left: 3px solid var(--border);
+}
+.offer-nested-row > td {
+  padding: 0 !important;
+  border-top: none;
+  background: var(--bg);
+}
+.offer-row.is-deal-expanded td {
+  background: color-mix(in srgb, var(--bg) 70%, var(--surface));
+}
+.republish-lander-row .offer-ws-pick {
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+.republish-lander-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.republish-lander-row__main small {
+  font-size: 11px;
+  word-break: break-all;
+}
+.republish-summary {
+  font-size: 12px;
+  margin: 0 0 0.85rem;
 }
 
 /* ---------- Chrome dialog (shell editor) ---------- */
