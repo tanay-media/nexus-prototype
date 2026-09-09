@@ -616,6 +616,7 @@
   <script src="offer-countries.js"></script>
   <script src="offers-governance.js"></script>
   <script src="deal-landers.js"></script>
+  <script src="thumbs.js"></script>
   <script>
     var ICON = {
       edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
@@ -1149,19 +1150,47 @@
       '</button>';
     }
 
+    function editorHref(landerName, variantName) {
+      var href = "editor.html?name=" + encodeURIComponent(landerName);
+      if (variantName) href += "&variant=" + encodeURIComponent(variantName);
+      return href;
+    }
+
+    function renderDealLanderVariantRows(l) {
+      var variants = l.variants || [];
+      if (variants.length <= 1) return "";
+      return '<ul class="deal-lander-card__variants">' +
+        variants.map(function (v) {
+          return '<li class="deal-lander-variant">' +
+            '<span class="lander-thumb lander-thumb--sm" data-thumb-name="' + escapeHtml(v.name) + '"></span>' +
+            '<span class="deal-lander-variant__name">' + escapeHtml(v.name) + '</span>' +
+            '<span class="deal-lander-variant__split muted">' + escapeHtml(v.split || "") + '</span>' +
+            '<a class="icon-btn deal-lander-variant__open" href="' + editorHref(l.name, v.name) + '" target="_blank" rel="noopener" title="Open ' + escapeHtml(v.name) + ' in editor" aria-label="Open ' + escapeHtml(v.name) + ' in editor">' + ICON_OPEN_LANDER + '</a>' +
+          '</li>';
+        }).join("") +
+      '</ul>';
+    }
+
     function renderDealLandersDrawerList(landers) {
       return landers.map(function (l) {
         var path = (l.url || "").replace(/^https?:\/\//, "");
-        return '<article class="deal-lander-card">' +
-          '<div class="deal-lander-card__main">' +
-            '<strong class="deal-lander-card__name">' + escapeHtml(l.name) + '</strong>' +
-            '<span class="deal-lander-card__url mono muted">' + escapeHtml(path) + '</span>' +
+        var variants = l.variants || [];
+        var primaryVariant = variants[0] ? variants[0].name : "";
+        var variantLabel = variants.length + " variant" + (variants.length === 1 ? "" : "s");
+        return '<article class="deal-lander-card' + (variants.length > 1 ? " deal-lander-card--has-variants" : "") + '">' +
+          '<div class="deal-lander-card__header">' +
+            '<span class="lander-thumb" data-thumb-name="' + escapeHtml(primaryVariant || l.name) + '"></span>' +
+            '<div class="deal-lander-card__main">' +
+              '<strong class="deal-lander-card__name">' + escapeHtml(l.name) + '</strong>' +
+              '<span class="deal-lander-card__url mono muted">' + escapeHtml(path) + '</span>' +
+              '<div class="deal-lander-card__meta">' +
+                landerStatusBadge(l.status) +
+                '<span class="muted deal-lander-card__variant-count">' + variantLabel + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<a class="icon-btn deal-lander-card__open" href="' + editorHref(l.name, primaryVariant) + '" target="_blank" rel="noopener" title="Open in editor" aria-label="Open ' + escapeHtml(l.name) + ' in editor">' + ICON_OPEN_LANDER + '</a>' +
           '</div>' +
-          '<div class="deal-lander-card__meta">' +
-            landerStatusBadge(l.status) +
-            '<span class="muted deal-lander-card__variants">' + (l.variantCount || 1) + ' variant' + ((l.variantCount || 1) === 1 ? "" : "s") + '</span>' +
-          '</div>' +
-          '<a class="icon-btn deal-lander-card__open" href="landers.html?lander=' + escapeHtml(l.id) + '" title="Open in Landers" aria-label="Open ' + escapeHtml(l.name) + ' in Landers">' + ICON_OPEN_LANDER + '</a>' +
+          renderDealLanderVariantRows(l) +
         '</article>';
       }).join("");
     }
