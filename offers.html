@@ -559,22 +559,44 @@
     </div>
   </dialog>
 
-  <div class="drawer-scrim" id="deal-landers-scrim" hidden></div>
-  <aside class="drawer deal-landers-drawer" id="deal-landers-drawer" aria-hidden="true" aria-labelledby="deal-landers-drawer-title">
-    <div class="drawer__head">
-      <div class="drawer__head-text">
-        <h2 class="drawer__title" id="deal-landers-drawer-title">Linked landers</h2>
-        <p class="drawer__sub muted" id="deal-landers-drawer-sub">Landers using this deal</p>
+  <dialog class="modal modal--deal-landers" id="dialog-deal-landers">
+    <div class="modal__inner modal__inner--deal-landers">
+      <div class="modal__header">
+        <div>
+          <h2 class="modal__title" id="deal-landers-dialog-title">Linked landers</h2>
+          <p class="modal__hint" id="deal-landers-dialog-sub">Landers tagged with this deal</p>
+        </div>
+        <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
-      <button type="button" class="icon-btn" id="deal-landers-drawer-close" aria-label="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
+      <p class="deal-landers-dialog__summary muted" id="deal-landers-dialog-summary"></p>
+      <div class="deal-landers-dialog__card">
+        <div class="table-scroll" role="region" aria-label="Linked landers and variants">
+          <table class="table" id="deal-landers-table">
+            <thead>
+              <tr>
+                <th class="lander-row__toggle" style="width:44px"></th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Traffic</th>
+                <th>Last updated</th>
+                <th>By</th>
+                <th class="right">Visits</th>
+                <th class="right">Impressions</th>
+                <th class="right">Clicks</th>
+                <th class="right">Conversions</th>
+                <th class="right">Score</th>
+                <th class="right" style="min-width:72px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="deal-landers-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--black" data-close-dialog>Close</button>
+      </div>
     </div>
-    <div class="drawer__body">
-      <p class="muted deal-landers-drawer__summary" id="deal-landers-drawer-summary"></p>
-      <div class="deal-landers-list" id="deal-landers-drawer-list"></div>
-    </div>
-  </aside>
+  </dialog>
 
   <dialog class="modal modal--settings" id="dialog-republish-landers">
     <form method="dialog" class="modal__inner" id="republish-landers-form">
@@ -1156,87 +1178,101 @@
       return href;
     }
 
-    function renderDealLanderVariantRows(l) {
-      var variants = l.variants || [];
-      if (variants.length <= 1) return "";
-      return '<div class="deal-lander-card__variant-section">' +
-        '<p class="deal-lander-card__variant-label">Variants · click to open in editor</p>' +
-        '<div class="deal-variant-grid">' +
-        variants.map(function (v) {
-          return '<a class="deal-variant-tile" href="' + editorHref(l.name, v.name) + '" target="_blank" rel="noopener" title="Open ' + escapeHtml(v.name) + ' in editor">' +
-            '<span class="lander-thumb lander-thumb--tile" data-thumb-name="' + escapeHtml(v.name) + '"></span>' +
-            '<span class="deal-variant-tile__body">' +
-              '<strong class="deal-variant-tile__name">' + escapeHtml(v.name) + '</strong>' +
-              '<span class="deal-variant-tile__split muted">' + escapeHtml(v.split || "") + ' traffic</span>' +
-            '</span>' +
-            '<span class="deal-variant-tile__open" aria-hidden="true">' + ICON_OPEN_LANDER + '</span>' +
-          '</a>';
-        }).join("") +
-        '</div></div>';
+    function fmtMetric(n) {
+      return (n || 0).toLocaleString();
     }
 
-    function renderDealLandersDrawerList(landers) {
-      return landers.map(function (l) {
-        var path = (l.url || "").replace(/^https?:\/\//, "");
+    function renderDealLanderActions(l, variantName) {
+      var v = variantName || (l.variants && l.variants[0] ? l.variants[0].name : "");
+      return '<div class="actions">' +
+        '<a class="icon-btn" href="' + editorHref(l.name, v) + '" target="_blank" rel="noopener" title="Open in editor">' + ICON_OPEN_LANDER + '</a>' +
+      '</div>';
+    }
+
+    function renderDealLanderNameCell(l, isVariant, variant) {
+      var thumbName = isVariant ? variant.name : (l.variants && l.variants[0] ? l.variants[0].name : l.name);
+      var label = isVariant ? variant.name : l.name;
+      var path = (l.url || "").replace(/^https?:\/\//, "");
+      var badge = (!isVariant && l.variants && l.variants.length > 1)
+        ? ' <span class="variants-badge">' + l.variants.length + ' variants</span>'
+        : "";
+      var statusChip = (!isVariant && l.status === "unpublished")
+        ? ' <span class="badge badge--unpublished" style="margin-left:.35rem;">Unpublished</span>'
+        : "";
+      return '<div class="lander-cell">' +
+        '<span class="lander-thumb" data-thumb-name="' + escapeHtml(thumbName) + '"></span>' +
+        '<div class="lander-name">' +
+          '<strong>' + escapeHtml(label) + badge + statusChip + '</strong>' +
+          (isVariant ? '' : '<small>' + escapeHtml(path) + ' <a href="' + escapeHtml(l.url) + '" target="_blank" rel="noopener" class="preview-link" title="Open live URL">↗</a></small>') +
+        '</div>' +
+      '</div>';
+    }
+
+    function renderDealLandersTable(landers) {
+      var tbody = document.getElementById("deal-landers-tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      if (!landers.length) {
+        tbody.innerHTML = '<tr><td colspan="12" class="muted" style="padding:1.25rem;text-align:center;">No landers linked to this deal yet.</td></tr>';
+        return;
+      }
+      landers.forEach(function (l) {
         var variants = l.variants || [];
-        var primaryVariant = variants[0] ? variants[0].name : "";
-        var variantLabel = variants.length + " variant" + (variants.length === 1 ? "" : "s");
-        var isMulti = variants.length > 1;
-        return '<article class="deal-lander-card' + (isMulti ? " deal-lander-card--multi" : "") + '">' +
-          '<div class="deal-lander-card__header">' +
-            '<span class="lander-thumb' + (isMulti ? " lander-thumb--lg" : "") + '" data-thumb-name="' + escapeHtml(primaryVariant || l.name) + '"></span>' +
-            '<div class="deal-lander-card__main">' +
-              '<strong class="deal-lander-card__name">' + escapeHtml(l.name) + '</strong>' +
-              '<span class="deal-lander-card__url mono muted">' + escapeHtml(path) + '</span>' +
-              '<div class="deal-lander-card__meta">' +
-                landerStatusBadge(l.status) +
-                '<span class="muted deal-lander-card__variant-count">' + variantLabel + '</span>' +
-              '</div>' +
-            '</div>' +
-            (isMulti ? '' : '<a class="icon-btn deal-lander-card__open" href="' + editorHref(l.name, primaryVariant) + '" target="_blank" rel="noopener" title="Open in editor" aria-label="Open ' + escapeHtml(l.name) + ' in editor">' + ICON_OPEN_LANDER + '</a>') +
-          '</div>' +
-          renderDealLanderVariantRows(l) +
-        '</article>';
-      }).join("");
+        var variantsId = "dl-variants-" + l.id;
+        var hasVariants = variants.length > 1;
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-lander-row", l.id);
+        tr.innerHTML =
+          '<td class="lander-row__toggle">' + (hasVariants
+            ? '<button type="button" class="lander-toggle" aria-expanded="false" aria-controls="' + escapeHtml(variantsId) + '" aria-label="Show or hide variants">' + ICON.chev + '</button>'
+            : "") + '</td>' +
+          '<td>' + renderDealLanderNameCell(l, false) + '</td>' +
+          '<td>' + landerStatusBadge(l.status) + '</td>' +
+          '<td class="muted">' + escapeHtml(l.split || "—") + '</td>' +
+          '<td class="muted">' + escapeHtml(l.updated || "—") + '</td>' +
+          '<td class="muted">' + escapeHtml(l.by || "—") + '</td>' +
+          '<td class="right num">' + fmtMetric(l.visits) + '</td>' +
+          '<td class="right num">' + fmtMetric(l.impressions) + '</td>' +
+          '<td class="right num">' + fmtMetric(l.clicks) + '</td>' +
+          '<td class="right num">' + fmtMetric(l.conversions) + '</td>' +
+          '<td class="right num"><strong>' + (l.score != null ? l.score.toFixed(2) : "—") + '</strong></td>' +
+          '<td class="right">' + renderDealLanderActions(l) + '</td>';
+        tbody.appendChild(tr);
+        variants.forEach(function (v) {
+          if (!hasVariants) return;
+          var vtr = document.createElement("tr");
+          vtr.className = "variant-row";
+          vtr.hidden = true;
+          vtr.setAttribute("data-parent", variantsId);
+          vtr.innerHTML =
+            '<td></td>' +
+            '<td>' + renderDealLanderNameCell(l, true, v) + '</td>' +
+            '<td></td>' +
+            '<td class="muted">' + escapeHtml(v.split || "—") + '</td>' +
+            '<td class="muted">' + escapeHtml(v.updated || l.updated || "—") + '</td>' +
+            '<td class="muted">' + escapeHtml(v.by || l.by || "—") + '</td>' +
+            '<td class="right num">' + fmtMetric(v.visits) + '</td>' +
+            '<td class="right num">' + fmtMetric(v.impressions) + '</td>' +
+            '<td class="right num">' + fmtMetric(v.clicks) + '</td>' +
+            '<td class="right num">' + fmtMetric(v.conversions) + '</td>' +
+            '<td class="right num">' + (v.score != null ? v.score.toFixed(2) : "—") + '</td>' +
+            '<td class="right">' + renderDealLanderActions(l, v.name) + '</td>';
+          tbody.appendChild(vtr);
+        });
+      });
     }
 
-    function openDealLandersDrawer(contextType, contextId, contextLabel) {
+    function openDealLandersDialog(contextType, contextId, contextLabel) {
       var landers = contextType === "deal" ? landersForTeamOffer(contextId) : landersForParentOffer(contextId);
-      var scrim = document.getElementById("deal-landers-scrim");
-      var drawer = document.getElementById("deal-landers-drawer");
-      var titleEl = document.getElementById("deal-landers-drawer-title");
-      var subEl = document.getElementById("deal-landers-drawer-sub");
-      var summaryEl = document.getElementById("deal-landers-drawer-summary");
-      var listEl = document.getElementById("deal-landers-drawer-list");
+      var dlg = document.getElementById("dialog-deal-landers");
+      var titleEl = document.getElementById("deal-landers-dialog-title");
+      var subEl = document.getElementById("deal-landers-dialog-sub");
+      var summaryEl = document.getElementById("deal-landers-dialog-summary");
       if (titleEl) titleEl.textContent = contextLabel || "Linked landers";
       if (subEl) subEl.textContent = contextType === "deal" ? "Landers tagged with this deal" : "Landers across team deals for this offer";
-      if (summaryEl) summaryEl.textContent = landers.length ? landers.length + " linked lander" + (landers.length === 1 ? "" : "s") : "No landers linked yet";
-      if (listEl) {
-        listEl.innerHTML = landers.length
-          ? renderDealLandersDrawerList(landers)
-          : '<p class="deal-landers-empty muted">No landers are using this deal yet. Tag a lander from the Landers screen.</p>';
-      }
-      if (scrim) {
-        scrim.hidden = false;
-        scrim.classList.add("is-open");
-      }
-      if (drawer) {
-        drawer.classList.add("is-open");
-        drawer.setAttribute("aria-hidden", "false");
-      }
-    }
-
-    function closeDealLandersDrawer() {
-      var scrim = document.getElementById("deal-landers-scrim");
-      var drawer = document.getElementById("deal-landers-drawer");
-      if (scrim) {
-        scrim.classList.remove("is-open");
-        scrim.hidden = true;
-      }
-      if (drawer) {
-        drawer.classList.remove("is-open");
-        drawer.setAttribute("aria-hidden", "true");
-      }
+      if (summaryEl) summaryEl.textContent = landers.length ? landers.length + " linked lander" + (landers.length === 1 ? "" : "s") + " · expand rows to see variants" : "No landers linked yet";
+      renderDealLandersTable(landers);
+      if (dlg) dlg.showModal();
     }
 
     function renderAdvertiserFilters() {
@@ -2462,7 +2498,7 @@
       if (handleAdvertiserToggle(e)) return;
       var landersBtn = e.target.closest(".js-open-deal-landers");
       if (landersBtn) {
-        openDealLandersDrawer(landersBtn.getAttribute("data-context-type"), landersBtn.getAttribute("data-context-id"), landersBtn.getAttribute("data-context-label"));
+        openDealLandersDialog(landersBtn.getAttribute("data-context-type"), landersBtn.getAttribute("data-context-id"), landersBtn.getAttribute("data-context-label"));
         return;
       }
       var cbtn = e.target.closest(".js-team-offer-clone");
@@ -2476,7 +2512,7 @@
         if (handleAdvertiserToggle(e)) return;
         var landersBtn = e.target.closest(".js-open-deal-landers");
         if (landersBtn) {
-          openDealLandersDrawer(landersBtn.getAttribute("data-context-type"), landersBtn.getAttribute("data-context-id"), landersBtn.getAttribute("data-context-label"));
+          openDealLandersDialog(landersBtn.getAttribute("data-context-type"), landersBtn.getAttribute("data-context-id"), landersBtn.getAttribute("data-context-label"));
           return;
         }
         var cbtn = e.target.closest(".js-parent-offer-clone");
@@ -2525,14 +2561,17 @@
       republishSkipBtn.addEventListener("click", function () { republishDlg.close(); });
     }
 
-    var dealLandersClose = document.getElementById("deal-landers-drawer-close");
-    var dealLandersScrim = document.getElementById("deal-landers-scrim");
-    if (dealLandersClose) dealLandersClose.addEventListener("click", closeDealLandersDrawer);
-    if (dealLandersScrim) dealLandersScrim.addEventListener("click", closeDealLandersDrawer);
-    document.addEventListener("keydown", function (e) {
-      var drawer = document.getElementById("deal-landers-drawer");
-      if (e.key === "Escape" && drawer && drawer.classList.contains("is-open")) closeDealLandersDrawer();
-    });
+    var dealLandersTbody = document.getElementById("deal-landers-tbody");
+    if (dealLandersTbody) {
+      dealLandersTbody.addEventListener("click", function (e) {
+        var row = e.target.closest("tr[data-lander-row]");
+        if (!row) return;
+        if (e.target.closest(".lander-toggle")) return;
+        if (e.target.closest(".actions, a, button:not(.lander-toggle)")) return;
+        var toggle = row.querySelector(".lander-toggle");
+        if (toggle) toggle.click();
+      });
+    }
 
     document.getElementById("team-offer-add-btn").addEventListener("click", function () {
       var id = "to-" + Date.now();
@@ -2675,7 +2714,7 @@
       var demoDeal = teamOfferById(urlDealLanders);
       if (demoDeal) {
         requestAnimationFrame(function () {
-          openDealLandersDrawer("deal", urlDealLanders, teamOfferLabel(demoDeal));
+          openDealLandersDialog("deal", urlDealLanders, teamOfferLabel(demoDeal));
         });
       }
     }
