@@ -75,6 +75,7 @@
                   <th>Created by</th>
                   <th>Last updated</th>
                   <th class="offer-ws-col">Workspaces</th>
+                  <th class="offer-landers-col">Landers</th>
                   <th class="right" style="min-width:100px;">Actions</th>
                 </tr>
               </thead>
@@ -119,6 +120,7 @@
                   <th>Created by</th>
                   <th>Last updated</th>
                   <th>Teams</th>
+                  <th class="offer-landers-col">Landers</th>
                   <th class="right" style="min-width:80px;">Actions</th>
                 </tr>
               </thead>
@@ -557,6 +559,23 @@
     </div>
   </dialog>
 
+  <div class="drawer-scrim" id="deal-landers-scrim" hidden></div>
+  <aside class="drawer deal-landers-drawer" id="deal-landers-drawer" aria-hidden="true" aria-labelledby="deal-landers-drawer-title">
+    <div class="drawer__head">
+      <div class="drawer__head-text">
+        <h2 class="drawer__title" id="deal-landers-drawer-title">Linked landers</h2>
+        <p class="drawer__sub muted" id="deal-landers-drawer-sub">Landers using this deal</p>
+      </div>
+      <button type="button" class="icon-btn" id="deal-landers-drawer-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="drawer__body">
+      <p class="muted deal-landers-drawer__summary" id="deal-landers-drawer-summary"></p>
+      <div class="deal-landers-list" id="deal-landers-drawer-list"></div>
+    </div>
+  </aside>
+
   <dialog class="modal modal--settings" id="dialog-republish-landers">
     <form method="dialog" class="modal__inner" id="republish-landers-form">
       <div class="modal__header">
@@ -946,7 +965,6 @@
     }
 
     var expandedAdvertisers = {};
-    var expandedDeals = {};
     var activeTeamOfferId = null;
     var activeParentOfferId = null;
     var isNewTeamOffer = false;
@@ -1124,54 +1142,67 @@
       return '<span class="badge badge--unpublished">Unpublished</span>';
     }
 
-    function landerToggleMeta(count, nestedId, expanded) {
-      if (!count) return '<div class="offer-row__meta muted">0 landers</div>';
-      return '<div class="offer-row__meta">' + count + ' lander' + (count === 1 ? "" : "s") + ' · ' +
-        '<button type="button" class="js-domain-toggle" data-target="' + escapeHtml(nestedId) + '" aria-expanded="' + (expanded ? "true" : "false") + '" aria-controls="' + escapeHtml(nestedId) + '">' +
-        '<span class="js-collapse-label">' + (expanded ? "collapse ▴" : "expand ▾") + '</span></button></div>';
+    function landersColCell(landers, contextType, contextId, contextLabel) {
+      if (!landers.length) return '<span class="muted">—</span>';
+      return '<button type="button" class="offer-landers-link js-open-deal-landers" data-context-type="' + escapeHtml(contextType) + '" data-context-id="' + escapeHtml(contextId) + '" data-context-label="' + escapeHtml(contextLabel) + '" title="View linked landers">' +
+        landers.length + ' lander' + (landers.length === 1 ? "" : "s") +
+      '</button>';
     }
 
-    function buildNestedLandersHtml(landers, nestedId, expanded) {
-      var items = landers.map(function (l) {
+    function renderDealLandersDrawerList(landers) {
+      return landers.map(function (l) {
         var path = (l.url || "").replace(/^https?:\/\//, "");
-        return '<div class="nested-lander">' +
-          '<div class="lander-cell"><span class="lander-thumb"></span><div class="lander-name"><strong>' + escapeHtml(l.name) + '</strong><small>' + escapeHtml(path) + '</small></div></div>' +
-          '<div>' + landerStatusBadge(l.status) + '</div>' +
-          '<div class="right">' + (l.variantCount || 1) + '</div>' +
-          '<div><a class="icon-btn" href="landers.html?lander=' + escapeHtml(l.id) + '" title="Open in Landers" aria-label="Open ' + escapeHtml(l.name) + ' in Landers">' + ICON_OPEN_LANDER + '</a></div>' +
-        '</div>';
+        return '<article class="deal-lander-card">' +
+          '<div class="deal-lander-card__main">' +
+            '<strong class="deal-lander-card__name">' + escapeHtml(l.name) + '</strong>' +
+            '<span class="deal-lander-card__url mono muted">' + escapeHtml(path) + '</span>' +
+          '</div>' +
+          '<div class="deal-lander-card__meta">' +
+            landerStatusBadge(l.status) +
+            '<span class="muted deal-lander-card__variants">' + (l.variantCount || 1) + ' variant' + ((l.variantCount || 1) === 1 ? "" : "s") + '</span>' +
+          '</div>' +
+          '<a class="icon-btn deal-lander-card__open" href="landers.html?lander=' + escapeHtml(l.id) + '" title="Open in Landers" aria-label="Open ' + escapeHtml(l.name) + ' in Landers">' + ICON_OPEN_LANDER + '</a>' +
+        '</article>';
       }).join("");
-      return '<div class="nested-landers nested-landers--deal" id="' + escapeHtml(nestedId) + '"' + (expanded ? "" : " hidden") + '>' +
-        '<div class="nested-landers__head"><div>Lander</div><div>Status</div><div class="right">Variants</div><div></div></div>' +
-        items + '</div>';
     }
 
-    function appendDealNestedRow(parentTbody, teamOfferId, advertiserExpanded) {
-      var landers = landersForTeamOffer(teamOfferId);
-      var nestedId = "nested-deal-" + teamOfferId;
-      var dealExpanded = expandedDeals[teamOfferId] === true;
-      var nrow = document.createElement("tr");
-      nrow.className = "offer-nested-row";
-      nrow.setAttribute("data-deal-nested", teamOfferId);
-      if (!advertiserExpanded) nrow.hidden = true;
-      nrow.innerHTML = '<td colspan="11" style="padding:0;border:none;">' +
-        (landers.length ? buildNestedLandersHtml(landers, nestedId, dealExpanded) : '<div class="nested-landers nested-landers--deal is-empty muted" style="padding:.75rem 1rem;font-size:12px;">No landers linked to this deal yet.</div>') +
-      '</td>';
-      parentTbody.appendChild(nrow);
+    function openDealLandersDrawer(contextType, contextId, contextLabel) {
+      var landers = contextType === "deal" ? landersForTeamOffer(contextId) : landersForParentOffer(contextId);
+      var scrim = document.getElementById("deal-landers-scrim");
+      var drawer = document.getElementById("deal-landers-drawer");
+      var titleEl = document.getElementById("deal-landers-drawer-title");
+      var subEl = document.getElementById("deal-landers-drawer-sub");
+      var summaryEl = document.getElementById("deal-landers-drawer-summary");
+      var listEl = document.getElementById("deal-landers-drawer-list");
+      if (titleEl) titleEl.textContent = contextLabel || "Linked landers";
+      if (subEl) subEl.textContent = contextType === "deal" ? "Landers tagged with this deal" : "Landers across team deals for this offer";
+      if (summaryEl) summaryEl.textContent = landers.length ? landers.length + " linked lander" + (landers.length === 1 ? "" : "s") : "No landers linked yet";
+      if (listEl) {
+        listEl.innerHTML = landers.length
+          ? renderDealLandersDrawerList(landers)
+          : '<p class="deal-landers-empty muted">No landers are using this deal yet. Tag a lander from the Landers screen.</p>';
+      }
+      if (scrim) {
+        scrim.hidden = false;
+        scrim.classList.add("is-open");
+      }
+      if (drawer) {
+        drawer.classList.add("is-open");
+        drawer.setAttribute("aria-hidden", "false");
+      }
     }
 
-    function appendParentOfferNestedRow(parentTbody, parentOfferId, advertiserExpanded) {
-      var landers = landersForParentOffer(parentOfferId);
-      var nestedId = "nested-offer-" + parentOfferId;
-      var offerExpanded = expandedDeals["po:" + parentOfferId] === true;
-      var nrow = document.createElement("tr");
-      nrow.className = "offer-nested-row";
-      nrow.setAttribute("data-offer-nested", parentOfferId);
-      if (!advertiserExpanded) nrow.hidden = true;
-      nrow.innerHTML = '<td colspan="12" style="padding:0;border:none;">' +
-        (landers.length ? buildNestedLandersHtml(landers, nestedId, offerExpanded) : '<div class="nested-landers nested-landers--deal is-empty muted" style="padding:.75rem 1rem;font-size:12px;">No landers linked to team deals for this offer yet.</div>') +
-      '</td>';
-      parentTbody.appendChild(nrow);
+    function closeDealLandersDrawer() {
+      var scrim = document.getElementById("deal-landers-scrim");
+      var drawer = document.getElementById("deal-landers-drawer");
+      if (scrim) {
+        scrim.classList.remove("is-open");
+        scrim.hidden = true;
+      }
+      if (drawer) {
+        drawer.classList.remove("is-open");
+        drawer.setAttribute("aria-hidden", "true");
+      }
     }
 
     function renderAdvertiserFilters() {
@@ -1193,7 +1224,7 @@
       var groups = groupTeamOffersByAdvertiser(rows);
       tbody.innerHTML = "";
       if (!groups.length) {
-        tbody.innerHTML = '<tr><td colspan="11" class="muted" style="padding:1.5rem;text-align:center;">No deals for this team.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" class="muted" style="padding:1.5rem;text-align:center;">No deals for this team.</td></tr>';
         return;
       }
       groups.forEach(function (g) {
@@ -1205,22 +1236,20 @@
           '<td class="lander-row__toggle">' +
             '<button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button>' +
           '</td>' +
-          '<td colspan="10"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
+          '<td colspan="11"><strong>' + escapeHtml(g.advertiserName) + '</strong>' +
             '<span class="muted" style="margin-left:.5rem;font-size:12px;">' + g.offers.length + ' deal' + (g.offers.length === 1 ? "" : "s") + '</span></td>';
         tbody.appendChild(tr);
         g.offers.forEach(function (to) {
           var p = parentById(to.parentOfferId);
           var linkedLanders = landersForTeamOffer(to.id);
-          var nestedId = "nested-deal-" + to.id;
-          var dealExpanded = expandedDeals[to.id] === true;
+          var dealLabel = teamOfferLabel(to);
           var orow = document.createElement("tr");
-          orow.className = "offer-row variant-row" + (to.deletedAt ? " is-soft-deleted" : "") + (dealExpanded && linkedLanders.length ? " is-deal-expanded" : "");
+          orow.className = "offer-row variant-row" + (to.deletedAt ? " is-soft-deleted" : "");
           if (!expanded) orow.hidden = true;
           orow.setAttribute("data-team-offer-id", to.id);
           orow.innerHTML =
             '<td></td>' +
-            '<td><strong>' + escapeHtml(teamOfferLabel(to)) + '</strong>' + (to.deletedAt ? ' <span class="badge badge--archived">Deleted</span>' : '') +
-              landerToggleMeta(linkedLanders.length, nestedId, dealExpanded) + '</td>' +
+            '<td><strong>' + escapeHtml(dealLabel) + '</strong>' + (to.deletedAt ? ' <span class="badge badge--archived">Deleted</span>' : '') + '</td>' +
             '<td class="muted" style="font-size:12px;">' + escapeHtml(p ? p.name : "—") + '</td>' +
             '<td class="muted">' + escapeHtml(p ? catL2FromParent(p) : "—") + '</td>' +
             '<td class="right num"><span class="offer-deal-cell">' + escapeHtml(fmtDealParent({ dealType: resolvedDealType(to) })) + ' <span class="offer-deal-value">' + fmtDealValueResolved(to) + '</span></span></td>' +
@@ -1229,12 +1258,12 @@
             '<td>' + fmtCreatedBy(to) + '</td>' +
             '<td>' + fmtUpdatedAt(to) + '</td>' +
             '<td class="offer-ws-col">' + wsNamesCompact(getWorkspaceIds(to)) + '</td>' +
+            '<td class="offer-landers-col">' + landersColCell(linkedLanders, "deal", to.id, dealLabel) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-team-offer-clone" data-team-offer-id="' + escapeHtml(to.id) + '" title="Duplicate deal">' + ICON.clone + '</button>' +
               '<button type="button" class="icon-btn js-team-offer-settings" data-team-offer-id="' + escapeHtml(to.id) + '" title="Edit deal">' + ICON.edit + '</button>' +
             '</div></td>';
           tbody.appendChild(orow);
-          appendDealNestedRow(tbody, to.id, expanded);
         });
       });
     }
@@ -1253,7 +1282,7 @@
       });
       parentBody.innerHTML = "";
       if (!groupList.length) {
-        parentBody.innerHTML = '<tr><td colspan="12" class="muted" style="padding:1.5rem;text-align:center;">No offers found.</td></tr>';
+        parentBody.innerHTML = '<tr><td colspan="13" class="muted" style="padding:1.5rem;text-align:center;">No offers found.</td></tr>';
         return;
       }
       groupList.forEach(function (g) {
@@ -1263,19 +1292,16 @@
         tr.className = "offer-advertiser-row";
         tr.innerHTML =
           '<td class="lander-row__toggle"><button type="button" class="lander-toggle' + (expanded ? " is-expanded" : "") + '" data-advertiser-toggle="' + escapeHtml(advKey) + '" aria-expanded="' + (expanded ? "true" : "false") + '">' + ICON.chev + '</button></td>' +
-          '<td colspan="11"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
+          '<td colspan="12"><strong>' + escapeHtml(g.advertiserName) + '</strong></td>';
         parentBody.appendChild(tr);
         g.offers.forEach(function (p) {
           var linkedLanders = landersForParentOffer(p.id);
-          var nestedId = "nested-offer-" + p.id;
-          var offerExpanded = expandedDeals["po:" + p.id] === true;
           var orow = document.createElement("tr");
-          orow.className = "offer-row variant-row" + (offerExpanded && linkedLanders.length ? " is-deal-expanded" : "");
+          orow.className = "offer-row variant-row";
           if (!expanded) orow.hidden = true;
           orow.innerHTML =
             '<td></td>' +
-            '<td><strong>' + escapeHtml(p.name) + '</strong>' +
-              landerToggleMeta(linkedLanders.length, nestedId, offerExpanded) + '</td>' +
+            '<td><strong>' + escapeHtml(p.name) + '</strong></td>' +
             '<td class="muted">' + escapeHtml(catL2FromParent(p) || "—") + '</td>' +
             '<td>' + escapeHtml(fmtDealParent(p)) + '</td>' +
             '<td>' + escapeHtml(fmtTargetTypeParent(p)) + '</td>' +
@@ -1285,12 +1311,12 @@
             '<td>' + fmtCreatedBy(p) + '</td>' +
             '<td>' + fmtUpdatedAt(p) + '</td>' +
             '<td class="muted" style="font-size:12px;">' + teamNames(p.teamIds) + '</td>' +
+            '<td class="offer-landers-col">' + landersColCell(linkedLanders, "offer", p.id, p.name) + '</td>' +
             '<td class="right"><div class="actions">' +
               '<button type="button" class="icon-btn js-parent-offer-clone" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Duplicate offer">' + ICON.clone + '</button>' +
               '<button type="button" class="icon-btn js-parent-offer-settings" data-parent-offer-id="' + escapeHtml(p.id) + '" title="Edit offer">' + ICON.edit + '</button>' +
             '</div></td>';
           parentBody.appendChild(orow);
-          appendParentOfferNestedRow(parentBody, p.id, expanded);
         });
       });
     }
@@ -2095,26 +2121,10 @@
       tbtn.classList.toggle("is-expanded", nowExpanded);
       var row = tbtn.closest("tr");
       var next = row && row.nextElementSibling;
-      while (next && (next.classList.contains("offer-row") || next.classList.contains("offer-nested-row"))) {
+      while (next && next.classList.contains("offer-row")) {
         next.hidden = !nowExpanded;
         next = next.nextElementSibling;
       }
-      return true;
-    }
-
-    function handleDealLandersToggle(e) {
-      var tbtn = e.target.closest(".js-domain-toggle[data-target^='nested-deal-'], .js-domain-toggle[data-target^='nested-offer-']");
-      if (!tbtn) return false;
-      var targetId = tbtn.getAttribute("data-target");
-      if (!targetId) return false;
-      var nowExpanded = tbtn.getAttribute("aria-expanded") !== "true";
-      if (targetId.indexOf("nested-deal-") === 0) {
-        expandedDeals[targetId.slice("nested-deal-".length)] = nowExpanded;
-      } else if (targetId.indexOf("nested-offer-") === 0) {
-        expandedDeals["po:" + targetId.slice("nested-offer-".length)] = nowExpanded;
-      }
-      var dealRow = tbtn.closest("tr.offer-row");
-      if (dealRow) dealRow.classList.toggle("is-deal-expanded", nowExpanded);
       return true;
     }
 
@@ -2416,7 +2426,11 @@
 
     tbody.addEventListener("click", function (e) {
       if (handleAdvertiserToggle(e)) return;
-      if (handleDealLandersToggle(e)) return;
+      var landersBtn = e.target.closest(".js-open-deal-landers");
+      if (landersBtn) {
+        openDealLandersDrawer(landersBtn.getAttribute("data-context-type"), landersBtn.getAttribute("data-context-id"), landersBtn.getAttribute("data-context-label"));
+        return;
+      }
       var cbtn = e.target.closest(".js-team-offer-clone");
       if (cbtn) { openTeamOfferClone(cbtn.getAttribute("data-team-offer-id")); return; }
       var sbtn = e.target.closest(".js-team-offer-settings");
@@ -2426,7 +2440,11 @@
     if (parentBody) {
       parentBody.addEventListener("click", function (e) {
         if (handleAdvertiserToggle(e)) return;
-        if (handleDealLandersToggle(e)) return;
+        var landersBtn = e.target.closest(".js-open-deal-landers");
+        if (landersBtn) {
+          openDealLandersDrawer(landersBtn.getAttribute("data-context-type"), landersBtn.getAttribute("data-context-id"), landersBtn.getAttribute("data-context-label"));
+          return;
+        }
         var cbtn = e.target.closest(".js-parent-offer-clone");
         if (cbtn) { openParentOfferClone(cbtn.getAttribute("data-parent-offer-id")); return; }
         var sbtn = e.target.closest(".js-parent-offer-settings");
@@ -2472,6 +2490,15 @@
     if (republishSkipBtn && republishDlg) {
       republishSkipBtn.addEventListener("click", function () { republishDlg.close(); });
     }
+
+    var dealLandersClose = document.getElementById("deal-landers-drawer-close");
+    var dealLandersScrim = document.getElementById("deal-landers-scrim");
+    if (dealLandersClose) dealLandersClose.addEventListener("click", closeDealLandersDrawer);
+    if (dealLandersScrim) dealLandersScrim.addEventListener("click", closeDealLandersDrawer);
+    document.addEventListener("keydown", function (e) {
+      var drawer = document.getElementById("deal-landers-drawer");
+      if (e.key === "Escape" && drawer && drawer.classList.contains("is-open")) closeDealLandersDrawer();
+    });
 
     document.getElementById("team-offer-add-btn").addEventListener("click", function () {
       var id = "to-" + Date.now();
