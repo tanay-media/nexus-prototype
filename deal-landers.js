@@ -7,8 +7,9 @@
       id: "summer-sale", name: "Summer Sale", url: "https://offers.acme.com/summer-sale-hero",
       teamOfferId: "to-hb-wis", status: "published",
       variants: [
-        { name: "Main hero", split: "60%" },
-        { name: "Urgency countdown", split: "40%" }
+        { name: "Main hero", split: "50%" },
+        { name: "Urgency countdown", split: "30%" },
+        { name: "Social proof strip", split: "20%" }
       ]
     },
     {

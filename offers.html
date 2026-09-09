@@ -1159,16 +1159,20 @@
     function renderDealLanderVariantRows(l) {
       var variants = l.variants || [];
       if (variants.length <= 1) return "";
-      return '<ul class="deal-lander-card__variants">' +
+      return '<div class="deal-lander-card__variant-section">' +
+        '<p class="deal-lander-card__variant-label">Variants · click to open in editor</p>' +
+        '<div class="deal-variant-grid">' +
         variants.map(function (v) {
-          return '<li class="deal-lander-variant">' +
-            '<span class="lander-thumb lander-thumb--sm" data-thumb-name="' + escapeHtml(v.name) + '"></span>' +
-            '<span class="deal-lander-variant__name">' + escapeHtml(v.name) + '</span>' +
-            '<span class="deal-lander-variant__split muted">' + escapeHtml(v.split || "") + '</span>' +
-            '<a class="icon-btn deal-lander-variant__open" href="' + editorHref(l.name, v.name) + '" target="_blank" rel="noopener" title="Open ' + escapeHtml(v.name) + ' in editor" aria-label="Open ' + escapeHtml(v.name) + ' in editor">' + ICON_OPEN_LANDER + '</a>' +
-          '</li>';
+          return '<a class="deal-variant-tile" href="' + editorHref(l.name, v.name) + '" target="_blank" rel="noopener" title="Open ' + escapeHtml(v.name) + ' in editor">' +
+            '<span class="lander-thumb lander-thumb--tile" data-thumb-name="' + escapeHtml(v.name) + '"></span>' +
+            '<span class="deal-variant-tile__body">' +
+              '<strong class="deal-variant-tile__name">' + escapeHtml(v.name) + '</strong>' +
+              '<span class="deal-variant-tile__split muted">' + escapeHtml(v.split || "") + ' traffic</span>' +
+            '</span>' +
+            '<span class="deal-variant-tile__open" aria-hidden="true">' + ICON_OPEN_LANDER + '</span>' +
+          '</a>';
         }).join("") +
-      '</ul>';
+        '</div></div>';
     }
 
     function renderDealLandersDrawerList(landers) {
@@ -1177,9 +1181,10 @@
         var variants = l.variants || [];
         var primaryVariant = variants[0] ? variants[0].name : "";
         var variantLabel = variants.length + " variant" + (variants.length === 1 ? "" : "s");
-        return '<article class="deal-lander-card' + (variants.length > 1 ? " deal-lander-card--has-variants" : "") + '">' +
+        var isMulti = variants.length > 1;
+        return '<article class="deal-lander-card' + (isMulti ? " deal-lander-card--multi" : "") + '">' +
           '<div class="deal-lander-card__header">' +
-            '<span class="lander-thumb" data-thumb-name="' + escapeHtml(primaryVariant || l.name) + '"></span>' +
+            '<span class="lander-thumb' + (isMulti ? " lander-thumb--lg" : "") + '" data-thumb-name="' + escapeHtml(primaryVariant || l.name) + '"></span>' +
             '<div class="deal-lander-card__main">' +
               '<strong class="deal-lander-card__name">' + escapeHtml(l.name) + '</strong>' +
               '<span class="deal-lander-card__url mono muted">' + escapeHtml(path) + '</span>' +
@@ -1188,7 +1193,7 @@
                 '<span class="muted deal-lander-card__variant-count">' + variantLabel + '</span>' +
               '</div>' +
             '</div>' +
-            '<a class="icon-btn deal-lander-card__open" href="' + editorHref(l.name, primaryVariant) + '" target="_blank" rel="noopener" title="Open in editor" aria-label="Open ' + escapeHtml(l.name) + ' in editor">' + ICON_OPEN_LANDER + '</a>' +
+            (isMulti ? '' : '<a class="icon-btn deal-lander-card__open" href="' + editorHref(l.name, primaryVariant) + '" target="_blank" rel="noopener" title="Open in editor" aria-label="Open ' + escapeHtml(l.name) + ' in editor">' + ICON_OPEN_LANDER + '</a>') +
           '</div>' +
           renderDealLanderVariantRows(l) +
         '</article>';
@@ -2660,10 +2665,20 @@
     populateBuySourcesCatalog();
     wireAlertsPanel();
     renderAlertsBadge();
-    var urlTeamOffer = new URLSearchParams(window.location.search).get("teamOffer");
+    var urlParams = new URLSearchParams(window.location.search);
+    var urlTeamOffer = urlParams.get("teamOffer");
+    var urlDealLanders = urlParams.get("dealLanders");
     renderAdvertiserFilters();
     render();
     if (urlTeamOffer) openTeamOfferDetail(urlTeamOffer);
+    if (urlDealLanders) {
+      var demoDeal = teamOfferById(urlDealLanders);
+      if (demoDeal) {
+        requestAnimationFrame(function () {
+          openDealLandersDrawer("deal", urlDealLanders, teamOfferLabel(demoDeal));
+        });
+      }
+    }
 
     // ---- Page-level tabs ----
     var pageTabs = document.querySelectorAll("[data-page-tab]");
