@@ -64,7 +64,7 @@
         source: "facebook",
         fields: { fb_pixel_id: "319847562103948", fb_action_source: "website", fb_token_ref: "secret://vault/meta/acme-prod" },
         landerEventMap: defaultLanderEventMap("facebook"),
-        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase", value: { mode: "postback_minus_commission", commission: { type: "percent", amount: 15 } } }],
+        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase", value: { mode: "dynamic", base: "conversion_value", percent: 85, currency: "USD" } }],
         createdAt: "2026-03-12"
       },
       {
@@ -73,7 +73,7 @@
         source: "facebook",
         fields: { fb_pixel_id: "904782156390124", fb_action_source: "website", fb_token_ref: "secret://vault/meta/acme-promo" },
         landerEventMap: defaultLanderEventMap("facebook"),
-        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase", value: { mode: "postback_minus_commission", commission: { type: "percent", amount: 15 } } }],
+        eventMap: [{ from: "lead", to: "Lead" }, { from: "purchase", to: "Purchase", value: { mode: "dynamic", base: "conversion_value", percent: 85, currency: "USD" } }],
         createdAt: "2026-04-22"
       },
       {
