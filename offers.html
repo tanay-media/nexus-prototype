@@ -598,8 +598,8 @@
     </div>
   </dialog>
 
-  <dialog class="modal modal--settings" id="dialog-republish-landers">
-    <form method="dialog" class="modal__inner" id="republish-landers-form">
+  <dialog class="modal modal--settings modal--republish-landers" id="dialog-republish-landers">
+    <form method="dialog" class="modal__inner modal__inner--republish-landers" id="republish-landers-form">
       <div class="modal__header">
         <div>
           <h2 class="modal__title">Republish landers</h2>
@@ -608,7 +608,23 @@
         <button type="button" class="modal__close" data-close-dialog aria-label="Close">&times;</button>
       </div>
       <p class="republish-summary muted" id="republish-dialog-summary">Published landers are pre-selected.</p>
-      <ul class="offer-ws-list" id="republish-landers-list"></ul>
+      <div class="republish-landers-card">
+        <div class="table-scroll" role="region" aria-label="Landers to republish">
+          <table class="table" id="republish-landers-table">
+            <thead>
+              <tr>
+                <th class="republish-check-col" style="width:36px"></th>
+                <th class="lander-row__toggle" style="width:44px"></th>
+                <th>Name</th>
+                <th>Created by</th>
+                <th>Last updated</th>
+                <th class="right" style="min-width:72px">Open</th>
+              </tr>
+            </thead>
+            <tbody id="republish-landers-tbody"></tbody>
+          </table>
+        </div>
+      </div>
       <div class="modal__actions">
         <button type="button" class="btn" id="republish-skip-btn">Skip for now</button>
         <button type="submit" class="btn btn--black" id="republish-submit-btn">Republish selected</button>
@@ -1156,8 +1172,16 @@
       return window.NexusDealLanders ? NexusDealLanders.forTeamOffer(teamOfferId) : [];
     }
 
+    function publishedLandersForTeamOffer(teamOfferId) {
+      return window.NexusDealLanders ? NexusDealLanders.publishedForTeamOffer(teamOfferId) : [];
+    }
+
     function landersForParentOffer(parentOfferId) {
       return window.NexusDealLanders ? NexusDealLanders.forParentOffer(parentOfferId, teamOffers) : [];
+    }
+
+    function publishedLandersForParentOffer(parentOfferId) {
+      return window.NexusDealLanders ? NexusDealLanders.publishedForParentOffer(parentOfferId, teamOffers) : [];
     }
 
     function landerStatusBadge(status) {
@@ -1882,23 +1906,57 @@
 
     var republishDlg = document.getElementById("dialog-republish-landers");
 
+    function renderRepublishLandersTable(landers) {
+      var tbody = document.getElementById("republish-landers-tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      if (!landers.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="muted" style="padding:1.25rem;text-align:center;">No published landers linked to this deal.</td></tr>';
+        return;
+      }
+      landers.forEach(function (l) {
+        var variants = l.variants || [];
+        var variantsId = "rp-variants-" + l.id;
+        var hasVariants = variants.length > 1;
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-lander-row", l.id);
+        tr.innerHTML =
+          '<td class="republish-check"><input type="checkbox" data-republish-lander="' + escapeHtml(l.id) + '" checked aria-label="Select ' + escapeHtml(l.name) + '" /></td>' +
+          '<td class="lander-row__toggle">' + (hasVariants
+            ? '<button type="button" class="lander-toggle" aria-expanded="false" aria-controls="' + escapeHtml(variantsId) + '" aria-label="Show or hide variants">' + ICON.chev + '</button>'
+            : "") + '</td>' +
+          '<td>' + renderDealLanderNameCell(l, false) + '</td>' +
+          '<td class="muted">' + escapeHtml(l.by || "—") + '</td>' +
+          '<td class="muted">' + escapeHtml(l.updated || "—") + '</td>' +
+          '<td class="right">' + renderDealLanderActions(l) + '</td>';
+        tbody.appendChild(tr);
+        variants.forEach(function (v) {
+          if (!hasVariants) return;
+          var vtr = document.createElement("tr");
+          vtr.className = "variant-row";
+          vtr.hidden = true;
+          vtr.setAttribute("data-parent", variantsId);
+          vtr.innerHTML =
+            '<td class="republish-check"><input type="checkbox" data-republish-variant="' + escapeHtml(l.id) + '" data-variant-name="' + escapeHtml(v.name) + '" checked aria-label="Select ' + escapeHtml(v.name) + '" /></td>' +
+            '<td></td>' +
+            '<td>' + renderDealLanderNameCell(l, true, v) + '</td>' +
+            '<td class="muted">' + escapeHtml(v.by || l.by || "—") + '</td>' +
+            '<td class="muted">' + escapeHtml(v.updated || l.updated || "—") + '</td>' +
+            '<td class="right">' + renderDealLanderActions(l, v.name) + '</td>';
+          tbody.appendChild(vtr);
+        });
+      });
+    }
+
     function openRepublishDialog(opts) {
-      if (!republishDlg || !opts || !opts.landers || !opts.landers.length) return;
-      var list = document.getElementById("republish-landers-list");
+      if (!republishDlg || !opts) return;
+      var landers = (opts.landers || []).filter(function (l) { return l.status === "published"; });
+      if (!landers.length) return;
       var sub = document.getElementById("republish-dialog-sub");
       var summary = document.getElementById("republish-dialog-summary");
       if (sub) sub.textContent = opts.contextLabel || "Select landers to republish with updated deal details.";
-      if (summary) summary.textContent = opts.landers.length + " linked lander" + (opts.landers.length === 1 ? "" : "s") + " · published landers are pre-selected";
-      if (list) {
-        list.innerHTML = opts.landers.map(function (l) {
-          var checked = l.status === "published" ? " checked" : "";
-          return '<li class="offer-ws-row republish-lander-row"><label class="offer-ws-pick">' +
-            '<input type="checkbox" value="' + escapeHtml(l.id) + '"' + checked + ' />' +
-            '<span class="republish-lander-row__main"><strong>' + escapeHtml(l.name) + '</strong><small class="muted">' + escapeHtml(l.url || "") + '</small></span>' +
-            landerStatusBadge(l.status) +
-          '</label></li>';
-        }).join("");
-      }
+      if (summary) summary.textContent = landers.length + " published lander" + (landers.length === 1 ? "" : "s") + " · expand rows to see variants · all selected";
+      renderRepublishLandersTable(landers);
       republishDlg.dataset.sourceType = opts.sourceType || "";
       republishDlg.dataset.sourceId = opts.sourceId || "";
       republishDlg.showModal();
@@ -1959,7 +2017,7 @@
       render();
       if (teamDetailDlg) teamDetailDlg.close();
       if (wasExistingDeal) {
-        var linked = landersForTeamOffer(to.id);
+        var linked = publishedLandersForTeamOffer(to.id);
         if (linked.length) {
           openRepublishDialog({
             sourceType: "deal",
@@ -2103,7 +2161,7 @@
       renderAdvertiserFilters();
       render();
       if (parentDetailDlg) parentDetailDlg.close();
-      var linked = landersForParentOffer(p.id);
+      var linked = publishedLandersForParentOffer(p.id);
       if (wasExistingOffer && linked.length) {
         openRepublishDialog({
           sourceType: "offer",
@@ -2540,8 +2598,8 @@
       republishForm.addEventListener("submit", function (e) {
         e.preventDefault();
         var picked = [];
-        republishForm.querySelectorAll("#republish-landers-list input:checked").forEach(function (cb) {
-          picked.push(cb.value);
+        republishForm.querySelectorAll('[data-republish-lander]:checked').forEach(function (cb) {
+          picked.push(cb.getAttribute("data-republish-lander"));
         });
         if (!picked.length) {
           alert("Select at least one lander to republish.");
@@ -2561,15 +2619,29 @@
       republishSkipBtn.addEventListener("click", function () { republishDlg.close(); });
     }
 
-    var dealLandersTbody = document.getElementById("deal-landers-tbody");
-    if (dealLandersTbody) {
-      dealLandersTbody.addEventListener("click", function (e) {
+    function wireLanderRowExpand(tbody) {
+      if (!tbody) return;
+      tbody.addEventListener("click", function (e) {
         var row = e.target.closest("tr[data-lander-row]");
         if (!row) return;
         if (e.target.closest(".lander-toggle")) return;
-        if (e.target.closest(".actions, a, button:not(.lander-toggle)")) return;
+        if (e.target.closest(".actions, a, button:not(.lander-toggle), input[type=checkbox]")) return;
         var toggle = row.querySelector(".lander-toggle");
         if (toggle) toggle.click();
+      });
+    }
+    wireLanderRowExpand(document.getElementById("deal-landers-tbody"));
+    wireLanderRowExpand(document.getElementById("republish-landers-tbody"));
+
+    var republishTbody = document.getElementById("republish-landers-tbody");
+    if (republishTbody) {
+      republishTbody.addEventListener("change", function (e) {
+        var landerCb = e.target.closest("[data-republish-lander]");
+        if (!landerCb) return;
+        var landerId = landerCb.getAttribute("data-republish-lander");
+        republishTbody.querySelectorAll('[data-republish-variant="' + landerId + '"]').forEach(function (vcb) {
+          vcb.checked = landerCb.checked;
+        });
       });
     }
 
