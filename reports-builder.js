@@ -15,10 +15,30 @@
     utm_source: "UTM source",
     utm_campaign: "UTM campaign",
     keyword: "Keyword",
+    keyword_rank: "Keyword rank",
+    keyword_term: "Keyword term",
+    display_term: "Display term",
+    keyword_img: "Keyword image",
+    ad_rank: "Ad rank",
     ad_title: "Ad title",
+    ad_url: "Ad URL",
+    ad_img: "Ad image",
     form_widget: "Form widget",
     kb_widget: "KB widget"
   };
+
+  var KB_GROUP_OPTIONS = {
+    keyword_rank: "Keyword rank",
+    keyword_term: "Keyword term",
+    display_term: "Display term",
+    keyword_img: "Keyword image",
+    ad_rank: "Ad rank",
+    ad_title: "Ad title",
+    ad_url: "Ad URL",
+    ad_img: "Ad image"
+  };
+
+  var KB_KEYWORD_GROUP_KEYS = ["keyword_rank", "keyword_term", "display_term", "keyword_img"];
 
   var MEASURES = {
     visits: "Visits",
@@ -106,11 +126,13 @@
     {
       id: "kb-funnels",
       title: "Keyword block funnels",
-      meta: "Widget views → block click → ad click",
+      meta: "Keyword & ad · visits → conversions",
       scope: "system",
       chart: "funnel",
-      rows: ["keyword", "ad_title"],
-      values: ["kb_widget_views", "kb_block_clicks", "kb_ad_clicks"],
+      kbEntity: "keyword",
+      kbGroupBy: "keyword_term",
+      rows: ["keyword_term"],
+      values: ["visits", "impressions", "clicks", "conversions"],
       filters: { date: "Last 7 days", status: "Published", domain: "All domains" }
     },
     {
@@ -236,11 +258,18 @@
     { label: "Abandon", val: 46036, pct: 46.9 }
   ];
 
-  var KB_FUNNEL_STEPS = [
-    { label: "Widget views", val: 3248, pct: 100 },
-    { label: "Keyword picks", val: 964, pct: 29.7 },
-    { label: "Ads shown", val: 941, pct: 97.6 },
-    { label: "Ad clicks", val: 47, pct: 5.0 }
+  var KB_FUNNEL_STEPS_KEYWORD = [
+    { label: "Visits", val: 6008, pct: 100 },
+    { label: "Impressions", val: 5724, pct: 95.3 },
+    { label: "Clicks", val: 1564, pct: 27.3 },
+    { label: "Conversions", val: 142, pct: 9.1 }
+  ];
+
+  var KB_FUNNEL_STEPS_AD = [
+    { label: "Visits", val: 9410, pct: 100 },
+    { label: "Impressions", val: 9024, pct: 95.9 },
+    { label: "Clicks", val: 74, pct: 0.8 },
+    { label: "Conversions", val: 31, pct: 41.9 }
   ];
 
   var FORM_FUNNEL_DATA = [
@@ -286,67 +315,91 @@
   var KB_KEYWORD_FUNNEL_DATA = [
     {
       id: "kw-passive",
-      keyword: "passive income investing",
-      kb_widget_views: 3248,
-      kb_block_clicks: 412,
-      kb_ad_clicks: 24,
+      keyword_rank: 1,
+      keyword_term: "passive income investing",
+      display_term: "How much can I save on investing?",
+      keyword_img: "https://cdn.example.com/kw/passive-income.jpg",
+      visits: 3248,
+      impressions: 3102,
+      clicks: 412,
+      conversions: 38,
       ads: [
-        { ad_title: "Earn 8% APY on High-Yield Savings", kb_widget_views: 2100, kb_block_clicks: 280, kb_ad_clicks: 18 },
-        { ad_title: "E*TRADE® Account Setup", kb_widget_views: 1148, kb_block_clicks: 132, kb_ad_clicks: 6 }
+        { ad_rank: 1, ad_title: "Earn 8% APY on High-Yield Savings", ad_url: "etrade.com/savings", ad_img: "https://cdn.example.com/logos/etrade-28.png", visits: 2100, impressions: 1980, clicks: 18, conversions: 4 },
+        { ad_rank: 2, ad_title: "E*TRADE® Account Setup", ad_url: "etrade.com/open", ad_img: "https://cdn.example.com/logos/etrade-28.png", visits: 1148, impressions: 1122, clicks: 6, conversions: 2 }
       ]
     },
     {
       id: "kw-etf",
-      keyword: "etf zero fee platform",
-      kb_widget_views: 3248,
-      kb_block_clicks: 198,
-      kb_ad_clicks: 11,
+      keyword_rank: 2,
+      keyword_term: "etf zero fee platform",
+      display_term: "Which ETF platform has zero fees?",
+      keyword_img: "https://cdn.example.com/kw/etf-zero.jpg",
+      visits: 3248,
+      impressions: 3010,
+      clicks: 198,
+      conversions: 21,
       ads: [
-        { ad_title: "Fidelity Zero ETFs", kb_widget_views: 1980, kb_block_clicks: 121, kb_ad_clicks: 7 },
-        { ad_title: "Schwab ETF OneSource", kb_widget_views: 1268, kb_block_clicks: 77, kb_ad_clicks: 4 }
+        { ad_rank: 1, ad_title: "Fidelity Zero ETFs", ad_url: "fidelity.com/zero", ad_img: "https://cdn.example.com/logos/fidelity-28.png", visits: 1980, impressions: 1860, clicks: 7, conversions: 3 },
+        { ad_rank: 2, ad_title: "Schwab ETF OneSource", ad_url: "schwab.com/etf", ad_img: "https://cdn.example.com/logos/schwab-28.png", visits: 1268, impressions: 1150, clicks: 4, conversions: 1 }
       ]
     },
     {
       id: "kw-beginner",
-      keyword: "beginner investing start",
-      kb_widget_views: 3248,
-      kb_block_clicks: 186,
-      kb_ad_clicks: 8,
+      keyword_rank: 3,
+      keyword_term: "beginner investing start",
+      display_term: "Where should beginners start investing?",
+      keyword_img: "https://cdn.example.com/kw/beginner.jpg",
+      visits: 3248,
+      impressions: 2988,
+      clicks: 186,
+      conversions: 16,
       ads: [
-        { ad_title: "Schwab Beginner Guide", kb_widget_views: 1860, kb_block_clicks: 104, kb_ad_clicks: 5 },
-        { ad_title: "Start Investing with $0 minimum", kb_widget_views: 1388, kb_block_clicks: 82, kb_ad_clicks: 3 }
+        { ad_rank: 1, ad_title: "Schwab Beginner Guide", ad_url: "schwab.com/learn", ad_img: "https://cdn.example.com/logos/schwab-28.png", visits: 1860, impressions: 1720, clicks: 5, conversions: 2 },
+        { ad_rank: 2, ad_title: "Start Investing with $0 minimum", ad_url: "fidelity.com/start", ad_img: "https://cdn.example.com/logos/fidelity-28.png", visits: 1388, impressions: 1268, clicks: 3, conversions: 1 }
       ]
     },
     {
       id: "kw-brokerage",
-      keyword: "open brokerage account fast",
-      kb_widget_views: 3248,
-      kb_block_clicks: 168,
-      kb_ad_clicks: 4,
+      keyword_rank: 4,
+      keyword_term: "open brokerage account fast",
+      display_term: "How fast can I open a brokerage account?",
+      keyword_img: "https://cdn.example.com/kw/brokerage.jpg",
+      visits: 1680,
+      impressions: 1624,
+      clicks: 168,
+      conversions: 12,
       ads: [
-        { ad_title: "Robinhood Sign Up", kb_widget_views: 1680, kb_block_clicks: 168, kb_ad_clicks: 4 }
+        { ad_rank: 1, ad_title: "Robinhood Sign Up", ad_url: "robinhood.com/signup", ad_img: "https://cdn.example.com/logos/robinhood-28.png", visits: 1680, impressions: 1624, clicks: 4, conversions: 2 }
       ]
     },
     {
       id: "kw-medicare",
-      keyword: "medicare advantage",
-      kb_widget_views: 1820,
-      kb_block_clicks: 412,
-      kb_ad_clicks: 19,
+      keyword_rank: 5,
+      keyword_term: "medicare advantage",
+      display_term: "What Medicare Advantage plans are available?",
+      keyword_img: "https://cdn.example.com/kw/medicare.jpg",
+      visits: 1820,
+      impressions: 1764,
+      clicks: 412,
+      conversions: 34,
       ads: [
-        { ad_title: "Compare Medicare Advantage Plans", kb_widget_views: 1100, kb_block_clicks: 248, kb_ad_clicks: 12 },
-        { ad_title: "Extra Benefits You May Qualify For", kb_widget_views: 720, kb_block_clicks: 164, kb_ad_clicks: 7 }
+        { ad_rank: 1, ad_title: "Compare Medicare Advantage Plans", ad_url: "medicare.gov/compare", ad_img: "https://cdn.example.com/logos/medicare-28.png", visits: 1100, impressions: 1048, clicks: 12, conversions: 5 },
+        { ad_rank: 2, ad_title: "Extra Benefits You May Qualify For", ad_url: "benefits.example.com", ad_img: "https://cdn.example.com/logos/benefits-28.png", visits: 720, impressions: 716, clicks: 7, conversions: 3 }
       ]
     },
     {
       id: "kw-auto",
-      keyword: "auto insurance savings",
-      kb_widget_views: 940,
-      kb_block_clicks: 188,
-      kb_ad_clicks: 8,
+      keyword_rank: 6,
+      keyword_term: "auto insurance savings",
+      display_term: "How much can I save on auto insurance?",
+      keyword_img: "https://cdn.example.com/kw/auto-insurance.jpg",
+      visits: 940,
+      impressions: 912,
+      clicks: 188,
+      conversions: 21,
       ads: [
-        { ad_title: "Save up to $500/yr on auto insurance", kb_widget_views: 620, kb_block_clicks: 124, kb_ad_clicks: 5 },
-        { ad_title: "Compare quotes in 2 minutes", kb_widget_views: 320, kb_block_clicks: 64, kb_ad_clicks: 3 }
+        { ad_rank: 1, ad_title: "Save up to $500/yr on auto insurance", ad_url: "geico.com/save", ad_img: "https://cdn.example.com/logos/geico-28.png", visits: 620, impressions: 598, clicks: 5, conversions: 2 },
+        { ad_rank: 2, ad_title: "Compare quotes in 2 minutes", ad_url: "progressive.com/quotes", ad_img: "https://cdn.example.com/logos/progressive-28.png", visits: 320, impressions: 314, clicks: 3, conversions: 1 }
       ]
     }
   ];
@@ -364,7 +417,9 @@
     histTimeBinSize: 15,
     histScrollMode: "count",
     histScrollBins: 5,
-    histScrollBinSize: 10
+    histScrollBinSize: 10,
+    kbEntity: "keyword",
+    kbGroupBy: "keyword_term"
   };
 
   function scopeLabel(scope) {
@@ -469,6 +524,10 @@
     state.rows = report.rows.slice();
     state.values = report.values.slice();
     state.filters = Object.assign({}, report.filters);
+    if (report.id === "kb-funnels" || report.kbEntity) {
+      state.kbEntity = report.kbEntity || "keyword";
+      state.kbGroupBy = report.kbGroupBy || state.rows[0] || "keyword_term";
+    }
     renderBuilder();
     renderResult();
     renderSavedList();
@@ -480,12 +539,136 @@
   }
 
   function getCurrentConfig() {
-    return {
+    var cfg = {
       chart: state.chart,
       rows: state.rows.slice(),
       values: state.values.slice(),
       filters: Object.assign({}, state.filters)
     };
+    if (state.presetId === "kb-funnels") {
+      cfg.kbEntity = state.kbEntity;
+      cfg.kbGroupBy = state.kbGroupBy;
+    }
+    return cfg;
+  }
+
+  function getKbGroupKeysForEntity(entity) {
+    if (entity === "ad") return Object.keys(KB_GROUP_OPTIONS);
+    return KB_KEYWORD_GROUP_KEYS.slice();
+  }
+
+  function getKbFlatRows(entity) {
+    var rows = [];
+    KB_KEYWORD_FUNNEL_DATA.forEach(function (kw) {
+      if (entity === "keyword") {
+        rows.push({
+          keyword_rank: kw.keyword_rank,
+          keyword_term: kw.keyword_term,
+          display_term: kw.display_term,
+          keyword_img: kw.keyword_img,
+          ad_rank: null,
+          ad_title: null,
+          ad_url: null,
+          ad_img: null,
+          visits: kw.visits,
+          impressions: kw.impressions,
+          clicks: kw.clicks,
+          conversions: kw.conversions
+        });
+      } else {
+        kw.ads.forEach(function (ad) {
+          rows.push({
+            keyword_rank: kw.keyword_rank,
+            keyword_term: kw.keyword_term,
+            display_term: kw.display_term,
+            keyword_img: kw.keyword_img,
+            ad_rank: ad.ad_rank,
+            ad_title: ad.ad_title,
+            ad_url: ad.ad_url,
+            ad_img: ad.ad_img,
+            visits: ad.visits,
+            impressions: ad.impressions,
+            clicks: ad.clicks,
+            conversions: ad.conversions
+          });
+        });
+      }
+    });
+    return rows;
+  }
+
+  function aggregateKbRows(rows, groupBy) {
+    var map = {};
+    rows.forEach(function (row) {
+      var key = row[groupBy] != null ? String(row[groupBy]) : "—";
+      if (!map[key]) {
+        map[key] = { groupKey: key, sample: row, visits: 0, impressions: 0, clicks: 0, conversions: 0 };
+      }
+      map[key].visits += row.visits || 0;
+      map[key].impressions += row.impressions || 0;
+      map[key].clicks += row.clicks || 0;
+      map[key].conversions += row.conversions || 0;
+    });
+    return Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) {
+      return b.visits - a.visits;
+    });
+  }
+
+  function sumKbMetrics(rows) {
+    return rows.reduce(function (acc, row) {
+      acc.visits += row.visits || 0;
+      acc.impressions += row.impressions || 0;
+      acc.clicks += row.clicks || 0;
+      acc.conversions += row.conversions || 0;
+      return acc;
+    }, { visits: 0, impressions: 0, clicks: 0, conversions: 0 });
+  }
+
+  function buildKbFunnelSteps(entity) {
+    var totals = sumKbMetrics(getKbFlatRows(entity));
+    var base = totals.visits || 1;
+    return [
+      { label: "Visits", val: totals.visits, pct: 100 },
+      { label: "Impressions", val: totals.impressions, pct: Math.round((totals.impressions / base) * 1000) / 10 },
+      { label: "Clicks", val: totals.clicks, pct: Math.round((totals.clicks / base) * 1000) / 10 },
+      { label: "Conversions", val: totals.conversions, pct: totals.clicks ? Math.round((totals.conversions / totals.clicks) * 1000) / 10 : 0 }
+    ];
+  }
+
+  function renderKbGroupCell(groupBy, agg) {
+    var row = agg.sample;
+    var val = row[groupBy];
+    if (groupBy === "keyword_img" || groupBy === "ad_img") {
+      return '<div class="rb-kb-cell-img">' +
+        '<img src="' + val + '" alt="" width="28" height="28" loading="lazy" />' +
+        '<span class="rb-kb-cell-img__label">' + (groupBy === "keyword_img" ? row.keyword_term : row.ad_title) + "</span></div>";
+    }
+    if (groupBy === "keyword_rank" || groupBy === "ad_rank") {
+      return '<span class="rb-kb-rank">#' + val + "</span>";
+    }
+    if (groupBy === "ad_url") {
+      return '<span class="mono rb-kb-url">' + val + "</span>";
+    }
+    return "<strong>" + (val != null ? val : "—") + "</strong>";
+  }
+
+  function renderKbFunnelToolbar() {
+    var entity = state.kbEntity || "keyword";
+    var groupKeys = getKbGroupKeysForEntity(entity);
+    if (groupKeys.indexOf(state.kbGroupBy) === -1) state.kbGroupBy = groupKeys[0];
+    var groupOpts = groupKeys.map(function (key) {
+      return '<option value="' + key + '"' + (state.kbGroupBy === key ? " selected" : "") + ">" + KB_GROUP_OPTIONS[key] + "</option>";
+    }).join("");
+    return (
+      '<div class="rb-kb-toolbar">' +
+      '<div class="rb-kb-entity-tabs" role="tablist" aria-label="Metric layer">' +
+      '<button type="button" class="rb-kb-entity-tab' + (entity === "keyword" ? " is-active" : "") + '" data-kb-entity="keyword" role="tab" aria-selected="' + (entity === "keyword") + '">Keyword blocks</button>' +
+      '<button type="button" class="rb-kb-entity-tab' + (entity === "ad" ? " is-active" : "") + '" data-kb-entity="ad" role="tab" aria-selected="' + (entity === "ad") + '">Ads</button>' +
+      "</div>" +
+      '<label class="rb-kb-groupby"><span>Group by</span>' +
+      '<select class="rb-kb-groupby-select" aria-label="Group by">' + groupOpts + "</select></label>" +
+      "</div>"
+    );
   }
 
   function renderSavedItem(report) {
@@ -816,49 +999,65 @@
   }
 
   function renderKbFunnelTable() {
-    var flatRows = [];
-    KB_KEYWORD_FUNNEL_DATA.forEach(function (kw) {
-      kw.ads.forEach(function (ad) {
-        flatRows.push({
-          keyword: kw.keyword,
-          ad_title: ad.ad_title,
-          kb_widget_views: ad.kb_widget_views,
-          kb_block_clicks: ad.kb_block_clicks,
-          kb_ad_clicks: ad.kb_ad_clicks
-        });
-      });
-    });
+    var entity = state.kbEntity || "keyword";
+    var groupBy = state.kbGroupBy || "keyword_term";
+    var flatRows = getKbFlatRows(entity);
+    var grouped = aggregateKbRows(flatRows, groupBy);
+    var totals = sumKbMetrics(flatRows);
+    var entityLabel = entity === "keyword" ? "Keyword blocks" : "Ads";
+    var groupLabel = KB_GROUP_OPTIONS[groupBy] || groupBy;
 
-    var body = flatRows.map(function (row) {
+    var body = grouped.map(function (agg) {
       return "<tr>" +
-        "<td><strong>" + row.keyword + "</strong></td>" +
-        "<td>" + row.ad_title + "</td>" +
-        '<td class="right">' + nf(row.kb_widget_views) + "</td>" +
-        '<td class="right">' + nf(row.kb_block_clicks) + "</td>" +
-        '<td class="right">' + nf(row.kb_ad_clicks) + "</td>" +
+        "<td>" + renderKbGroupCell(groupBy, agg) + "</td>" +
+        '<td class="right">' + nf(agg.visits) + "</td>" +
+        '<td class="right">' + nf(agg.impressions) + "</td>" +
+        '<td class="right">' + nf(agg.clicks) + "</td>" +
+        '<td class="right">' + nf(agg.conversions) + "</td>" +
+        '<td class="right">' + pct(agg.conversions, agg.clicks) + "</td>" +
         "</tr>";
     }).join("");
 
-    var totals = flatRows.reduce(function (acc, row) {
-      acc.views += row.kb_widget_views;
-      acc.blocks += row.kb_block_clicks;
-      acc.clicks += row.kb_ad_clicks;
-      return acc;
-    }, { views: 0, blocks: 0, clicks: 0 });
-
-    return '<p class="muted" style="font-size:12px;margin:0 0 12px;">Keyword block funnel · one row per keyword + ad title</p>' +
-      '<div class="kb-funnel-stats" style="margin-bottom:16px;">' +
-      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Widget views</div><div class="kb-funnel-step__val">6,008</div></div>' +
-      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Keyword picks</div><div class="kb-funnel-step__val">1,564</div></div>' +
-      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad clicks</div><div class="kb-funnel-step__val">74</div></div>' +
-      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Ad CTR</div><div class="kb-funnel-step__val">4.7%</div></div></div>' +
+    return renderKbFunnelToolbar() +
+      '<p class="muted rb-kb-subtitle">' + entityLabel + " · grouped by " + groupLabel + " · visits → impressions → clicks → conversions</p>" +
+      '<div class="kb-funnel-stats rb-kb-summary">' +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Visits</div><div class="kb-funnel-step__val">' + nf(totals.visits) + "</div></div>" +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Impressions</div><div class="kb-funnel-step__val">' + nf(totals.impressions) + "</div></div>" +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Clicks</div><div class="kb-funnel-step__val">' + nf(totals.clicks) + "</div></div>" +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">Conversions</div><div class="kb-funnel-step__val">' + nf(totals.conversions) + "</div></div>" +
+      '<div class="kb-funnel-step"><div class="kb-funnel-step__label">CVR</div><div class="kb-funnel-step__val">' + pct(totals.conversions, totals.clicks) + "</div></div></div>" +
       '<div class="table-scroll rb-table-wrap"><table class="table rb-kb-funnel-table"><thead><tr>' +
-      "<th>keyword</th><th>ad title</th><th class=\"right\">KB widget views</th><th class=\"right\">KB block clicks</th><th class=\"right\">KB ad clicks</th>" +
+      "<th>" + groupLabel + '</th><th class="right">Visits</th><th class="right">Impressions</th><th class="right">Clicks</th><th class="right">Conversions</th><th class="right">CVR</th>' +
       "</tr></thead><tbody>" + body + '</tbody><tfoot><tr class="rb-table-total">' +
-      "<td><strong>Grand total</strong></td><td></td>" +
-      '<td class="right"><strong>' + nf(totals.views) + "</strong></td>" +
-      '<td class="right"><strong>' + nf(totals.blocks) + "</strong></td>" +
-      '<td class="right"><strong>' + nf(totals.clicks) + "</strong></td></tr></tfoot></table></div>";
+      "<td><strong>Grand total</strong></td>" +
+      '<td class="right"><strong>' + nf(totals.visits) + "</strong></td>" +
+      '<td class="right"><strong>' + nf(totals.impressions) + "</strong></td>" +
+      '<td class="right"><strong>' + nf(totals.clicks) + "</strong></td>" +
+      '<td class="right"><strong>' + nf(totals.conversions) + "</strong></td>" +
+      '<td class="right"><strong>' + pct(totals.conversions, totals.clicks) + "</strong></td></tr></tfoot></table></div>";
+  }
+
+  function wireKbFunnelControls(root) {
+    if (!root) return;
+    root.querySelectorAll(".rb-kb-entity-tab").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        state.kbEntity = btn.getAttribute("data-kb-entity");
+        var keys = getKbGroupKeysForEntity(state.kbEntity);
+        if (keys.indexOf(state.kbGroupBy) === -1) state.kbGroupBy = keys[0];
+        state.rows = [state.kbGroupBy];
+        renderBuilder();
+        renderResult();
+      });
+    });
+    var groupSel = root.querySelector(".rb-kb-groupby-select");
+    if (groupSel) {
+      groupSel.addEventListener("change", function () {
+        state.kbGroupBy = groupSel.value;
+        state.rows = [state.kbGroupBy];
+        renderBuilder();
+        renderResult();
+      });
+    }
   }
 
   function wireFormFunnelToggles(root) {
@@ -1143,7 +1342,7 @@
       chartWrap.innerHTML = renderBehaviourDashboard();
       wireBehaviourControls(chartWrap);
     } else if (isFunnel) {
-      chartWrap.innerHTML = renderFunnel(isKbFunnel ? KB_FUNNEL_STEPS : FORM_FUNNEL_STEPS);
+      chartWrap.innerHTML = renderFunnel(isKbFunnel ? buildKbFunnelSteps(state.kbEntity || "keyword") : FORM_FUNNEL_STEPS);
     } else if (isChart) {
       var vk = valueCols.filter(function (c) { return ["time_on_page", "scroll_pct", "visits", "impressions", "clicks"].indexOf(c) !== -1; }).slice(0, 2);
       if (!vk.length) vk = ["time_on_page", "scroll_pct"];
@@ -1157,6 +1356,7 @@
       wireFormFunnelToggles(tableWrap);
     } else if (isKbFunnel) {
       tableWrap.innerHTML = renderKbFunnelTable();
+      wireKbFunnelControls(tableWrap);
     } else if (state.chart === "funnel") {
       tableWrap.innerHTML = renderFormFunnelTable();
       wireFormFunnelToggles(tableWrap);
@@ -1170,9 +1370,14 @@
 
     if (meta) {
       var label = (CHART_TYPES.find(function (c) { return c.id === state.chart; }) || {}).label;
-      meta.textContent = isBehaviour
-        ? rows.length + " visits · histograms + heatmap"
-        : rows.length + " rows · " + label;
+      if (isBehaviour) {
+        meta.textContent = rows.length + " visits · histograms + heatmap";
+      } else if (isKbFunnel) {
+        var groupedCount = aggregateKbRows(getKbFlatRows(state.kbEntity || "keyword"), state.kbGroupBy || "keyword_term").length;
+        meta.textContent = groupedCount + " rows · " + (state.kbEntity === "ad" ? "Ads" : "Keyword blocks") + " · " + label;
+      } else {
+        meta.textContent = rows.length + " rows · " + label;
+      }
     }
   }
 
