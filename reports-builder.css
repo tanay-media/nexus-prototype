@@ -572,69 +572,150 @@
   margin-top: 2px;
 }
 
-.rb-kb-toolbar {
+.rb-kb-rollup {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 12px;
+}
+
+.rb-kb-rollup-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
 }
 
-.rb-kb-entity-tabs {
-  display: inline-flex;
-  border: 1px solid var(--border, #e8e4da);
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-}
-
-.rb-kb-entity-tab {
-  appearance: none;
-  border: none;
-  background: transparent;
-  padding: 7px 14px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted, #7a7568);
-  cursor: pointer;
-}
-
-.rb-kb-entity-tab + .rb-kb-entity-tab {
-  border-left: 1px solid var(--border, #e8e4da);
-}
-
-.rb-kb-entity-tab.is-active {
-  background: var(--brand-soft, #f0ebe0);
+.rb-kb-rollup-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
   color: #111;
 }
 
-.rb-kb-groupby {
-  display: inline-flex;
+.rb-kb-rollup-desc {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.rb-kb-pills {
+  display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.rb-kb-pills__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--text-muted, #7a7568);
 }
 
-.rb-kb-groupby select {
+.rb-kb-pill {
+  appearance: none;
+  border: 1px solid var(--border, #e8e4da);
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
   font: inherit;
   font-size: 12px;
-  padding: 6px 10px;
-  border: 1px solid var(--border, #e8e4da);
-  border-radius: 8px;
-  background: #fff;
-  min-width: 180px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
 }
 
-.rb-kb-subtitle {
+.rb-kb-pill:hover {
+  background: #faf9f7;
+}
+
+.rb-kb-pill.is-active {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.rb-kb-rollup-foot {
   font-size: 12px;
-  margin: 0 0 12px;
+  margin: 0;
+  line-height: 1.45;
 }
 
-.rb-kb-summary {
-  margin-bottom: 16px;
+.rb-kb-rollup-table {
+  min-width: 980px;
+}
+
+.rb-kb-rollup-table .rb-kb-rollup-group-h {
+  text-align: center;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  background: #fafafa;
+}
+
+.rb-kb-rollup-table thead tr:last-child th {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.rb-kb-rollup-row > td {
+  background: #fff;
+  vertical-align: middle;
+}
+
+.rb-kb-rollup-row.is-expanded > td {
+  background: #f8fafc;
+}
+
+.rb-kb-rollup-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rb-kb-rollup-toggle {
+  appearance: none;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #2563eb;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.rb-kb-rollup-child > td {
+  background: #fafbfc;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.rb-kb-rollup-child__label {
+  padding-left: 34px !important;
+}
+
+.rb-kb-child-prop {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+}
+
+.rb-kb-child-val {
+  display: block;
+  font-size: 12px;
+  color: #374151;
+  margin-top: 2px;
+}
+
+.rb-kb-ad-col {
+  background: rgba(249, 250, 251, 0.7);
 }
 
 .rb-kb-cell-img {
@@ -676,6 +757,7 @@
   color: #6b7280;
 }
 
+.rb-kb-rollup-table .rb-kb-funnel-table__chev,
 .rb-kb-funnel-table .rb-kb-funnel-table__chev {
   width: 28px;
 }
