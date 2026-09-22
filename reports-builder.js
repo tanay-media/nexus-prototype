@@ -536,7 +536,7 @@
     state.values = report.values.slice();
     state.filters = Object.assign({}, report.filters);
     if (report.id === "kb-funnels") {
-      state.kbExpandedGroups = {};
+      refreshKbExpandedGroups();
     }
     renderBuilder();
     renderResult();
@@ -650,6 +650,10 @@
     return keys.sort(function (a, b) { return String(a).localeCompare(String(b)); });
   }
 
+  function kbNodeId(parentPath, dimension, value) {
+    return (parentPath ? parentPath + "|" : "") + dimension + ":" + encodeURIComponent(String(value != null ? value : "—"));
+  }
+
   function buildKbNestedTree(leaves, dimensions, parentPath) {
     if (!dimensions.length) return [];
     var dimension = dimensions[0];
@@ -660,7 +664,7 @@
       var key = String(value);
       if (!map[key]) {
         map[key] = {
-          id: (parentPath ? parentPath + "|" : "") + dimension + ":" + key,
+          id: kbNodeId(parentPath, dimension, value),
           dimension: dimension,
           value: value,
           sample: leaf,
@@ -673,8 +677,25 @@
       var node = map[key];
       node.metrics = aggregateKbLeafMetrics(node.leaves);
       node.children = rest.length ? buildKbNestedTree(node.leaves, rest, node.id) : [];
+      node.isLeaf = !rest.length;
       return node;
     });
+  }
+
+  function expandAllKbGroupNodes(nodes, expanded) {
+    nodes.forEach(function (node) {
+      if (node.children && node.children.length > 0) {
+        expanded[node.id] = true;
+        expandAllKbGroupNodes(node.children, expanded);
+      }
+    });
+    return expanded;
+  }
+
+  function refreshKbExpandedGroups() {
+    var dimensions = getKbRowDimensions();
+    var tree = buildKbNestedTree(getKbLeafRows(), dimensions, "");
+    state.kbExpandedGroups = expandAllKbGroupNodes(tree, {});
   }
 
   function getKbBreakdownHeader(dimensions) {
@@ -852,7 +873,7 @@
       arr.splice(insertIdx, 0, sourceId);
       state[stateKey] = arr;
       state.presetId = "custom-current";
-      if (isKbFunnelReport()) state.kbExpandedGroups = {};
+      if (isKbFunnelReport()) refreshKbExpandedGroups();
       renderBuilder();
       renderResult();
     }
@@ -919,9 +940,11 @@
       current = state.rows;
       onAdd = function (id) {
         if (state.rows.indexOf(id) === -1) state.rows.push(id);
-        if (isKbFunnelReport()) state.kbExpandedGroups = {};
         renderBuilder();
-        if (isKbFunnelReport()) renderResult();
+        if (isKbFunnelReport()) {
+          refreshKbExpandedGroups();
+          renderResult();
+        }
       };
     } else if (containerId === "rb-values") {
       pool = MEASURES;
@@ -962,9 +985,11 @@
   function renderBuilder() {
     renderChips("rb-rows", state.rows, DIMENSIONS, "", function (id) {
       state.rows = state.rows.filter(function (r) { return r !== id; });
-      if (isKbFunnelReport()) state.kbExpandedGroups = {};
       renderBuilder();
-      if (isKbFunnelReport()) renderResult();
+      if (isKbFunnelReport()) {
+        refreshKbExpandedGroups();
+        renderResult();
+      }
     }, true);
     renderChips("rb-values", state.values, MEASURES, "rb-chip--value", function (id) {
       state.values = state.values.filter(function (v) { return v !== id; });
@@ -1490,7 +1515,7 @@
     var genBtn = document.getElementById("rb-generate");
     if (genBtn) {
       genBtn.addEventListener("click", function () {
-        if (isKbFunnelReport()) state.kbExpandedGroups = {};
+        if (isKbFunnelReport()) refreshKbExpandedGroups();
         renderResult();
       });
     }
