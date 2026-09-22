@@ -672,6 +672,26 @@
 .rb-kb-rollup-label {
   font-weight: 600;
   white-space: nowrap;
+  vertical-align: middle;
+}
+
+.rb-kb-dim-tag {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  vertical-align: middle;
+}
+
+.rb-kb-rollup-spacer {
+  display: inline-block;
+  width: 28px;
 }
 
 .rb-kb-rollup-toggle {
