@@ -7,7 +7,9 @@
 (function () {
   var STORAGE_KEY = "nexus.cd.v3";
   var CURRENT_USER_EMAIL = "kyle@acme.com";
+  var IS_SUPER_ADMIN = true;
   var DEFAULT_WS_ID = "acme-growth";
+  var BUILTIN_SOURCE_IDS = ["facebook", "google", "taboola", "gtm", "meta_pixel", "ga4"];
 
   var TEAM_WORKSPACES = [
     { id: "acme-growth", name: "ACME Growth", teamId: "acme" },
@@ -51,7 +53,92 @@
 
   function defaultLanderEventMap(src) {
     var d = DEFAULT_LANDER_EVENTS[src];
-    return d ? JSON.parse(JSON.stringify(d)) : null;
+    if (d) return JSON.parse(JSON.stringify(d));
+    var ct = getCustomBuySourceType(src);
+    if (ct && ct.landerEvents) return JSON.parse(JSON.stringify(ct.landerEvents));
+    return null;
+  }
+
+  function slugifyBuySource(name) {
+    return String(name || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/(^_|_$)/g, "")
+      .slice(0, 32);
+  }
+
+  function getCustomBuySourceTypes() {
+    return rootState.customBuySourceTypes || [];
+  }
+
+  function getCustomBuySourceType(id) {
+    return getCustomBuySourceTypes().find(function (t) { return t.id === id; }) || null;
+  }
+
+  function isCustomBuySource(src) {
+    return !!getCustomBuySourceType(src);
+  }
+
+  function syncCustomSourceMeta() {
+    getCustomBuySourceTypes().forEach(function (t) {
+      SOURCE_LABEL[t.id] = { name: t.name, short: t.logoText || t.name.slice(0, 8) };
+      SOURCE_THUMB[t.id] = '<span class="cd-thumb" style="background:' + escapeHtml(t.logoBg || "#64748b") + ';color:#fff;font-weight:700;font-size:12px">' + escapeHtml(t.logoText || t.name.slice(0, 2)) + "</span>";
+      LANDER_DEST_OPTIONS[t.id] = ["visit", "impression", "click"].map(function (k) {
+        return t.landerEvents && t.landerEvents[k] ? t.landerEvents[k].eventName : k;
+      });
+    });
+  }
+
+  function getGroupOrder() {
+    return ["facebook", "google", "taboola"]
+      .concat(getCustomBuySourceTypes().map(function (t) { return t.id; }))
+      .concat(["gtm", "meta_pixel"]);
+  }
+
+  function customTypeLogoHtml(t) {
+    return '<span class="cd-thumb" style="background:' + escapeHtml(t.logoBg || "#64748b") + ';color:#fff;font-weight:700;font-size:12px">' + escapeHtml(t.logoText || t.name.slice(0, 2)) + "</span>";
+  }
+
+  function getFullCatalog() {
+    var custom = getCustomBuySourceTypes().map(function (t) {
+      return {
+        id: t.id,
+        name: t.name,
+        cat: "ads",
+        desc: t.desc,
+        connectable: true,
+        isCustom: true,
+        logo: customTypeLogoHtml(t)
+      };
+    });
+    return CATALOG.concat(custom);
+  }
+
+  function renderCustomSourceFields(src, row) {
+    var wrap = document.getElementById("cd-custom-fields-wrap");
+    if (!wrap) return;
+    var ctype = getCustomBuySourceType(src);
+    if (!ctype) {
+      wrap.innerHTML = "";
+      return;
+    }
+    wrap.innerHTML = '<div class="cd-section"><div class="dskp__label">' + escapeHtml(ctype.name) + " account</div>" +
+      '<p class="dskp__hint" style="margin:0 0 12px;">' + escapeHtml(ctype.desc || "") + "</p></div>" +
+      (ctype.fields || []).map(function (f) {
+        var val = row && row.fields ? (row.fields[f.key] || "") : "";
+        var refKey = f.key + "_ref";
+        if (f.type === "secret") {
+          return '<div class="dskp__field"><div class="dskp__label">' + escapeHtml(f.label) + "</div>" +
+            '<div class="dskp__token"><input id="cd-custom-' + escapeHtml(f.key) + '" type="password" placeholder="' + escapeHtml(f.placeholder || "Paste token…") + '" /></div></div>';
+        }
+        return '<div class="dskp__field"><div class="dskp__label">' + escapeHtml(f.label) + "</div>" +
+          '<input class="dskp__input" type="text" id="cd-custom-' + escapeHtml(f.key) + '" placeholder="' + escapeHtml(f.placeholder || "") + '" value="' + escapeHtml(val) + '" /></div>';
+      }).join("");
+    if (row && ctype.fields) {
+      ctype.fields.forEach(function (f) {
+        if (f.type === "secret") applySecretField("cd-custom-" + f.key, row.fields[f.key + "_ref"], row, false);
+      });
+    }
   }
 
   // ----- Defaults / seed data -----
@@ -248,6 +335,7 @@
         var parsed = JSON.parse(raw);
         if (parsed && parsed.workspaces) {
           if (!parsed.secretVault) parsed.secretVault = JSON.parse(JSON.stringify(VAULT_SEED));
+          if (!parsed.customBuySourceTypes) parsed.customBuySourceTypes = [];
           migrateRows(parsed);
           return parsed;
         }
@@ -260,6 +348,7 @@
           migrateRows(old);
           return {
             secretVault: JSON.parse(JSON.stringify(VAULT_SEED)),
+            customBuySourceTypes: [],
             workspaces: { [DEFAULT_WS_ID]: { defaults: old.defaults || seed.defaults, rows: old.rows } }
           };
         }
@@ -267,6 +356,7 @@
     } catch (e) {}
     return {
       secretVault: JSON.parse(JSON.stringify(VAULT_SEED)),
+      customBuySourceTypes: [],
       workspaces: {
         [DEFAULT_WS_ID]: {
           defaults: JSON.parse(JSON.stringify(seed.defaults)),
@@ -346,7 +436,7 @@
   var deletePending = null;
 
   function isBuySourceSrc(src) {
-    return src === "facebook" || src === "google" || src === "taboola";
+    return src === "facebook" || src === "google" || src === "taboola" || isCustomBuySource(src);
   }
 
   function maxCdDrawerStep(src) {
@@ -422,6 +512,14 @@
         '<small>client-side · fbq</small>' +
       '</div>';
     }
+    if (isCustomBuySource(row.source)) {
+      var ct = getCustomBuySourceType(row.source);
+      var first = ct && ct.fields && ct.fields[0] ? row.fields[ct.fields[0].key] || "—" : "—";
+      return '<div class="cd-ids">' +
+        '<code>' + escapeHtml(first) + '</code>' +
+        '<small>' + escapeHtml(ct ? ct.delivery + " · custom" : "custom buy source") + '</small>' +
+      '</div>';
+    }
     return "—";
   }
 
@@ -493,7 +591,7 @@
     if (tableScroll) tableScroll.hidden = false;
     if (emptyEl) emptyEl.hidden = true;
 
-    var GROUP_ORDER = ["facebook", "google", "taboola", "gtm"];
+    var GROUP_ORDER = getGroupOrder();
     function rowHtml(r) {
       return '<tr class="cd-acct-row" data-group="' + r.source + '"' + (collapsed[r.source] ? ' hidden' : '') + '>' +
         '<td>' +
@@ -546,14 +644,23 @@
   // ----- Dialog: provider switching -----
   function setSourceInDialog(src) {
     var groups = document.querySelectorAll("[data-source-fields]");
-    groups.forEach(function (g) { g.hidden = g.getAttribute("data-source-fields") !== src; });
+    var isCustom = isCustomBuySource(src);
+    groups.forEach(function (g) {
+      var attr = g.getAttribute("data-source-fields");
+      g.hidden = isCustom ? attr !== "__custom__" : attr !== src;
+    });
+    if (isCustom) {
+      var editRow = editIdIn.value ? state.rows.find(function (x) { return x.id === editIdIn.value; }) : null;
+      renderCustomSourceFields(src, editRow);
+    }
     var btns = document.querySelectorAll(".cd-prov");
     btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-source") === src)); });
     formDlg.setAttribute("data-source", src);
     var isClientPixel = src === "gtm" || src === "meta_pixel";
     var defSec = document.querySelector("[data-default-section]");
     if (defSec) defSec.hidden = isClientPixel;
-    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", taboola: "Taboola", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src] || "Integration";
+    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", taboola: "Taboola", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src]
+      || (getCustomBuySourceType(src) ? getCustomBuySourceType(src).name : "Integration");
     var eyebrow = document.getElementById("cd-eyebrow");
     if (eyebrow) eyebrow.textContent = provName;
 
@@ -567,7 +674,11 @@
         taboola: '<svg viewBox="0 0 24 24" width="22" height="22"><text x="5" y="17" fill="#1652DA" font-size="14" font-weight="700">Tb</text></svg>',
         gtm:      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg>',
         meta_pixel: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>'
-      })[src] || '';
+      })[src] || (function () {
+        var ct = getCustomBuySourceType(src);
+        if (!ct) return "";
+        return '<span style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:800;font-size:13px;color:#fff;background:' + ct.logoBg + ';border-radius:8px;">' + escapeHtml(ct.logoText) + "</span>";
+      })();
     }
 
     // Update event-map header to reflect chosen destination
@@ -577,6 +688,8 @@
       taboola:  { name: "Taboola event name", sub: 'Realize · <code>name</code> (exact match)' },
       gtm:      { name: "dataLayer event", sub: 'pushed client-side · <code>event</code>' }
     };
+    var customType = getCustomBuySourceType(src);
+    if (customType) labelMap[src] = { name: customType.name + " event", sub: customType.delivery + " · custom buy source" };
     var l = labelMap[src] || labelMap.facebook;
     // Client-side pixels have no server-side test — relabel the action button
     if (testBtn) {
@@ -1298,6 +1411,22 @@
       fields.gtm_env = document.getElementById("cd-gtm-env").value;
     } else if (src === "meta_pixel") {
       fields.pixel_id = document.getElementById("cd-meta-pixel-id").value.trim();
+    } else if (isCustomBuySource(src)) {
+      var ctype = getCustomBuySourceType(src);
+      (ctype.fields || []).forEach(function (f) {
+        var el = document.getElementById("cd-custom-" + f.key);
+        if (!el) return;
+        if (f.type === "secret") {
+          var secretVal = el.value.trim();
+          if (secretVal) {
+            fields[f.key + "_ref"] = "secret://vault/custom/" + src + "/" + f.key;
+            setSecretPlain(fields[f.key + "_ref"], secretVal);
+            becameSecretsOwner = true;
+          }
+        } else {
+          fields[f.key] = el.value.trim();
+        }
+      });
     }
 
     var id = editIdIn.value;
@@ -1310,6 +1439,14 @@
         ["fb_token_ref", "g_token_ref", "g_client_secret_ref", "g_dev_token", "tb_token_ref"].forEach(function (k) {
           if (prevFields[k] && fields[k] == null) fields[k] = prevFields[k];
         });
+        if (isCustomBuySource(src)) {
+          var ctypePrev = getCustomBuySourceType(src);
+          (ctypePrev.fields || []).forEach(function (f) {
+            var refK = f.key + "_ref";
+            if (f.type === "secret" && prevFields[refK] && !fields[refK]) fields[refK] = prevFields[refK];
+            if (f.type === "text" && prevFields[f.key] && !fields[f.key]) fields[f.key] = prevFields[f.key];
+          });
+        }
         r.source = src;
         r.fields = fields;
         r.landerEventMap = collectLanderEventMap();
@@ -1577,7 +1714,7 @@
   }
   function browseFiltered() {
     var conn = connectedSources();
-    return CATALOG.filter(function (it) {
+    return getFullCatalog().filter(function (it) {
       if (browseState.cat === "connected" && !conn[it.id]) return false;
       if (browseState.cat !== "all" && browseState.cat !== "connected" && it.cat !== browseState.cat) return false;
       if (browseState.q) {
@@ -1589,33 +1726,189 @@
   }
   function renderBrowseCounts() {
     var conn = connectedSources();
-    var counts = { all: CATALOG.length, connected: Object.keys(conn).length, ads: 0, tag: 0 };
-    CATALOG.forEach(function (it) { if (counts[it.cat] != null) counts[it.cat]++; });
+    var catalog = getFullCatalog();
+    var counts = { all: catalog.length, connected: Object.keys(conn).length, ads: 0, tag: 0 };
+    catalog.forEach(function (it) { if (counts[it.cat] != null) counts[it.cat]++; });
     document.querySelectorAll("#brws-nav .brws__cat-count").forEach(function (el) {
       el.textContent = counts[el.getAttribute("data-count")] || 0;
     });
   }
+  function renderBrowseAdminCard() {
+    if (!IS_SUPER_ADMIN) return "";
+    if (browseState.cat !== "all" && browseState.cat !== "ads") return "";
+    return '<div class="brws__admin-card">' +
+      '<div class="brws__admin-card-inner">' +
+      "<div>" +
+      '<div class="brws__admin-eyebrow">Super admin</div>' +
+      '<div class="brws__admin-title">Add a new buy source type</div>' +
+      '<p class="brws__admin-desc">Define a platform catalog entry — publishers can connect accounts once you publish it.</p>' +
+      "</div>" +
+      '<button type="button" class="btn btn--black brws__admin-btn" id="brws-add-type">+ Create buy source</button>' +
+      "</div></div>";
+  }
+
   function renderBrowse() {
     renderBrowseCounts();
     var list = document.getElementById("brws-list");
     if (!list) return;
     var conn = connectedSources();
     var rows = browseFiltered();
-    if (!rows.length) { list.innerHTML = '<div class="brws__empty">No integrations match.</div>'; return; }
-    list.innerHTML = rows.map(function (it) {
+    var adminCard = renderBrowseAdminCard();
+    if (!rows.length && !adminCard) {
+      list.innerHTML = '<div class="brws__empty">No integrations match.</div>';
+      return;
+    }
+    list.innerHTML = adminCard + rows.map(function (it) {
       var isConn = conn[it.id];
+      var badges = (isConn ? ' <span class="brws__connected">Connected</span>' : "") +
+        (it.isCustom ? ' <span class="brws__custom-badge">Custom</span>' : "");
       var action = it.connectable
-        ? '<button type="button" class="brws__add" data-add="' + it.id + '"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add account</button>'
+        ? '<div class="brws__item-actions">' +
+          (it.isCustom && IS_SUPER_ADMIN ? '<button type="button" class="brws__edit-type" data-edit-type="' + it.id + '">Edit type</button>' : "") +
+          '<button type="button" class="brws__add" data-add="' + it.id + '"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add account</button>' +
+          "</div>"
         : '<span class="brws__soon">Soon</span>';
       return '<div class="brws__item">' +
         it.logo +
-        '<div class="brws__item-txt"><div class="brws__item-name">' + escapeHtml(it.name) +
-          (isConn ? ' <span class="brws__connected">Connected</span>' : '') + '</div>' +
-          '<div class="brws__item-desc">' + escapeHtml(it.desc) + '</div></div>' +
+        '<div class="brws__item-txt"><div class="brws__item-name">' + escapeHtml(it.name) + badges + "</div>" +
+        '<div class="brws__item-desc">' + escapeHtml(it.desc) + "</div></div>" +
         action +
-      '</div>';
+      "</div>";
     }).join("");
   }
+
+  var bsTypeDlg = document.getElementById("dialog-bs-type");
+  var bsTypeFieldsEl = document.getElementById("bs-type-fields");
+  var bsTypeEditId = document.getElementById("bs-type-edit-id");
+  var bsTypeNameIn = document.getElementById("bs-type-name");
+  var bsTypeSlugIn = document.getElementById("bs-type-slug");
+  var bsTypeDescIn = document.getElementById("bs-type-desc");
+  var bsTypeLogoTextIn = document.getElementById("bs-type-logo-text");
+  var bsTypeLogoBgIn = document.getElementById("bs-type-logo-bg");
+  var bsTypeDeliveryIn = document.getElementById("bs-type-delivery");
+  var bsTypeIconPreview = document.getElementById("bs-type-icon-preview");
+  var bsTypeTitle = document.getElementById("bs-type-title");
+  var bsTypeDeleteBtn = document.getElementById("bs-type-delete");
+  var bsSlugManual = false;
+
+  function defaultBsTypeFields() {
+    return [
+      { key: "account_id", label: "Account ID", type: "text", placeholder: "1234567" },
+      { key: "api_token", label: "API token", type: "secret", placeholder: "Paste token…" }
+    ];
+  }
+
+  function updateBsTypePreview() {
+    if (!bsTypeIconPreview) return;
+    var txt = (bsTypeLogoTextIn && bsTypeLogoTextIn.value.trim()) || (bsTypeNameIn && bsTypeNameIn.value.trim().slice(0, 2)) || "Bs";
+    var bg = (bsTypeLogoBgIn && bsTypeLogoBgIn.value) || "#64748b";
+    bsTypeIconPreview.textContent = txt.slice(0, 3);
+    bsTypeIconPreview.style.background = bg;
+  }
+
+  function renderBsTypeFieldRow(field) {
+    var f = field || { key: "", label: "", type: "text", placeholder: "" };
+    return '<div class="bs-type__field-row" data-bs-field-row>' +
+      '<div class="dskp__field"><div class="dskp__label">Label</div><input class="dskp__input bs-type-field-label" type="text" value="' + escapeHtml(f.label) + '" placeholder="Account ID" /></div>' +
+      '<div class="dskp__field"><div class="dskp__label">Field key</div><input class="dskp__input mono bs-type-field-key" type="text" value="' + escapeHtml(f.key) + '" placeholder="account_id" /></div>' +
+      '<div class="dskp__field"><div class="dskp__label">Type</div><select class="dskp__select bs-type-field-type"><option value="text"' + (f.type === "text" ? " selected" : "") + '>Text</option><option value="secret"' + (f.type === "secret" ? " selected" : "") + ">Secret</option></select></div>" +
+      '<button type="button" class="bs-type__field-remove" aria-label="Remove field">×</button></div>';
+  }
+
+  function collectBsTypeFields() {
+    if (!bsTypeFieldsEl) return [];
+    return Array.prototype.map.call(bsTypeFieldsEl.querySelectorAll("[data-bs-field-row]"), function (row) {
+      return {
+        label: (row.querySelector(".bs-type-field-label").value || "").trim(),
+        key: slugifyBuySource(row.querySelector(".bs-type-field-key").value || ""),
+        type: row.querySelector(".bs-type-field-type").value,
+        placeholder: ""
+      };
+    }).filter(function (f) { return f.label && f.key; });
+  }
+
+  function openBsTypeDialog(editId) {
+    if (!bsTypeDlg) return;
+    var existing = editId ? getCustomBuySourceType(editId) : null;
+    bsSlugManual = !!existing;
+    if (bsTypeEditId) bsTypeEditId.value = existing ? existing.id : "";
+    if (bsTypeTitle) bsTypeTitle.textContent = existing ? "Edit buy source" : "Create buy source";
+    if (bsTypeDeleteBtn) bsTypeDeleteBtn.hidden = !existing;
+    if (bsTypeNameIn) bsTypeNameIn.value = existing ? existing.name : "";
+    if (bsTypeSlugIn) {
+      bsTypeSlugIn.value = existing ? existing.id : "";
+      bsTypeSlugIn.readOnly = !!existing;
+    }
+    if (bsTypeDescIn) bsTypeDescIn.value = existing ? existing.desc : "";
+    if (bsTypeLogoTextIn) bsTypeLogoTextIn.value = existing ? existing.logoText : "";
+    if (bsTypeLogoBgIn) bsTypeLogoBgIn.value = existing ? existing.logoBg : "#EE6513";
+    if (bsTypeDeliveryIn) bsTypeDeliveryIn.value = existing ? existing.delivery : "s2s";
+    if (document.getElementById("bs-type-ev-visit")) document.getElementById("bs-type-ev-visit").value = existing && existing.landerEvents ? existing.landerEvents.visit.eventName : "page_view";
+    if (document.getElementById("bs-type-ev-impression")) document.getElementById("bs-type-ev-impression").value = existing && existing.landerEvents ? existing.landerEvents.impression.eventName : "view_content";
+    if (document.getElementById("bs-type-ev-click")) document.getElementById("bs-type-ev-click").value = existing && existing.landerEvents ? existing.landerEvents.click.eventName : "cta_click";
+    if (bsTypeFieldsEl) {
+      bsTypeFieldsEl.innerHTML = (existing && existing.fields ? existing.fields : defaultBsTypeFields()).map(renderBsTypeFieldRow).join("");
+    }
+    updateBsTypePreview();
+    bsTypeDlg.showModal();
+  }
+
+  function saveBsType() {
+    var name = (bsTypeNameIn && bsTypeNameIn.value || "").trim();
+    if (!name) { if (bsTypeNameIn) bsTypeNameIn.focus(); return; }
+    var id = (bsTypeSlugIn && bsTypeSlugIn.value || "").trim() || slugifyBuySource(name);
+    if (!id || BUILTIN_SOURCE_IDS.indexOf(id) !== -1) {
+      alert("Choose a catalog ID that does not conflict with built-in integrations.");
+      return;
+    }
+    var fields = collectBsTypeFields();
+    if (!fields.length) {
+      alert("Add at least one account setup field.");
+      return;
+    }
+    var payload = {
+      id: id,
+      name: name,
+      desc: (bsTypeDescIn && bsTypeDescIn.value || "").trim(),
+      logoText: ((bsTypeLogoTextIn && bsTypeLogoTextIn.value) || name.slice(0, 2)).trim().slice(0, 3),
+      logoBg: (bsTypeLogoBgIn && bsTypeLogoBgIn.value) || "#64748b",
+      delivery: (bsTypeDeliveryIn && bsTypeDeliveryIn.value) || "s2s",
+      fields: fields,
+      landerEvents: {
+        visit: { enabled: true, eventName: document.getElementById("bs-type-ev-visit").value.trim() || "page_view" },
+        impression: { enabled: true, eventName: document.getElementById("bs-type-ev-impression").value.trim() || "view_content" },
+        click: { enabled: true, eventName: document.getElementById("bs-type-ev-click").value.trim() || "cta_click" }
+      },
+      createdAt: new Date().toISOString().slice(0, 10),
+      createdBy: CURRENT_USER_EMAIL
+    };
+    if (!rootState.customBuySourceTypes) rootState.customBuySourceTypes = [];
+    var idx = rootState.customBuySourceTypes.findIndex(function (t) { return t.id === id; });
+    if (idx === -1) rootState.customBuySourceTypes.push(payload);
+    else rootState.customBuySourceTypes[idx] = Object.assign({}, rootState.customBuySourceTypes[idx], payload);
+    syncCustomSourceMeta();
+    save();
+    render();
+    if (bsTypeDlg) bsTypeDlg.close();
+    if (browseDlg && browseDlg.open) renderBrowse();
+  }
+
+  function deleteBsType() {
+    var id = bsTypeEditId ? bsTypeEditId.value : "";
+    if (!id) return;
+    var inUse = (state.rows || []).some(function (r) { return r.source === id; });
+    if (inUse) {
+      alert("Cannot delete — workspace integrations still use this buy source. Remove accounts first.");
+      return;
+    }
+    rootState.customBuySourceTypes = (rootState.customBuySourceTypes || []).filter(function (t) { return t.id !== id; });
+    syncCustomSourceMeta();
+    save();
+    render();
+    if (bsTypeDlg) bsTypeDlg.close();
+    if (browseDlg && browseDlg.open) renderBrowse();
+  }
+
   (function wireBrowse() {
     var nav = document.getElementById("brws-nav");
     var search = document.getElementById("brws-search");
@@ -1629,16 +1922,52 @@
     });
     if (search) search.addEventListener("input", function () { browseState.q = search.value; renderBrowse(); });
     if (list) list.addEventListener("click", function (e) {
+      if (e.target.closest("#brws-add-type")) {
+        openBsTypeDialog();
+        return;
+      }
+      var editType = e.target.closest("[data-edit-type]");
+      if (editType) {
+        openBsTypeDialog(editType.getAttribute("data-edit-type"));
+        return;
+      }
       var add = e.target.closest("[data-add]");
       if (!add) return;
       if (browseDlg) browseDlg.close();
       openAdd(add.getAttribute("data-add"));
     });
+    if (bsTypeNameIn) {
+      bsTypeNameIn.addEventListener("input", function () {
+        if (!bsSlugManual && bsTypeSlugIn) bsTypeSlugIn.value = slugifyBuySource(bsTypeNameIn.value);
+        updateBsTypePreview();
+      });
+    }
+    if (bsTypeLogoTextIn) bsTypeLogoTextIn.addEventListener("input", updateBsTypePreview);
+    if (bsTypeLogoBgIn) bsTypeLogoBgIn.addEventListener("change", updateBsTypePreview);
+    if (bsTypeSlugIn) bsTypeSlugIn.addEventListener("input", function () { bsSlugManual = true; });
+    var bsAddFieldBtn = document.getElementById("bs-type-add-field");
+    if (bsAddFieldBtn && bsTypeFieldsEl) {
+      bsAddFieldBtn.addEventListener("click", function () {
+        bsTypeFieldsEl.insertAdjacentHTML("beforeend", renderBsTypeFieldRow({ key: "", label: "", type: "text" }));
+      });
+    }
+    if (bsTypeFieldsEl) {
+      bsTypeFieldsEl.addEventListener("click", function (e) {
+        var rm = e.target.closest(".bs-type__field-remove");
+        if (!rm) return;
+        var row = rm.closest("[data-bs-field-row]");
+        if (row) row.remove();
+      });
+    }
+    var bsTypeSaveBtn = document.getElementById("bs-type-save");
+    if (bsTypeSaveBtn) bsTypeSaveBtn.addEventListener("click", saveBsType);
+    if (bsTypeDeleteBtn) bsTypeDeleteBtn.addEventListener("click", deleteBsType);
   })();
 
   // ----- Close dialog wires up via existing app.js [data-close-dialog] handler -----
 
   // initial paint
+  syncCustomSourceMeta();
   render();
 
   // ----- Clone to workspace -----
