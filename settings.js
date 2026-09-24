@@ -1885,6 +1885,11 @@
       p.classList.toggle("is-active", on);
       p.hidden = !on;
     });
+    var showVars = tab === "dispatch" || tab === "firing" || tab === "traffic";
+    var vars = document.getElementById("bs-type-vars");
+    var layout = document.querySelector(".bs-type__layout");
+    if (vars) vars.hidden = !showVars;
+    if (layout) layout.classList.toggle("bs-type__layout--wide-main", !showVars);
   }
 
   function renderBsTypeVars() {
@@ -1895,7 +1900,7 @@
       if (!groups[v.group]) groups[v.group] = [];
       groups[v.group].push(v);
     });
-    el.innerHTML = Object.keys(groups).map(function (g) {
+    el.innerHTML = '<p class="bs-type__vars-title">Template tokens</p>' + Object.keys(groups).map(function (g) {
       return '<div class="bs-type__var-group"><div class="bs-type__var-group-title">' + escapeHtml(g) + "</div>" +
         groups[g].map(function (v) {
           return '<button type="button" class="bs-type__var-chip" data-token="' + escapeHtml(v.token) + '" title="' + escapeHtml(v.desc) + '">' + escapeHtml(v.token) + "</button>";
