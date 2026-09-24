@@ -590,78 +590,252 @@
     </div>
   </dialog>
 
-  <!-- Super admin: create / edit buy source type -->
-  <dialog class="modal modal--dsk-pro" id="dialog-bs-type">
+  <!-- Super admin: buy source provider superset (catalog + dispatch) -->
+  <dialog class="modal modal--dsk-pro modal--bs-superset" id="dialog-bs-type">
     <div class="modal__inner bs-type">
       <div class="dskp__head">
         <div class="dskp__icon bs-type__icon-preview" id="bs-type-icon-preview" aria-hidden="true">Bs</div>
         <div class="dskp__head-text">
-          <div class="dskp__eyebrow">Super admin · Platform catalog</div>
-          <h2 class="dskp__title" id="bs-type-title">Create buy source</h2>
-          <p class="dskp__sub">New buy sources appear in Integrations for every workspace.</p>
+          <div class="dskp__eyebrow">Super admin · Provider superset</div>
+          <h2 class="dskp__title" id="bs-type-title">Configure buy source</h2>
+          <p class="dskp__sub">One schema for 50+ traffic platforms — entry URL, HTTP dispatch, firing policy, account fields.</p>
         </div>
         <button type="button" class="dskp__x" data-close-dialog aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
       </div>
-      <div class="bs-type__body">
-        <input type="hidden" id="bs-type-edit-id" value="" />
-        <div class="dskp__row dskp__row--2">
-          <div class="dskp__field">
-            <div class="dskp__label">Display name</div>
-            <input class="dskp__input" type="text" id="bs-type-name" placeholder="e.g. Outbrain" required />
-          </div>
-          <div class="dskp__field">
-            <div class="dskp__label">Catalog ID</div>
-            <input class="dskp__input mono" type="text" id="bs-type-slug" placeholder="outbrain" />
-            <div class="dskp__hint">Auto-generated from name · used in API mappings</div>
-          </div>
+      <input type="hidden" id="bs-type-edit-id" value="" />
+      <div class="bs-type__layout">
+        <nav class="bs-type__tabs" id="bs-type-tabs" aria-label="Provider sections">
+          <button type="button" class="bs-type__tab is-active" data-bs-tab="identity">Identity</button>
+          <button type="button" class="bs-type__tab" data-bs-tab="signin">Sign-in</button>
+          <button type="button" class="bs-type__tab" data-bs-tab="traffic">Traffic</button>
+          <button type="button" class="bs-type__tab" data-bs-tab="dispatch">API &amp; payload</button>
+          <button type="button" class="bs-type__tab" data-bs-tab="firing">When to fire</button>
+          <button type="button" class="bs-type__tab" data-bs-tab="accounts">Accounts</button>
+        </nav>
+        <div class="bs-type__main">
+          <section class="bs-type__panel is-active" data-bs-panel="identity">
+            <div class="dskp__field">
+              <div class="dskp__label">Import from market catalog</div>
+              <select class="dskp__select" id="bs-type-market">
+                <option value="">— Custom / blank —</option>
+              </select>
+              <div class="dskp__hint">52+ TP-style sources (LeadVision, Outbrain, NewsBreak, …). Prefills wire id + clid macro.</div>
+            </div>
+            <div class="dskp__row dskp__row--2">
+              <div class="dskp__field">
+                <div class="dskp__label">Display name</div>
+                <input class="dskp__input" type="text" id="bs-type-name" placeholder="e.g. Outbrain" required />
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Catalog / wire ID</div>
+                <input class="dskp__input mono" type="text" id="bs-type-slug" placeholder="outbrain" />
+                <div class="dskp__hint">Serving <code>buySource</code> + Integrations provider key</div>
+              </div>
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Description</div>
+              <textarea class="dskp__input bs-type__textarea" id="bs-type-desc" rows="2" placeholder="S2S postback + lander events."></textarea>
+            </div>
+            <div class="dskp__row dskp__row--3">
+              <div class="dskp__field">
+                <div class="dskp__label">Logo initials</div>
+                <input class="dskp__input" type="text" id="bs-type-logo-text" maxlength="3" placeholder="Ob" />
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Brand color</div>
+                <input class="dskp__input" type="color" id="bs-type-logo-bg" value="#EE6513" />
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Primary delivery</div>
+                <select class="dskp__select" id="bs-type-delivery">
+                  <option value="s2s">Server-to-server</option>
+                  <option value="webhook">Webhook</option>
+                  <option value="hybrid">Hybrid (tag + S2S)</option>
+                  <option value="tag">Client tag only</option>
+                </select>
+              </div>
+            </div>
+            <div class="bs-type__events">
+              <div class="dskp__label">Default lander event names</div>
+              <div class="dskp__row dskp__row--3">
+                <div class="dskp__field"><div class="dskp__label">Visit</div><input class="dskp__input" type="text" id="bs-type-ev-visit" value="page_view" /></div>
+                <div class="dskp__field"><div class="dskp__label">Impression</div><input class="dskp__input" type="text" id="bs-type-ev-impression" value="view_content" /></div>
+                <div class="dskp__field"><div class="dskp__label">Click</div><input class="dskp__input" type="text" id="bs-type-ev-click" value="cta_click" /></div>
+              </div>
+            </div>
+          </section>
+          <section class="bs-type__panel" data-bs-panel="signin" hidden>
+            <p class="bs-type__lead">Publishers connect accounts differently per platform — OAuth redirect, token paste, MCC picker, or partner-only instructions.</p>
+            <div class="dskp__field">
+              <div class="dskp__label">Connection method</div>
+              <select class="dskp__select" id="bs-type-auth-mode">
+                <option value="api_token">API token / secret paste</option>
+                <option value="oauth2">OAuth 2.0 — Sign in with provider</option>
+                <option value="oauth2_plus_fields">OAuth + extra credentials (e.g. Google Ads)</option>
+                <option value="basic">Login + password (Basic)</option>
+                <option value="signed">Signed requests (HMAC secret)</option>
+                <option value="partner_only">Partner portal only (no Nexus OAuth)</option>
+              </select>
+            </div>
+            <div class="bs-type__auth-panel" id="bs-type-auth-oauth" hidden>
+              <div class="dskp__row dskp__row--2">
+                <div class="dskp__field">
+                  <div class="dskp__label">Authorize URL</div>
+                  <input class="dskp__input mono" type="text" id="bs-type-oauth-auth-url" placeholder="https://accounts.google.com/o/oauth2/v2/auth" />
+                </div>
+                <div class="dskp__field">
+                  <div class="dskp__label">Token URL</div>
+                  <input class="dskp__input mono" type="text" id="bs-type-oauth-token-url" placeholder="https://oauth2.googleapis.com/token" />
+                </div>
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Scopes <span class="muted">(space-separated)</span></div>
+                <input class="dskp__input mono" type="text" id="bs-type-oauth-scopes" placeholder="https://www.googleapis.com/auth/adwords" />
+              </div>
+              <div class="dskp__row dskp__row--2">
+                <div class="dskp__field">
+                  <div class="dskp__label">Button label</div>
+                  <input class="dskp__input" type="text" id="bs-type-oauth-btn-label" placeholder="Sign in with Google" />
+                </div>
+                <div class="dskp__field">
+                  <div class="dskp__label">Refresh token vault key</div>
+                  <input class="dskp__input mono" type="text" id="bs-type-oauth-refresh-key" placeholder="accessToken" />
+                </div>
+              </div>
+            </div>
+            <div class="bs-type__auth-panel" id="bs-type-auth-partner" hidden>
+              <div class="dskp__field">
+                <div class="dskp__label">Publisher instructions (markdown OK)</div>
+                <textarea class="dskp__input bs-type__textarea" id="bs-type-auth-instructions" rows="4" placeholder="Request S2S token from your Phonexa rep. Paste under API token after account ID."></textarea>
+              </div>
+            </div>
+            <div class="bs-type__auth-preview" id="bs-type-auth-preview">
+              <div class="dskp__label">Publisher preview</div>
+              <div class="bs-type__auth-preview-box" id="bs-type-auth-preview-inner"></div>
+            </div>
+          </section>
+          <section class="bs-type__panel" data-bs-panel="traffic" hidden>
+            <p class="bs-type__lead">Nexus entry URL contract: generic <code>clid</code> + <code>buySource</code> on the ad → lander URL (see conversion destinations PRD §7.4).</p>
+            <div class="dskp__field">
+              <div class="dskp__label">Buy-source click macro (ad platform)</div>
+              <input class="dskp__input mono" type="text" id="bs-type-clid-macro" placeholder="{{ob_click_id}}" />
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Entry URL template</div>
+              <input class="dskp__input mono" type="text" id="bs-type-entry-url" placeholder="{{route}}?clid={{ob_click_id}}&amp;buySource=outbrain" />
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Wire <code>buySource</code> value</div>
+              <input class="dskp__input mono" type="text" id="bs-type-wire" placeholder="outbrain" />
+            </div>
+          </section>
+          <section class="bs-type__panel" data-bs-panel="dispatch" hidden>
+            <div class="dskp__row dskp__row--2">
+              <div class="dskp__field">
+                <div class="dskp__label">Dispatch profile (trigger)</div>
+                <select class="dskp__select" id="bs-type-profile-trigger"></select>
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Payload shape</div>
+                <select class="dskp__select" id="bs-type-body-type">
+                  <option value="query">Query string (GET)</option>
+                  <option value="json">JSON body (POST)</option>
+                  <option value="form">Form urlencoded</option>
+                  <option value="none">No body</option>
+                </select>
+              </div>
+            </div>
+            <div class="dskp__row dskp__row--2">
+              <div class="dskp__field">
+                <div class="dskp__label">HTTP method</div>
+                <select class="dskp__select" id="bs-type-http-method">
+                  <option>GET</option>
+                  <option>POST</option>
+                  <option>PUT</option>
+                </select>
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Endpoint URL</div>
+                <input class="dskp__input mono" type="text" id="bs-type-http-url" placeholder="https://…" />
+              </div>
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Headers <span class="muted">(one per line, Name: value)</span></div>
+              <textarea class="dskp__input mono bs-type__code" id="bs-type-headers" rows="3" placeholder="Authorization: Bearer {{account.api_token}}&#10;Content-Type: application/json"></textarea>
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Payload template</div>
+              <textarea class="dskp__input mono bs-type__code" id="bs-type-body" rows="8" placeholder='{"click_id":"{{clid}}","event":"{{event_name}}"}'></textarea>
+            </div>
+            <div class="bs-type__curl-wrap">
+              <div class="bs-type__curl-head">
+                <span class="dskp__label">Generated cURL (preview)</span>
+                <button type="button" class="btn bs-type__curl-copy" id="bs-type-curl-copy" type="button">Copy</button>
+              </div>
+              <pre class="bs-type__curl" id="bs-type-curl-preview">curl …</pre>
+            </div>
+          </section>
+          <section class="bs-type__panel" data-bs-panel="firing" hidden>
+            <div class="dskp__row dskp__row--2">
+              <div class="dskp__field">
+                <div class="dskp__label">Profile trigger</div>
+                <select class="dskp__select" id="bs-type-fire-trigger"></select>
+              </div>
+              <label class="bs-type__check dskp__field">
+                <input type="checkbox" id="bs-type-profile-enabled" checked />
+                <span>Enable fires for this trigger</span>
+              </label>
+            </div>
+            <div class="dskp__field">
+              <div class="dskp__label">Delivery mode</div>
+              <div class="bs-type__radio-row">
+                <label class="bs-type__radio"><input type="radio" name="bs-fire-mode" value="realtime" checked /> Realtime · 1:1 per event</label>
+                <label class="bs-type__radio"><input type="radio" name="bs-fire-mode" value="batch" /> Batch · aggregate then flush</label>
+              </div>
+            </div>
+            <div class="dskp__row dskp__row--3" id="bs-type-batch-fields">
+              <div class="dskp__field">
+                <div class="dskp__label">Max batch size</div>
+                <input class="dskp__input" type="number" id="bs-type-batch-max" min="1" value="25" />
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Flush window (sec)</div>
+                <input class="dskp__input" type="number" id="bs-type-batch-window" min="0" value="30" />
+              </div>
+              <div class="dskp__field">
+                <div class="dskp__label">Dedupe key template</div>
+                <input class="dskp__input mono" type="text" id="bs-type-dedupe" placeholder="{{visit_id}}:{{event_name}}" />
+              </div>
+            </div>
+            <div class="bs-type__conditions-head">
+              <div>
+                <div class="dskp__label">Fire only when</div>
+                <div class="dskp__hint">All rules must pass (AND). Empty = always fire for this trigger.</div>
+              </div>
+              <button type="button" class="btn bs-type__add-field" id="bs-type-add-condition">+ Rule</button>
+            </div>
+            <div class="bs-type__conditions" id="bs-type-conditions"></div>
+          </section>
+          <section class="bs-type__panel" data-bs-panel="accounts" hidden>
+            <div class="bs-type__fields-head">
+              <div>
+                <div class="dskp__label">Publisher account fields</div>
+                <div class="dskp__hint">Mapped to <code>{{account.*}}</code> in headers/payload.</div>
+              </div>
+              <button type="button" class="btn bs-type__add-field" id="bs-type-add-field">+ Add field</button>
+            </div>
+            <div class="bs-type__fields" id="bs-type-fields"></div>
+          </section>
         </div>
-        <div class="dskp__field">
-          <div class="dskp__label">Description</div>
-          <textarea class="dskp__input bs-type__textarea" id="bs-type-desc" rows="2" placeholder="S2S visit, impression, and click events."></textarea>
-        </div>
-        <div class="dskp__row dskp__row--3">
-          <div class="dskp__field">
-            <div class="dskp__label">Logo initials</div>
-            <input class="dskp__input" type="text" id="bs-type-logo-text" maxlength="3" placeholder="Ob" />
-          </div>
-          <div class="dskp__field">
-            <div class="dskp__label">Brand color</div>
-            <input class="dskp__input" type="color" id="bs-type-logo-bg" value="#EE6513" />
-          </div>
-          <div class="dskp__field">
-            <div class="dskp__label">Delivery</div>
-            <select class="dskp__select" id="bs-type-delivery">
-              <option value="s2s">Server-to-server (S2S)</option>
-              <option value="webhook">Webhook POST</option>
-              <option value="tag">Client-side tag</option>
-            </select>
-          </div>
-        </div>
-        <div class="bs-type__fields-head">
-          <div>
-            <div class="dskp__label">Account setup fields</div>
-            <div class="dskp__hint">Shown when a publisher adds an account for this buy source.</div>
-          </div>
-          <button type="button" class="btn bs-type__add-field" id="bs-type-add-field">+ Add field</button>
-        </div>
-        <div class="bs-type__fields" id="bs-type-fields"></div>
-        <div class="bs-type__events">
-          <div class="dskp__label">Default lander events</div>
-          <div class="dskp__hint" style="margin-bottom:8px;">Visit · impression · click mapping for new accounts.</div>
-          <div class="dskp__row dskp__row--3">
-            <div class="dskp__field"><div class="dskp__label">Visit</div><input class="dskp__input" type="text" id="bs-type-ev-visit" value="page_view" /></div>
-            <div class="dskp__field"><div class="dskp__label">Impression</div><input class="dskp__input" type="text" id="bs-type-ev-impression" value="view_content" /></div>
-            <div class="dskp__field"><div class="dskp__label">Click</div><input class="dskp__input" type="text" id="bs-type-ev-click" value="cta_click" /></div>
-          </div>
-        </div>
+        <aside class="bs-type__vars" id="bs-type-vars" aria-label="Template variables"></aside>
       </div>
       <div class="dskp__foot">
         <button type="button" class="dskp__b dskp__b--ghost bs-type__delete" id="bs-type-delete" hidden>Delete type</button>
         <div class="dskp__foot-spacer"></div>
         <button type="button" class="dskp__b dskp__b--ghost" data-close-dialog>Cancel</button>
-        <button type="button" class="dskp__b dskp__b--primary" id="bs-type-save">Save buy source</button>
+        <button type="button" class="dskp__b dskp__b--primary" id="bs-type-save">Save provider</button>
       </div>
     </div>
   </dialog>
@@ -693,6 +867,7 @@
   <script src="site-shell.js"></script>
   <script src="thumbs.js"></script>
   <script src="integrations-catalog.js"></script>
+  <script src="buy-source-provider-catalog.js"></script>
   <script src="settings.js"></script>
   <script src="settings-general.js"></script>
 </body>

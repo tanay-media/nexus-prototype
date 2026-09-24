@@ -122,11 +122,28 @@
       wrap.innerHTML = "";
       return;
     }
+    var auth = ctype.auth || { mode: "api_token" };
+    var authHtml = "";
+    if (auth.mode === "oauth2" || auth.mode === "oauth2_plus_fields") {
+      var connected = row && row.fields && row.fields.oauth_connected;
+      var btnLabel = (auth.oauth && auth.oauth.buttonLabel) || ("Sign in with " + ctype.name);
+      authHtml = '<div class="cd-custom-oauth">' +
+        '<div class="dskp__label">Connect ' + escapeHtml(ctype.name) + "</div>" +
+        '<p class="dskp__hint" style="margin:0 0 10px;">OAuth redirect — refresh token stored in vault (secrets owner only).</p>' +
+        '<button type="button" class="cd-custom-oauth__btn" id="cd-custom-oauth-mock">' + escapeHtml(btnLabel) + "</button>" +
+        '<div class="cd-custom-oauth__status' + (connected ? " is-connected" : "") + '" id="cd-custom-oauth-status">' +
+        (connected ? "● Connected as " + escapeHtml(row.fields.oauth_account_label || "account") : "Not connected yet") +
+        "</div></div>";
+    } else if (auth.mode === "partner_only" && auth.instructions) {
+      authHtml = '<div class="cd-custom-oauth" style="background:#fffaf2;border-color:#e8dcc8">' +
+        '<div class="dskp__label">Partner setup</div>' +
+        '<p class="dskp__hint" style="margin:0;white-space:pre-wrap;">' + escapeHtml(auth.instructions) + "</p></div>";
+    }
     wrap.innerHTML = '<div class="cd-section"><div class="dskp__label">' + escapeHtml(ctype.name) + " account</div>" +
       '<p class="dskp__hint" style="margin:0 0 12px;">' + escapeHtml(ctype.desc || "") + "</p></div>" +
+      authHtml +
       (ctype.fields || []).map(function (f) {
         var val = row && row.fields ? (row.fields[f.key] || "") : "";
-        var refKey = f.key + "_ref";
         if (f.type === "secret") {
           return '<div class="dskp__field"><div class="dskp__label">' + escapeHtml(f.label) + "</div>" +
             '<div class="dskp__token"><input id="cd-custom-' + escapeHtml(f.key) + '" type="password" placeholder="' + escapeHtml(f.placeholder || "Paste token…") + '" /></div></div>';
@@ -137,6 +154,16 @@
     if (row && ctype.fields) {
       ctype.fields.forEach(function (f) {
         if (f.type === "secret") applySecretField("cd-custom-" + f.key, row.fields[f.key + "_ref"], row, false);
+      });
+    }
+    var oauthMock = document.getElementById("cd-custom-oauth-mock");
+    if (oauthMock) {
+      oauthMock.addEventListener("click", function () {
+        var st = document.getElementById("cd-custom-oauth-status");
+        if (st) {
+          st.textContent = "● Connected as demo@" + slugifyBuySource(ctype.name) + ".com";
+          st.classList.add("is-connected");
+        }
       });
     }
   }
@@ -1413,6 +1440,17 @@
       fields.pixel_id = document.getElementById("cd-meta-pixel-id").value.trim();
     } else if (isCustomBuySource(src)) {
       var ctype = getCustomBuySourceType(src);
+      var oauthSt = document.getElementById("cd-custom-oauth-status");
+      if (oauthSt && oauthSt.classList.contains("is-connected")) {
+        fields.oauth_connected = true;
+        var m = oauthSt.textContent.match(/Connected as (.+)/);
+        fields.oauth_account_label = m ? m[1].trim() : "connected";
+        if (!fields.access_token_ref && (ctype.auth && (ctype.auth.mode === "oauth2" || ctype.auth.mode === "oauth2_plus_fields"))) {
+          fields.access_token_ref = "secret://vault/custom/" + src + "/oauth";
+          if (!getSecretPlain(fields.access_token_ref)) setSecretPlain(fields.access_token_ref, "mock_oauth_refresh_token");
+          becameSecretsOwner = true;
+        }
+      }
       (ctype.fields || []).forEach(function (f) {
         var el = document.getElementById("cd-custom-" + f.key);
         if (!el) return;
@@ -1740,10 +1778,10 @@
       '<div class="brws__admin-card-inner">' +
       "<div>" +
       '<div class="brws__admin-eyebrow">Super admin</div>' +
-      '<div class="brws__admin-title">Add a new buy source type</div>' +
-      '<p class="brws__admin-desc">Define a platform catalog entry — publishers can connect accounts once you publish it.</p>' +
+      '<div class="brws__admin-title">Provider superset (50+ market sources)</div>' +
+      '<p class="brws__admin-desc">Configure traffic macros, HTTP/cURL dispatch, batch vs 1:1 firing, sign-in method, and account fields — once per platform.</p>' +
       "</div>" +
-      '<button type="button" class="btn btn--black brws__admin-btn" id="brws-add-type">+ Create buy source</button>' +
+      '<button type="button" class="btn btn--black brws__admin-btn" id="brws-add-type">+ Configure provider</button>' +
       "</div></div>";
   }
 
@@ -1760,8 +1798,12 @@
     }
     list.innerHTML = adminCard + rows.map(function (it) {
       var isConn = conn[it.id];
+      var ctypeMeta = it.isCustom ? getCustomBuySourceType(it.id) : null;
+      var authBadge = ctypeMeta && ctypeMeta.auth
+        ? ' <span class="brws__auth-badge">' + escapeHtml((ctypeMeta.auth.mode || "api_token").replace(/_/g, " ")) + "</span>"
+        : "";
       var badges = (isConn ? ' <span class="brws__connected">Connected</span>' : "") +
-        (it.isCustom ? ' <span class="brws__custom-badge">Custom</span>' : "");
+        (it.isCustom ? ' <span class="brws__custom-badge">Custom</span>' : "") + authBadge;
       var action = it.connectable
         ? '<div class="brws__item-actions">' +
           (it.isCustom && IS_SUPER_ADMIN ? '<button type="button" class="brws__edit-type" data-edit-type="' + it.id + '">Edit type</button>' : "") +
@@ -1777,6 +1819,7 @@
     }).join("");
   }
 
+  var bsCat = window.nexusBuySourceProviderCatalog;
   var bsTypeDlg = document.getElementById("dialog-bs-type");
   var bsTypeFieldsEl = document.getElementById("bs-type-fields");
   var bsTypeEditId = document.getElementById("bs-type-edit-id");
@@ -1790,12 +1833,321 @@
   var bsTypeTitle = document.getElementById("bs-type-title");
   var bsTypeDeleteBtn = document.getElementById("bs-type-delete");
   var bsSlugManual = false;
+  var bsTypeDispatchState = null;
+  var bsTypeProfileTrigger = "postback";
+  var bsTypeMarketInited = false;
 
-  function defaultBsTypeFields() {
+  function defaultBsTypeFields(authMode) {
+    if (authMode === "oauth2_plus_fields") {
+      return [
+        { key: "customer_id", label: "Ads customer ID", type: "text", placeholder: "1234567890" },
+        { key: "developer_token", label: "Developer token", type: "secret", placeholder: "From MCC / API center" },
+        { key: "login_customer_id", label: "Login customer ID (MCC)", type: "text", placeholder: "Optional MCC" }
+      ];
+    }
+    if (authMode === "basic") {
+      return [
+        { key: "username", label: "Username", type: "text", placeholder: "" },
+        { key: "password", label: "Password", type: "secret", placeholder: "" }
+      ];
+    }
+    if (authMode === "signed") {
+      return [
+        { key: "account_id", label: "Account ID", type: "text", placeholder: "" },
+        { key: "signing_secret", label: "Signing secret", type: "secret", placeholder: "HMAC key" }
+      ];
+    }
     return [
       { key: "account_id", label: "Account ID", type: "text", placeholder: "1234567" },
       { key: "api_token", label: "API token", type: "secret", placeholder: "Paste token…" }
     ];
+  }
+
+  function initBsTypeMarketSelect() {
+    if (bsTypeMarketInited || !bsCat) return;
+    var sel = document.getElementById("bs-type-market");
+    if (!sel) return;
+    bsCat.MARKET_SOURCES.forEach(function (m) {
+      var opt = document.createElement("option");
+      opt.value = m.slug;
+      opt.textContent = m.name;
+      sel.appendChild(opt);
+    });
+    bsTypeMarketInited = true;
+  }
+
+  function setBsTypeTab(tab) {
+    document.querySelectorAll(".bs-type__tab").forEach(function (b) {
+      b.classList.toggle("is-active", b.getAttribute("data-bs-tab") === tab);
+    });
+    document.querySelectorAll(".bs-type__panel").forEach(function (p) {
+      var on = p.getAttribute("data-bs-panel") === tab;
+      p.classList.toggle("is-active", on);
+      p.hidden = !on;
+    });
+  }
+
+  function renderBsTypeVars() {
+    var el = document.getElementById("bs-type-vars");
+    if (!el || !bsCat) return;
+    var groups = {};
+    bsCat.DISPATCH_VARIABLES.forEach(function (v) {
+      if (!groups[v.group]) groups[v.group] = [];
+      groups[v.group].push(v);
+    });
+    el.innerHTML = Object.keys(groups).map(function (g) {
+      return '<div class="bs-type__var-group"><div class="bs-type__var-group-title">' + escapeHtml(g) + "</div>" +
+        groups[g].map(function (v) {
+          return '<button type="button" class="bs-type__var-chip" data-token="' + escapeHtml(v.token) + '" title="' + escapeHtml(v.desc) + '">' + escapeHtml(v.token) + "</button>";
+        }).join("") + "</div>";
+    }).join("");
+  }
+
+  function bsProfileList() {
+    return bsTypeDispatchState && bsTypeDispatchState.profiles ? bsTypeDispatchState.profiles : [];
+  }
+
+  function getBsProfile(trigger) {
+    return bsProfileList().find(function (p) { return p.trigger === trigger; }) || null;
+  }
+
+  function ensureBsProfiles(slug, clidMacro) {
+    if (!bsCat) return;
+    bsTypeDispatchState = bsCat.defaultDispatchSuperset(slug, clidMacro);
+  }
+
+  function flushBsProfileFromUI() {
+    var p = getBsProfile(bsTypeProfileTrigger);
+    if (!p || !bsTypeDispatchState) return;
+    var methodEl = document.getElementById("bs-type-http-method");
+    var urlEl = document.getElementById("bs-type-http-url");
+    var bodyTypeEl = document.getElementById("bs-type-body-type");
+    var bodyEl = document.getElementById("bs-type-body");
+    var headersEl = document.getElementById("bs-type-headers");
+    p.http = p.http || {};
+    if (methodEl) p.http.method = methodEl.value;
+    if (urlEl) p.http.url = urlEl.value.trim();
+    if (bodyTypeEl) p.bodyType = bodyTypeEl.value;
+    if (bodyEl) p.bodyTemplate = bodyEl.value;
+    if (headersEl) p.headersRaw = headersEl.value;
+    var en = document.getElementById("bs-type-profile-enabled");
+    if (en) p.enabled = en.checked;
+    var mode = document.querySelector('input[name="bs-fire-mode"]:checked');
+    p.firing = p.firing || {};
+    if (mode) p.firing.mode = mode.value;
+    var bmax = document.getElementById("bs-type-batch-max");
+    var bwin = document.getElementById("bs-type-batch-window");
+    var ded = document.getElementById("bs-type-dedupe");
+    if (bmax) p.firing.batchMax = parseInt(bmax.value, 10) || 1;
+    if (bwin) p.firing.batchWindowSec = parseInt(bwin.value, 10) || 0;
+    if (ded) p.firing.dedupeKey = ded.value.trim();
+    p.conditions = collectBsConditions();
+  }
+
+  function loadBsProfileToUI(trigger) {
+    bsTypeProfileTrigger = trigger;
+    var p = getBsProfile(trigger);
+    if (!p) return;
+    var methodEl = document.getElementById("bs-type-http-method");
+    var urlEl = document.getElementById("bs-type-http-url");
+    var bodyTypeEl = document.getElementById("bs-type-body-type");
+    var bodyEl = document.getElementById("bs-type-body");
+    var headersEl = document.getElementById("bs-type-headers");
+    if (methodEl) methodEl.value = (p.http && p.http.method) || "GET";
+    if (urlEl) urlEl.value = (p.http && p.http.url) || "";
+    if (bodyTypeEl) bodyTypeEl.value = p.bodyType || "query";
+    if (bodyEl) bodyEl.value = p.bodyTemplate || "";
+    if (headersEl) headersEl.value = p.headersRaw || "";
+    var en = document.getElementById("bs-type-profile-enabled");
+    if (en) en.checked = !!p.enabled;
+    var mode = (p.firing && p.firing.mode) || "realtime";
+    document.querySelectorAll('input[name="bs-fire-mode"]').forEach(function (r) {
+      r.checked = r.value === mode;
+    });
+    syncBsBatchFieldsVisibility();
+    var bmax = document.getElementById("bs-type-batch-max");
+    var bwin = document.getElementById("bs-type-batch-window");
+    var ded = document.getElementById("bs-type-dedupe");
+    if (bmax) bmax.value = (p.firing && p.firing.batchMax) || 25;
+    if (bwin) bwin.value = (p.firing && p.firing.batchWindowSec) || 30;
+    if (ded) ded.value = (p.firing && p.firing.dedupeKey) || "";
+    renderBsConditions(p.conditions || []);
+    updateBsCurlPreview();
+  }
+
+  function syncBsBatchFieldsVisibility() {
+    var batch = document.querySelector('input[name="bs-fire-mode"]:checked');
+    var wrap = document.getElementById("bs-type-batch-fields");
+    if (wrap) wrap.style.opacity = batch && batch.value === "batch" ? "1" : "0.45";
+  }
+
+  function populateBsTriggerSelects() {
+    if (!bsCat) return;
+    ["bs-type-profile-trigger", "bs-type-fire-trigger"].forEach(function (id) {
+      var sel = document.getElementById(id);
+      if (!sel || sel.options.length) return;
+      bsCat.TRIGGERS.forEach(function (t) {
+        var o = document.createElement("option");
+        o.value = t.id;
+        o.textContent = t.label + " · " + t.hint;
+        sel.appendChild(o);
+      });
+    });
+  }
+
+  function onBsTriggerChange(trigger) {
+    flushBsProfileFromUI();
+    loadBsProfileToUI(trigger);
+    var fireSel = document.getElementById("bs-type-fire-trigger");
+    var profSel = document.getElementById("bs-type-profile-trigger");
+    if (fireSel) fireSel.value = trigger;
+    if (profSel) profSel.value = trigger;
+  }
+
+  function renderBsConditionRow(c) {
+    var row = c || { field: "conversion_type", op: "in", value: "" };
+    return '<div class="bs-type__cond-row" data-bs-cond-row>' +
+      '<div class="dskp__field"><div class="dskp__label">Field</div><input class="dskp__input mono bs-cond-field" value="' + escapeHtml(row.field) + '" /></div>' +
+      '<div class="dskp__field"><div class="dskp__label">Op</div><select class="dskp__select bs-cond-op">' +
+      ["in", "not_empty", "gt", "eq"].map(function (op) {
+        return '<option value="' + op + '"' + (row.op === op ? " selected" : "") + ">" + op + "</option>";
+      }).join("") + "</select></div>" +
+      '<div class="dskp__field"><div class="dskp__label">Value</div><input class="dskp__input mono bs-cond-val" value="' + escapeHtml(row.value) + '" /></div>' +
+      '<button type="button" class="bs-type__field-remove bs-cond-rm">×</button></div>';
+  }
+
+  function renderBsConditions(list) {
+    var wrap = document.getElementById("bs-type-conditions");
+    if (!wrap) return;
+    wrap.innerHTML = (list && list.length ? list : []).map(renderBsConditionRow).join("");
+  }
+
+  function collectBsConditions() {
+    var wrap = document.getElementById("bs-type-conditions");
+    if (!wrap) return [];
+    return Array.prototype.map.call(wrap.querySelectorAll("[data-bs-cond-row]"), function (row) {
+      return {
+        field: (row.querySelector(".bs-cond-field").value || "").trim(),
+        op: row.querySelector(".bs-cond-op").value,
+        value: (row.querySelector(".bs-cond-val").value || "").trim()
+      };
+    }).filter(function (c) { return c.field; });
+  }
+
+  function collectBsTraffic() {
+    return {
+      buySourceWire: (document.getElementById("bs-type-wire") && document.getElementById("bs-type-wire").value.trim()) || "",
+      clidMacro: (document.getElementById("bs-type-clid-macro") && document.getElementById("bs-type-clid-macro").value.trim()) || "",
+      entryUrlTemplate: (document.getElementById("bs-type-entry-url") && document.getElementById("bs-type-entry-url").value.trim()) || ""
+    };
+  }
+
+  function applyBsTraffic(traffic) {
+    var t = traffic || {};
+    var wire = document.getElementById("bs-type-wire");
+    var clid = document.getElementById("bs-type-clid-macro");
+    var ent = document.getElementById("bs-type-entry-url");
+    if (wire) wire.value = t.buySourceWire || "";
+    if (clid) clid.value = t.clidMacro || "";
+    if (ent) ent.value = t.entryUrlTemplate || "";
+  }
+
+  function syncBsAuthPanels() {
+    var modeEl = document.getElementById("bs-type-auth-mode");
+    var mode = modeEl ? modeEl.value : "api_token";
+    var oauth = document.getElementById("bs-type-auth-oauth");
+    var partner = document.getElementById("bs-type-auth-partner");
+    if (oauth) oauth.hidden = mode.indexOf("oauth") === -1;
+    if (partner) partner.hidden = mode !== "partner_only";
+    renderBsAuthPreview();
+  }
+
+  function collectBsAuth() {
+    var modeEl = document.getElementById("bs-type-auth-mode");
+    var mode = modeEl ? modeEl.value : "api_token";
+    var auth = { mode: mode, oauth: null, instructions: "" };
+    if (mode.indexOf("oauth") !== -1) {
+      auth.oauth = {
+        authorizeUrl: (document.getElementById("bs-type-oauth-auth-url") || {}).value || "",
+        tokenUrl: (document.getElementById("bs-type-oauth-token-url") || {}).value || "",
+        scopes: (document.getElementById("bs-type-oauth-scopes") || {}).value || "",
+        buttonLabel: (document.getElementById("bs-type-oauth-btn-label") || {}).value || "",
+        refreshTokenField: (document.getElementById("bs-type-oauth-refresh-key") || {}).value || "accessToken"
+      };
+    }
+    if (mode === "partner_only") {
+      auth.instructions = (document.getElementById("bs-type-auth-instructions") || {}).value || "";
+    }
+    return auth;
+  }
+
+  function applyBsAuth(auth) {
+    var a = auth || bsCat.defaultAuth(bsTypeSlugIn ? bsTypeSlugIn.value : "");
+    var modeEl = document.getElementById("bs-type-auth-mode");
+    if (modeEl) modeEl.value = a.mode || "api_token";
+    if (a.oauth) {
+      var u = document.getElementById("bs-type-oauth-auth-url");
+      var t = document.getElementById("bs-type-oauth-token-url");
+      var s = document.getElementById("bs-type-oauth-scopes");
+      var b = document.getElementById("bs-type-oauth-btn-label");
+      var r = document.getElementById("bs-type-oauth-refresh-key");
+      if (u) u.value = a.oauth.authorizeUrl || "";
+      if (t) t.value = a.oauth.tokenUrl || "";
+      if (s) s.value = a.oauth.scopes || "";
+      if (b) b.value = a.oauth.buttonLabel || "";
+      if (r) r.value = a.oauth.refreshTokenField || "accessToken";
+    }
+    var ins = document.getElementById("bs-type-auth-instructions");
+    if (ins) ins.value = a.instructions || "";
+    syncBsAuthPanels();
+  }
+
+  function renderBsAuthPreview() {
+    var box = document.getElementById("bs-type-auth-preview-inner");
+    var modeEl = document.getElementById("bs-type-auth-mode");
+    if (!box || !modeEl) return;
+    var mode = modeEl.value;
+    var name = (bsTypeNameIn && bsTypeNameIn.value.trim()) || "Provider";
+    if (mode === "oauth2" || mode === "oauth2_plus_fields") {
+      var lbl = (document.getElementById("bs-type-oauth-btn-label") || {}).value || ("Sign in with " + name);
+      box.innerHTML = '<button type="button" class="bs-type__oauth-btn">' + escapeHtml(lbl) + "</button>" +
+        (mode === "oauth2_plus_fields" ? '<p class="dskp__hint" style="margin:10px 0 0">Then: developer token, customer ID, MCC fields below.</p>' : "");
+    } else if (mode === "partner_only") {
+      var txt = (document.getElementById("bs-type-auth-instructions") || {}).value || "Partner will provision credentials.";
+      box.innerHTML = '<p class="dskp__hint" style="margin:0;white-space:pre-wrap;">' + escapeHtml(txt) + "</p>";
+    } else if (mode === "basic") {
+      box.innerHTML = '<div class="dskp__hint">Username + password fields on Add account.</div>';
+    } else {
+      box.innerHTML = '<div class="dskp__hint">Masked API token field on Add account.</div>';
+    }
+  }
+
+  function updateBsCurlPreview() {
+    var pre = document.getElementById("bs-type-curl-preview");
+    if (!pre || !bsCat) return;
+    var p = getBsProfile(bsTypeProfileTrigger);
+    var headers = document.getElementById("bs-type-headers");
+    pre.textContent = bsCat.buildCurlPreview(p, headers ? headers.value : "");
+  }
+
+  function applyMarketTemplate(slug) {
+    if (!slug || !bsCat) return;
+    var m = bsCat.marketBySlug(slug);
+    if (!m) return;
+    if (bsTypeNameIn) bsTypeNameIn.value = m.name;
+    if (bsTypeSlugIn && !bsTypeEditId.value) {
+      bsTypeSlugIn.value = m.slug;
+      bsSlugManual = true;
+    }
+    ensureBsProfiles(m.slug, m.clidMacro);
+    applyBsTraffic(bsTypeDispatchState.traffic);
+    applyBsAuth(bsCat.defaultAuth(m.slug));
+    if (bsTypeFieldsEl) {
+      var auth = bsCat.defaultAuth(m.slug);
+      bsTypeFieldsEl.innerHTML = defaultBsTypeFields(auth.mode).map(renderBsTypeFieldRow).join("");
+    }
+    onBsTriggerChange("postback");
+    updateBsTypePreview();
   }
 
   function updateBsTypePreview() {
@@ -1804,6 +2156,7 @@
     var bg = (bsTypeLogoBgIn && bsTypeLogoBgIn.value) || "#64748b";
     bsTypeIconPreview.textContent = txt.slice(0, 3);
     bsTypeIconPreview.style.background = bg;
+    renderBsAuthPreview();
   }
 
   function renderBsTypeFieldRow(field) {
@@ -1829,16 +2182,22 @@
 
   function openBsTypeDialog(editId) {
     if (!bsTypeDlg) return;
+    initBsTypeMarketSelect();
+    populateBsTriggerSelects();
+    renderBsTypeVars();
+    setBsTypeTab("identity");
     var existing = editId ? getCustomBuySourceType(editId) : null;
     bsSlugManual = !!existing;
     if (bsTypeEditId) bsTypeEditId.value = existing ? existing.id : "";
-    if (bsTypeTitle) bsTypeTitle.textContent = existing ? "Edit buy source" : "Create buy source";
+    if (bsTypeTitle) bsTypeTitle.textContent = existing ? "Edit provider" : "Configure provider";
     if (bsTypeDeleteBtn) bsTypeDeleteBtn.hidden = !existing;
     if (bsTypeNameIn) bsTypeNameIn.value = existing ? existing.name : "";
     if (bsTypeSlugIn) {
       bsTypeSlugIn.value = existing ? existing.id : "";
       bsTypeSlugIn.readOnly = !!existing;
     }
+    var marketSel = document.getElementById("bs-type-market");
+    if (marketSel) marketSel.value = "";
     if (bsTypeDescIn) bsTypeDescIn.value = existing ? existing.desc : "";
     if (bsTypeLogoTextIn) bsTypeLogoTextIn.value = existing ? existing.logoText : "";
     if (bsTypeLogoBgIn) bsTypeLogoBgIn.value = existing ? existing.logoBg : "#EE6513";
@@ -1846,14 +2205,22 @@
     if (document.getElementById("bs-type-ev-visit")) document.getElementById("bs-type-ev-visit").value = existing && existing.landerEvents ? existing.landerEvents.visit.eventName : "page_view";
     if (document.getElementById("bs-type-ev-impression")) document.getElementById("bs-type-ev-impression").value = existing && existing.landerEvents ? existing.landerEvents.impression.eventName : "view_content";
     if (document.getElementById("bs-type-ev-click")) document.getElementById("bs-type-ev-click").value = existing && existing.landerEvents ? existing.landerEvents.click.eventName : "cta_click";
+    bsTypeDispatchState = existing && existing.dispatchSuperset
+      ? JSON.parse(JSON.stringify(existing.dispatchSuperset))
+      : null;
+    if (!bsTypeDispatchState) ensureBsProfiles(existing ? existing.id : "", "");
+    applyBsTraffic(bsTypeDispatchState.traffic);
+    applyBsAuth(existing && existing.auth ? existing.auth : (bsCat ? bsCat.defaultAuth(existing ? existing.id : "") : { mode: "api_token" }));
     if (bsTypeFieldsEl) {
-      bsTypeFieldsEl.innerHTML = (existing && existing.fields ? existing.fields : defaultBsTypeFields()).map(renderBsTypeFieldRow).join("");
+      bsTypeFieldsEl.innerHTML = (existing && existing.fields ? existing.fields : defaultBsTypeFields((existing && existing.auth && existing.auth.mode) || "api_token")).map(renderBsTypeFieldRow).join("");
     }
+    onBsTriggerChange("postback");
     updateBsTypePreview();
     bsTypeDlg.showModal();
   }
 
   function saveBsType() {
+    flushBsProfileFromUI();
     var name = (bsTypeNameIn && bsTypeNameIn.value || "").trim();
     if (!name) { if (bsTypeNameIn) bsTypeNameIn.focus(); return; }
     var id = (bsTypeSlugIn && bsTypeSlugIn.value || "").trim() || slugifyBuySource(name);
@@ -1862,10 +2229,13 @@
       return;
     }
     var fields = collectBsTypeFields();
-    if (!fields.length) {
-      alert("Add at least one account setup field.");
+    var auth = collectBsAuth();
+    if (auth.mode !== "partner_only" && !fields.length) {
+      alert("Add at least one account field (or use Partner portal only).");
       return;
     }
+    var traffic = collectBsTraffic();
+    if (bsTypeDispatchState) bsTypeDispatchState.traffic = traffic;
     var payload = {
       id: id,
       name: name,
@@ -1873,6 +2243,8 @@
       logoText: ((bsTypeLogoTextIn && bsTypeLogoTextIn.value) || name.slice(0, 2)).trim().slice(0, 3),
       logoBg: (bsTypeLogoBgIn && bsTypeLogoBgIn.value) || "#64748b",
       delivery: (bsTypeDeliveryIn && bsTypeDeliveryIn.value) || "s2s",
+      auth: auth,
+      dispatchSuperset: bsTypeDispatchState,
       fields: fields,
       landerEvents: {
         visit: { enabled: true, eventName: document.getElementById("bs-type-ev-visit").value.trim() || "page_view" },
@@ -1962,6 +2334,69 @@
     var bsTypeSaveBtn = document.getElementById("bs-type-save");
     if (bsTypeSaveBtn) bsTypeSaveBtn.addEventListener("click", saveBsType);
     if (bsTypeDeleteBtn) bsTypeDeleteBtn.addEventListener("click", deleteBsType);
+    var bsTabs = document.getElementById("bs-type-tabs");
+    if (bsTabs) bsTabs.addEventListener("click", function (e) {
+      var tab = e.target.closest(".bs-type__tab");
+      if (!tab) return;
+      setBsTypeTab(tab.getAttribute("data-bs-tab"));
+    });
+    var bsMarket = document.getElementById("bs-type-market");
+    if (bsMarket) bsMarket.addEventListener("change", function () {
+      if (bsMarket.value) applyMarketTemplate(bsMarket.value);
+    });
+    ["bs-type-profile-trigger", "bs-type-fire-trigger"].forEach(function (id) {
+      var sel = document.getElementById(id);
+      if (sel) sel.addEventListener("change", function () { onBsTriggerChange(sel.value); });
+    });
+    document.querySelectorAll('input[name="bs-fire-mode"]').forEach(function (r) {
+      r.addEventListener("change", syncBsBatchFieldsVisibility);
+    });
+    var bsAuthMode = document.getElementById("bs-type-auth-mode");
+    if (bsAuthMode) bsAuthMode.addEventListener("change", function () {
+      syncBsAuthPanels();
+      if (bsTypeFieldsEl && !bsTypeEditId.value) {
+        bsTypeFieldsEl.innerHTML = defaultBsTypeFields(bsAuthMode.value).map(renderBsTypeFieldRow).join("");
+      }
+    });
+    ["bs-type-oauth-btn-label", "bs-type-auth-instructions"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("input", renderBsAuthPreview);
+    });
+    ["bs-type-http-method", "bs-type-http-url", "bs-type-body-type", "bs-type-body", "bs-type-headers"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("input", updateBsCurlPreview);
+      if (el) el.addEventListener("change", updateBsCurlPreview);
+    });
+    var bsCurlCopy = document.getElementById("bs-type-curl-copy");
+    if (bsCurlCopy) bsCurlCopy.addEventListener("click", function () {
+      var pre = document.getElementById("bs-type-curl-preview");
+      if (pre && navigator.clipboard) navigator.clipboard.writeText(pre.textContent || "");
+    });
+    var bsVars = document.getElementById("bs-type-vars");
+    if (bsVars) bsVars.addEventListener("click", function (e) {
+      var chip = e.target.closest(".bs-type__var-chip");
+      if (!chip) return;
+      var token = chip.getAttribute("data-token");
+      var body = document.getElementById("bs-type-body");
+      if (body) {
+        body.focus();
+        body.value += token;
+        updateBsCurlPreview();
+      }
+    });
+    var bsAddCond = document.getElementById("bs-type-add-condition");
+    var bsCondWrap = document.getElementById("bs-type-conditions");
+    if (bsAddCond && bsCondWrap) {
+      bsAddCond.addEventListener("click", function () {
+        bsCondWrap.insertAdjacentHTML("beforeend", renderBsConditionRow({ field: "conversion_type", op: "in", value: "lead,purchase" }));
+      });
+      bsCondWrap.addEventListener("click", function (e) {
+        var rm = e.target.closest(".bs-cond-rm");
+        if (!rm) return;
+        var row = rm.closest("[data-bs-cond-row]");
+        if (row) row.remove();
+      });
+    }
   })();
 
   // ----- Close dialog wires up via existing app.js [data-close-dialog] handler -----
