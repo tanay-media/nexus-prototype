@@ -1766,8 +1766,7 @@
           payload = {
             callback: "nb_test_callback_1234567890",
             event_type: ev,
-            nb_value: val,
-            currency: cur
+            nb_value: val
           };
           response = { success: true, event_id: conversionId };
         } else if (src === "taboola") {
