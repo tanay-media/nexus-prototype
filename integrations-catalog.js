@@ -12,8 +12,8 @@
   var STORAGE_KEY = "nexus.cd.v2";
 
   var UI_FIELD_MAP = {
-    sourceToProvider: { facebook: "meta_capi", google: "google_ads", taboola: "taboola", gtm: "gtm", meta_pixel: "meta_pixel" },
-    providerToBuySource: { meta_capi: "fb", google_ads: "google", taboola: "taboola" },
+    sourceToProvider: { facebook: "meta_capi", google: "google_ads", taboola: "taboola", newsbreak: "newsbreak", gtm: "gtm", meta_pixel: "meta_pixel" },
+    providerToBuySource: { meta_capi: "fb", google_ads: "google", taboola: "taboola", newsbreak: "newsbreak" },
     rowKeys: { id: "integrationId", name: "integrationName", source: "provider" },
     configFields: {
       fb_pixel_id: "pixelId",
@@ -27,6 +27,8 @@
       g_token_ref: "accessToken",
       tb_account_id: "accountId",
       tb_token_ref: "accessToken",
+      nb_account_id: "accountId",
+      nb_token_ref: "accessToken",
       gtm_container: "containerId",
       gtm_env: "environment",
       pixel_id: "pixelId"
@@ -50,13 +52,18 @@
         visit: { enabled: true, eventName: "page_view" },
         impression: { enabled: true, eventName: "view_content" },
         click: { enabled: true, eventName: "cta_click" }
+      },
+      newsbreak: {
+        visit: { enabled: true, eventName: "page_view" },
+        impression: { enabled: true, eventName: "view_content" },
+        click: { enabled: true, eventName: "cta_click" }
       }
     };
     return maps[source] ? JSON.parse(JSON.stringify(maps[source])) : null;
   }
 
   var SEED = {
-    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", taboola: "cd_taboola_main", gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
+    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", taboola: "cd_taboola_main", newsbreak: null, gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
     rows: [
       {
         id: "cd_meta_prod",
@@ -128,7 +135,7 @@
         var parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.rows)) {
           parsed.defaults = parsed.defaults || {};
-          ["facebook", "google", "taboola", "gtm", "meta_pixel"].forEach(function (k) {
+          ["facebook", "google", "taboola", "newsbreak", "gtm", "meta_pixel"].forEach(function (k) {
             if (!parsed.defaults[k] && SEED.defaults[k]) parsed.defaults[k] = SEED.defaults[k];
           });
           parsed.rows.forEach(function (r) {
@@ -180,6 +187,6 @@
     rowById: rowById,
     defaultIdForSource: defaultIdForSource,
     defaultLanderEventMap: defaultLanderEventMap,
-    BUY_SOURCES: ["facebook", "google", "taboola"]
+    BUY_SOURCES: ["facebook", "google", "taboola", "newsbreak"]
   };
 })();
