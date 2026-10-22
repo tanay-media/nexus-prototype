@@ -82,7 +82,7 @@
               <h2 class="settings-intro__title">Integrations</h2>
               <p class="settings-intro__sub">
                 Connect buy sources for your workspace. Nexus fires <strong>visit</strong>, <strong>impression</strong>, and <strong>click</strong>
-                to Meta, Google Ads, and Taboola automatically (browser tag + server API — you only pick the tracking ID and event names).
+                to Meta, Google Ads, Taboola, NewsBreak, and MediaGo (browser tag + server API — you only pick the tracking ID and event names).
                 <strong>Advertiser-level events</strong> fire when MAX sends a conversion postback.
               </p>
             </div>
@@ -333,7 +333,14 @@
               <span class="cd-prov__logo" style="background:#F4511E;color:#fff;font-weight:700;font-size:11px">NB</span>
               <div>
                 <div class="cd-prov__name">NewsBreak</div>
-                <div class="cd-prov__meta">S2S · conversion postbacks</div>
+                <div class="cd-prov__meta">S2S · callback postback</div>
+              </div>
+            </button>
+            <button type="button" class="cd-prov" data-source="mediago" aria-pressed="false">
+              <span class="cd-prov__logo" style="background:#E10600;color:#fff;font-weight:700;font-size:11px">MG</span>
+              <div>
+                <div class="cd-prov__name">MediaGo</div>
+                <div class="cd-prov__meta">S2S · numeric conversion type</div>
               </div>
             </button>
             <button type="button" class="cd-prov" data-source="gtm" aria-pressed="false">
@@ -448,9 +455,9 @@
             <input class="dskp__input" type="text" id="cd-tb-account" placeholder="1234567" />
           </div>
           <div class="dskp__field">
-            <div class="dskp__label">S2S access token</div>
+            <div class="dskp__label">S2S access token <span class="dskp__opt">bulk only</span></div>
             <div class="dskp__token">
-              <input id="cd-tb-token" type="password" placeholder="Paste Taboola S2S token…" />
+              <input id="cd-tb-token" type="password" placeholder="Optional — single GET postback does not send this" />
               <button type="button" class="dskp__token-btn" data-token-paste data-target="cd-tb-token" title="Paste from clipboard">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/></svg>
                 Paste
@@ -470,9 +477,9 @@
             <input class="dskp__input" type="text" id="cd-nb-account" placeholder="NewsBreak advertiser account ID" />
           </div>
           <div class="dskp__field">
-            <div class="dskp__label">S2S access token</div>
+            <div class="dskp__label">S2S access token <span class="dskp__opt">not sent on the attribute GET</span></div>
             <div class="dskp__token">
-              <input id="cd-nb-token" type="password" placeholder="Paste NewsBreak S2S token…" />
+              <input id="cd-nb-token" type="password" placeholder="Optional — attribute GET uses callback only" />
               <button type="button" class="dskp__token-btn" data-token-paste data-target="cd-nb-token" title="Paste from clipboard">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="3" rx="1"/><path d="M9 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/></svg>
                 Paste
@@ -482,6 +489,15 @@
                 <span data-token-toggle-label>Show</span>
               </button>
             </div>
+          </div>
+        </div>
+
+        <!-- MediaGo fields -->
+        <div data-source-fields="mediago" hidden>
+          <div class="dskp__field">
+            <div class="dskp__label">Account name</div>
+            <input class="dskp__input" type="text" id="cd-mg-account" placeholder="my_account_name" />
+            <div class="dskp__hint">Sent as <code>accountname</code> on the postback. No API token — MediaGo’s conversion fire is an unsigned GET. Click <code>trackingid</code> and <code>adid</code> come from the entry URL.</div>
           </div>
         </div>
 

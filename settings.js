@@ -9,7 +9,7 @@
   var CURRENT_USER_EMAIL = "kyle@acme.com";
   var IS_SUPER_ADMIN = true;
   var DEFAULT_WS_ID = "acme-growth";
-  var BUILTIN_SOURCE_IDS = ["facebook", "google", "taboola", "newsbreak", "gtm", "meta_pixel", "ga4"];
+  var BUILTIN_SOURCE_IDS = ["facebook", "google", "taboola", "newsbreak", "mediago", "gtm", "meta_pixel", "ga4"];
 
   var TEAM_WORKSPACES = [
     { id: "acme-growth", name: "ACME Growth", teamId: "acme" },
@@ -48,6 +48,11 @@
       visit:      { enabled: true, eventName: "page_view" },
       impression: { enabled: true, eventName: "view_content" },
       click:      { enabled: true, eventName: "cta_click" }
+    },
+    mediago: {
+      visit:      { enabled: true, eventName: "1" },
+      impression: { enabled: true, eventName: "1" },
+      click:      { enabled: true, eventName: "12" }
     }
   };
   var LANDER_EVENT_KEYS = [
@@ -95,7 +100,7 @@
   }
 
   function getGroupOrder() {
-    return ["facebook", "google", "taboola", "newsbreak"]
+    return ["facebook", "google", "taboola", "newsbreak", "mediago"]
       .concat(getCustomBuySourceTypes().map(function (t) { return t.id; }))
       .concat(["gtm", "meta_pixel"]);
   }
@@ -175,7 +180,7 @@
 
   // ----- Defaults / seed data -----
   var seed = {
-    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", taboola: "cd_taboola_main", newsbreak: null, gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
+    defaults: { facebook: "cd_meta_prod", google: "cd_google_main", taboola: "cd_taboola_main", newsbreak: null, mediago: null, gtm: "cd_gtm_main", meta_pixel: "cd_meta_pixel_main" },
     rows: [
       {
         id: "cd_meta_prod",
@@ -296,7 +301,7 @@
     if (!rootState.workspaces) rootState.workspaces = {};
     if (!rootState.workspaces[wsId]) {
       rootState.workspaces[wsId] = {
-        defaults: { facebook: null, google: null, taboola: null, newsbreak: null, gtm: null, meta_pixel: null },
+        defaults: { facebook: null, google: null, taboola: null, newsbreak: null, mediago: null, gtm: null, meta_pixel: null },
         rows: []
       };
     }
@@ -468,7 +473,7 @@
   var deletePending = null;
 
   function isBuySourceSrc(src) {
-    return src === "facebook" || src === "google" || src === "taboola" || src === "newsbreak" || isCustomBuySource(src);
+    return src === "facebook" || src === "google" || src === "taboola" || src === "newsbreak" || src === "mediago" || isCustomBuySource(src);
   }
 
   function maxCdDrawerStep(src) {
@@ -503,6 +508,7 @@
     google:   { name: "Google Ads", short: "Google" },
     taboola:  { name: "Taboola", short: "Taboola" },
     newsbreak: { name: "NewsBreak", short: "NewsBreak" },
+    mediago:  { name: "MediaGo", short: "MediaGo" },
     gtm:      { name: "Google Tag Manager", short: "GTM" },
     meta_pixel: { name: "Meta Pixel", short: "Pixel" }
   };
@@ -511,6 +517,7 @@
     google: '<span class="cd-thumb cd-thumb--google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg></span>',
     taboola: '<span class="cd-thumb cd-thumb--taboola" style="background:#1652DA;color:#fff;font-weight:700;font-size:12px">Tb</span>',
     newsbreak: '<span class="cd-thumb" style="background:#F4511E;color:#fff;font-weight:700;font-size:11px">NB</span>',
+    mediago: '<span class="cd-thumb" style="background:#E10600;color:#fff;font-weight:700;font-size:11px">MG</span>',
     gtm: '<span class="cd-thumb cd-thumb--gtm"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg></span>',
     meta_pixel: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>'
   };
@@ -537,7 +544,13 @@
     if (row.source === "newsbreak") {
       return '<div class="cd-ids">' +
         '<code>acct ' + escapeHtml(row.fields.nb_account_id || "—") + '</code>' +
-        '<small>S2S · NewsBreak</small>' +
+        '<small>callback · event_type</small>' +
+      '</div>';
+    }
+    if (row.source === "mediago") {
+      return '<div class="cd-ids">' +
+        '<code>' + escapeHtml(row.fields.mg_account_name || "—") + '</code>' +
+        '<small>trackingid · conversiontype</small>' +
       '</div>';
     }
     if (row.source === "gtm") {
@@ -699,7 +712,7 @@
     var isClientPixel = src === "gtm" || src === "meta_pixel";
     var defSec = document.querySelector("[data-default-section]");
     if (defSec) defSec.hidden = isClientPixel;
-    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", taboola: "Taboola", newsbreak: "NewsBreak", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src]
+    var provName = ({ facebook: "Meta (Facebook)", google: "Google Ads", taboola: "Taboola", newsbreak: "NewsBreak", mediago: "MediaGo", gtm: "Google Tag Manager", meta_pixel: "Meta Pixel" })[src]
       || (getCustomBuySourceType(src) ? getCustomBuySourceType(src).name : "Integration");
     var eyebrow = document.getElementById("cd-eyebrow");
     if (eyebrow) eyebrow.textContent = provName;
@@ -713,6 +726,7 @@
         google:   '<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.3-.2-2H12v3.8h5.6c-.2 1.3-1 2.4-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.4-2.6c-1 .6-2.1 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1H2.8v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H2.8a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 6.1c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 3.1 14.7 2.2 12 2.2A10 10 0 0 0 2.8 7.5l3.6 2.6C7.2 7.8 9.4 6.1 12 6.1z"/></svg>',
         taboola: '<svg viewBox="0 0 24 24" width="22" height="22"><text x="5" y="17" fill="#1652DA" font-size="14" font-weight="700">Tb</text></svg>',
         newsbreak: '<svg viewBox="0 0 24 24" width="22" height="22"><text x="2" y="17" fill="#F4511E" font-size="12" font-weight="700">NB</text></svg>',
+        mediago: '<svg viewBox="0 0 24 24" width="22" height="22"><text x="2" y="17" fill="#E10600" font-size="12" font-weight="700">MG</text></svg>',
         gtm:      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 2l10 10-10 10L2 12z" fill="#8AB4F8"/><path d="M12 7l5 5-5 5-5-5z" fill="#4285F4"/></svg>',
         meta_pixel: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>'
       })[src] || (function () {
@@ -727,7 +741,8 @@
       facebook: { name: "Meta event name", sub: 'platform · <code>event_name</code>' },
       google:   { name: "Google conversion", sub: 'platform · <code>conversion_action</code>' },
       taboola:  { name: "Taboola event name", sub: 'Realize · <code>name</code> (exact match)' },
-      newsbreak: { name: "NewsBreak event name", sub: 'S2S · <code>event_type</code> (exact match)' },
+      newsbreak: { name: "NewsBreak event_type", sub: 'attribute GET · <code>event_type</code> (e.g. submit_form)' },
+      mediago: { name: "MediaGo conversiontype", sub: 'numeric code · <code>conversiontype</code>' },
       gtm:      { name: "dataLayer event", sub: 'pushed client-side · <code>event</code>' }
     };
     var customType = getCustomBuySourceType(src);
@@ -747,13 +762,16 @@
     var landerDestLbl = document.querySelector("[data-lander-event-dest-label]");
     if (landerDestLbl) landerDestLbl.textContent = l.name;
 
-    // Re-render existing rows so destination dropdowns reflect the new buy source
-    if (eventMapEl && eventMapEl.children.length) {
-      rerenderEventMapPreservingValues();
-    }
-    if (landerEventsEl) {
-      var cur = collectLanderEventMap();
-      renderLanderEventMap(cur && Object.keys(cur).length ? cur : null);
+    // New integrations get the platform's default postback map. Edits keep the saved rows.
+    if (!editIdIn.value) {
+      renderEventMap(defaultAdvEventMap(src));
+      renderLanderEventMap(null);
+    } else {
+      if (eventMapEl && eventMapEl.children.length) rerenderEventMapPreservingValues();
+      if (landerEventsEl) {
+        var cur = collectLanderEventMap();
+        renderLanderEventMap(cur && Object.keys(cur).length ? cur : null);
+      }
     }
     if (cdDrawerStep > maxCdDrawerStep(src)) cdDrawerStep = 1;
     setCdDrawerStep(cdDrawerStep);
@@ -770,7 +788,8 @@
     facebook: ["PageView", "ViewContent", "InitiateCheckout", "Lead", "Contact", "AddToCart"],
     google: ["page_view", "view_content", "cta_click", "lead_offline", "purchase_offline"],
     taboola: ["page_view", "view_content", "cta_click", "lead", "purchase"],
-    newsbreak: ["page_view", "view_content", "cta_click", "lead", "purchase"]
+    newsbreak: ["page_view", "view_content", "cta_click"],
+    mediago: ["1", "2", "3", "8", "10", "12"]
   };
 
   function isCustomSelectValue(val) {
@@ -805,7 +824,7 @@
   }
 
   function renderLanderEventsHeader(src) {
-    var destLabel = ({ facebook: "Meta event", google: "Google conversion", taboola: "Taboola event", newsbreak: "NewsBreak event" })[src] || "Platform event";
+    var destLabel = ({ facebook: "Meta event", google: "Google conversion", taboola: "Taboola event", newsbreak: "NewsBreak event_type", mediago: "MediaGo conversiontype" })[src] || "Platform event";
     if (src === "google") {
       return '<div class="cd-lander-grid-head cd-lander-grid-head--google">' +
         '<span>Event</span><span>' + escapeHtml(destLabel) + '</span><span>On</span>' +
@@ -936,15 +955,33 @@
       { v: "trial_start_offline", value: true }
     ],
     taboola: [
-      { v: "lead" },
+      { v: "lead", value: true },
       { v: "purchase", value: true },
       { v: "signup" }
     ],
     newsbreak: [
-      { v: "lead" },
-      { v: "purchase", value: true },
-      { v: "signup" },
-      { v: "install" }
+      { v: "submit_form", value: true },
+      { v: "complete_payment", value: true }
+    ],
+    mediago: [
+      { v: "1", label: "1 — View Content", value: true },
+      { v: "2", label: "2 — App Install", value: true },
+      { v: "3", label: "3 — Complete Registration", value: true },
+      { v: "4", label: "4 — Add to Cart", value: true },
+      { v: "5", label: "5 — Add Payment Info", value: true },
+      { v: "6", label: "6 — Search", value: true },
+      { v: "7", label: "7 — Start Checkout", value: true },
+      { v: "8", label: "8 — Purchase", value: true },
+      { v: "9", label: "9 — Add to Wishlist", value: true },
+      { v: "10", label: "10 — Lead", value: true },
+      { v: "12", label: "12 — Click Button", value: true },
+      { v: "13", label: "13 — Lead Qualified", value: true },
+      { v: "14", label: "14 — Call Connected", value: true },
+      { v: "15", label: "15 — Appointment Booked", value: true },
+      { v: "16", label: "16 — Application Started", value: true },
+      { v: "17", label: "17 — Application Approved", value: true },
+      { v: "18", label: "18 — Account Created", value: true },
+      { v: "19", label: "19 — Deal Completed", value: true }
     ],
     gtm: [
       { v: "page_view" },
@@ -958,6 +995,48 @@
   var ADV_EVENTS = ["lead", "purchase", "signup", "subscribe", "trial_start", "view_content", "add_to_cart", "initiate_checkout", "search", "install"];
 
   function currentSource() { return formDlg.getAttribute("data-source") || "facebook"; }
+
+  function defaultAdvEventMap(src) {
+    if (src === "newsbreak") {
+      return [
+        { from: "lead", to: "submit_form", value: { mode: "static", amount: 7, currency: "USD" } },
+        { from: "purchase", to: "complete_payment", value: { mode: "dynamic", amount: 10, currency: "USD" } }
+      ];
+    }
+    if (src === "mediago") {
+      return [
+        { from: "lead", to: "10", includeInTotalConversion: 1, value: { mode: "static", amount: 3.5, currency: "USD" } },
+        { from: "purchase", to: "8", includeInTotalConversion: 1, value: { mode: "dynamic", amount: 0, currency: "USD" } }
+      ];
+    }
+    if (src === "taboola") {
+      return [
+        { from: "lead", to: "lead", value: { mode: "static", amount: 10, currency: "USD" } },
+        { from: "purchase", to: "purchase", value: { mode: "dynamic", amount: 40, currency: "USD" } }
+      ];
+    }
+    if (src === "google") {
+      return [
+        { from: "lead", to: "Submit lead form" },
+        { from: "purchase", to: "purchase_offline" }
+      ];
+    }
+    return [
+      { from: "lead", to: "Lead" },
+      { from: "purchase", to: "Purchase" }
+    ];
+  }
+
+  function renderMediagoIncludeSubrow(m) {
+    if (currentSource() !== "mediago") return "";
+    var on = m.includeInTotalConversion !== 0 && m.includeInTotalConversion !== "0";
+    return '<div class="cd-em-row__google">' +
+      '<label class="cd-em-row__field-lbl" style="display:flex;align-items:center;gap:8px;">' +
+        '<input type="checkbox" data-em="includeInTotal"' + (on ? " checked" : "") + " />" +
+        "Include in total conversions" +
+      "</label>" +
+    "</div>";
+  }
 
   function isValueEvent(dest, src) {
     var list = DEST_EVENTS[src || currentSource()] || [];
@@ -1014,7 +1093,7 @@
     var advBuilt = buildPresetSelectOptions(ADV_EVENTS, m.from || "", true);
     var isCustomDest = m.to && destPresets.indexOf(m.to) === -1;
     var destOptions = '<option value=""></option>' + destList.map(function (e) {
-      var label = e.v + (e.value ? "  (+ value)" : "");
+      var label = (e.label || e.v) + (!e.label && e.value ? "  (+ value)" : "");
       return '<option value="' + escapeHtml(e.v) + '"' + (e.v === m.to ? " selected" : "") + '>' + escapeHtml(label) + '</option>';
     }).join("");
     destOptions += '<option value="' + CUSTOM_SELECT_VALUE + '"' + (isCustomDest ? " selected" : "") + '>Custom…</option>';
@@ -1043,6 +1122,7 @@
         '</button>' +
       '</div>' +
       renderGoogleAdvActionSubrow(m) +
+      renderMediagoIncludeSubrow(m) +
       (showValue ? renderValueSubrow(mode, amount, currency, dynamicBase, dynamicPercent) : "") +
     '</div>';
   }
@@ -1196,6 +1276,8 @@
       if (actionIn && (actionIn.value || "").trim()) {
         entry.conversionActionId = actionIn.value.trim();
       }
+      var includeIn = r.querySelector('[data-em="includeInTotal"]');
+      if (includeIn) entry.includeInTotalConversion = includeIn.checked ? 1 : 0;
       var sub = r.querySelector(".cd-em-row__value");
       if (sub && isValueEvent(to)) {
         var mode = sub.querySelector(".cd-em-mode").getAttribute("data-mode") || "dynamic";
@@ -1348,14 +1430,14 @@
       document.getElementById("cd-nb-account").value = r && r.source === "newsbreak" ? (r.fields.nb_account_id || "") : "";
     }
     applySecretField("cd-nb-token", r && r.source === "newsbreak" ? r.fields.nb_token_ref : null, r, !r);
+    if (document.getElementById("cd-mg-account")) {
+      document.getElementById("cd-mg-account").value = r && r.source === "mediago" ? (r.fields.mg_account_name || "") : "";
+    }
     document.getElementById("cd-gtm-container").value = r && r.source === "gtm" ? (r.fields.gtm_container || "") : "";
     if (document.getElementById("cd-gtm-env")) document.getElementById("cd-gtm-env").value = r && r.source === "gtm" ? (r.fields.gtm_env || "live") : "live";
     if (document.getElementById("cd-meta-pixel-id")) document.getElementById("cd-meta-pixel-id").value = r && r.source === "meta_pixel" ? (r.fields.pixel_id || "") : "";
     renderLanderEventMap(r ? r.landerEventMap : null);
-    renderEventMap(r ? r.eventMap : [
-      { from: "lead", to: "Lead" },
-      { from: "purchase", to: "Purchase" }
-    ]);
+    renderEventMap(r ? r.eventMap : defaultAdvEventMap(formDlg.getAttribute("data-source") || "facebook"));
     setDefaultIn.checked = r ? (state.defaults && state.defaults[r.source] === r.id) : false;
   }
 
@@ -1467,6 +1549,8 @@
         setSecretPlain(fields.nb_token_ref, newNb);
         becameSecretsOwner = true;
       }
+    } else if (src === "mediago") {
+      fields.mg_account_name = document.getElementById("cd-mg-account").value.trim();
     } else if (src === "gtm") {
       fields.gtm_container = document.getElementById("cd-gtm-container").value.trim();
       fields.gtm_env = document.getElementById("cd-gtm-env").value;
@@ -1569,7 +1653,9 @@
     var defaults = {
       facebook: ["Lead", "Purchase", "ViewContent", "AddToCart", "CompleteRegistration"],
       google:   ["lead_offline", "purchase_offline", "signup_offline"],
-      newsbreak: ["lead", "purchase", "signup", "install"],
+      taboola: ["lead", "purchase", "signup"],
+      newsbreak: ["submit_form", "complete_payment"],
+      mediago: ["10", "8", "1", "3"],
       gtm:      ["page_view", "form_submit", "cta_click", "purchase"]
     }[dest];
     // Add any mapped event names from the current editor
@@ -1684,6 +1770,27 @@
             currency: cur
           };
           response = { success: true, event_id: conversionId };
+        } else if (src === "taboola") {
+          endpoint = "GET trc.taboola.com/actions-handler/log/3/s2s-action";
+          payload = {
+            "click-id": "tbl_test_click_id",
+            name: ev,
+            revenue: val,
+            currency: cur,
+            orderid: conversionId
+          };
+          response = { status: 204 };
+        } else if (src === "mediago") {
+          endpoint = "GET sync.mediago.io/api/bidder/postback";
+          payload = {
+            trackingid: "3990b3995f7070b7727c18e074c76701",
+            adid: "1000000",
+            conversiontype: ev,
+            conversionprice: val,
+            includeintotalconversion: 1,
+            accountname: (document.getElementById("cd-mg-account") && document.getElementById("cd-mg-account").value) || "my_account_name"
+          };
+          response = { accepted: true };
         } else {
           endpoint = "dataLayer.push() · " + (document.getElementById("cd-gtm-container").value || "GTM-XXXXXXX");
           payload = {
@@ -1783,8 +1890,10 @@
       logo: '<span class="cd-thumb cd-thumb--facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg></span>' },
     { id: "taboola", name: "Taboola", cat: "ads", desc: "Visit, impression, and click to Taboola (S2S + tag).", connectable: true,
       logo: '<span class="cd-thumb cd-thumb--taboola" style="background:#1652DA">Tb</span>' },
-    { id: "newsbreak", name: "NewsBreak", cat: "ads", desc: "Conversion postbacks and lander events via NewsBreak S2S.", connectable: true,
+    { id: "newsbreak", name: "NewsBreak", cat: "ads", desc: "Conversion postback via callback + event_type (submit_form, complete_payment).", connectable: true,
       logo: '<span class="cd-thumb" style="background:#F4511E;color:#fff;font-weight:700;font-size:11px">NB</span>' },
+    { id: "mediago", name: "MediaGo", cat: "ads", desc: "Unsigned S2S postback. trackingid + numeric conversiontype. Account name only.", connectable: true,
+      logo: '<span class="cd-thumb" style="background:#E10600;color:#fff;font-weight:700;font-size:11px">MG</span>' },
     { id: "ga4", name: "Google Analytics 4", cat: "tag", desc: "Measurement Protocol events.", connectable: false,
       logo: '<span class="cd-thumb" style="background:#E8710A;color:#fff;font-weight:700">GA</span>' }
   ];
